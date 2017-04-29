@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  alcor:
+    build: .
+    image: lycantropos/alcor:latest
+    volumes:
+      - .:/alcor/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"  # for debugging
