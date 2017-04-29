@@ -8,3 +8,5 @@ services:
       - .:/alcor/
     extra_hosts:
       - "dockerhost:$DOCKERHOST"  # for debugging
+    command:
+      - run
