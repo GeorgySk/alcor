@@ -1,0 +1,36 @@
+model_name:
+
+# specifies to which decimal place
+# floating point numbers should be rounded
+precision: 6
+
+parameters:
+  DB_fraction:
+    start: 0
+    step: 0.1
+    count: 10
+
+  galaxy_age:
+    start: 0
+    step: 100000
+    count: 20
+
+  initial_mass_function_exponent:
+    start: 1
+    step: 0.15
+    count: 10
+
+  lifetime_mass_ratio:
+    start: 0.1
+    step: 0.1
+    count: 8
+
+  burst_time:
+    start: 0
+    step: 10000
+    count: 10
+
+  reduction_factor:
+    start: 0.1
+    step: 0.3
+    count: 10
