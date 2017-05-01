@@ -10,3 +10,5 @@ services:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
       - run
+      - --project-dir
+      - test_project

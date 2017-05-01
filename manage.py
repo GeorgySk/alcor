@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import os
 from itertools import product
+from subprocess import call
 from typing import (Union,
                     Iterable,
                     Dict,
@@ -25,13 +27,34 @@ def main() -> None:
               help='Settings file path '
                    '(absolute or relative, '
                    'default "settings.yml").')
-def run(settings_path: str) -> None:
+@click.option('--project-dir', '-d',
+              required=True,
+              type=click.Path(),
+              help='Project directory path '
+                   '(absolute or relative).')
+def run(settings_path: str,
+        project_dir: str) -> None:
     settings = load_settings(settings_path)
     precision = settings['precision']
     parameters_info = settings['parameters']
-    parameters_values = list(generate_parameters_values(
-        parameters_info=parameters_info,
-        precision=precision))
+    os.chdir(project_dir)
+    for parameters_values in generate_parameters_values(
+            parameters_info=parameters_info,
+            precision=precision):
+        simulate(parameters_values)
+
+
+def simulate(parameters_values: Dict[str, NumericType]
+             ) -> None:
+    # TODO: check if parameters aliases are correctly mapped with parameters names
+    args = ['./main.sh',
+            '-db', parameters_values['DB_fraction'],
+            '-g', parameters_values['galaxy_age'],
+            '-mf', parameters_values['initial_mass_function_exponent'],
+            '-ifr', parameters_values['lifetime_mass_ratio'],
+            '-bt', parameters_values['burst_time'],
+            '-mr', parameters_values['reduction_factor']]
+    call(list(map(str, args)))
 
 
 def generate_parameters_values(
@@ -59,7 +82,7 @@ def generate_parameters_values_ranges_by_names(
             round(start_value + value_number * step_size,
                   precision)
             for value_number in range(values_count)
-        ]
+            ]
         yield parameter_name, values_range
 
 

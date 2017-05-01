@@ -1,0 +1,40 @@
+
+     White dwarf evolutionar tracks (progenitor metallicity: Z=0.01)
+
+ 1: LOG(L):        Log stellar luminosity in solar units
+ 2: LOG(TEFF):     Log effective temperature (K)
+ 3: T_c:           Log central temperature in millon K
+ 4: Ro_c:          Log central density
+ 5: Log(age/Myr):  Log age en 10^6 year (to get the WD cooling time, see below)
+ 6: Masa:          stellar mass in solar units
+ 7: M^dot:         mass-loss rate
+ 8: modelo  :      number of model
+ 9: Log(Lpp):      Log proton-proton burning luminosity in solar units
+10: Log(Lcno):     Log CNO-burning luminosity in solar units
+11: Log(LHe):      Log He-burning luminosity in solar units
+12: Log(LCC):      Log carbon-burning luminosity in solar units
+13: int(dS/dt):    Gravothermal contribution in solar units
+14: Log(Lnu):      Log energy lost by neutrino in solar units
+15: Log MHtot:     Log hydrogen content in solar masses
+16: Log HeBuf:     Log He buffer mass in solar masses (it is not the total He content)  
+17: Masa_HFC :     Mass of the hydrogen-free core in solar units 
+18: Masa_HeFC:     Mass of the He-free core in solar units
+19: Log(grav):     Log surface gravity
+20: R/R_sun:       Stellar radius in solar units  
+
+        ************* IMPORTANT  ****************
+
+To get the white dwarf cooling times, the following pre-white dwarf ages must be
+substracted from the tabulated age:
+
+M_WD          pre-white dwarf age (Gyr, 10^9 yr))
+
+0.5249         11.117 
+0.570          2.7004
+0.59316        1.699
+0.60959        1.2114
+0.63229        0.9892
+0.65988        0.7422
+0.70511        0.4431
+0.877          0.114 
+1.0000         0.135 
