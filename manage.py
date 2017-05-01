@@ -9,15 +9,18 @@ from typing import (Union,
                     List)
 
 import click
+import logging
 
 from alcor.utils import load_settings
+
+logger = logging.getLogger(__name__)
 
 NumericType = Union[int, float]
 
 
 @click.group()
 def main() -> None:
-    pass
+    logging.basicConfig(level=logging.DEBUG)
 
 
 @main.command()
@@ -35,26 +38,32 @@ def main() -> None:
 def run(settings_path: str,
         project_dir: str) -> None:
     settings = load_settings(settings_path)
+    model_type = settings['model_type']
     precision = settings['precision']
     parameters_info = settings['parameters']
     os.chdir(project_dir)
     for parameters_values in generate_parameters_values(
             parameters_info=parameters_info,
             precision=precision):
-        simulate(parameters_values)
+        simulate(parameters_values=parameters_values,
+                 model_type=model_type)
 
 
-def simulate(parameters_values: Dict[str, NumericType]
-             ) -> None:
-    # TODO: check if parameters aliases are correctly mapped with parameters names
-    args = ['./main.sh',
+def simulate(*,
+             parameters_values: Dict[str, NumericType],
+             model_type: int) -> None:
+    args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
             '-g', parameters_values['galaxy_age'],
             '-mf', parameters_values['initial_mass_function_exponent'],
             '-ifr', parameters_values['lifetime_mass_ratio'],
             '-bt', parameters_values['burst_time'],
-            '-mr', parameters_values['reduction_factor']]
-    call(list(map(str, args)))
+            '-mr', parameters_values['mass_reduction_factor'],
+            '-km', model_type]
+    args = list(map(str, args))
+    args_str = ' '.join(args)
+    logger.info(f'Invoking simulation with command "{args_str}".')
+    call(args)
 
 
 def generate_parameters_values(
