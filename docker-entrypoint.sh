@@ -2,6 +2,8 @@
 set -e
 
 cd test_project
+# unzipping seed files
+unzip -o forts.zip
 # compiling Fortran files
 gfortran main.f -o main.e
 cd -
