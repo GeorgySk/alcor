@@ -396,7 +396,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       do i = 1, numberOfWDs
         write(420,*) luminosityOfWD(i),massOfWD(i),metallicityOfWD(i),
      &effTempOfWD(i),flagOfWD(i),properMotion(i),rightAscension(i),
-     &rightAscension(i),declination(i),rgac(i),coordinate_R(i),
+     &declination(i),rgac(i),coordinate_R(i),
      &coordinate_Theta(i),coordinate_Zcylindr(i),coolingTime(i),go(i),
      &gr(i),gi(i),ur(i),rz(i),typeOfWD(i),V(i),uu(i),vv(i),ww(i)
       end do
