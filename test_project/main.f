@@ -378,7 +378,7 @@ C     SD for velocities in each bin
 C     2D-array of velocities (nº of bin; newly assigned to WD nº in bin)
 C     needed to calculate Standart Deviation (SD) for velocities in each 
 C     bin
-C     TODO: make dinamic array or linked list
+C     TODO: make dynamic array or linked list
       double precision arrayOfVelocitiesForSD_u(25,50000)
       double precision arrayOfVelocitiesForSD_v(25,50000)
       double precision arrayOfVelocitiesForSD_w(25,50000)
