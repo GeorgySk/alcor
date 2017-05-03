@@ -43,16 +43,22 @@ def run(settings_path: str,
     precision = settings['precision']
     parameters_info = settings['parameters']
     os.chdir(project_dir)
+    max_output_file_name_length = 5
+    output_file_extension = '.res'
     for parameters_values in generate_parameters_values(
             parameters_info=parameters_info,
             precision=precision):
+        output_file_name = (uuid.uuid4().hex[:max_output_file_name_length]
+                            + output_file_extension)
         simulate(parameters_values=parameters_values,
-                 model_type=model_type)
+                 model_type=model_type,
+                 output_file_name=output_file_name)
 
 
 def simulate(*,
              parameters_values: Dict[str, NumericType],
-             model_type: int) -> None:
+             model_type: int,
+             output_file_name: str) -> None:
     args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
             '-g', parameters_values['galaxy_age'],
@@ -61,7 +67,7 @@ def simulate(*,
             '-bt', parameters_values['burst_time'],
             '-mr', parameters_values['mass_reduction_factor'],
             '-km', model_type,
-            '-o', f'{uuid.uuid4().hex}.res']
+            '-o', output_file_name]
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')
