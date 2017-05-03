@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import uuid
 from itertools import product
 from subprocess import call
 from typing import (Union,
@@ -59,7 +60,8 @@ def simulate(*,
             '-ifr', parameters_values['lifetime_mass_ratio'],
             '-bt', parameters_values['burst_time'],
             '-mr', parameters_values['mass_reduction_factor'],
-            '-km', model_type]
+            '-km', model_type,
+            '-o', f'{uuid.uuid4().hex}.res']
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')

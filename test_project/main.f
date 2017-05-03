@@ -61,6 +61,7 @@ C     For terminal:
       character(len = 10) :: temp_string
       double precision :: massReductionFactor
       integer :: kinematicModel
+      character(len = 100) :: output_filename
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
@@ -123,6 +124,8 @@ C           call get_command_argument(i, args(i))
             case ("-km")
               call getarg(i + 1, temp_string)
               read(temp_string, *) kinematicModel
+            case ("-o")
+              call getarg(i + 1, output_filename)
           end select
         end do
       end if
@@ -235,7 +238,7 @@ C     TODO: give a better description to this step
 C     NOTE: This will be in a separate processing module
 C       write(6,*) '9. Working with obtained sample (9/9)'
 C       call volum_40pc
-      call printForProcessing
+      call printForProcessing(output_filename)
 
 
       write (6,*) 'End'
@@ -294,8 +297,9 @@ C***********************************************************************
 
       include 'code/tables_linking.f'
 
-      subroutine printForProcessing
+      subroutine printForProcessing(output_filename)
       implicit none
+      character(len = 100), intent(in) :: output_filename
       integer i,j
       logical eleminationFlag
       integer numberOfStars,numberOfWDs
@@ -393,8 +397,10 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       common /johnson/ V
       common /vel/ uu,vv,ww
 
-      do i = 1, numberOfWDs
-        write(420,*) luminosityOfWD(i),massOfWD(i),metallicityOfWD(i),
+      open(421, file = output_filename)
+
+      do i = 1, numberOfStars
+        write(421,*) luminosityOfWD(i),massOfWD(i),metallicityOfWD(i),
      &effTempOfWD(i),flagOfWD(i),properMotion(i),rightAscension(i),
      &declination(i),rgac(i),coordinate_R(i),
      &coordinate_Theta(i),coordinate_Zcylindr(i),coolingTime(i),go(i),
