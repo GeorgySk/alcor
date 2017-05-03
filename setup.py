@@ -1,6 +1,8 @@
-from setuptools import setup
+from setuptools import (setup,
+                        find_packages)
 
 setup(name='alcor',
+      packages=find_packages(),
       version='0.0.0',
       description='Library for astronomical researches.',
       author='Georgy Skorobogatov, '
@@ -9,4 +11,7 @@ setup(name='alcor',
                    'azatibrakov@gmail.com',
       url='https://github.com/lycantropos/alcor',
       download_url='https://github.com/lycantropos/alcor/archive/master.tar.gz',
-      keywords=['astronomy'])
+      keywords=['astronomy'],
+      install_requires=[
+          'PyYAML>=3.12.0',  # settings loading
+      ])

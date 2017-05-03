@@ -1,0 +1,9 @@
+26 columns:
+Informacion recibida de Leandro:
+1: log L/Lsun
+2: Log Teff
+9: Log10 (tiempo enfriamento) (en millones años) (contado desde el primer 
+valor tabulado)
+10: masa de la estrella (en masa solar)
+Informacion añadida por mi:
+23: log(g)

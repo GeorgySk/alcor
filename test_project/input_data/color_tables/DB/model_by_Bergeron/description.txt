@@ -1,0 +1,7 @@
+Table DA
+    6   60  Pure hydrogen grid                                                                                                             Mon Oct 17 08:06:05 2011
+ Teff  log g  M/Mo  Mbol     BC    U      B      V      R      I      J      H      K      u      g      r      i      z      y      b-y    u-b    v-y    V-I    G-R    U-V    U-G    B-V     Age
+ 
+ Table DB
+     5   48  Pure helium grid                                                                                                               Mon Oct 17 08:06:05 2011
+ Teff  log g  M/Mo  Mbol     BC    U      B      V      R      I      J      H      K      u      g      r      i      z      y      b-y    u-b    v-y    V-I    G-R    U-V    U-G    B-V     Age
