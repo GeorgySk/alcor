@@ -19,6 +19,7 @@ from cassandra_helpers.keyspace import (keyspace_exists,
                                         drop_keyspace)
 from cassandra_helpers.models import sync_tables
 
+from alcor.config import PROJECT_NAME
 from alcor.models import (STAR_PARAMETERS_NAMES,
                           Parameter,
                           Star)
@@ -67,7 +68,7 @@ def run(ctx: click.Context,
     contact_points = cluster_settings['contact_points']
     port = cluster_settings['port']
 
-    keyspace_name = 'test'
+    keyspace_name = PROJECT_NAME
 
     check_connection(contact_points=contact_points,
                      port=port)

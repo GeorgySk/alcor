@@ -1,7 +1,9 @@
 from setuptools import (setup,
                         find_packages)
 
-setup(name='alcor',
+from alcor.config import PROJECT_NAME
+
+setup(name=PROJECT_NAME,
       packages=find_packages(),
       version='0.0.0',
       description='Library for astronomical researches.',
