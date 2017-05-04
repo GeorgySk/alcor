@@ -13,5 +13,6 @@ setup(name='alcor',
       download_url='https://github.com/lycantropos/alcor/archive/master.tar.gz',
       keywords=['astronomy'],
       install_requires=[
+          'cassandra-driver>=3.9.0',  # working with Cassandra
           'PyYAML>=3.12.0',  # settings loading
       ])
