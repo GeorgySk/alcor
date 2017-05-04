@@ -1,5 +1,5 @@
-from typing import (Iterable,
-                    Any,
+from typing import (Any,
+                    Iterable,
                     Dict)
 
 import yaml
