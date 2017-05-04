@@ -13,3 +13,14 @@ services:
       - run
       - --project-dir
       - test_project
+    environment:
+      - CASSANDRA_RPC_ADDRESS=cassandra
+      - CASSANDRA_RPC_PORT=9042
+
+  cassandra:
+    image: cassandra:latest
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+
+volumes:
+  cassandra-data:
