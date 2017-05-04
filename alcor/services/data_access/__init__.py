@@ -1,2 +1,1 @@
-from .service import (insert,
-                      insert_by_batches)
+from .service import insert
