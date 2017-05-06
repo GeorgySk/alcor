@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from cassandra.cqlengine.columns import (UUID,
-                                         Float,
+                                         Decimal,
                                          DateTime)
 from cassandra.cqlengine.models import Model
 
@@ -23,13 +23,13 @@ class Star(Model):
     id = UUID(primary_key=True,
               default=uuid.uuid4)
     group_id = UUID(required=True)
-    luminosity = Float(required=True)
-    proper_motion = Float(required=True)
-    declination_galactocentric_distance = Float(required=True)
-    gr_photometry = Float(required=True)
-    rz_photometry = Float(required=True)
-    v_photometry = Float(required=True)
-    velocity_u = Float(required=True)
-    velocity_v = Float(required=True)
-    velocity_w = Float(required=True)
+    luminosity = Decimal(required=True)
+    proper_motion = Decimal(required=True)
+    declination_galactocentric_distance = Decimal(required=True)
+    gr_photometry = Decimal(required=True)
+    rz_photometry = Decimal(required=True)
+    v_photometry = Decimal(required=True)
+    velocity_u = Decimal(required=True)
+    velocity_v = Decimal(required=True)
+    velocity_w = Decimal(required=True)
     updated_timestamp = DateTime(default=datetime.now)

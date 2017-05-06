@@ -3,7 +3,7 @@ from datetime import datetime
 
 from cassandra.cqlengine.columns import (UUID,
                                          Text,
-                                         Float,
+                                         Decimal,
                                          DateTime)
 from cassandra.cqlengine.models import Model
 
@@ -16,5 +16,5 @@ class Parameter(Model):
     group_id = UUID(required=True,
                     index=True)
     name = Text(required=True)
-    value = Float(required=True)
+    value = Decimal(required=True)
     created_timestamp = DateTime(default=datetime.now)
