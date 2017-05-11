@@ -106,9 +106,9 @@ def run_simulations(*,
         output_file_name = generate_output_file_name(
             parameters_group_id=str(parameters_group_id))
 
-        simulate(parameters_values=parameters_values,
-                 model_type=model_type,
-                 output_file_name=output_file_name)
+        run_simulation(parameters_values=parameters_values,
+                       model_type=model_type,
+                       output_file_name=output_file_name)
 
         save_stars(file_name=output_file_name,
                    group_id=parameters_group_id,
@@ -127,10 +127,10 @@ def save_parameters(*,
            session=session)
 
 
-def simulate(*,
-             parameters_values: Dict[str, NumericType],
-             model_type: int,
-             output_file_name: str) -> None:
+def run_simulation(*,
+                   parameters_values: Dict[str, NumericType],
+                   model_type: int,
+                   output_file_name: str) -> None:
     args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
             '-g', parameters_values['galaxy_age'],
