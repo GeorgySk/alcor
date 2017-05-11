@@ -399,11 +399,16 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
 
       open(421, file = output_filename)
 
-      do i = 1, numberOfStars
-        if ((flagOfWD .gt. 0.99) .AND. (flagOfWD .lt. 1.01)) then
-          write(421,*) luminosityOfWD(i),properMotion(i),
-     &      declination(i),rgac(i),gr(i),rz(i),V(i),uu(i),vv(i),ww(i)
-        end if
+      do i = 1, numberOfWDs
+          write(421, *) luminosityOfWD(i),
+     &                  properMotion(i),
+     &                  declination(i),
+     &                  rgac(i),
+     &                  gr(i),
+     &                  rz(i),
+     &                  V(i),
+     &                  uu(i),
+     &                  vv(i),
+     &                  ww(i)
       end do
-
       end subroutine
