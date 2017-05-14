@@ -1,7 +1,9 @@
 from setuptools import (setup,
                         find_packages)
 
-setup(name='alcor',
+from alcor.config import PROJECT_NAME
+
+setup(name=PROJECT_NAME,
       packages=find_packages(),
       version='0.0.0',
       description='Library for astronomical researches.',
@@ -13,5 +15,6 @@ setup(name='alcor',
       download_url='https://github.com/lycantropos/alcor/archive/master.tar.gz',
       keywords=['astronomy'],
       install_requires=[
+          'cassandra-driver>=3.9.0',  # working with Cassandra
           'PyYAML>=3.12.0',  # settings loading
       ])

@@ -39,4 +39,4 @@ fort.*
 main.e
 
 # outputs
-output.dat
+*.res
