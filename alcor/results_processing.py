@@ -5,6 +5,7 @@ from math import (log10,
 from typing import Dict
 
 from alcor.models.star import Star
+from alcor.utils import parse_stars
 
 
 def main() -> None:
@@ -19,12 +20,7 @@ def main() -> None:
     bins_count = bolometric_magnitude_amplitude / bin_size
 
     with open('output.res', 'r') as f:
-        line_counter = 0
-        for line in f:
-            line_counter += 1
-            parts = line.split()
-            params = map(Decimal, parts)
-            star = Star(*params)
+        for star in parse_stars(f, "test"):
             stars.append(star)
 
     elimination_counters = defaultdict(int)
@@ -55,8 +51,8 @@ def is_eliminated(star: Star,
     elif star.declination < min_declination:
         elimination_counters["eliminated_by_declination"] += 1
         star_is_eliminated = True
-    elif (sqrt(star.velocity_u**2 + star.velocity_v**2 + star.velocity_z**2)
-            > max_velocity):
+    elif (star.velocity_u**2 + star.velocity_v**2 + star.velocity_z**2
+            > max_velocity**2):
         elimination_counters["eliminated_by_velocity"] += 1
         star_is_eliminated = True
     elif star.proper_motion < min_proper_motion:

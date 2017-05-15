@@ -26,7 +26,8 @@ from alcor.models import (STAR_PARAMETERS_NAMES,
 from alcor.services.data_access import insert
 from alcor.services.parameters import generate_parameters_values
 from alcor.types import NumericType
-from alcor.utils import load_settings
+from alcor.utils import (load_settings,
+                         parse_stars)
 
 OUTPUT_FILE_EXTENSION = '.res'
 MAX_OUTPUT_FILE_NAME_LENGTH = 5
@@ -154,18 +155,6 @@ def save_stars(file_name: str,
                             group_id=group_id)
         insert(instances=stars,
                session=session)
-
-
-def parse_stars(lines: Iterable[str],
-                group_id: uuid.UUID
-                ) -> Iterable[Star]:
-    for line in lines:
-        parts = line.split()
-        params = map(Decimal, parts)
-        values = OrderedDict(zip(STAR_PARAMETERS_NAMES,
-                                 params))
-        yield Star(group_id=group_id,
-                   **values)
 
 
 def generate_output_file_name(parameters_group_id: str
