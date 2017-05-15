@@ -404,6 +404,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                  properMotion(i),
      &                  declination(i),
      &                  rgac(i),
+     &                  go(i),
      &                  gr(i),
      &                  rz(i),
      &                  V(i),

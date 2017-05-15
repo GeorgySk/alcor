@@ -8,7 +8,9 @@ from cassandra.cqlengine.models import Model
 
 STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion',
-                         'declination_galactocentric_distance',
+                         'declination',
+                         'galactocentric_distance',
+                         'go_photometry'
                          'gr_photometry',
                          'rz_photometry',
                          'v_photometry',
@@ -25,7 +27,9 @@ class Star(Model):
     group_id = UUID(required=True)
     luminosity = Decimal(required=True)
     proper_motion = Decimal(required=True)
-    declination_galactocentric_distance = Decimal(required=True)
+    declination = Decimal(required=True)
+    galactocentric_distance = Decimal(required=True)
+    go_photometry = Decimal(required=True)
     gr_photometry = Decimal(required=True)
     rz_photometry = Decimal(required=True)
     v_photometry = Decimal(required=True)
