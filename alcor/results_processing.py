@@ -1,18 +1,15 @@
-from collections import defaultdict
+from collections import Counter
 from fractions import Fraction
-from math import (log10,
-                  sqrt,
-                  cos,
-                  sin)
-import quantities as pq
+from math import (log10)
 from typing import Dict
+
+import astropy.units as u
 
 from alcor.models.star import Star
 from alcor.utils import parse_stars
 
 
 def main() -> None:
-    stars = []
 
     # Binning parameters of Luminosity Function
     min_bolometric_magnitude = 6.0
@@ -25,7 +22,7 @@ def main() -> None:
     with open('output.res', 'r') as output_file:
         stars = list(parse_stars(output_file, 'test'))
 
-    elimination_counters = defaultdict(int)
+    elimination_counters = Counter(int)
 
     for star in stars:
         if not is_eliminated(star,
@@ -36,14 +33,14 @@ def main() -> None:
 
 def is_eliminated(star: Star,
                   elimination_counters: Dict[str, int]) -> bool:
-    min_parallax = 0.025
+    min_parallax = 0.025 * u.arcsec
     min_declination = 0.0
     max_velocity = 500.0
     min_proper_motion = 0.04
 
     galactocentric_distance = star.galactocentric_distance * 10e3  # From kpc
-    parallax = Fraction(1.0, galactocentric_distance)
-    hrm = star.go_photometry + 5.0*log10(star.proper_motion) + 5.0
+    parallax = Fraction(1.0, Fraction(galactocentric_distance))
+    hrm = star.go_photometry + 5.0 * log10(star.proper_motion) + 5.0
     gz = star.gr_photometry + star.rz_photometry
 
     if parallax < min_parallax:
@@ -59,10 +56,10 @@ def is_eliminated(star: Star,
     elif star.proper_motion < min_proper_motion:
         elimination_counters['proper_motion'] += 1
         return True
-    elif (gz < -0.33) and (hrm < 14.0):
+    elif gz < -0.33 and hrm < 14.0:
         elimination_counters['reduced_proper_motion'] += 1
         return True
-    elif hrm < (3.559 * gz + 15.17):
+    elif hrm < 3.559 * gz + 15.17:
         elimination_counters['reduced_proper_motion'] += 1
         return True
     elif star.v_photometry >= 19.0:

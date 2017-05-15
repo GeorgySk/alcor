@@ -1,11 +1,14 @@
 import uuid
 from datetime import datetime
+from math import (cos,
+                  sin)
 
 from cassandra.cqlengine.columns import (UUID,
                                          Decimal,
                                          DateTime)
 from cassandra.cqlengine.models import Model
-from math import cos, sin
+
+ASTRONOMICAL_UNIT_IN_KM_PER_S = 4.74
 
 STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion',
@@ -50,35 +53,29 @@ class Star(Model):
     updated_timestamp = DateTime(default=datetime.now)
 
     def set_radial_velocity_to_zero(self) -> None:
-        astronomical_unit_in_km_per_s = 4.74
         distance_in_pc = self.galactocentric_distance * 10e3
 
-        a1 = (-astronomical_unit_in_km_per_s
+        a1 = (-ASTRONOMICAL_UNIT_IN_KM_PER_S
               * cos(self.galactocentric_coordinate_b)
               * sin(self.galactocentric_coordinate_l))
-        b1 = (-astronomical_unit_in_km_per_s
+        b1 = (-ASTRONOMICAL_UNIT_IN_KM_PER_S
               * sin(self.galactocentric_coordinate_b)
               * cos(self.galactocentric_coordinate_l))
-        c1 = 0.0
         self.velocity_u = (a1 * self.proper_motion_component_l * distance_in_pc
                            + b1 * self.proper_motion_component_b
-                              * distance_in_pc
-                           + c1 * self.proper_motion_component_vr)
+                              * distance_in_pc)
 
-        a2 = (astronomical_unit_in_km_per_s
+        a2 = (ASTRONOMICAL_UNIT_IN_KM_PER_S
               * cos(self.galactocentric_coordinate_b)
               * cos(self.galactocentric_coordinate_l))
-        b2 = (-astronomical_unit_in_km_per_s
+        b2 = (-ASTRONOMICAL_UNIT_IN_KM_PER_S
               * sin(self.galactocentric_coordinate_b)
               * sin(self.galactocentric_coordinate_l))
-        c2 = 0.0
         self.velocity_v = (a2 * self.proper_motion_component_l * distance_in_pc
                            + b2 * self.proper_motion_component_b
-                              * distance_in_pc
-                           + c2 * self.proper_motion_component_vr)
+                              * distance_in_pc)
 
-        b3 = astronomical_unit_in_km_per_s * cos(
+        b3 = ASTRONOMICAL_UNIT_IN_KM_PER_S * cos(
             self.galactocentric_coordinate_b)
-        c3 = 0.0
-        self.velocity_w = (b3 * self.proper_motion_component_b * distance_in_pc
-                           + c3 * self.proper_motion_component_vr)
+        self.velocity_w = (b3 * self.proper_motion_component_b
+                           * distance_in_pc)
