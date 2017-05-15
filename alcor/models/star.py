@@ -20,6 +20,20 @@ STAR_PARAMETERS_NAMES = ['luminosity',
 
 
 class Star(Model):
+    def __init__(self,
+                 parameters: list):
+        self.luminosity = parameters[0]
+        self.proper_motion = parameters[1]
+        self.declination = parameters[2]
+        self.galactocentric_distance = parameters[3]
+        self.go_photometry = parameters[4]
+        self.gr_photometry = parameters[5]
+        self.rz_photometry = parameters[6]
+        self.v_photometry = parameters[7]
+        self.velocity_u = parameters[8]
+        self.velocity_v = parameters[9]
+        self.velocity_w = parameters[10]
+
     __table_name__ = 'stars'
 
     id = UUID(primary_key=True,
