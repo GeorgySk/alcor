@@ -1,5 +1,7 @@
 from collections import Counter
 from fractions import Fraction
+from functools import partial
+from itertools import filterfalse
 from math import (log10)
 from typing import Dict
 
@@ -20,19 +22,22 @@ def main() -> None:
     bins_count = bolometric_magnitude_amplitude / bin_size
 
     with open('output.res', 'r') as output_file:
-        stars = list(parse_stars(output_file, 'test'))
+        full_stars_sample = list(parse_stars(output_file, 'test'))
 
     elimination_counters = Counter(int)
+    apply_elimination_criteria = partial(check_if_eliminated,
+                                         elimination_counters
+                                         =elimination_counters)
+    restricted_stars_sample = filterfalse(apply_elimination_criteria,
+                                          full_stars_sample)
 
-    for star in stars:
-        if not is_eliminated(star,
-                             elimination_counters):
-            star.set_radial_velocity_to_zero()
-            distribute_into_bins(star, bins)
+    for star in restricted_stars_sample:
+        star.set_radial_velocity_to_zero()
+        distribute_into_bins(star, bins)
 
 
-def is_eliminated(star: Star,
-                  elimination_counters: Dict[str, int]) -> bool:
+def check_if_eliminated(star: Star,
+                        elimination_counters: Dict[str, int]) -> bool:
     min_parallax = 0.025 * u.arcsec
     min_declination = 0.0
     max_velocity = 500.0
