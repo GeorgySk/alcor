@@ -334,6 +334,8 @@ C     Parameters of mass histograms
       double precision flagOfWD(numberOfStars)
 C     rgac - galactocentric distance to WD TODO: give a better name
       double precision rgac(numberOfStars)
+      double precision lgac(numberOfStars)
+      double precision bgac(numberOfStars)
       double precision coolingTime(numberOfStars)
 C     NOTE: this 70 comes from nowhere      
       integer numberOfWDsInBin(70),numberOfBins
@@ -389,7 +391,9 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs      
       common /mad/ properMotion,rightAscension,declination
+      common /mopro/ mpb,mpl,vr
       common /paral/ rgac
+      common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
       common /photo/ go,gr,gi,ur,rz
@@ -402,8 +406,13 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       do i = 1, numberOfWDs
           write(421, *) luminosityOfWD(i),
      &                  properMotion(i),
+     &                  mpb(i),
+     &                  mpl(i),
+     &                  vr(i)
      &                  declination(i),
      &                  rgac(i),
+     &                  bgac(i),
+     &                  lgac(i),
      &                  go(i),
      &                  gr(i),
      &                  rz(i),
