@@ -30,19 +30,15 @@ def main() -> None:
     elimination_counters = defaultdict(int)
 
     for star in stars:
-        star_is_eliminated = False
-        apply_elimination_criteria(star,
-                                   star_is_eliminated,
-                                   elimination_counters)
-        if not star_is_eliminated:
+        if not is_eliminated(star,
+                             elimination_counters):
             # Save stars after applying elimination criteria
             set_radial_velocity_to_zero(stars)
             distribute_into_bins(star, bins)
 
 
-def apply_elimination_criteria(star: Star,
-                               star_is_eliminated: bool,
-                               elimination_counters: Dict[str, int]):
+def is_eliminated(star: Star,
+                  elimination_counters: Dict[str, int]):
     min_parallax = 0.025
     min_declination = 0.0
     max_velocity = 500.0
@@ -75,7 +71,9 @@ def apply_elimination_criteria(star: Star,
     elif star.v_photometry >= 19.0:
         elimination_counters["eliminated_by_apparent_magnitude"] += 1
         star_is_eliminated = True
-    return elimination_counters, star_is_eliminated
+    else:
+        star_is_eliminated = False
+    return star_is_eliminated
 
 
 if __name__ == '__main__':
