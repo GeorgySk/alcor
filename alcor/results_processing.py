@@ -16,7 +16,7 @@ def main() -> None:
                                       - min_bolometric_magnitude)
     bins_count = bolometric_magnitude_amplitude / bin_size
 
-    with open('output.dat', 'r') as f:
+    with open('output.res', 'r') as f:
         line_counter = 0
         for line in f:
             line_counter += 1
