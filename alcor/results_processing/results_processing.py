@@ -8,9 +8,10 @@ from typing import Dict
 import astropy.units as u
 
 from alcor.models.star import Star
+from alcor.results_processing.kinematics import write_bins_kinematic_info
 from alcor.results_processing.luminosity_function import (BINS_COUNT,
                                                           distribute_into_bins,
-                                                          write_bins_info)
+                                                          write_bins_luminosity_function_info)
 from alcor.utils import parse_stars
 
 
@@ -31,7 +32,8 @@ def main() -> None:
         star.set_radial_velocity_to_zero()
         distribute_into_bins(star, bins)
 
-    write_bins_info(bins)
+    write_bins_kinematic_info(bins)
+    write_bins_luminosity_function_info(bins)
 
 
 def check_if_eliminated(star: Star,
@@ -41,7 +43,7 @@ def check_if_eliminated(star: Star,
     max_velocity = 500.0
     min_proper_motion = 0.04
 
-    galactocentric_distance = star.galactocentric_distance * 10e3  # From kpc
+    galactocentric_distance = star.galactocentric_distance * 10e3
     parallax = Fraction(1.0, Fraction(galactocentric_distance))
     hrm = star.go_photometry + 5.0 * log10(star.proper_motion) + 5.0
     gz = star.gr_photometry + star.rz_photometry
@@ -53,7 +55,7 @@ def check_if_eliminated(star: Star,
         elimination_counters['declination'] += 1
         return True
     elif (star.velocity_u ** 2 + star.velocity_v ** 2 + star.velocity_z ** 2
-          > max_velocity ** 2):
+              > max_velocity ** 2):
         elimination_counters['velocity'] += 1
         return True
     elif star.proper_motion < min_proper_motion:

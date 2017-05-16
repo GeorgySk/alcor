@@ -1,4 +1,6 @@
-from math import ceil
+from math import (ceil,
+                  log10,
+                  sqrt)
 
 from numpy.ma.core import std
 
@@ -9,7 +11,7 @@ MAX_BOLOMETRIC_MAGNITUDE = 21.0
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
-BINS_COUNT = BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE
+BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 
 def distribute_into_bins(star: Star,
@@ -19,22 +21,31 @@ def distribute_into_bins(star: Star,
                    / BIN_SIZE))
     bins[bin].append(star)
 
-def write_bins_info(bins: list[list[Star]]) -> None:
-    with open('magnitude_bins.res', 'w') as output_file:
+
+def write_bins_luminosity_function_info(bins: list[list[Star]]) -> None:
+    observational_data_trusted_bins_object_count = 220
+    forty_parsec_northern_hemisphere_volume = 134041.29
+    normalization_factor = (forty_parsec_northern_hemisphere_volume
+                            * (len(bins[16]) + len(bins[17]) + len(bins[18]))
+                            / observational_data_trusted_bins_object_count)
+
+    with open('luminosity_function.res', 'w') as output_file:
+        output_file.write(normalization_factor)
+
         for bin_index, bin in enumerate(bins):
+            normalized_stars_number_in_bin = (len(bin) / normalization_factor)
             average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
                                      + BIN_SIZE * (bin_index - 0.5))
-            average_bin_velocity_u = sum(bin(:).velocity_u) / len(bin)
-            average_bin_velocity_v = sum(bin(:).velocity_v) / len(bin)
-            average_bin_velocity_w = sum(bin(:).velocity_w) / len(bin)
-            bin_standard_deviation_of_velocity_u = std.(bin(:).velocity_u)
-            bin_standard_deviation_of_velocity_v = std.(bin(:).velocity_v)
-            bin_standard_deviation_of_velocity_w = std.(bin(:).velocity_w)
+            if normalized_stars_number_in_bin == 0:
+                star_count_logarithm = 0.0
+            else:
+                star_count_logarithm = log10(normalized_stars_number_in_bin)
+            upper_errorbar = (log10((len(bin) + sqrt(len(bin)))
+                                    / forty_parsec_northern_hemisphere_volume)
+                              - len(bin))
+            lower_errorbar = (len(bin) - log10((len(bin) - sqrt(len(bin)))
+                                               / forty_parsec_northern_hemisphere_volume))
             output_file.write(average_bin_magnitude,
-                              average_bin_velocity_u,
-                              average_bin_velocity_v,
-                              average_bin_velocity_w,
-                              bin_standard_deviation_of_velocity_u,
-                              bin_standard_deviation_of_velocity_v,
-                              bin_standard_deviation_of_velocity_w)
-            
+                              star_count_logarithm,
+                              upper_errorbar,
+                              lower_errorbar)
