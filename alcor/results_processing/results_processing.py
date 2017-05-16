@@ -2,25 +2,18 @@ from collections import Counter
 from fractions import Fraction
 from functools import partial
 from itertools import filterfalse
-from math import (log10)
+from math import log10, ceil
 from typing import Dict
 
 import astropy.units as u
 
 from alcor.models.star import Star
+from alcor.results_processing.luminosity_function import (BINS_COUNT,
+                                                          distribute_into_bins)
 from alcor.utils import parse_stars
 
 
 def main() -> None:
-
-    # Binning parameters of Luminosity Function
-    min_bolometric_magnitude = 6.0
-    max_bolometric_magnitude = 21.0
-    bin_size = 0.5
-    bolometric_magnitude_amplitude = (max_bolometric_magnitude
-                                      - min_bolometric_magnitude)
-    bins_count = bolometric_magnitude_amplitude / bin_size
-
     with open('output.res', 'r') as output_file:
         full_stars_sample = list(parse_stars(output_file, 'test'))
 
@@ -31,6 +24,8 @@ def main() -> None:
     restricted_stars_sample = filterfalse(apply_elimination_criteria,
                                           full_stars_sample)
 
+    bins = [] * BINS_COUNT
+
     for star in restricted_stars_sample:
         star.set_radial_velocity_to_zero()
         distribute_into_bins(star, bins)
@@ -38,7 +33,7 @@ def main() -> None:
 
 def check_if_eliminated(star: Star,
                         elimination_counters: Dict[str, int]) -> bool:
-    min_parallax = 0.025 * u.arcsec
+    min_parallax = 0.025
     min_declination = 0.0
     max_velocity = 500.0
     min_proper_motion = 0.04
@@ -54,8 +49,8 @@ def check_if_eliminated(star: Star,
     elif star.declination < min_declination:
         elimination_counters['declination'] += 1
         return True
-    elif (star.velocity_u**2 + star.velocity_v**2 + star.velocity_z**2
-            > max_velocity**2):
+    elif (star.velocity_u ** 2 + star.velocity_v ** 2 + star.velocity_z ** 2
+          > max_velocity ** 2):
         elimination_counters['velocity'] += 1
         return True
     elif star.proper_motion < min_proper_motion:
