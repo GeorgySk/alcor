@@ -73,3 +73,11 @@ def write_data_for_velocity_clouds(stars: List[Star]) -> None:
                     vw_writer.writerow('\n')
                     uw_writer.writerow('\n')
                     uv_writer.writerow('\n')
+    else:
+        with open('uvw_cloud.csv', 'w') as uvw_file:
+            uvw_writer = csv.writer(uvw_file, delimiter='  ')
+            for star in stars:
+                uvw_writer.writerow(star.velocity_u,
+                                    star.velocity_v,
+                                    star.velocity_w)
+            uvw_writer.writerow('\n')
