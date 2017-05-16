@@ -2,14 +2,15 @@ from collections import Counter
 from fractions import Fraction
 from functools import partial
 from itertools import filterfalse
-from math import log10, ceil
+from math import log10
 from typing import Dict
 
 import astropy.units as u
 
 from alcor.models.star import Star
 from alcor.results_processing.luminosity_function import (BINS_COUNT,
-                                                          distribute_into_bins)
+                                                          distribute_into_bins,
+                                                          write_bins_info)
 from alcor.utils import parse_stars
 
 
@@ -29,6 +30,8 @@ def main() -> None:
     for star in restricted_stars_sample:
         star.set_radial_velocity_to_zero()
         distribute_into_bins(star, bins)
+
+    write_bins_info(bins)
 
 
 def check_if_eliminated(star: Star,
