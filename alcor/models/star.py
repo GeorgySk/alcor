@@ -3,18 +3,21 @@ from datetime import datetime
 from math import (cos,
                   sin)
 
+from astropy import units as u
 from cassandra.cqlengine.columns import (UUID,
                                          Decimal,
-                                         DateTime)
+                                         DateTime,
+                                         Integer)
 from cassandra.cqlengine.models import Model
 
-ASTRONOMICAL_UNIT_IN_KM_PER_S = 4.74
+ASTRONOMICAL_UNIT = 4.74 * u.km / u.s
 
 STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion',
                          'proper_motion_component_b',
                          'proper_motion_component_l',
                          'proper_motion_component_vr',
+                         'right_ascension',
                          'declination',
                          'galactocentric_distance',
                          'galactocentric_coordinate_b',
@@ -25,7 +28,8 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'v_photometry',
                          'velocity_u',
                          'velocity_v',
-                         'velocity_w']
+                         'velocity_w',
+                         'spectral_type']
 
 
 class Star(Model):
@@ -39,6 +43,7 @@ class Star(Model):
     proper_motion_component_b = Decimal(required=True)
     proper_motion_component_l = Decimal(required=True)
     proper_motion_component_vr = Decimal(required=True)
+    right_ascension = Decimal(required=True)
     declination = Decimal(required=True)
     galactocentric_distance = Decimal(required=True)
     galactocentric_coordinate_b = Decimal(required=True)
@@ -50,32 +55,33 @@ class Star(Model):
     velocity_u = Decimal(required=True)
     velocity_v = Decimal(required=True)
     velocity_w = Decimal(required=True)
+    spectral_type = Integer(required=True)
     updated_timestamp = DateTime(default=datetime.now)
 
     def set_radial_velocity_to_zero(self) -> None:
         distance_in_pc = self.galactocentric_distance * 10e3
 
-        a1 = (-ASTRONOMICAL_UNIT_IN_KM_PER_S
+        a1 = (-ASTRONOMICAL_UNIT
               * cos(self.galactocentric_coordinate_b)
               * sin(self.galactocentric_coordinate_l))
-        b1 = (-ASTRONOMICAL_UNIT_IN_KM_PER_S
+        b1 = (-ASTRONOMICAL_UNIT
               * sin(self.galactocentric_coordinate_b)
               * cos(self.galactocentric_coordinate_l))
         self.velocity_u = (a1 * self.proper_motion_component_l * distance_in_pc
                            + b1 * self.proper_motion_component_b
                               * distance_in_pc)
 
-        a2 = (ASTRONOMICAL_UNIT_IN_KM_PER_S
+        a2 = (ASTRONOMICAL_UNIT
               * cos(self.galactocentric_coordinate_b)
               * cos(self.galactocentric_coordinate_l))
-        b2 = (-ASTRONOMICAL_UNIT_IN_KM_PER_S
+        b2 = (-ASTRONOMICAL_UNIT
               * sin(self.galactocentric_coordinate_b)
               * sin(self.galactocentric_coordinate_l))
         self.velocity_v = (a2 * self.proper_motion_component_l * distance_in_pc
                            + b2 * self.proper_motion_component_b
                               * distance_in_pc)
 
-        b3 = ASTRONOMICAL_UNIT_IN_KM_PER_S * cos(
+        b3 = ASTRONOMICAL_UNIT * cos(
             self.galactocentric_coordinate_b)
         self.velocity_w = (b3 * self.proper_motion_component_b
                            * distance_in_pc)

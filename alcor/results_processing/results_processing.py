@@ -2,14 +2,14 @@ from collections import Counter
 from functools import partial
 from itertools import filterfalse
 
-import astropy.units as u
+from .kinematics import (write_bins_kinematic_info,
+                         write_data_for_velocity_clouds)
+from .luminosity_function import (BINS_COUNT,
+                                  distribute_into_bins,
+                                  write_bins_luminosity_function_info)
+from .sampling import (write_elimination_stats,
+                       check_elimination)
 
-from alcor.results_processing.kinematics import write_bins_kinematic_info
-from alcor.results_processing.luminosity_function import (BINS_COUNT,
-                                                          distribute_into_bins,
-                                                          write_bins_luminosity_function_info)
-from alcor.results_processing.sampling import (write_elimination_stats,
-                                               check_if_eliminated)
 from alcor.utils import parse_stars
 
 
@@ -18,7 +18,7 @@ def main() -> None:
         full_stars_sample = list(parse_stars(output_file, 'test'))
 
     elimination_counters = Counter(int)
-    apply_elimination_criteria = partial(check_if_eliminated,
+    apply_elimination_criteria = partial(check_elimination,
                                          elimination_counters
                                          =elimination_counters)
     restricted_stars_sample = filterfalse(apply_elimination_criteria,
@@ -35,6 +35,7 @@ def main() -> None:
     write_elimination_stats(len(full_stars_sample),
                             len(restricted_stars_sample),
                             elimination_counters)
+    write_data_for_velocity_clouds(restricted_stars_sample)
 
 
 if __name__ == '__main__':

@@ -408,7 +408,8 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                  properMotion(i),
      &                  mpb(i),
      &                  mpl(i),
-     &                  vr(i)
+     &                  vr(i),
+     &                  rightAscension(i),
      &                  declination(i),
      &                  rgac(i),
      &                  bgac(i),
@@ -419,6 +420,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                  V(i),
      &                  uu(i),
      &                  vv(i),
-     &                  ww(i)
+     &                  ww(i),
+     &                  typeOfWD(i)
       end do
       end subroutine

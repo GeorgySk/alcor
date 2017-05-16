@@ -1,6 +1,6 @@
+import csv
 from collections import Counter
 from fractions import Fraction
-from typing import Dict
 
 from math import log10
 
@@ -12,8 +12,8 @@ MAX_VELOCITY = 500.0
 MIN_PROPER_MOTION = 0.04
 
 
-def check_if_eliminated(star: Star,
-                        elimination_counters: Dict[str, int]) -> bool:
+def check_elimination(star: Star,
+                      elimination_counters: Counter) -> bool:
     galactocentric_distance = star.galactocentric_distance * 10e3
     parallax = Fraction(1.0, Fraction(galactocentric_distance))
     hrm = star.go_photometry + 5.0 * log10(star.proper_motion) + 5.0
@@ -46,23 +46,24 @@ def check_if_eliminated(star: Star,
 
 def write_elimination_stats(full_sample_stars_count: int,
                             restricted_sample_stars_count: int,
-                            elimination_counters: Counter[int]) -> None:
-    with open('elimination_stats.res', 'w') as output_file:
-        output_file.write('Initial number of WDs:',
-                          full_sample_stars_count,
-                          'Eliminated by parallax:',
-                          elimination_counters[parallax],
-                          'Eliminated by declination:',
-                          elimination_counters[declination],
-                          'Initial number of stars in northern hemisphere:',
-                          full_sample_stars_count
-                          - elimination_counters[parallax]
-                          - elimination_counters[declination],
-                          'Eliminated by proper motion:',
-                          elimination_counters[proper_motion],
-                          'Eliminated by reduced proper motion:',
-                          elimination_counters[reduced_proper_motion],
-                          'Eliminated by apparent magnitude:',
-                          elimination_counters[apparent_magnitude],
-                          'Number of stars in restricted sample:',
-                          restricted_sample_stars_count)
+                            elimination_counters: Counter) -> None:
+    with open('elimination_stats.csv', 'w') as csv_file:
+        file_writer = csv.writer(csv_file, delimiter='  ')
+        file_writer.writerow('Initial number of WDs:', full_sample_stars_count)
+        file_writer.writerow('Eliminated by parallax:',
+                             elimination_counters[parallax])
+        file_writer.writerow('Eliminated by declination:',
+                             elimination_counters[declination])
+        file_writer.writerow('Initial number of stars in northern hemisphere:',
+                             full_sample_stars_count
+                             - elimination_counters[parallax]
+                             - elimination_counters[declination])
+        file_writer.writerow('Eliminated by proper motion:',
+                             elimination_counters[proper_motion], )
+        file_writer.writerow('Eliminated by reduced proper motion:',
+                             elimination_counters[reduced_proper_motion])
+        file_writer.writerow('Eliminated by apparent magnitude:',
+                             elimination_counters[apparent_magnitude])
+        file_writer.writerow('Number of stars in restricted sample:',
+                             restricted_sample_stars_count)
+        file_writer.writerow('\n')
