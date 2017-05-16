@@ -3,7 +3,8 @@ from functools import partial
 from itertools import filterfalse
 
 from .kinematics import (write_bins_kinematic_info,
-                         write_data_for_velocity_clouds)
+                         write_data_for_velocity_clouds,
+                         write_data_for_velocities_vs_magnitude)
 from .luminosity_function import (BINS_COUNT,
                                   distribute_into_bins,
                                   write_bins_luminosity_function_info)
@@ -36,6 +37,7 @@ def main() -> None:
                             len(restricted_stars_sample),
                             elimination_counters)
     write_data_for_velocity_clouds(restricted_stars_sample)
+    write_data_for_velocities_vs_magnitude(restricted_stars_sample)
 
 
 if __name__ == '__main__':
