@@ -14,8 +14,9 @@ BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
 BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 
-def distribute_into_bins(star: Star,
-                         bins: List[List[Star]]) -> None:
+def distribute_into_bins_for_luminosity_function(star: Star,
+                                                 bins: List[List[Star]]) -> (
+        None):
     bolometric_magnitude = 2.5 * star.luminosity + 4.75
     data_bin = int(ceil((bolometric_magnitude - MIN_BOLOMETRIC_MAGNITUDE)
                    / BIN_SIZE))
@@ -31,7 +32,12 @@ def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
 
     with open('luminosity_function.csv', 'w') as output_file:
         output_writer = csv.writer(output_file, delimiter='  ')
-        output_writer.writerow(normalization_factor)
+        output_writer.writerow('normalization_factor:',
+                               normalization_factor)
+        output_writer.writerow('average_bin_magnitude',
+                               'star_count_logarithm',
+                               'upper_errorbar',
+                               'lower_errorbar')
 
         for data_bin_index, data_bin in enumerate(bins):
             normalized_stars_number_in_bin = (len(data_bin)
@@ -45,9 +51,10 @@ def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
             upper_errorbar = (log10((len(data_bin) + sqrt(len(data_bin)))
                                     / forty_parsec_northern_hemisphere_volume)
                               - len(data_bin))
-            lower_errorbar = (len(data_bin) - log10((len(data_bin)
-                                                     - sqrt(len(data_bin)))
-                                               / forty_parsec_northern_hemisphere_volume))
+            lower_errorbar = (
+                len(data_bin)
+                - log10((len(data_bin) - sqrt(len(data_bin)))
+                        / forty_parsec_northern_hemisphere_volume))
             output_writer.writerow(average_bin_magnitude,
                                    star_count_logarithm,
                                    upper_errorbar,

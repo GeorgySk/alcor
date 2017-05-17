@@ -49,21 +49,22 @@ def write_elimination_stats(full_sample_stars_count: int,
                             elimination_counters: Counter) -> None:
     with open('elimination_stats.csv', 'w') as csv_file:
         file_writer = csv.writer(csv_file, delimiter='  ')
-        file_writer.writerow('Initial number of WDs:', full_sample_stars_count)
-        file_writer.writerow('Eliminated by parallax:',
-                             elimination_counters[parallax])
-        file_writer.writerow('Eliminated by declination:',
-                             elimination_counters[declination])
-        file_writer.writerow('Initial number of stars in northern hemisphere:',
+        file_writer.writerow('Initial number of WDs:',
+                             'Eliminated by parallax:',
+                             'Eliminated by declination:',
+                             'Initial number of stars in northern hemisphere:',
+                             'Eliminated by proper motion:',
+                             'Eliminated by reduced proper motion:',
+                             'Eliminated by apparent magnitude:',
+                             'Number of stars in restricted sample:')
+        file_writer.writerow(full_sample_stars_count,
+                             elimination_counters[parallax],
+                             elimination_counters[declination],
                              full_sample_stars_count
                              - elimination_counters[parallax]
-                             - elimination_counters[declination])
-        file_writer.writerow('Eliminated by proper motion:',
-                             elimination_counters[proper_motion], )
-        file_writer.writerow('Eliminated by reduced proper motion:',
-                             elimination_counters[reduced_proper_motion])
-        file_writer.writerow('Eliminated by apparent magnitude:',
-                             elimination_counters[apparent_magnitude])
-        file_writer.writerow('Number of stars in restricted sample:',
+                             - elimination_counters[declination],
+                             elimination_counters[proper_motion],
+                             elimination_counters[reduced_proper_motion],
+                             elimination_counters[apparent_magnitude],
                              restricted_sample_stars_count)
         file_writer.writerow('\n')
