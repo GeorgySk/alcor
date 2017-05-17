@@ -76,6 +76,48 @@ def run(ctx: click.Context,
                         session=session)
 
 
+@main.command()
+@click.option('--data-path', '-p',
+              required=True,
+              type=click.Path(),
+              help='Path to data to be processed '
+                   '(absolute or relative).')
+@click.option('--sample', '-s',
+              type=click.Choice(['raw',
+                                 'full',
+                                 'restricted']),
+              default='restricted',
+              help='How we want to sort raw data.'
+                   '(raw - do nothing,'
+                   'full - only declination and parallax selection criteria)',
+                   'restricted - apply all criteria')
+@click.option('--radial-zero', '-rvz',
+              is_flag=True,
+              help='Sets radial velocities to zero.')
+@click.option('--luminosity-function', '-lf',
+              is_flag=True,
+              help='Prepare data for plotting luminosity function.')
+@click.option('--velocity-clouds', '-uvw',
+              is_flag=True,
+              help='Prepare data for plotting velocity clouds.')
+@click.option('--velocities-vs-magnitude', '-vm',
+              is_flag=True,
+              help='Prepare data for plots of velocities vs bol. magnitude .')
+@click.option('--lepine-criterion', '-lcr',
+              is_flag=True,
+              help='Apply Lepine\'s criterion.')
+@click.pass_context
+def process(ctx: click.Context,
+            data_path: str,
+            sample: str,
+            radial_zero: bool,
+            luminosity_function: bool,
+            velocity_clouds: bool,
+            velocities_vs_magnitude: bool,
+            lepine_criterion: bool) -> None:
+    pass
+
+
 def init_db(*,
             keyspace_name: str,
             session: Session) -> None:
