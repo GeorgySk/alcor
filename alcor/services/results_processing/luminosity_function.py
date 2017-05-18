@@ -5,6 +5,7 @@ from math import (ceil,
 from typing import List
 
 from alcor.models.star import Star
+from alcor.types import StarsBinsType
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.0
 MAX_BOLOMETRIC_MAGNITUDE = 21.0
@@ -15,8 +16,8 @@ BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 
 def distribute_into_bins_for_luminosity_function(star: Star,
-                                                 bins: List[List[Star]]) -> (
-        None):
+                                                 bins: StarsBinsType
+                                                 ) -> None:
     stars_bin = int(ceil((star.bolometric_magnitude - MIN_BOLOMETRIC_MAGNITUDE)
                     / BIN_SIZE))
     bins[stars_bin].append(star)
@@ -40,14 +41,11 @@ def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
                                'lower_errorbar')
 
         for stars_bin_index, stars_bin in enumerate(bins):
-            normalized_stars_number_in_bin = (len(stars_bin)
-                                              / normalization_factor)
             average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
                                      + BIN_SIZE * (stars_bin_index - 0.5))
-            if normalized_stars_number_in_bin == 0:
-                star_count_logarithm = 0.0
-            else:
-                star_count_logarithm = log10(normalized_stars_number_in_bin)
+            stars_count_logarithm = get_stars_count_logarithm(
+                stars_count=len(stars_bin),
+                normalization_factor=normalization_factor)
             upper_errorbar = (log10((len(stars_bin) + sqrt(len(stars_bin)))
                                     / forty_parsec_northern_hemisphere_volume)
                               - len(stars_bin))
@@ -56,7 +54,14 @@ def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
                 - log10((len(stars_bin) - sqrt(len(stars_bin)))
                         / forty_parsec_northern_hemisphere_volume))
             output_writer.writerow(average_bin_magnitude,
-                                   star_count_logarithm,
+                                   stars_count_logarithm,
                                    upper_errorbar,
                                    lower_errorbar)
-        output_writer.writerow('\n')
+
+
+def get_stars_count_logarithm(stars_count: int,
+                              normalization_factor: float) -> float:
+    try:
+        return log10(stars_count / normalization_factor)
+    except ValueError:
+        return 0.
