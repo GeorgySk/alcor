@@ -9,8 +9,8 @@ from typing import (Dict,
 from cassandra.cluster.Session import Session
 
 from alcor.models.parameter import Parameter
-from alcor.services.data_access.service import insert
-from alcor.services.parameters.service import generate_parameters_values
+from alcor.services.data_access import insert
+from alcor.services.parameters import generate_parameters_values
 from alcor.types import NumericType
 from alcor.utils import parse_stars
 

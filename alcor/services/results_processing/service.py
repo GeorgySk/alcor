@@ -1,6 +1,7 @@
 from collections import Counter
 from functools import partial
 from itertools import filterfalse
+from typing import Dict
 
 from .kinematics import (write_data_for_velocity_clouds,
                          write_data_for_velocities_vs_magnitude)
@@ -13,7 +14,8 @@ from .sampling import (write_elimination_stats,
 from alcor.utils import parse_stars
 
 
-def run_processing() -> None:
+def run_processing(*,
+                   settings: Dict) -> None:
     with open('output.res', 'r') as output_file:
         full_stars_sample = list(parse_stars(output_file, 'test'))
 
@@ -36,7 +38,3 @@ def run_processing() -> None:
                             eliminations_counter)
     write_data_for_velocity_clouds(restricted_stars_sample)
     write_data_for_velocities_vs_magnitude(restricted_stars_sample)
-
-
-if __name__ == '__main__':
-    run_processing()

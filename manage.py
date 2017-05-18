@@ -15,8 +15,8 @@ from cassandra_helpers.models import sync_tables
 from alcor.config import PROJECT_NAME
 from alcor.models import (Parameter,
                           Star)
-from alcor.results_processing.service import run_processing
-from alcor.simulations.service import run_simulations
+from alcor.services.results_processing import run_processing
+from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
 logger = logging.getLogger(__name__)
@@ -129,7 +129,16 @@ def process(ctx: click.Context,
         session = cluster.connect()
         init_db(keyspace_name=keyspace_name,
                 session=session)
-        run_processing()
+
+        processing_settings = {'input_path': data_path,
+                               'plots': [luminosity_function,
+                                         velocity_clouds,
+                                         velocities_vs_magnitude],
+                               'methods': [sample,
+                                           nullify_radial_velocity,
+                                           lepine_criterion]}
+
+        run_processing(settings=processing_settings)
 
 
 def init_db(*,

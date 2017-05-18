@@ -67,27 +67,22 @@ class Star(Model):
         # TODO: implement pc/kpc units
         distance_in_pc = self.galactocentric_distance * 10e3
 
-        a1 = (-ASTRONOMICAL_UNIT
-              * cos(self.galactocentric_coordinate_b)
+        a1 = (-ASTRONOMICAL_UNIT * cos(self.galactocentric_coordinate_b)
               * sin(self.galactocentric_coordinate_l))
-        b1 = (-ASTRONOMICAL_UNIT
-              * sin(self.galactocentric_coordinate_b)
+        b1 = (-ASTRONOMICAL_UNIT * sin(self.galactocentric_coordinate_b)
               * cos(self.galactocentric_coordinate_l))
         self.velocity_u = ((a1 * self.proper_motion_component_l
                            + b1 * self.proper_motion_component_b)
                            * distance_in_pc)
 
-        a2 = (ASTRONOMICAL_UNIT
-              * cos(self.galactocentric_coordinate_b)
+        a2 = (ASTRONOMICAL_UNIT * cos(self.galactocentric_coordinate_b)
               * cos(self.galactocentric_coordinate_l))
-        b2 = (-ASTRONOMICAL_UNIT
-              * sin(self.galactocentric_coordinate_b)
+        b2 = (-ASTRONOMICAL_UNIT * sin(self.galactocentric_coordinate_b)
               * sin(self.galactocentric_coordinate_l))
         self.velocity_v = ((a2 * self.proper_motion_component_l
                            + b2 * self.proper_motion_component_b)
                            * distance_in_pc)
 
-        b3 = ASTRONOMICAL_UNIT * cos(
-            self.galactocentric_coordinate_b)
+        b3 = ASTRONOMICAL_UNIT * cos(self.galactocentric_coordinate_b)
         self.velocity_w = (b3 * self.proper_motion_component_b
                            * distance_in_pc)
