@@ -15,8 +15,9 @@ from cassandra_helpers.models import sync_tables
 from alcor.config import PROJECT_NAME
 from alcor.models import (Parameter,
                           Star)
-from alcor.run_simulations.run_simulations import run_simulations
-from alcor.utils import (load_settings)
+from alcor.results_processing.service import run_processing
+from alcor.simulations.service import run_simulations
+from alcor.utils import load_settings
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ def run(ctx: click.Context,
                    '(raw - do nothing,'
                    'full - only declination and parallax selection criteria)',
                    'restricted - apply all criteria')
-@click.option('--radial-zero', '-rvz',
+@click.option('--nullify-radial-velocity', '-nrf',
               is_flag=True,
               help='Sets radial velocities to zero.')
 @click.option('--luminosity-function', '-lf',
@@ -110,12 +111,25 @@ def run(ctx: click.Context,
 def process(ctx: click.Context,
             data_path: str,
             sample: str,
-            radial_zero: bool,
+            nullify_radial_velocity: bool,
             luminosity_function: bool,
             velocity_clouds: bool,
             velocities_vs_magnitude: bool,
             lepine_criterion: bool) -> None:
-    pass
+    cluster_settings = ctx.obj
+    contact_points = cluster_settings['contact_points']
+    port = cluster_settings['port']
+
+    keyspace_name = PROJECT_NAME
+
+    check_connection(contact_points=contact_points,
+                     port=port)
+    with Cluster(contact_points=contact_points,
+                 port=port) as cluster:
+        session = cluster.connect()
+        init_db(keyspace_name=keyspace_name,
+                session=session)
+        run_processing()
 
 
 def init_db(*,

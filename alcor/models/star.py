@@ -58,7 +58,13 @@ class Star(Model):
     spectral_type = Integer(required=True)
     updated_timestamp = DateTime(default=datetime.now)
 
+    @property
+    def bolometric_magnitude(self) -> float:
+        # TODO: find out the meaning of the following constants
+        return 2.5 * self.luminosity + 4.75
+
     def set_radial_velocity_to_zero(self) -> None:
+        # TODO: implement pc/kpc units
         distance_in_pc = self.galactocentric_distance * 10e3
 
         a1 = (-ASTRONOMICAL_UNIT
@@ -67,9 +73,9 @@ class Star(Model):
         b1 = (-ASTRONOMICAL_UNIT
               * sin(self.galactocentric_coordinate_b)
               * cos(self.galactocentric_coordinate_l))
-        self.velocity_u = (a1 * self.proper_motion_component_l * distance_in_pc
-                           + b1 * self.proper_motion_component_b
-                              * distance_in_pc)
+        self.velocity_u = ((a1 * self.proper_motion_component_l
+                           + b1 * self.proper_motion_component_b)
+                           * distance_in_pc)
 
         a2 = (ASTRONOMICAL_UNIT
               * cos(self.galactocentric_coordinate_b)
@@ -77,9 +83,9 @@ class Star(Model):
         b2 = (-ASTRONOMICAL_UNIT
               * sin(self.galactocentric_coordinate_b)
               * sin(self.galactocentric_coordinate_l))
-        self.velocity_v = (a2 * self.proper_motion_component_l * distance_in_pc
-                           + b2 * self.proper_motion_component_b
-                              * distance_in_pc)
+        self.velocity_v = ((a2 * self.proper_motion_component_l
+                           + b2 * self.proper_motion_component_b)
+                           * distance_in_pc)
 
         b3 = ASTRONOMICAL_UNIT * cos(
             self.galactocentric_coordinate_b)

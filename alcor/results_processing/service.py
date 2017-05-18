@@ -13,7 +13,7 @@ from .sampling import (write_elimination_stats,
 from alcor.utils import parse_stars
 
 
-def main() -> None:
+def run_processing() -> None:
     with open('output.res', 'r') as output_file:
         full_stars_sample = list(parse_stars(output_file, 'test'))
 
@@ -24,7 +24,7 @@ def main() -> None:
     restricted_stars_sample = filterfalse(apply_elimination_criteria,
                                           full_stars_sample)
 
-    bins = [] * BINS_COUNT
+    bins = [[] for _ in range(BINS_COUNT)]
 
     for star in restricted_stars_sample:
         star.set_radial_velocity_to_zero()
@@ -39,4 +39,4 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    main()
+    run_processing()

@@ -14,8 +14,10 @@ MIN_PROPER_MOTION = 0.04
 
 def check_elimination(star: Star,
                       elimination_counters: Counter) -> bool:
+    # TODO: implement pc/kpc units
     galactocentric_distance = star.galactocentric_distance * 10e3
     parallax = Fraction(1.0, Fraction(galactocentric_distance))
+    # TODO: find out the meaning of the following constants
     hrm = star.go_photometry + 5.0 * log10(star.proper_motion) + 5.0
     gz = star.gr_photometry + star.rz_photometry
 
@@ -32,12 +34,15 @@ def check_elimination(star: Star,
     elif star.proper_motion < MIN_PROPER_MOTION:
         elimination_counters['proper_motion'] += 1
         return True
+    # TODO: find out the meaning of the following constants
     elif gz < -0.33 and hrm < 14.0:
         elimination_counters['reduced_proper_motion'] += 1
         return True
+    # TODO: find out the meaning of the following constants
     elif hrm < 3.559 * gz + 15.17:
         elimination_counters['reduced_proper_motion'] += 1
         return True
+    # TODO: find out the meaning of the following constant
     elif star.v_photometry >= 19.0:
         elimination_counters['apparent_magnitude'] += 1
         return True
