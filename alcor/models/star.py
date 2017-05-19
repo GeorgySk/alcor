@@ -2,8 +2,10 @@ import uuid
 from datetime import datetime
 from math import (cos,
                   sin)
+from typing import Tuple
 
 from astropy import units as u
+from astropy.coordinates.sky_coordinate import SkyCoord
 from cassandra.cqlengine.columns import (UUID,
                                          Decimal,
                                          DateTime,
@@ -62,6 +64,38 @@ class Star(Model):
     def bolometric_magnitude(self) -> float:
         # TODO: find out the meaning of the following constants
         return 2.5 * self.luminosity + 4.75
+
+    @property
+    def coordinate_x(self) -> float:
+        try:
+            return self.coordinate_x
+        except AttributeError:
+            return self.to_cartesian_from_equatorial[0]
+
+    @property
+    def coordinate_y(self) -> float:
+        try:
+            return self.coordinate_y
+        except AttributeError:
+            return self.to_cartesian_from_equatorial[1]
+
+    @property
+    def coordinate_z(self) -> float:
+        try:
+            return self.coordinate_z
+        except AttributeError:
+            return self.to_cartesian_from_equatorial[2]
+
+    def to_cartesian_from_equatorial(self) -> Tuple[Decimal,
+                                                    Decimal,
+                                                    Decimal]:
+        equatorial_coordinates = SkyCoord(
+            ra=self.right_ascension * u.degree,
+            dec=self.declination * u.degree,
+            distance=self.distance * u.kpc)
+        return (equatorial_coordinates.cartesian.x,
+                equatorial_coordinates.cartesian.y,
+                equatorial_coordinates.cartesian.z)
 
     def set_radial_velocity_to_zero(self) -> None:
         # TODO: implement pc/kpc units
