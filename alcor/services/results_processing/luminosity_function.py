@@ -18,9 +18,14 @@ BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 def distribute_into_bins_for_luminosity_function(star: Star,
                                                  bins: StarsBinsType
                                                  ) -> None:
-    stars_bin = int(ceil((star.bolometric_magnitude - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE))
+    stars_bin = get_magnitude_bin_index(star)
     bins[stars_bin].append(star)
+
+
+def get_magnitude_bin_index(star: Star) -> int:
+    return int(ceil((star.bolometric_magnitude
+                     - MIN_BOLOMETRIC_MAGNITUDE)
+                    / BIN_SIZE))
 
 
 def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
