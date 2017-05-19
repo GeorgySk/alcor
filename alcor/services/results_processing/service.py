@@ -4,8 +4,8 @@ from itertools import filterfalse
 from typing import Dict
 
 from alcor.services.results_processing.kinematics import (
-    write_data_for_velocity_clouds,
-    write_data_for_velocities_vs_magnitude)
+    write_velocity_clouds_data,
+    write_velocities_vs_magnitude_data)
 from .luminosity_function import (BINS_COUNT,
                                   distribute_into_bins_for_luminosity_function,
                                   write_bins_luminosity_function_info)
@@ -16,7 +16,7 @@ from alcor.utils import parse_stars
 
 
 def run_processing(*,
-                   settings: Dict) -> None:
+                   settings: Dict[str, str]) -> None:
     with open('output.res', 'r') as output_file:
         full_stars_sample = list(parse_stars(output_file, 'test'))
 
@@ -37,5 +37,5 @@ def run_processing(*,
     write_elimination_stats(len(full_stars_sample),
                             len(restricted_stars_sample),
                             eliminations_counter)
-    write_data_for_velocity_clouds(restricted_stars_sample)
-    write_data_for_velocities_vs_magnitude(restricted_stars_sample)
+    write_velocity_clouds_data(restricted_stars_sample)
+    write_velocities_vs_magnitude_data(restricted_stars_sample)

@@ -1,12 +1,11 @@
 import csv
+from collections import Iterable
 from contextlib import ExitStack
 from math import ceil
 from statistics import (mean,
                         stdev)
 from typing import (List,
                     Tuple)
-
-from collections import Iterable
 
 from alcor.models.star import Star
 from alcor.types import (RowType,
@@ -17,10 +16,10 @@ MAX_BOLOMETRIC_MAGNITUDE = 21.0
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
-BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
+BINS_COUNT = BOLOMETRIC_MAGNITUDE_AMPLITUDE // BIN_SIZE
 
 
-def write_data_for_velocities_vs_magnitude(stars: List[Star]) -> None:
+def write_velocities_vs_magnitude_data(stars: List[Star]) -> None:
     # TODO: add reading criterion flag as command line arg
     lepine_selection_criterion_applied = True
 
@@ -33,6 +32,8 @@ def write_data_for_velocities_vs_magnitude(stars: List[Star]) -> None:
 
 
 def write_cloud_data_lepine_case(stars: List[Star]) -> None:
+    u_vs_mag_stars, v_vs_mag_stars, w_vs_mag_stars = generate_clouds(stars)
+
     with ExitStack() as stack:
         u_vs_mag_cloud_file = stack.enter_context(
             open('u_vs_mag_cloud.csv', mode='w'))
@@ -55,8 +56,6 @@ def write_cloud_data_lepine_case(stars: List[Star]) -> None:
         w_vs_mag_cloud_writer.writerow(['bolometric_magnitude',
                                         'velocity_w'])
 
-        u_vs_mag_stars, v_vs_mag_stars, w_vs_mag_stars = generate_clouds(stars)
-
         for star in u_vs_mag_stars:
             u_vs_mag_cloud_writer.writerow([star.bolometric_magnitude,
                                             star.velocity_u])
@@ -77,9 +76,12 @@ def generate_clouds(stars: List[Star]) -> Tuple[List[Star],
     w_vs_mag_clouds = []
 
     for star in stars:
-        if star.coordinate_x == highest_coordinate(star):
+        highest_coordinate = max(star.coordinate_x,
+                                 star.coordinate_y,
+                                 star.coordinate_z)
+        if star.coordinate_x == highest_coordinate:
             u_vs_mag_clouds.append(star)
-        elif star.coordinate_y == highest_coordinate(star):
+        elif star.coordinate_y == highest_coordinate:
             v_vs_mag_clouds.append(star)
         else:
             w_vs_mag_clouds.append(star)
@@ -88,63 +90,74 @@ def generate_clouds(stars: List[Star]) -> Tuple[List[Star],
             w_vs_mag_clouds)
 
 
-def highest_coordinate(star: Star) -> float:
-    return max(star.coordinate_x,
-               star.coordinate_y,
-               star.coordinate_z)
-
-
 def write_bins_data_lepine_case(stars: List[Star]) -> None:
     u_vs_mag_bins, v_vs_mag_bins, w_vs_mag_bins = generate_stars_bins(stars)
 
-    # TODO: find the way to shorten the next 3 code blocks
     with open('u_vs_mag_bins.csv', 'w') as u_file:
         u_writer = csv.writer(u_file, delimiter='  ')
         u_writer.writerow(['average_bin_magnitude',
                            'average_velocity_u',
                            'velocity_u_std'])
-        for stars_bin_index, stars_bin in enumerate(u_vs_mag_bins):
-            average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                     + BIN_SIZE * (stars_bin_index - 0.5))
-            average_bin_velocity_u = mean(star.velocity_u
-                                          for star in stars_bin)
-            bin_standard_deviation_of_velocity_u = stdev(star.velocity_u
-                                                         for star in stars_bin)
-            u_writer.writerow([average_bin_magnitude,
-                               average_bin_velocity_u,
-                               bin_standard_deviation_of_velocity_u])
+        for row in u_rows(u_vs_mag_bins):
+            u_writer.writerow(row)
 
     with open('v_vs_mag_bins.csv', 'w') as v_file:
         v_writer = csv.writer(v_file, delimiter='  ')
         v_writer.writerow(['average_bin_magnitude',
                            'average_velocity_v',
                            'velocity_v_std'])
-        for stars_bin_index, stars_bin in enumerate(v_vs_mag_bins):
-            average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                     + BIN_SIZE * (stars_bin_index - 0.5))
-            average_bin_velocity_v = mean(star.velocity_v
-                                          for star in stars_bin)
-            bin_standard_deviation_of_velocity_v = stdev(star.velocity_v
-                                                         for star in stars_bin)
-            v_writer.writerow([average_bin_magnitude,
-                               average_bin_velocity_v,
-                               bin_standard_deviation_of_velocity_v])
+        for row in v_rows(v_vs_mag_bins):
+            v_writer.writerow(row)
 
     with open('w_vs_mag_bins.csv', 'w') as w_file:
         w_writer = csv.writer(w_file, delimiter='  ')
         w_writer.writerow(['average_bin_magnitude',
                            'average_velocity_w',
                            'velocity_w_std'])
-        for stars_bin_index, stars_bin in enumerate(w_vs_mag_bins):
-            average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                     + BIN_SIZE * (stars_bin_index - 0.5))
-            average_bin_velocity_w = mean(star.velocity_w
-                                          for star in stars_bin)
-            bin_standard_deviation_of_velocity_w = stdev(star.velocity_w
-                                                         for star in stars_bin)
-            w_writer.writerow([average_bin_magnitude,
-                               average_bin_velocity_w,
-                               bin_standard_deviation_of_velocity_w])
+        for row in w_rows(w_vs_mag_bins):
+            w_writer.writerow(row)
+
+
+def u_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
+    for stars_bin_index, stars_bin in enumerate(stars_bins):
+        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                                 + BIN_SIZE * (stars_bin_index - 0.5))
+        average_bin_velocity_u = mean(star.velocity_u
+                                      for star in stars_bin)
+        bin_standard_deviation_of_velocity_u = stdev(star.velocity_u
+                                                     for star in stars_bin)
+
+        yield (average_bin_magnitude,
+               average_bin_velocity_u,
+               bin_standard_deviation_of_velocity_u)
+
+
+def v_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
+    for stars_bin_index, stars_bin in enumerate(stars_bins):
+        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                                 + BIN_SIZE * (stars_bin_index - 0.5))
+        average_bin_velocity_v = mean(star.velocity_v
+                                      for star in stars_bin)
+        bin_standard_deviation_of_velocity_v = stdev(star.velocity_v
+                                                     for star in stars_bin)
+
+        yield (average_bin_magnitude,
+               average_bin_velocity_v,
+               bin_standard_deviation_of_velocity_v)
+
+
+def w_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
+    for stars_bin_index, stars_bin in enumerate(stars_bins):
+        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                                 + BIN_SIZE * (stars_bin_index - 0.5))
+        average_bin_velocity_w = mean(star.velocity_w
+                                      for star in stars_bin)
+        bin_standard_deviation_of_velocity_w = stdev(star.velocity_w
+                                                     for star in stars_bin)
+
+        yield (average_bin_magnitude,
+               average_bin_velocity_w,
+               bin_standard_deviation_of_velocity_w)
 
 
 def generate_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
@@ -156,10 +169,13 @@ def generate_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
     for star in stars:
         stars_bin_index = get_magnitude_bin_index(star)
 
-        if star.coordinate_x == highest_coordinate(star):
+        highest_coordinate = max(star.coordinate_x,
+                                 star.coordinate_y,
+                                 star.coordinate_z)
+        if star.coordinate_x == highest_coordinate:
             v_vs_mag_bins[stars_bin_index].append(star)
             w_vs_mag_bins[stars_bin_index].append(star)
-        elif star.coordinate_y == highest_coordinate(star):
+        elif star.coordinate_y == highest_coordinate:
             u_vs_mag_bins[stars_bin_index].append(star)
             w_vs_mag_bins[stars_bin_index].append(star)
         else:

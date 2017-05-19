@@ -2,17 +2,20 @@ import csv
 from math import (ceil,
                   log10,
                   sqrt)
-from typing import List
+from typing import List, Iterable
 
 from alcor.models.star import Star
-from alcor.types import StarsBinsType
+from alcor.types import StarsBinsType, RowType
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.0
 MAX_BOLOMETRIC_MAGNITUDE = 21.0
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
-BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
+BINS_COUNT = BOLOMETRIC_MAGNITUDE_AMPLITUDE // BIN_SIZE
+
+OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
+FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
 def distribute_into_bins_for_luminosity_function(star: Star,
@@ -29,12 +32,10 @@ def get_magnitude_bin_index(star: Star) -> int:
 
 
 def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
-    observational_data_trusted_bins_object_count = 220
-    forty_parsec_northern_hemisphere_volume = 134041.29
     # TODO: comment on the choice of these particular bins
-    normalization_factor = (forty_parsec_northern_hemisphere_volume
+    normalization_factor = (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
                             * (len(bins[16]) + len(bins[17]) + len(bins[18]))
-                            / observational_data_trusted_bins_object_count)
+                            / OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT)
 
     with open('luminosity_function.csv', 'w') as output_file:
         output_writer = csv.writer(output_file, delimiter='  ')
@@ -44,24 +45,29 @@ def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
                                'star_count_logarithm',
                                'upper_errorbar',
                                'lower_errorbar')
+        for row in rows(bins):
+            output_writer.writerow(row)
 
-        for stars_bin_index, stars_bin in enumerate(bins):
-            average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                     + BIN_SIZE * (stars_bin_index - 0.5))
-            stars_count_logarithm = get_stars_count_logarithm(
-                stars_count=len(stars_bin),
-                normalization_factor=normalization_factor)
-            upper_errorbar = (log10((len(stars_bin) + sqrt(len(stars_bin)))
-                                    / forty_parsec_northern_hemisphere_volume)
-                              - len(stars_bin))
-            lower_errorbar = (
-                len(stars_bin)
-                - log10((len(stars_bin) - sqrt(len(stars_bin)))
-                        / forty_parsec_northern_hemisphere_volume))
-            output_writer.writerow(average_bin_magnitude,
-                                   stars_count_logarithm,
-                                   upper_errorbar,
-                                   lower_errorbar)
+
+def rows(bins: StarsBinsType,
+         normalization_factor: float) -> Iterable[RowType]:
+    for stars_bin_index, stars_bin in enumerate(bins):
+        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                                 + BIN_SIZE * (stars_bin_index - 0.5))
+        stars_count_logarithm = get_stars_count_logarithm(
+            stars_count=len(stars_bin),
+            normalization_factor=normalization_factor)
+        upper_errorbar = (log10((len(stars_bin) + sqrt(len(stars_bin)))
+                                / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
+                          - len(stars_bin))
+        lower_errorbar = (len(stars_bin)
+                          - log10((len(stars_bin) -
+                                   sqrt(len(stars_bin)))
+                                  / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME))
+        yield(average_bin_magnitude,
+              stars_count_logarithm,
+              upper_errorbar,
+              lower_errorbar)
 
 
 def get_stars_count_logarithm(stars_count: int,

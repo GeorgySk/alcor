@@ -1,2 +1,2 @@
-from .velocity_clouds import write_data_for_velocity_clouds
-from .velocity_vs_magnitude import write_data_for_velocities_vs_magnitude
+from .velocity_clouds import write_velocity_clouds_data
+from .velocity_vs_magnitude import write_velocities_vs_magnitude_data

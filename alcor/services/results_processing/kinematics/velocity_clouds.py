@@ -1,16 +1,12 @@
 import csv
 from contextlib import ExitStack
-from typing import List
-
-from astropy import units as u
-from astropy.coordinates.sky_coordinate import SkyCoord
+from typing import List, Tuple
 
 from alcor.models.star import Star
 
 
-def write_data_for_velocity_clouds(stars: List[Star]) -> None:
+def write_velocity_clouds_data(stars: List[Star]) -> None:
     lepine_selection_criterion_applied = True
-
     if lepine_selection_criterion_applied:
         write_data_lepin_case(stars)
     else:
@@ -18,6 +14,8 @@ def write_data_for_velocity_clouds(stars: List[Star]) -> None:
 
 
 def write_data_lepin_case(stars: List[Star]) -> None:
+    uv_cloud_stars, uw_cloud_stars, vw_cloud_stars = generate_clouds(stars)
+
     with ExitStack() as stack:
         uv_cloud_file = stack.enter_context(open('uv_cloud.csv', mode='w'))
         uw_cloud_file = stack.enter_context(open('uw_cloud.csv', mode='w'))
@@ -34,23 +32,34 @@ def write_data_lepin_case(stars: List[Star]) -> None:
         vw_cloud_writer.writerow(['velocity_v',
                                   'velocity_w'])
 
-        for star in stars:
-            if star.coordinate_x == highest_coordinate(star):
-                vw_cloud_writer.writerow([star.velocity_v,
-                                          star.velocity_w])
-            elif star.coordinate_y == highest_coordinate(star):
-                uw_cloud_writer.writerow([star.velocity_u,
-                                          star.velocity_w])
-            else:
-                uv_cloud_writer.writerow([star.velocity_u,
-                                          star.velocity_v])
+        for star in uv_cloud_stars:
+            uv_cloud_writer.writerow([star.velocity_u,
+                                      star.velocity_v])
+        for star in uw_cloud_stars:
+            uw_cloud_writer.writerow([star.velocity_u,
+                                      star.velocity_w])
+        for star in vw_cloud_stars:
+            vw_cloud_writer.writerow([star.velocity_v,
+                                      star.velocity_w])
 
 
-# TODO: this function is also in velocity_vs_magnitude. Where should I put it?
-def highest_coordinate(star: Star) -> float:
-    return max(star.coordinate_x,
-               star.coordinate_y,
-               star.coordinate_z)
+def generate_clouds(stars: List[Star]) -> Tuple[List[Star],
+                                                List[Star],
+                                                List[Star]]:
+    uv_cloud = []
+    uw_cloud = []
+    vw_cloud = []
+    for star in stars:
+        highest_coordinate = max(star.coordinate_x,
+                                 star.coordinate_y,
+                                 star.coordinate_z)
+        if star.coordinate_x == highest_coordinate:
+            vw_cloud.append(star)
+        elif star.coordinate_y == highest_coordinate:
+            uw_cloud.append(star)
+        else:
+            uv_cloud.append(star)
+    return uv_cloud, uw_cloud, vw_cloud
 
 
 def write_data_raw_case(stars: List[Star]) -> None:
