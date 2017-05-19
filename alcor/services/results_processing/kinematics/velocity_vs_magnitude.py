@@ -3,7 +3,8 @@ from contextlib import ExitStack
 from math import ceil
 from statistics import (mean,
                         stdev)
-from typing import List, Tuple
+from typing import (List,
+                    Tuple)
 
 from astropy import units as u
 from astropy.coordinates.sky_coordinate import SkyCoord
@@ -23,94 +24,48 @@ BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 
 # TODO: add get_row function(-s)
-def write_data_for_velocity_clouds(stars: List[Star]) -> None:
-    lepine_selection_criterion_applied = True
-
-    if lepine_selection_criterion_applied:
-        with ExitStack() as stack:
-            uv_file = stack.enter_context(open('uv_cloud.csv', mode='w'))
-            uw_file = stack.enter_context(open('uw_cloud.csv', mode='w'))
-            vw_file = stack.enter_context(open('vw_cloud.csv', mode='w'))
-
-            uv_writer = csv.writer(uv_file, delimiter='  ')
-            uw_writer = csv.writer(uw_file, delimiter='  ')
-            vw_writer = csv.writer(vw_file, delimiter='  ')
-
-            uv_writer.writerow(['velocity_u',
-                                'velocity_v'])
-            uw_writer.writerow(['velocity_u',
-                                'velocity_w'])
-            vw_writer.writerow(['velocity_v',
-                                'velocity_w'])
-
-            for star in stars:
-                equatorial_coordinates = SkyCoord(
-                    ra=star.right_ascension * u.degree,
-                    dec=star.declination * u.degree,
-                    distance=star.distance * u.kpc)
-                coordinate_x = equatorial_coordinates.cartesian.x
-                coordinate_y = equatorial_coordinates.cartesian.y
-                coordinate_z = equatorial_coordinates.cartesian.z
-                highest_coordinate = max(coordinate_x,
-                                         coordinate_y,
-                                         coordinate_z)
-                if coordinate_x == highest_coordinate:
-                    vw_writer.writerow([star.velocity_v,
-                                        star.velocity_w])
-                elif coordinate_y == highest_coordinate:
-                    uw_writer.writerow([star.velocity_u,
-                                        star.velocity_w])
-                elif coordinate_z == highest_coordinate:
-                    uv_writer.writerow([star.velocity_u,
-                                        star.velocity_v])
-    else:
-        with open('uvw_cloud.csv', 'w') as uvw_file:
-            uvw_writer = csv.writer(uvw_file, delimiter='  ')
-            uvw_writer.writerow(['velocity_u',
-                                 'velocity_v',
-                                 'velocity_w'])
-            for star in stars:
-                uvw_writer.writerow([star.velocity_u,
-                                     star.velocity_v,
-                                     star.velocity_w])
-
-
 def write_data_for_velocities_vs_magnitude(stars: List[Star]) -> None:
     lepine_selection_criterion_applied = True
 
     if lepine_selection_criterion_applied:
         with ExitStack() as stack:
-            u_file = stack.enter_context(open('u_vs_mag_cloud.csv', mode='w'))
-            v_file = stack.enter_context(open('v_vs_mag_cloud.csv', mode='w'))
-            w_file = stack.enter_context(open('w_vs_mag_cloud.csv', mode='w'))
+            u_vs_mag_cloud_file = stack.enter_context(
+                open('u_vs_mag_cloud.csv', mode='w'))
+            v_vs_mag_cloud_file = stack.enter_context(
+                open('v_vs_mag_cloud.csv', mode='w'))
+            w_vs_mag_cloud_file = stack.enter_context(
+                open('w_vs_mag_cloud.csv', mode='w'))
 
-            u_writer = csv.writer(u_file, delimiter='  ')
-            v_writer = csv.writer(v_file, delimiter='  ')
-            w_writer = csv.writer(w_file, delimiter='  ')
+            u_vs_mag_cloud_writer = csv.writer(u_vs_mag_cloud_file,
+                                               delimiter='  ')
+            v_vs_mag_cloud_writer = csv.writer(v_vs_mag_cloud_file,
+                                               delimiter='  ')
+            w_vs_mag_cloud_writer = csv.writer(w_vs_mag_cloud_file,
+                                               delimiter='  ')
 
-            u_writer.writerow(['bolometric_magnitude',
-                               'velocity_u'])
-            v_writer.writerow(['bolometric_magnitude',
-                               'velocity_v'])
-            w_writer.writerow(['bolometric_magnitude',
-                               'velocity_w'])
+            u_vs_mag_cloud_writer.writerow(['bolometric_magnitude',
+                                            'velocity_u'])
+            v_vs_mag_cloud_writer.writerow(['bolometric_magnitude',
+                                            'velocity_v'])
+            w_vs_mag_cloud_writer.writerow(['bolometric_magnitude',
+                                            'velocity_w'])
 
             u_vs_mag_bins, v_vs_mag_bins, w_vs_mag_bins = generate_stars_bins(
                 stars)
 
             for stars_bin in u_vs_mag_bins:
                 for star in stars_bin:
-                    u_writer.writerow([star.bolometric_magnitude,
-                                       star.velocity_u])
+                    u_vs_mag_cloud_writer.writerow([star.bolometric_magnitude,
+                                                    star.velocity_u])
             for stars_bin in v_vs_mag_bins:
                 for star in stars_bin:
-                    v_writer.writerow([star.bolometric_magnitude,
-                                       star.velocity_v])
+                    v_vs_mag_cloud_writer.writerow([star.bolometric_magnitude,
+                                                    star.velocity_v])
 
             for stars_bin in w_vs_mag_bins:
                 for star in stars_bin:
-                    w_writer.writerow([star.bolometric_magnitude,
-                                       star.velocity_w])
+                    w_vs_mag_cloud_writer.writerow([star.bolometric_magnitude,
+                                                    star.velocity_w])
 
         with open('u_vs_mag_bins.csv', 'w') as u_file:
             u_writer = csv.writer(u_file, delimiter='  ')

@@ -3,8 +3,9 @@ from functools import partial
 from itertools import filterfalse
 from typing import Dict
 
-from .kinematics import (write_data_for_velocity_clouds,
-                         write_data_for_velocities_vs_magnitude)
+from alcor.services.results_processing.kinematics import (
+    write_data_for_velocity_clouds,
+    write_data_for_velocities_vs_magnitude)
 from .luminosity_function import (BINS_COUNT,
                                   distribute_into_bins_for_luminosity_function,
                                   write_bins_luminosity_function_info)

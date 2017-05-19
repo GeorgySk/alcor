@@ -7,4 +7,4 @@ from alcor.models.star import Star
 
 NumericType = Union[int, float]
 RowType = Tuple[Number, ...]
-StarsBinsType = List[Star]
+StarsBinsType = List[List[Star]]
