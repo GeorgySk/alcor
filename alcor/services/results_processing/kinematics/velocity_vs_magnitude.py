@@ -16,14 +16,12 @@ MAX_BOLOMETRIC_MAGNITUDE = 21.0
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
-BINS_COUNT = BOLOMETRIC_MAGNITUDE_AMPLITUDE // BIN_SIZE
+BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 
-def write_velocities_vs_magnitude_data(stars: List[Star]) -> None:
-    # TODO: add reading criterion flag as command line arg
-    lepine_selection_criterion_applied = True
-
-    if lepine_selection_criterion_applied:
+def write_velocities_vs_magnitude_data(stars: List[Star],
+                                       lepine_criterion_applied: bool) -> None:
+    if lepine_criterion_applied:
         write_cloud_data_lepine_case(stars)
         write_bins_data_lepine_case(stars)
     else:
@@ -120,44 +118,44 @@ def write_bins_data_lepine_case(stars: List[Star]) -> None:
 
 def u_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                 + BIN_SIZE * (stars_bin_index - 0.5))
-        average_bin_velocity_u = mean(star.velocity_u
-                                      for star in stars_bin)
-        bin_standard_deviation_of_velocity_u = stdev(star.velocity_u
-                                                     for star in stars_bin)
+        average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index - 0.5))
+        average_velocity_u = mean(star.velocity_u
+                                  for star in stars_bin)
+        velocity_u_std = stdev(star.velocity_u
+                               for star in stars_bin)
 
-        yield (average_bin_magnitude,
-               average_bin_velocity_u,
-               bin_standard_deviation_of_velocity_u)
+        yield (average_magnitude,
+               average_velocity_u,
+               velocity_u_std)
 
 
 def v_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                 + BIN_SIZE * (stars_bin_index - 0.5))
-        average_bin_velocity_v = mean(star.velocity_v
-                                      for star in stars_bin)
-        bin_standard_deviation_of_velocity_v = stdev(star.velocity_v
-                                                     for star in stars_bin)
+        average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index - 0.5))
+        average_velocity_v = mean(star.velocity_v
+                                  for star in stars_bin)
+        velocity_v_std = stdev(star.velocity_v
+                               for star in stars_bin)
 
-        yield (average_bin_magnitude,
-               average_bin_velocity_v,
-               bin_standard_deviation_of_velocity_v)
+        yield (average_magnitude,
+               average_velocity_v,
+               velocity_v_std)
 
 
 def w_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                 + BIN_SIZE * (stars_bin_index - 0.5))
-        average_bin_velocity_w = mean(star.velocity_w
-                                      for star in stars_bin)
-        bin_standard_deviation_of_velocity_w = stdev(star.velocity_w
-                                                     for star in stars_bin)
+        average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index - 0.5))
+        average_velocity_w = mean(star.velocity_w
+                                  for star in stars_bin)
+        velocity_w_std = stdev(star.velocity_w
+                               for star in stars_bin)
 
-        yield (average_bin_magnitude,
-               average_bin_velocity_w,
-               bin_standard_deviation_of_velocity_w)
+        yield (average_magnitude,
+               average_velocity_w,
+               velocity_w_std)
 
 
 def generate_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
@@ -226,25 +224,24 @@ def write_bins_data_raw_case(stars: List[Star]) -> None:
 
 def uvw_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                 + BIN_SIZE * (stars_bin_index
-                                               - 0.5))
-        average_bin_velocity_u = mean(star.velocity_u
-                                      for star in stars_bin)
-        average_bin_velocity_v = mean(star.velocity_v
-                                      for star in stars_bin)
-        average_bin_velocity_w = mean(star.velocity_w
-                                      for star in stars_bin)
-        bin_standard_deviation_of_velocity_u = stdev(star.velocity_u
-                                                     for star in stars_bin)
-        bin_standard_deviation_of_velocity_v = stdev(star.velocity_v
-                                                     for star in stars_bin)
-        bin_standard_deviation_of_velocity_w = stdev(star.velocity_w
-                                                     for star in stars_bin)
-        yield (average_bin_magnitude,
-               average_bin_velocity_u,
-               average_bin_velocity_v,
-               average_bin_velocity_w,
-               bin_standard_deviation_of_velocity_u,
-               bin_standard_deviation_of_velocity_v,
-               bin_standard_deviation_of_velocity_w)
+        average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index - 0.5))
+        average_velocity_u = mean(star.velocity_u
+                                  for star in stars_bin)
+        average_velocity_v = mean(star.velocity_v
+                                  for star in stars_bin)
+        average_velocity_w = mean(star.velocity_w
+                                  for star in stars_bin)
+        velocity_u_std = stdev(star.velocity_u
+                               for star in stars_bin)
+        velocity_v_std = stdev(star.velocity_v
+                               for star in stars_bin)
+        velocity_w_std = stdev(star.velocity_w
+                               for star in stars_bin)
+        yield (average_magnitude,
+               average_velocity_u,
+               average_velocity_v,
+               average_velocity_w,
+               velocity_u_std,
+               velocity_v_std,
+               velocity_w_std)

@@ -130,13 +130,14 @@ def process(ctx: click.Context,
         init_db(keyspace_name=keyspace_name,
                 session=session)
 
-        processing_settings = {'input_path': data_path,
-                               'plots': [luminosity_function,
-                                         velocity_clouds,
-                                         velocities_vs_magnitude],
-                               'methods': [sample,
-                                           nullify_radial_velocity,
-                                           lepine_criterion]}
+        processing_settings = {
+            'input_path': data_path,
+            'plots': [{'luminosity_function': luminosity_function},
+                      {'velocity_clouds': velocity_clouds},
+                      {'velocities_vs_magnitude': velocities_vs_magnitude}],
+            'methods': [{'sampling_method': sample},
+                        {'nullify_radial_velocity': nullify_radial_velocity},
+                        {'lepine_criterion_applied': lepine_criterion}]}
 
         run_processing(settings=processing_settings)
 

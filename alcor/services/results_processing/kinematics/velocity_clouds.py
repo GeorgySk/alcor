@@ -5,9 +5,9 @@ from typing import List, Tuple
 from alcor.models.star import Star
 
 
-def write_velocity_clouds_data(stars: List[Star]) -> None:
-    lepine_selection_criterion_applied = True
-    if lepine_selection_criterion_applied:
+def write_velocity_clouds_data(stars: List[Star],
+                               lepine_criterion_applied: bool) -> None:
+    if lepine_criterion_applied:
         write_data_lepin_case(stars)
     else:
         write_data_raw_case(stars)

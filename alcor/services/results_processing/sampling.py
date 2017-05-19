@@ -13,7 +13,8 @@ MIN_PROPER_MOTION = 0.04
 
 
 def check_elimination(star: Star,
-                      elimination_counters: Counter) -> bool:
+                      elimination_counters: Counter,
+                      method: str) -> bool:
     # TODO: implement pc/kpc units
     galactocentric_distance = star.galactocentric_distance * 10e3
     parallax = Fraction(1.0, Fraction(galactocentric_distance))
@@ -31,21 +32,22 @@ def check_elimination(star: Star,
           > MAX_VELOCITY ** 2):
         elimination_counters['velocity'] += 1
         return True
-    elif star.proper_motion < MIN_PROPER_MOTION:
-        elimination_counters['proper_motion'] += 1
-        return True
-    # TODO: find out the meaning of the following constants
-    elif gz < -0.33 and hrm < 14.0:
-        elimination_counters['reduced_proper_motion'] += 1
-        return True
-    # TODO: find out the meaning of the following constants
-    elif hrm < 3.559 * gz + 15.17:
-        elimination_counters['reduced_proper_motion'] += 1
-        return True
-    # TODO: find out the meaning of the following constant
-    elif star.v_photometry >= 19.0:
-        elimination_counters['apparent_magnitude'] += 1
-        return True
+    elif method == 'restricted':
+        if star.proper_motion < MIN_PROPER_MOTION:
+            elimination_counters['proper_motion'] += 1
+            return True
+        # TODO: find out the meaning of the following constants
+        elif gz < -0.33 and hrm < 14.0:
+            elimination_counters['reduced_proper_motion'] += 1
+            return True
+        # TODO: find out the meaning of the following constants
+        elif hrm < 3.559 * gz + 15.17:
+            elimination_counters['reduced_proper_motion'] += 1
+            return True
+        # TODO: find out the meaning of the following constant
+        elif star.v_photometry >= 19.0:
+            elimination_counters['apparent_magnitude'] += 1
+            return True
     return False
 
 
@@ -63,13 +65,12 @@ def write_elimination_stats(full_sample_stars_count: int,
                              'Eliminated by apparent magnitude:',
                              'Number of stars in restricted sample:')
         file_writer.writerow(full_sample_stars_count,
-                             elimination_counters[parallax],
-                             elimination_counters[declination],
+                             elimination_counters['parallax'],
+                             elimination_counters['declination'],
                              full_sample_stars_count
-                             - elimination_counters[parallax]
-                             - elimination_counters[declination],
-                             elimination_counters[proper_motion],
-                             elimination_counters[reduced_proper_motion],
-                             elimination_counters[apparent_magnitude],
+                             - elimination_counters['parallax']
+                             - elimination_counters['declination'],
+                             elimination_counters['proper_motion'],
+                             elimination_counters['reduced_proper_motion'],
+                             elimination_counters['apparent_magnitude'],
                              restricted_sample_stars_count)
-        file_writer.writerow('\n')

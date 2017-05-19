@@ -12,26 +12,14 @@ MAX_BOLOMETRIC_MAGNITUDE = 21.0
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
-BINS_COUNT = BOLOMETRIC_MAGNITUDE_AMPLITUDE // BIN_SIZE
+BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
-def distribute_into_bins_for_luminosity_function(star: Star,
-                                                 bins: StarsBinsType
-                                                 ) -> None:
-    stars_bin = get_magnitude_bin_index(star)
-    bins[stars_bin].append(star)
-
-
-def get_magnitude_bin_index(star: Star) -> int:
-    return int(ceil((star.bolometric_magnitude
-                     - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE))
-
-
-def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
+def write_luminosity_function_data(stars: List[Star]) -> None:
+    bins = apply_binning_distribution(stars)
     # TODO: comment on the choice of these particular bins
     normalization_factor = (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
                             * (len(bins[16]) + len(bins[17]) + len(bins[18]))
@@ -49,11 +37,25 @@ def write_bins_luminosity_function_info(bins: List[List[Star]]) -> None:
             output_writer.writerow(row)
 
 
+def apply_binning_distribution(stars: List[Star]) -> StarsBinsType:
+    bins = [[] for _ in range(BINS_COUNT)]
+    for star in stars:
+        stars_bin = get_magnitude_bin_index(star)
+        bins[stars_bin].append(star)
+    return bins
+
+
+def get_magnitude_bin_index(star: Star) -> int:
+    return int(ceil((star.bolometric_magnitude
+                     - MIN_BOLOMETRIC_MAGNITUDE)
+                    / BIN_SIZE))
+
+
 def rows(bins: StarsBinsType,
          normalization_factor: float) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(bins):
-        average_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                 + BIN_SIZE * (stars_bin_index - 0.5))
+        average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index - 0.5))
         stars_count_logarithm = get_stars_count_logarithm(
             stars_count=len(stars_bin),
             normalization_factor=normalization_factor)
@@ -64,7 +66,7 @@ def rows(bins: StarsBinsType,
                           - log10((len(stars_bin) -
                                    sqrt(len(stars_bin)))
                                   / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME))
-        yield(average_bin_magnitude,
+        yield(average_magnitude,
               stars_count_logarithm,
               upper_errorbar,
               lower_errorbar)
