@@ -1,5 +1,5 @@
 import csv
-from collections import Iterable
+from typing import Iterable
 from contextlib import ExitStack
 from math import ceil
 from statistics import (mean,

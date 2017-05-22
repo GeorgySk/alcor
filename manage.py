@@ -90,8 +90,8 @@ def run(ctx: click.Context,
               default='restricted',
               help='How we want to sort raw data.'
                    '(raw - do nothing,'
-                   'full - only declination and parallax selection criteria)',
-                   'restricted - apply all criteria')
+                   'full - only declination and parallax selection criteria,'
+                   'restricted - apply all criteria)')
 @click.option('--nullify-radial-velocity', '-nrf',
               is_flag=True,
               help='Sets radial velocities to zero.')

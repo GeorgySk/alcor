@@ -6,7 +6,7 @@ from subprocess import check_call
 from typing import (Dict,
                     Any)
 
-from cassandra.cluster.Session import Session
+from cassandra.cluster import Session
 
 from alcor.models.parameter import Parameter
 from alcor.services.data_access import insert

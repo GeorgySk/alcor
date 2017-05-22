@@ -3,11 +3,9 @@ from functools import partial
 from itertools import filterfalse
 from typing import Dict
 
-from alcor.services.results_processing.kinematics import (
-    write_velocity_clouds_data,
-    write_velocities_vs_magnitude_data)
-from alcor.services.results_processing.luminosity_function import (
-    write_luminosity_function_data)
+from .kinematics import (write_velocity_clouds_data,
+                         write_velocities_vs_magnitude_data)
+from .luminosity_function import write_luminosity_function_data
 from .sampling import (write_elimination_stats,
                        check_elimination)
 from alcor.utils import parse_stars
@@ -23,10 +21,10 @@ def run_processing(*, settings: Dict[str, str]) -> None:
 
     sampling_method = methods['sampling_method']
     eliminations_counter = Counter(int)
-    apply_elimination_criteria = partial(check_elimination,
-                                         eliminations_counter
-                                         =eliminations_counter,
-                                         method=sampling_method)
+    apply_elimination_criteria = partial(
+        check_elimination,
+        eliminations_counter=eliminations_counter,
+        method=sampling_method)
     if sampling_method == 'full':
         stars = filterfalse(apply_elimination_criteria,
                             raw_stars_sample)

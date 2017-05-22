@@ -10,9 +10,17 @@ services:
     extra_hosts:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
-      - run
-      - --project-dir
-      - test_project
+      # Generating stars:
+#      - run
+#      - --project-dir
+#      - test_project
+      # Processing generated data:
+      - process
+      - --data-path
+      - test_project/381d4.res
+      - --sample
+      - restricted
+      - --luminosity-function
     environment:
       - CASSANDRA_RPC_ADDRESS=cassandra
       - CASSANDRA_RPC_PORT=9042

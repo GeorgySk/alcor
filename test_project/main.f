@@ -70,7 +70,6 @@ C     NOTE: use of commons is strongly discouraged!
       common /param/ fractionOfDB,galacticDiskAge,parameterIMF,
      &               parameterIFMR,timeOfBurst
 
-
 C     --- Filling info about groups of files (cooling, color tables) ---    
 C ======================================================================
       call fillTable(table)
@@ -344,6 +343,8 @@ C     NOTE: this 70 comes from nowhere
      &                 coordinate_Zcylindr(numberOfStars)
       double precision parallax(numberOfStars)
       double precision tangenVelo(numberOfStars)
+      double precision mpl(numberOfStars),mpb(numberOfStars),
+     &                 vr(numberOfStars)
       double precision errora(70),ndfa(70)
 C     ugriz-color system and V-band from Johnson system
       double precision go(numberOfStars),gr(numberOfStars),

@@ -74,8 +74,9 @@ C        ---   Galactic coordinate r (Kpc) ---
      &          coordinate_Zcylindr(i)))
 C     ---   Galactic coordinate lgac ---
         ros=dsqrt(ros)
-        zz=(coordinate_R(i)/ros)*dsin(coordinate_Theta(i))
-        lgac(i)=dasin(zz)
+        lgac(i) = dacos((solarGalactocentricDistance ** 2 + ros**2
+     &                   - coordinate_R(i) ** 2)
+     &                  /(2.d0 * solarGalactocentricDistance * ros))
         if (coordinate_R(i)*dcos(coordinate_Theta(i)).gt.
      &     solarGalactocentricDistance) then 
           lgac(i)=pi-lgac(i)
