@@ -1,3 +1,4 @@
+import decimal
 import uuid
 from datetime import datetime
 from math import (cos,
@@ -63,7 +64,7 @@ class Star(Model):
     @property
     def bolometric_magnitude(self) -> float:
         # TODO: find out the meaning of the following constants
-        return 2.5 * self.luminosity + 4.75
+        return decimal.Decimal(2.5) * self.luminosity + decimal.Decimal(4.75)
 
     @property
     def coordinate_x(self) -> float:

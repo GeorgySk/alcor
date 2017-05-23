@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from collections import Counter
@@ -10,6 +11,11 @@ from .luminosity_function import write_luminosity_function_data
 from .sampling import (write_elimination_stats,
                        check_elimination)
 from alcor.utils import parse_stars
+
+logging.basicConfig(format='%(filename)s %(funcName)s '
+                           '%(levelname)s: %(message)s',
+                    level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def run_processing(data_path,
@@ -28,25 +34,23 @@ def run_processing(data_path,
         check_elimination,
         eliminations_counter=eliminations_counter,
         method=sample)
-    raw_sample_stars_count = len(stars)
+    raw_sample_stars_count = len(list(stars))
     if sample == 'full' or sample == 'restricted':
-        filtered_stars = filterfalse(apply_elimination_criteria,
-                                     stars)
+        filtered_stars = list(filterfalse(apply_elimination_criteria,
+                                          stars))
     write_elimination_stats(raw_sample_stars_count=raw_sample_stars_count,
-                            filtered_stars_count=len(list(filtered_stars)),
+                            filtered_stars_count=len(filtered_stars),
                             eliminations_counter=eliminations_counter)
 
     if nullify_radial_velocity:
         for filtered_stars in stars:
             filtered_stars.set_radial_velocity_to_zero()
 
-    lepine_criterion_applied = lepine_criterion
-
     if luminosity_function:
         write_luminosity_function_data(filtered_stars)
     if velocity_clouds:
         write_velocity_clouds_data(filtered_stars,
-                                   lepine_criterion_applied)
+                                   lepine_criterion)
     if velocities_vs_magnitude:
         write_velocities_vs_magnitude_data(filtered_stars,
-                                           lepine_criterion_applied)
+                                           lepine_criterion)

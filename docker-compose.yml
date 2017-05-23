@@ -17,7 +17,7 @@ services:
       # Processing generated data:
       - process
       - --data-path
-      - test_project/381d4.res
+      - test_project/a45b7.res
       - --sample
       - restricted
       - --luminosity-function
