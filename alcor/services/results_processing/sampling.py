@@ -27,7 +27,7 @@ def check_elimination(star: Star,
     galactocentric_distance = star.galactocentric_distance * Decimal(1e3)
     parallax = Fraction(1, Fraction(galactocentric_distance))
     # TODO: find out the meaning of the following constants
-    hrm = (star.go_photometry + Decimal(5.0 * log10(star.proper_motion) + 5.0))
+    hrm = star.go_photometry + Decimal(5.0 * log10(star.proper_motion) + 5.0)
     gz = star.gr_photometry + star.rz_photometry
 
     if parallax < MIN_PARALLAX:

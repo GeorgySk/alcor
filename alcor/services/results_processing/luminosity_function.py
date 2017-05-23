@@ -6,8 +6,6 @@ from math import (ceil,
 from typing import (List,
                     Iterable)
 
-from decimal import Decimal
-
 from alcor.models.star import Star
 from alcor.types import StarsBinsType, RowType
 
@@ -16,19 +14,19 @@ logging.basicConfig(format='%(filename)s %(funcName)s '
                     level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-MIN_BOLOMETRIC_MAGNITUDE = Decimal(6.0)
-MAX_BOLOMETRIC_MAGNITUDE = Decimal(21.0)
-BIN_SIZE = Decimal(0.5)
+MIN_BOLOMETRIC_MAGNITUDE = 6.0
+MAX_BOLOMETRIC_MAGNITUDE = 21.0
+BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
 BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
-OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = Decimal(220)
-FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = Decimal(134041.29)
+OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
+FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
 def write_luminosity_function_data(stars: List[Star]) -> None:
-    bins = apply_binning_distribution(stars)
+    bins = generate_bins(stars)
     # TODO: comment on the choice of these particular bins
     normalization_factor = (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
                             * (len(bins[16]) + len(bins[17]) + len(bins[18]))
@@ -47,7 +45,7 @@ def write_luminosity_function_data(stars: List[Star]) -> None:
             output_writer.writerow(row)
 
 
-def apply_binning_distribution(stars: List[Star]) -> StarsBinsType:
+def generate_bins(stars: List[Star]) -> StarsBinsType:
     bins = [[] for _ in range(BINS_COUNT)]
     for star in stars:
         stars_bin = get_magnitude_bin_index(star)
@@ -56,7 +54,7 @@ def apply_binning_distribution(stars: List[Star]) -> StarsBinsType:
 
 
 def get_magnitude_bin_index(star: Star) -> int:
-    return int(ceil((star.bolometric_magnitude
+    return int(ceil((float(star.bolometric_magnitude)
                      - MIN_BOLOMETRIC_MAGNITUDE)
                     / BIN_SIZE))
 
@@ -64,22 +62,19 @@ def get_magnitude_bin_index(star: Star) -> int:
 def rows(bins: StarsBinsType,
          normalization_factor: float) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(bins):
+        stars_count = len(stars_bin)
         average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                             + BIN_SIZE * Decimal(stars_bin_index - 0.5))
+                             + BIN_SIZE * (stars_bin_index - 0.5))
         stars_count_logarithm = get_stars_count_logarithm(
-            stars_count=len(stars_bin),
+            stars_count=stars_count,
             normalization_factor=normalization_factor)
-        upper_errorbar = (log10(Decimal(len(stars_bin) + sqrt(len(stars_bin)))
-                                / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
-                          - len(stars_bin))
-        lower_errorbar = (len(stars_bin)
-                          - log10(Decimal(len(stars_bin)
-                                          - sqrt(len(stars_bin)))
-                                  / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME))
-        yield(average_magnitude,
-              stars_count_logarithm,
-              upper_errorbar,
-              lower_errorbar)
+        upper_errorbar = get_upper_errorbar(stars_count)
+        lower_errorbar = get_lower_errorbar(stars_count)
+        if stars_count > 0:
+            yield (average_magnitude,
+                   stars_count_logarithm,
+                   upper_errorbar,
+                   lower_errorbar)
 
 
 def get_stars_count_logarithm(stars_count: int,
@@ -88,3 +83,23 @@ def get_stars_count_logarithm(stars_count: int,
         return log10(stars_count / normalization_factor)
     except ValueError:
         return 0.
+
+
+def get_upper_errorbar(stars_count: int) -> float:
+    if stars_count == 0:
+        return 0.0
+    else:
+        return (log10((stars_count + sqrt(stars_count))
+                      / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
+                - log10(stars_count / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME))
+
+
+def get_lower_errorbar(stars_count: int) -> float:
+    if stars_count == 0:
+        return 0.0
+    elif stars_count == 1:
+        return 5.0  # Random number so that errorbar would go below the plot
+    else:
+        return (log10(stars_count / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
+                - log10((stars_count - sqrt(stars_count))
+                        / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME))
