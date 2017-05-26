@@ -218,7 +218,7 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
      &     solarGalactocentricDistance,scaleLength)
 
       write(6,*) '5. Generating heliocentric velocities (5/9)'
-      call velh(iseed,numberOfStarsInSample,kinematicModel)
+      call velh(iseed,numberOfStarsInSample)
 
 C     QUESTION: why are we missing the next step?
       goto 7
@@ -388,9 +388,10 @@ C     TODO: make dynamic array or linked list
 C     2D-array of bolometric magnitudes for each WD; indexes are the 
 C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision arrayOfMagnitudes(25,50000)
+      integer disk_belonging(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
-      common /index/ flagOfWD,numberOfWDs      
+      common /index/ flagOfWD,numberOfWDs,disk_belonging      
       common /mad/ properMotion,rightAscension,declination
       common /mopro/ mpb,mpl,vr
       common /paral/ rgac

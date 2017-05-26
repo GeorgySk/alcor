@@ -1,66 +1,69 @@
       subroutine gen(iseed,parameterOfSFR,areaOfSector,
      &           numberOfStarsInSample,galacticDiskAge,timeOfBurst,
-     &           massReductionFactor,kinematicModel)
+     &           massReductionFactor,sfr_model)
 C=======================================================================
-C
 C     Divides the SFR in intervals of time. In each interval, the total 
 C     mass of stars is distributed. The mass of each star follows the 
-C     distribution law given by IMF. The birth time(t_b) is also
-C     calculated from which the height pattern and finally cylindrical 
+C     distribution law given by IMF. The birth time is also calculated,
+C     from which the height pattern and finally cylindrical 
 C     z-coordinate are determined.
-C
-C     NOTE: using version control system lets avoid lines like this
-C     Revised by S. Torres 22/09/07
-C     Modifications by E.R.Cojocaru 06/2013
 C-----------------------------------------------------------------------       
 C           Input parameters:
-C           QUESTION: what does it mean?
-C           iseed=entero generador de ran       
-C           parameterOfSFR: parametro of the SFR        
+C           iseed: seed for random generator
+C           parameterOfSFR
 C           areaOfSector: area of the considered sector in Kpc²
+C           galacticDiskAge
+C           timeOfBurst: how many Gyr ago burst of star gener-n happened
 C-----------------------------------------------------------------------
 C           Output parameters:
 C           numberOfStarsInSample: number of participating stars
 C=======================================================================
+C     TODO: change to implicit none
       implicit double precision (a-h,m,o-z)
 
-C     ---   Declaration of variables  ---
-
-C     QUESTION: what are the next 2 lines?
+C     overloading intrinsic 'ran' function by our own RNG
       external ran
       real ran
-C     QUESTION: what is nbins and sheight?
-      integer numberOfStars,nbins,iseed
-      double precision zDistribution_zo,deltaT_SFRThickDisk,
-     &                 heightSFR_ThickDisk,sheight
-      double precision hDistr_zi,hDistr_t,hDistr_zf
+      integer numberOfStars,
+     &        nbins,
+     &        iseed,
+     &        sfr_model
+      double precision zDistribution_zo,
+     &                 deltaT_SFRThickDisk,
+     &                 heightSFR_ThickDisk,
+     &                 sheight, 
+     &                 sheight_thick,
+     &                 hDistr_zi,
+     &                 hDistr_t,
+     &                 hDistr_zf,
+     &                 ttdisk,
+     &                 tmdisk,
+     &                 tmax,
+     &                 tau,
+     &                 ft,
+     &                 fz
 
-      integer kinematicModel
-
-
-C     ---   Parameters   ---
-
-
-      parameter (numberOfStars=6000000)
-      parameter (zDistribution_zo=1.0)
-C     delta t SFR thick disk
-      parameter (deltaT_SFRThickDisk=0.5)
-C     height SFR thick disk
-      parameter (heightSFR_ThickDisk=5.0)
-      parameter (sheight=0.250)
-      parameter (hDistr_zi=242.5)
-      parameter (hDistr_t=0.7)
-      parameter (hDistr_zf=0.250)
-
-C     ---   Dimensions   ---
+      parameter (numberOfStars = 6000000)
+      parameter (zDistribution_zo = 1.0)
+      parameter (deltaT_SFRThickDisk = 0.5)
+      parameter (heightSFR_ThickDisk = 5.0)
+C     Scale height of the thin disk?
+      parameter (sheight = 0.250)
+      parameter (hDistr_zi = 242.5)
+      parameter (hDistr_t = 0.7)
+      parameter (hDistr_zf = 0.250)
+C     Scale height of the thick disk:
+      parameter (sheight_thick=0.900)
+C     Parameters of the thick disk
+      parameter (ttdisk = 12.0)
+      parameter (tmdisk = 10.0)
+      parameter (tau = 2.0)
       
-C     QUESTION: what are in, cte, deltat, psi?      
-      integer numberOfStarsInSample,i,k,in
+      integer numberOfStarsInSample, i, k, in
       double precision parameterOfSFR,areaOfSector,galacticDiskAge,cte,
      &                 deltat,massReductionFactor,psi
-C     QUESTION: what are these variables?
       double precision me,mgen,mrep,t,tf,to,xseed,xx,zmaxbin,zz
-C     NOTE; ximf - mass from IMF by Salpeter, cnorm - const.of 
+C     NOTE: ximf - mass from IMF by Salpeter, cnorm - const.of 
 C           normalization of SFR. Both are from functions with same name
       double precision ximf,cnorm  
       double precision coordinate_Theta(numberOfStars),
@@ -70,37 +73,35 @@ C     QUESTION: what is m? massInMainSequence?
       double precision m(numberOfStars)
       double precision starBirthTime(numberOfStars)
       double precision heightPattern(numberOfStars)
+      double precision flagOfWD(numberOfStars)
+      integer disk_belonging(numberOfStars)
 
-C     ---  Commons  ---
-       
       common /tm/ starBirthTime,m
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /patron/ heightPattern
-
+      common /index/ flagOfWD,numberOfWDs,disk_belonging
 
 C------------------------------------------------------------------
 C     ---   Calculating the mass, time of birth and z-coordinate of 
 C           every star   ---
 C------------------------------------------------------------------
-
-C      --- Initialization de different variables ---
+C     --- Initialization of different variables ---
 
 C     Variables referring to SFR:
 C     Calculating the normalization constant of the SFR
-      cte=cnorm(parameterOfSFR,galacticDiskAge)
-C     QUESTION: is to - time when birth of stars begins?      
-      to=0.0
-C     QUESTION: why do we need tf if is the same as galacticDiskAge?      
-      tf=galacticDiskAge
-      nbins=5000
-      deltat=(tf-to)/nbins  
+      cte = cnorm(parameterOfSFR, galacticDiskAge)
+C     QUESTION: is 'to' a time when stars begin to be born?      
+      to = 0.0
+C     QUESTION: why do we need tf if it's the same as galacticDiskAge?      
+      tf = galacticDiskAge
+      nbins = 5000
+      deltat = (tf - to) / nbins  
 C     NOTE: this k counter variable is used in GOTO-loop, which is bad
-      k=0  
+      k=0
 
-C      ---  Reduction factor of the mass to be distributed ---
+C     ---  Reduction factor of the mass to be distributed ---
 C     massReductionFactor=0.1 for 'fat' sample
 C     massReductionFactor=3.0 individual samples
-C       massReductionFactor=0.5
 
       write(6,*) '      Factor of mass reduction=',massReductionFactor
 
@@ -108,95 +109,114 @@ C     ---  Choosing properties of the thin/thick disk according to the
 C          corresponding line parameter ---
 
 C     ---  Calculating the mass to be distributed at each interval ---        
+      do 3 i = 1, nbins
+          zmaxbin = 0.0
+          psi = cte * deltat
+          mrep = psi * areaOfSector * 1.0d6
+          mrep = mrep / massReductionFactor
+          mgen = 0.0
 
+C         ---  Recent Burst   ---
+C         NOTE: we don't need so many parameters
+          tago = timeOfBurst
+          tago = galacticDiskAge - tago
+          tfin = galacticDiskAge
 
-
-      do 3 i=1,nbins
-C       QUESTION: what does all these parameters mean?       
-        zmaxbin=0.0
-        psi=cte*deltat
-        mrep=psi*areaOfSector*1.0d6
-        mrep=mrep/massReductionFactor
-        mgen=0.0
-
-C       ---  Recent Burst   ---
-C       NOTE: we don't need so many parameters
-        tago=timeOfBurst
-        tago=galacticDiskAge-tago
-        tfin=galacticDiskAge
-
-        tsfr=to+dfloat(i-1)*deltat
+          tsfr = to + dfloat(i-1) * deltat
       
-        if(tsfr.ge.tago.and.tsfr.lt.tfin) then
-          mrep=mrep*5.0
-        endif
+          if(tsfr.ge.tago .and. tsfr.lt.tfin) then
+              mrep = mrep * 5.0
+          endif
 
-C       ---  Calling to the IMF  ---
-1       me=ximf(iseed)
+C         ---  Calling to the IMF  ---
+1         me = ximf(iseed)
 
-C       QUESTION: what is it supposed to mean?
-C       ---  Ya tenemos la masa  ---
-       
-        k=k+1
+C         QUESTION: what is it supposed to mean?
+C         ---  Ya tenemos la masa  ---
+          k=k+1
 
-        if(k.eq.numberOfStars) then 
-          write(6,*) '     ***  Dimension exceeded   ***'
-          write(6,*) '***  Increase the reduction factor   ***'
-          stop
-        else
-          continue
-        endif
-        m(k)=me
+          if(k.eq.numberOfStars) then 
+              write(6,*) '     ***  Dimension exceeded   ***'
+              write(6,*) '***  Increase the reduction factor   ***'
+              stop
+          else
+              continue
+          endif
+          m(k)=me
         
-        mgen=mgen+me               
+          mgen=mgen+me               
          
-C       --- Birth time from SFR constant  ---
-C       running RNG once more to get exactly the same results as for
-C       my fortran program
-        xseed=deltat*ran(iseed)
-        xseed=deltat*ran(iseed)      
-        t=to+dfloat(i-1)*deltat+xseed 
-        starBirthTime(k)=t 
+C         --- Birth time from SFR constant  --- 
+C         --- Choosing with what model we generate stars ---
+C         --- disk_belonging = 1 (thin disk), = 2 (thick disk)
+          if (sfr_model == 2) then
+              if (ran(iseed) .le. 0.08) then
+                  disk_belonging(k) = 2
+                  tmax = tmdisk * dexp(-tmdisk/tau)
+ 33               ttry = ttdisk * ran(iseed)
+                  ft = ttry * dexp(-ttry/tau)
+                  fz = tmax * ran(iseed)
+                  if (fz .le. ft) then
+                      starBirthTime(k) = ttry
+                  else
+                      goto 33
+                  end if
+              else
+                  disk_belonging(k) = 1
+                  xseed = deltat * ran(iseed)      
+                  t = to + dfloat(i - 1)*deltat + xseed 
+                  starBirthTime(k) = t
+              end if
+          else if (sfr_model == 1) then 
+C             running ran once more to get same results as for model2 
+              xseed = deltat * ran(iseed)
+              xseed = deltat * ran(iseed)      
+              t = to + dfloat(i - 1)*deltat + xseed 
+              starBirthTime(k) = t
+              disk_belonging(k) = 1
+          else
+              write(6,*) 'ERROR: wrong SFR model'
+          end if
        
-C       ---  Calculating the height pattern in kpc ---
-C       ---  modal of constant heightPattern  ---
-      if (kinematicModel == 1) then
-        heightPattern(k)=sheight
-      else if (kinematicModel == 2) then
-C       --- modal of variable heightPattern  ---
-        heightPattern(k)=hDistr_zi*dexp(-starBirthTime(k)/hDistr_t)+
-     &                    hDistr_zf
-      else
-        print*, "kinematic_model can be only 1 or 2"
-      end if
+C         ---  Calculating the height pattern in kpc ---
+C         ---  model of constant heightPattern  ---
+          if (disk_belonging(k) == 1) then
+              heightPattern(k) = sheight
+          else if (disk_belonging(k) == 2) then
+              heightPattern(k) = sheight_thick
+          else
+              write(6, *) "Error: wrong SFR model"
+          end if
+C         --- model of variable heightPattern  ---
+C           heightPattern(k)=hDistr_zi*dexp(-starBirthTime(k)/hDistr_t)+
+C      &                     hDistr_zf
 
-C       --- Calculating z ---
-C       TODO: delete this goto and put loop here
-2       xx=zDistribution_zo*heightPattern(k)*ran(iseed)
-        if (xx.eq.0.0) goto 2 
-        zz=heightPattern(k)*DLOG(zDistribution_zo*heightPattern(k)/xx)
+C         --- Calculating z ---
+C         TODO: delete this goto and put a loop here
+2         xx=zDistribution_zo*heightPattern(k)*ran(iseed)
+          if (xx.eq.0.0) goto 2 
+          zz=heightPattern(k)*DLOG(zDistribution_zo*heightPattern(k)/xx)
 
-C       QUESTION: what is this?
+C         QUESTION: what is this?
 C-------------------------------------------------------------------    
 C       z-contstant       zz=0.240*ran(iseed)  
 C-------------------------------------------------------------------    
 
-        in=int(2.0*ran(iseed))
+          in=int(2.0*ran(iseed))
 
-        coordinate_Zcylindr(k)=zz*dfloat(1-2*in)
+          coordinate_Zcylindr(k)=zz*dfloat(1-2*in)
 
-        zmaxbin=dmax1(zmaxbin,coordinate_Zcylindr(k))
+          zmaxbin=dmax1(zmaxbin,coordinate_Zcylindr(k))
 
-C       --- Checking if we have generated enough mass  ---
+C         --- Checking if we have generated enough mass  ---
    
-        if (mgen.lt.mrep) then
-C         TODO: eleminate this goto
-          goto 1
-        else
-          m(k)=m(k)-(mgen-mrep)
-          mgen=mrep
-        endif
-
+          if (mgen.lt.mrep) then
+C             TODO: eleminate this goto
+              goto 1
+          else
+              m(k)=m(k)-(mgen-mrep)
+              mgen=mrep
+          endif
 3     continue
         
       numberOfStarsInSample=k
@@ -211,11 +231,9 @@ C***********************************************************************
 
 
 C***********************************************************************
-      function cnorm(parameterOfSFR,galacticDiskAge)
+      function cnorm(parameterOfSFR, galacticDiskAge)
 C=======================================================================
-C
 C     Calculating the normalization constant of the SFR
-C    
 C=======================================================================
       implicit double precision (a-h,m,o-z)
       double precision sigma,parameterOfSFR,galacticDiskAge,cnorm

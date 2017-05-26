@@ -2,7 +2,10 @@ import decimal
 import uuid
 from datetime import datetime
 from math import (cos,
-                  sin, asin, atan, pi)
+                  sin,
+                  pi,
+                  asin,
+                  atan)
 from typing import Tuple
 from cassandra.cqlengine.columns import (UUID,
                                          Decimal,

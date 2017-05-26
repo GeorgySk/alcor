@@ -34,12 +34,13 @@ C     ---   Dimensions   ---
       double precision flagOfWD(numberOfStars)
       double precision yscal(2),y(2),dydx(2)         
       double precision xpla(numberOfStars),ypla(numberOfStars)
+      integer disk_belonging(numberOfStars)
         
 C     ---   Commons   ---
       common /vel/ uu,vv,ww
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /tm/ starBirthTime,m
-      common /index/ flagOfWD,numberOfWDs         
+      common /index/ flagOfWD,numberOfWDs,disk_belonging         
 C     NOTE: names are different in this block      
       common /plano/ xpla,ypla
       common /carte/ xcar,ycar

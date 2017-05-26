@@ -43,12 +43,13 @@ C     ---   Dimensions  ---
      &                 rz(numberOfStars)
       double precision coolingTime(numberOfStars)
       double precision typeOfWD(numberOfStars)
+      integer disk_belonging(numberOfStars)
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
 C     ---   Commons   ---
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
-      common /index/ flagOfWD,numberOfWDs
+      common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /paral/ rgac
       common /photo/ go,gr,gi,ur,rz
       common /johnson/ v

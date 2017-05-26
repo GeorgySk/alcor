@@ -45,13 +45,14 @@ C     ---   Dimensions   ---
       double precision rightAscension(numberOfStars),
      &                 declination(numberOfStars)
       double precision flagOfWD(numberOfStars)
+      integer disk_belonging(numberOfStars)
        
 C     ---   Commons   ---
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /vel/ uu,vv,ww
       common /paral/ rgac
       common /mad/ properMotion,rightAscension,declination
-      common /index/ flagOfWD,numberOfWDs
+      common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /mopro/ mpb,mpl,vr
       common /lb/ lgac,bgac
       

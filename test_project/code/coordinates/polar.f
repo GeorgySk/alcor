@@ -45,11 +45,12 @@ C     ---  Dimensions  ---
      &                 coordinate_Zcylindr(numberOfStars)
       double precision x(numberOfStars),y(numberOfStars)
       double precision flagOfWD(numberOfStars)
+      integer disk_belonging(numberOfStars)
 
 C     ---  Commons  ---
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /plano/ x,y
-      common /index/ flagOfWD,numberOfWDs
+      common /index/ flagOfWD,numberOfWDs,disk_belonging
 
 C     ---  Inicialization of pi and sigma ---
       pi=4.0*atan(1.0)
