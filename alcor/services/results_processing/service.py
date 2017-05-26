@@ -38,13 +38,15 @@ def run_processing(data_path,
     if sample == 'full' or sample == 'restricted':
         filtered_stars = list(filterfalse(apply_elimination_criteria,
                                           stars))
+    else:
+        filtered_stars = stars
     write_elimination_stats(raw_sample_stars_count=raw_sample_stars_count,
                             filtered_stars_count=len(filtered_stars),
                             eliminations_counter=eliminations_counter)
 
     if nullify_radial_velocity:
-        for filtered_stars in stars:
-            filtered_stars.set_radial_velocity_to_zero()
+        for star in filtered_stars:
+            star.set_radial_velocity_to_zero()
 
     if luminosity_function:
         write_luminosity_function_data(filtered_stars)

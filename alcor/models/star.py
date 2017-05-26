@@ -2,18 +2,18 @@ import decimal
 import uuid
 from datetime import datetime
 from math import (cos,
-                  sin)
+                  sin, asin, atan, pi)
 from typing import Tuple
-
-from astropy import units as u
-from astropy.coordinates.sky_coordinate import SkyCoord
 from cassandra.cqlengine.columns import (UUID,
                                          Decimal,
                                          DateTime,
                                          Integer)
 from cassandra.cqlengine.models import Model
 
-ASTRONOMICAL_UNIT = 4.74 * u.km / u.s
+ASTRONOMICAL_UNIT = 4.74
+DEC_GPOLE = 27.128336 * pi / 180.0
+RA_GPOLE = 192.859508 * pi / 180.0
+AUX_ANGLE = 122.932 * pi / 180.0
 
 STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion',
@@ -68,56 +68,69 @@ class Star(Model):
 
     @property
     def coordinate_x(self) -> float:
-        try:
-            return self.coordinate_x
-        except AttributeError:
-            return self.to_cartesian_from_equatorial[0]
+        return float(self.to_cartesian_from_equatorial()[0])
 
     @property
     def coordinate_y(self) -> float:
-        try:
-            return self.coordinate_y
-        except AttributeError:
-            return self.to_cartesian_from_equatorial[1]
+        return float(self.to_cartesian_from_equatorial()[1])
 
     @property
     def coordinate_z(self) -> float:
-        try:
-            return self.coordinate_z
-        except AttributeError:
-            return self.to_cartesian_from_equatorial[2]
+        return float(self.to_cartesian_from_equatorial()[2])
 
-    def to_cartesian_from_equatorial(self) -> Tuple[Decimal,
-                                                    Decimal,
-                                                    Decimal]:
-        equatorial_coordinates = SkyCoord(
-            ra=self.right_ascension * u.degree,
-            dec=self.declination * u.degree,
-            distance=self.distance * u.kpc)
-        return (equatorial_coordinates.cartesian.x,
-                equatorial_coordinates.cartesian.y,
-                equatorial_coordinates.cartesian.z)
+    def to_cartesian_from_equatorial(self) -> Tuple[float,
+                                                    float,
+                                                    float]:
+        ra = float(self.right_ascension)
+        dec = float(self.declination)
+        distance = float(self.galactocentric_distance)
+
+        b = (asin(cos(dec) * cos(DEC_GPOLE) * cos(ra - RA_GPOLE)
+                  + sin(dec) * sin(DEC_GPOLE)))
+        x = sin(dec) - sin(b) * sin(DEC_GPOLE)
+        y = cos(dec) * sin(ra - RA_GPOLE) * cos(DEC_GPOLE)
+        l = atan(x / y) + AUX_ANGLE - pi / 2.0
+        if y < 0.0 < x:
+            l += pi
+        elif x < 0.0 > y:
+            l += pi
+        elif x < 0.0 < y:
+            l += 2.0 * pi
+        elif l > 2.0 * pi:
+            l -= 2.0 * pi
+        coordinate_x = distance * cos(b) * cos(l)
+        coordinate_y = distance * cos(b) * sin(l)
+        coordinate_z = distance * sin(b)
+        return (coordinate_x,
+                coordinate_y,
+                coordinate_z)
 
     def set_radial_velocity_to_zero(self) -> None:
         # TODO: implement pc/kpc units
-        distance_in_pc = self.galactocentric_distance * 10e3
+        galactocentric_distance = float(self.galactocentric_distance)
+        galactocentric_coordinate_b = float(self.galactocentric_coordinate_b)
+        galactocentric_coordinate_l = float(self.galactocentric_coordinate_l)
+        proper_motion_component_b = float(self.proper_motion_component_b)
+        proper_motion_component_l = float(self.proper_motion_component_l)
 
-        a1 = (-ASTRONOMICAL_UNIT * cos(self.galactocentric_coordinate_b)
-              * sin(self.galactocentric_coordinate_l))
-        b1 = (-ASTRONOMICAL_UNIT * sin(self.galactocentric_coordinate_b)
-              * cos(self.galactocentric_coordinate_l))
-        self.velocity_u = ((a1 * self.proper_motion_component_l
-                           + b1 * self.proper_motion_component_b)
+        distance_in_pc = galactocentric_distance * 1e3
+
+        a1 = (-ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
+              * sin(galactocentric_coordinate_l))
+        b1 = (-ASTRONOMICAL_UNIT * sin(galactocentric_coordinate_b)
+              * cos(galactocentric_coordinate_l))
+        self.velocity_u = ((a1 * proper_motion_component_l
+                           + b1 * proper_motion_component_b)
                            * distance_in_pc)
 
-        a2 = (ASTRONOMICAL_UNIT * cos(self.galactocentric_coordinate_b)
-              * cos(self.galactocentric_coordinate_l))
-        b2 = (-ASTRONOMICAL_UNIT * sin(self.galactocentric_coordinate_b)
-              * sin(self.galactocentric_coordinate_l))
-        self.velocity_v = ((a2 * self.proper_motion_component_l
-                           + b2 * self.proper_motion_component_b)
+        a2 = (ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
+              * cos(galactocentric_coordinate_l))
+        b2 = (-ASTRONOMICAL_UNIT * sin(galactocentric_coordinate_b)
+              * sin(galactocentric_coordinate_l))
+        self.velocity_v = ((a2 * proper_motion_component_l
+                           + b2 * proper_motion_component_b)
                            * distance_in_pc)
 
-        b3 = ASTRONOMICAL_UNIT * cos(self.galactocentric_coordinate_b)
-        self.velocity_w = (b3 * self.proper_motion_component_b
+        b3 = ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
+        self.velocity_w = (b3 * proper_motion_component_b
                            * distance_in_pc)

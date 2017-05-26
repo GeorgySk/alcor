@@ -150,7 +150,10 @@ C       ---  Ya tenemos la masa  ---
         
         mgen=mgen+me               
          
-C       --- Birth time from SFR constant  --- 
+C       --- Birth time from SFR constant  ---
+C       running RNG once more to get exactly the same results as for
+C       my fortran program
+        xseed=deltat*ran(iseed)
         xseed=deltat*ran(iseed)      
         t=to+dfloat(i-1)*deltat+xseed 
         starBirthTime(k)=t 

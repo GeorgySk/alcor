@@ -21,9 +21,9 @@ def write_data_lepin_case(stars: List[Star]) -> None:
         uw_cloud_file = stack.enter_context(open('uw_cloud.csv', mode='w'))
         vw_cloud_file = stack.enter_context(open('vw_cloud.csv', mode='w'))
 
-        uv_cloud_writer = csv.writer(uv_cloud_file, delimiter='  ')
-        uw_cloud_writer = csv.writer(uw_cloud_file, delimiter='  ')
-        vw_cloud_writer = csv.writer(vw_cloud_file, delimiter='  ')
+        uv_cloud_writer = csv.writer(uv_cloud_file, delimiter=' ')
+        uw_cloud_writer = csv.writer(uw_cloud_file, delimiter=' ')
+        vw_cloud_writer = csv.writer(vw_cloud_file, delimiter=' ')
 
         uv_cloud_writer.writerow(['velocity_u',
                                   'velocity_v'])
@@ -64,7 +64,7 @@ def generate_clouds(stars: List[Star]) -> Tuple[List[Star],
 
 def write_data_raw_case(stars: List[Star]) -> None:
     with open('uvw_cloud.csv', 'w') as uvw_file:
-        uvw_writer = csv.writer(uvw_file, delimiter='  ')
+        uvw_writer = csv.writer(uvw_file, delimiter=' ')
         uvw_writer.writerow(['velocity_u',
                              'velocity_v',
                              'velocity_w'])
