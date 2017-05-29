@@ -70,7 +70,6 @@ C     NOTE: use of commons is strongly discouraged!
       common /param/ fractionOfDB,galacticDiskAge,parameterIMF,
      &               parameterIFMR,timeOfBurst
 
-
 C     --- Filling info about groups of files (cooling, color tables) ---    
 C ======================================================================
       call fillTable(table)
@@ -219,7 +218,7 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
      &     solarGalactocentricDistance,scaleLength)
 
       write(6,*) '5. Generating heliocentric velocities (5/9)'
-      call velh(iseed,numberOfStarsInSample,kinematicModel)
+      call velh(iseed,numberOfStarsInSample)
 
 C     QUESTION: why are we missing the next step?
       goto 7
@@ -334,6 +333,8 @@ C     Parameters of mass histograms
       double precision flagOfWD(numberOfStars)
 C     rgac - galactocentric distance to WD TODO: give a better name
       double precision rgac(numberOfStars)
+      double precision lgac(numberOfStars)
+      double precision bgac(numberOfStars)
       double precision coolingTime(numberOfStars)
 C     NOTE: this 70 comes from nowhere      
       integer numberOfWDsInBin(70),numberOfBins
@@ -342,6 +343,8 @@ C     NOTE: this 70 comes from nowhere
      &                 coordinate_Zcylindr(numberOfStars)
       double precision parallax(numberOfStars)
       double precision tangenVelo(numberOfStars)
+      double precision mpl(numberOfStars),mpb(numberOfStars),
+     &                 vr(numberOfStars)
       double precision errora(70),ndfa(70)
 C     ugriz-color system and V-band from Johnson system
       double precision go(numberOfStars),gr(numberOfStars),
@@ -385,11 +388,14 @@ C     TODO: make dynamic array or linked list
 C     2D-array of bolometric magnitudes for each WD; indexes are the 
 C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision arrayOfMagnitudes(25,50000)
+      integer disk_belonging(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
-      common /index/ flagOfWD,numberOfWDs      
+      common /index/ flagOfWD,numberOfWDs,disk_belonging      
       common /mad/ properMotion,rightAscension,declination
+      common /mopro/ mpb,mpl,vr
       common /paral/ rgac
+      common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
       common /photo/ go,gr,gi,ur,rz
@@ -402,13 +408,21 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       do i = 1, numberOfWDs
           write(421, *) luminosityOfWD(i),
      &                  properMotion(i),
+     &                  mpb(i),
+     &                  mpl(i),
+     &                  vr(i),
+     &                  rightAscension(i),
      &                  declination(i),
      &                  rgac(i),
+     &                  bgac(i),
+     &                  lgac(i),
+     &                  go(i),
      &                  gr(i),
      &                  rz(i),
      &                  V(i),
      &                  uu(i),
      &                  vv(i),
-     &                  ww(i)
+     &                  ww(i),
+     &                  typeOfWD(i)
       end do
       end subroutine

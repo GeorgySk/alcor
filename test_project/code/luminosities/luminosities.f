@@ -45,12 +45,13 @@ C-----------------------------------------------------------------------
       double precision ztcool(numberOfStars),zmeb(numberOfStars),
      &                 zzeb(numberOfStars),ztms(numberOfStars)
       double precision ztborn(numberOfStars)
+      integer disk_belonging(numberOfStars)
 
 C     ---  Commons  ---
       common /tm/ starBirthTime,m
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
-      common /index/ flagOfWD,numberOfWDs
+      common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /cool/ coolingTime
       common /tms/ tms
       common /param/ fractionOfDB,galacticDiskAge,parameterIMF,

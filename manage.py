@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 import logging
 import os
-import uuid
-from collections import OrderedDict
-from decimal import Decimal
-from subprocess import check_call
-from typing import (Any,
-                    Iterable,
-                    Dict)
 
 import click
 from cassandra.cluster import (Cluster,
@@ -20,16 +13,11 @@ from cassandra_helpers.keyspace import (keyspace_exists,
 from cassandra_helpers.models import sync_tables
 
 from alcor.config import PROJECT_NAME
-from alcor.models import (STAR_PARAMETERS_NAMES,
-                          Parameter,
+from alcor.models import (Parameter,
                           Star)
-from alcor.services.data_access import insert
-from alcor.services.parameters import generate_parameters_values
-from alcor.types import NumericType
+from alcor.services.results_processing import run_processing
+from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
-
-OUTPUT_FILE_EXTENSION = '.res'
-MAX_OUTPUT_FILE_NAME_LENGTH = 5
 
 logger = logging.getLogger(__name__)
 
@@ -89,89 +77,66 @@ def run(ctx: click.Context,
                         session=session)
 
 
-def run_simulations(*,
-                    settings: Dict[str, Any],
-                    session: Session) -> None:
-    model_type = settings['model_type']
-    precision = settings['precision']
-    parameters_info = settings['parameters']
-    for parameters_values in generate_parameters_values(
-            parameters_info=parameters_info,
-            precision=precision):
-        parameters_group_id = uuid.uuid4()
-        save_parameters(values=parameters_values,
-                        group_id=parameters_group_id,
-                        session=session)
+@main.command()
+@click.option('--data-path', '-p',
+              required=True,
+              type=click.Path(),
+              help='Path to data to be processed '
+                   '(absolute or relative).')
+@click.option('--sample', '-s',
+              type=click.Choice(['raw',
+                                 'full',
+                                 'restricted']),
+              default='restricted',
+              help='How we want to sort raw data.'
+                   '(raw - do nothing,'
+                   'full - only declination and parallax selection criteria,'
+                   'restricted - apply all criteria)')
+@click.option('--nullify-radial-velocity', '-nrf',
+              is_flag=True,
+              help='Sets radial velocities to zero.')
+@click.option('--luminosity-function', '-lf',
+              is_flag=True,
+              help='Prepare data for plotting luminosity function.')
+@click.option('--velocity-clouds', '-uvw',
+              is_flag=True,
+              help='Prepare data for plotting velocity clouds.')
+@click.option('--velocities-vs-magnitude', '-vm',
+              is_flag=True,
+              help='Prepare data for plots of velocities vs bol. magnitude .')
+@click.option('--lepine-criterion', '-lcr',
+              is_flag=True,
+              help='Apply Lepine\'s criterion.')
+@click.pass_context
+def process(ctx: click.Context,
+            data_path: str,
+            sample: str,
+            nullify_radial_velocity: bool,
+            luminosity_function: bool,
+            velocity_clouds: bool,
+            velocities_vs_magnitude: bool,
+            lepine_criterion: bool) -> None:
+    cluster_settings = ctx.obj
+    contact_points = cluster_settings['contact_points']
+    port = cluster_settings['port']
 
-        output_file_name = generate_output_file_name(
-            parameters_group_id=str(parameters_group_id))
+    keyspace_name = PROJECT_NAME
 
-        run_simulation(parameters_values=parameters_values,
-                       model_type=model_type,
-                       output_file_name=output_file_name)
+    check_connection(contact_points=contact_points,
+                     port=port)
+    with Cluster(contact_points=contact_points,
+                 port=port) as cluster:
+        session = cluster.connect()
+        init_db(keyspace_name=keyspace_name,
+                session=session)
 
-        save_stars(file_name=output_file_name,
-                   group_id=parameters_group_id,
-                   session=session)
-
-
-def save_parameters(*,
-                    values: Dict[str, Decimal],
-                    group_id: uuid.UUID,
-                    session: Session) -> None:
-    instances = [Parameter(group_id=group_id,
-                           name=parameter_name,
-                           value=parameter_value)
-                 for parameter_name, parameter_value in values.items()]
-    insert(instances=instances,
-           session=session)
-
-
-def run_simulation(*,
-                   parameters_values: Dict[str, NumericType],
-                   model_type: int,
-                   output_file_name: str) -> None:
-    args = ['./main.e',
-            '-db', parameters_values['DB_fraction'],
-            '-g', parameters_values['galaxy_age'],
-            '-mf', parameters_values['initial_mass_function_exponent'],
-            '-ifr', parameters_values['lifetime_mass_ratio'],
-            '-bt', parameters_values['burst_time'],
-            '-mr', parameters_values['mass_reduction_factor'],
-            '-km', model_type,
-            '-o', output_file_name]
-    args = list(map(str, args))
-    args_str = ' '.join(args)
-    logger.info(f'Invoking simulation with command "{args_str}".')
-    check_call(args)
-
-
-def save_stars(file_name: str,
-               group_id: uuid.UUID,
-               session: Session) -> None:
-    with open(file_name) as output_file:
-        stars = parse_stars(output_file,
-                            group_id=group_id)
-        insert(instances=stars,
-               session=session)
-
-
-def parse_stars(lines: Iterable[str],
-                group_id: uuid.UUID
-                ) -> Iterable[Star]:
-    for line in lines:
-        parts = line.split()
-        params = map(Decimal, parts)
-        values = OrderedDict(zip(STAR_PARAMETERS_NAMES,
-                                 params))
-        yield Star(group_id=group_id,
-                   **values)
-
-
-def generate_output_file_name(parameters_group_id: str
-                              ) -> str:
-    base_name = parameters_group_id[:MAX_OUTPUT_FILE_NAME_LENGTH]
-    return ''.join([base_name, OUTPUT_FILE_EXTENSION])
+        run_processing(data_path,
+                       luminosity_function,
+                       velocity_clouds,
+                       velocities_vs_magnitude,
+                       sample,
+                       nullify_radial_velocity,
+                       lepine_criterion)
 
 
 def init_db(*,

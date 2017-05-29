@@ -105,12 +105,13 @@ C     TODO: make dinamic array or linked list
 C     2D-array of bolometric magnitudes for each WD; indexes are the 
 C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision arrayOfMagnitudes(25,50000)
+      integer disk_belonging(numberOfStars)
 
 
 C     TODO: make a WD-class with these args
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
-      common /index/ flagOfWD,numberOfWDs      
+      common /index/ flagOfWD,numberOfWDs,disk_belonging      
       common /mad/ properMotion,rightAscension,declination
       common /paral/ rgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
@@ -524,8 +525,9 @@ C     TODO:pass parameters in common block? pass commons as I/O vars
      &                 gi(numberOfStars),ur(numberOfStars),
      &                 rz(numberOfStars)
       double precision v(numberOfStars)
+      integer disk_belonging(numberOfStars)
 
-      common /index/ flagOfWD,numberOfWDs
+      common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /mad/ properMotion,rightAscension,declination
       common /paral/ rgac
       common /photo/ go,gr,gi,ur,rz

@@ -45,13 +45,14 @@ C     ---   Dimensions   ---
       double precision rightAscension(numberOfStars),
      &                 declination(numberOfStars)
       double precision flagOfWD(numberOfStars)
+      integer disk_belonging(numberOfStars)
        
 C     ---   Commons   ---
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /vel/ uu,vv,ww
       common /paral/ rgac
       common /mad/ properMotion,rightAscension,declination
-      common /index/ flagOfWD,numberOfWDs
+      common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /mopro/ mpb,mpl,vr
       common /lb/ lgac,bgac
       
@@ -74,8 +75,9 @@ C        ---   Galactic coordinate r (Kpc) ---
      &          coordinate_Zcylindr(i)))
 C     ---   Galactic coordinate lgac ---
         ros=dsqrt(ros)
-        zz=(coordinate_R(i)/ros)*dsin(coordinate_Theta(i))
-        lgac(i)=dasin(zz)
+        lgac(i) = dacos((solarGalactocentricDistance ** 2 + ros**2
+     &                   - coordinate_R(i) ** 2)
+     &                  /(2.d0 * solarGalactocentricDistance * ros))
         if (coordinate_R(i)*dcos(coordinate_Theta(i)).gt.
      &     solarGalactocentricDistance) then 
           lgac(i)=pi-lgac(i)

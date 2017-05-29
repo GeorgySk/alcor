@@ -34,12 +34,13 @@ C     ---   Dimensions   ---
       double precision flagOfWD(numberOfStars)
       double precision yscal(2),y(2),dydx(2)         
       double precision xpla(numberOfStars),ypla(numberOfStars)
+      integer disk_belonging(numberOfStars)
         
 C     ---   Commons   ---
       common /vel/ uu,vv,ww
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /tm/ starBirthTime,m
-      common /index/ flagOfWD,numberOfWDs         
+      common /index/ flagOfWD,numberOfWDs,disk_belonging         
 C     NOTE: names are different in this block      
       common /plano/ xpla,ypla
       common /carte/ xcar,ycar
@@ -82,7 +83,7 @@ C       ---  Calling to the Runge-Kutta integrator ---
         call ODEINT(y,n,ti,tf,eps,htry,hmin,NOK,NBAD,DERIVS,RKQC,yscal,
      &       y,dydx)      
         ecinf=0.5*y(2)*y(2)
-        call epot(y(1),epotf)     
+        call epot(y(1),epotf)
         coordinate_Zcylindr(i)=y(1)/(3.086d+16)
         ww(i)=y(2)+wosun
  1    continue
