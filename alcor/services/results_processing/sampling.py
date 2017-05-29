@@ -15,8 +15,8 @@ logging.basicConfig(format='%(filename)s %(funcName)s '
 logger = logging.getLogger(__name__)
 
 MIN_PARALLAX = 0.025
-MIN_DECLINATION = 0.0
-MAX_VELOCITY = 500.0
+MIN_DECLINATION = 0.
+MAX_VELOCITY = 500.
 MIN_PROPER_MOTION = 0.04
 
 
@@ -27,7 +27,7 @@ def check_elimination(star: Star,
     galactocentric_distance = star.galactocentric_distance * Decimal(1e3)
     parallax = Fraction(1, Fraction(galactocentric_distance))
     # TODO: find out the meaning of the following constants
-    hrm = star.go_photometry + Decimal(5.0 * log10(star.proper_motion) + 5.0)
+    hrm = star.go_photometry + Decimal(5. * log10(star.proper_motion) + 5.)
     gz = star.gr_photometry + star.rz_photometry
 
     if parallax < MIN_PARALLAX:
@@ -45,7 +45,7 @@ def check_elimination(star: Star,
             eliminations_counter['proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
-        elif gz < -0.33 and hrm < 14.0:
+        elif gz < -0.33 and hrm < 14.:
             eliminations_counter['reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
@@ -53,7 +53,7 @@ def check_elimination(star: Star,
             eliminations_counter['reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constant
-        elif star.v_photometry >= 19.0:
+        elif star.v_photometry >= 19.:
             eliminations_counter['apparent_magnitude'] += 1
             return True
     return False

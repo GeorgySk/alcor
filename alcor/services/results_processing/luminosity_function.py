@@ -14,8 +14,8 @@ logging.basicConfig(format='%(filename)s %(funcName)s '
                     level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-MIN_BOLOMETRIC_MAGNITUDE = 6.0
-MAX_BOLOMETRIC_MAGNITUDE = 21.0
+MIN_BOLOMETRIC_MAGNITUDE = 6.
+MAX_BOLOMETRIC_MAGNITUDE = 21.
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
@@ -87,7 +87,7 @@ def get_stars_count_logarithm(stars_count: int,
 
 def get_upper_errorbar(stars_count: int) -> float:
     if stars_count == 0:
-        return 0.0
+        return 0.
     else:
         return (log10((stars_count + sqrt(stars_count))
                       / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
@@ -96,9 +96,9 @@ def get_upper_errorbar(stars_count: int) -> float:
 
 def get_lower_errorbar(stars_count: int) -> float:
     if stars_count == 0:
-        return 0.0
+        return 0.
     elif stars_count == 1:
-        return 5.0  # Random number so that errorbar would go below the plot
+        return 5.  # Random number so that errorbar would go below the plot
     else:
         return (log10(stars_count / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
                 - log10((stars_count - sqrt(stars_count))

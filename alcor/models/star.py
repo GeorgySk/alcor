@@ -14,9 +14,9 @@ from cassandra.cqlengine.columns import (UUID,
 from cassandra.cqlengine.models import Model
 
 ASTRONOMICAL_UNIT = 4.74
-DEC_GPOLE = 27.128336 * pi / 180.0
-RA_GPOLE = 192.859508 * pi / 180.0
-AUX_ANGLE = 122.932 * pi / 180.0
+DEC_GPOLE = 27.128336 * pi / 180.
+RA_GPOLE = 192.859508 * pi / 180.
+AUX_ANGLE = 122.932 * pi / 180.
 
 STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion',
@@ -92,15 +92,15 @@ class Star(Model):
                   + sin(dec) * sin(DEC_GPOLE)))
         x = sin(dec) - sin(b) * sin(DEC_GPOLE)
         y = cos(dec) * sin(ra - RA_GPOLE) * cos(DEC_GPOLE)
-        l = atan(x / y) + AUX_ANGLE - pi / 2.0
+        l = atan(x / y) + AUX_ANGLE - pi / 2.
         if y < 0. and x > 0.:
             l += pi
         elif x < 0. and y < 0.:
             l += pi
         elif x < 0. and y > 0.:
-            l += 2.0 * pi
-        elif l > 2.0 * pi:
-            l -= 2.0 * pi
+            l += 2. * pi
+        elif l > 2. * pi:
+            l -= 2. * pi
         coordinate_x = distance * cos(b) * cos(l)
         coordinate_y = distance * cos(b) * sin(l)
         coordinate_z = distance * sin(b)

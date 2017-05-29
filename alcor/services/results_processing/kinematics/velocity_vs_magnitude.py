@@ -130,7 +130,7 @@ def u_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
             average_velocity_u = mean(star.velocity_u
                                       for star in stars_bin)
             if len(stars_bin) == 1:
-                velocity_u_std = 100.0
+                velocity_u_std = 100.
             else:
                 velocity_u_std = stdev(star.velocity_u
                                        for star in stars_bin)
@@ -147,7 +147,7 @@ def v_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
             average_velocity_v = mean(star.velocity_v
                                       for star in stars_bin)
             if len(stars_bin) == 1:
-                velocity_v_std = 100.0
+                velocity_v_std = 100.
             else:
                 velocity_v_std = stdev(star.velocity_v
                                        for star in stars_bin)
@@ -256,9 +256,9 @@ def uvw_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
                 velocity_w_std = stdev(float(star.velocity_w)
                                        for star in stars_bin)
             else:
-                velocity_u_std = 100.0
-                velocity_v_std = 100.0
-                velocity_w_std = 100.0
+                velocity_u_std = 100.
+                velocity_v_std = 100.
+                velocity_w_std = 100.
             yield (average_magnitude,
                    average_velocity_u,
                    average_velocity_v,
