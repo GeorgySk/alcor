@@ -35,7 +35,7 @@ def run_processing(data_path,
         eliminations_counter=eliminations_counter,
         method=sample)
     raw_sample_stars_count = len(list(stars))
-    if sample == 'full' or sample == 'restricted':
+    if sample in {'restricted', 'full'}:
         filtered_stars = list(filterfalse(apply_elimination_criteria,
                                           stars))
     else:

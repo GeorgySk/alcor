@@ -20,10 +20,10 @@ services:
       - test_project/5d0bd.res
       - --sample
       - restricted
-#      - --nullify-radial-velocity
+      - --nullify-radial-velocity
       - --luminosity-function
-#      - --velocity-clouds
-#      - --velocities-vs-magnitude
+      - --velocity-clouds
+      - --velocities-vs-magnitude
 #      - --lepine-criterion
     environment:
       - CASSANDRA_RPC_ADDRESS=cassandra

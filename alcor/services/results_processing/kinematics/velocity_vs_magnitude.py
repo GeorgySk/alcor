@@ -124,7 +124,7 @@ def write_bins_data_lepine_case(stars: List[Star]) -> None:
 
 def u_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        if len(stars_bin) > 0:
+        if stars_bin:
             average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
                                  + BIN_SIZE * (stars_bin_index - 0.5))
             average_velocity_u = mean(star.velocity_u
@@ -141,7 +141,7 @@ def u_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
 
 def v_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        if len(stars_bin) > 0:
+        if stars_bin:
             average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
                                  + BIN_SIZE * (stars_bin_index - 0.5))
             average_velocity_v = mean(star.velocity_v
@@ -158,13 +158,13 @@ def v_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
 
 def w_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        if len(stars_bin) > 0:
+        if stars_bin:
             average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
                                  + BIN_SIZE * (stars_bin_index - 0.5))
             average_velocity_w = mean(star.velocity_w
                                       for star in stars_bin)
             if len(stars_bin) == 1:
-                velocity_w_std = 100.0
+                velocity_w_std = 100.
             else:
                 velocity_w_std = stdev(star.velocity_w
                                        for star in stars_bin)
@@ -239,7 +239,7 @@ def write_bins_data_raw_case(stars: List[Star]) -> None:
 
 def uvw_rows(stars_bins: StarsBinsType) -> Iterable[RowType]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
-        if len(stars_bin) != 0:
+        if stars_bin:
             average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
                                  + BIN_SIZE * (stars_bin_index - 0.5))
             average_velocity_u = mean(float(star.velocity_u)

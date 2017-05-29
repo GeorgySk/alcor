@@ -93,11 +93,11 @@ class Star(Model):
         x = sin(dec) - sin(b) * sin(DEC_GPOLE)
         y = cos(dec) * sin(ra - RA_GPOLE) * cos(DEC_GPOLE)
         l = atan(x / y) + AUX_ANGLE - pi / 2.0
-        if y < 0.0 < x:
+        if y < 0. and x > 0.:
             l += pi
-        elif x < 0.0 > y:
+        elif x < 0. and y < 0.:
             l += pi
-        elif x < 0.0 < y:
+        elif x < 0. and y > 0.:
             l += 2.0 * pi
         elif l > 2.0 * pi:
             l -= 2.0 * pi
