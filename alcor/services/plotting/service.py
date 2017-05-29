@@ -1,4 +1,6 @@
 import csv
+from operator import (add,
+                      sub)
 
 from bokeh.plotting import (figure,
                             output_file,
@@ -38,5 +40,15 @@ def make_plots() -> None:
                star_count_logarithm,
                legend="Temp.",
                line_width=2)
+        p.square(average_bin_magnitude,
+                 star_count_logarithm)
+        p.multi_line(average_bin_magnitude,
+                     map(add,
+                         star_count_logarithm,
+                         upper_errorbar))
+        p.multi_line(average_bin_magnitude,
+                     map(sub,
+                         star_count_logarithm,
+                         lower_errorbar))
 
         show(p)
