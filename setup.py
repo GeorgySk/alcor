@@ -17,5 +17,5 @@ setup(name=PROJECT_NAME,
       install_requires=[
           'cassandra-driver>=3.9.0',  # working with Cassandra
           'PyYAML>=3.12.0',  # settings loading
-          'astropy>=1.3.2'
+          'bokeh>=0.12.5'
       ])

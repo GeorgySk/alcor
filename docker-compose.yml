@@ -23,6 +23,8 @@ services:
       - --velocities-clouds
       - --velocities-vs-magnitude
 #      - --lepine-criterion
+      # Plotting
+      - plot
     environment:
       - CASSANDRA_RPC_ADDRESS=cassandra
       - CASSANDRA_RPC_PORT=9042
