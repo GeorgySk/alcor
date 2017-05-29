@@ -1,6 +1,7 @@
 import csv
 from contextlib import ExitStack
-from typing import List, Tuple
+from typing import (List,
+                    Tuple)
 
 from alcor.models.star import Star
 

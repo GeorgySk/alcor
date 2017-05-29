@@ -84,26 +84,27 @@ class Star(Model):
     def to_cartesian_from_equatorial(self) -> Tuple[float,
                                                     float,
                                                     float]:
-        ra = float(self.right_ascension)
-        dec = float(self.declination)
+        right_ascension = float(self.right_ascension)
+        declination = float(self.declination)
         distance = float(self.galactocentric_distance)
 
-        b = (asin(cos(dec) * cos(DEC_GPOLE) * cos(ra - RA_GPOLE)
-                  + sin(dec) * sin(DEC_GPOLE)))
-        x = sin(dec) - sin(b) * sin(DEC_GPOLE)
-        y = cos(dec) * sin(ra - RA_GPOLE) * cos(DEC_GPOLE)
-        l = atan(x / y) + AUX_ANGLE - pi / 2.
+        latitude = (asin(cos(declination) * cos(DEC_GPOLE)
+                         * cos(right_ascension - RA_GPOLE)
+                         + sin(declination) * sin(DEC_GPOLE)))
+        x = sin(declination) - sin(latitude) * sin(DEC_GPOLE)
+        y = cos(declination) * sin(right_ascension - RA_GPOLE) * cos(DEC_GPOLE)
+        longitude = atan(x / y) + AUX_ANGLE - pi / 2.
         if y < 0. and x > 0.:
-            l += pi
+            longitude += pi
         elif x < 0. and y < 0.:
-            l += pi
+            longitude += pi
         elif x < 0. and y > 0.:
-            l += 2. * pi
-        elif l > 2. * pi:
-            l -= 2. * pi
-        coordinate_x = distance * cos(b) * cos(l)
-        coordinate_y = distance * cos(b) * sin(l)
-        coordinate_z = distance * sin(b)
+            longitude += 2. * pi
+        elif longitude > 2. * pi:
+            longitude -= 2. * pi
+        coordinate_x = distance * cos(latitude) * cos(longitude)
+        coordinate_y = distance * cos(latitude) * sin(longitude)
+        coordinate_z = distance * sin(latitude)
         return (coordinate_x,
                 coordinate_y,
                 coordinate_z)
