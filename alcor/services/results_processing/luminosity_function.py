@@ -61,20 +61,20 @@ def get_magnitude_bin_index(star: Star) -> int:
 
 def rows(bins: StarsBinsType,
          normalization_factor: float) -> Iterable[RowType]:
-    for stars_bin_index, stars_bin in enumerate(bins):
+    non_empty_bins = filter(None, bins)
+    for stars_bin_index, stars_bin in enumerate(non_empty_bins):
         stars_count = len(stars_bin)
-        if stars_count > 0:
-            average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                 + BIN_SIZE * (stars_bin_index - 0.5))
-            stars_count_logarithm = get_stars_count_logarithm(
-                stars_count=stars_count,
-                normalization_factor=normalization_factor)
-            upper_errorbar = get_upper_errorbar(stars_count)
-            lower_errorbar = get_lower_errorbar(stars_count)
-            yield (average_magnitude,
-                   stars_count_logarithm,
-                   upper_errorbar,
-                   lower_errorbar)
+        average_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index - 0.5))
+        stars_count_logarithm = get_stars_count_logarithm(
+            stars_count=stars_count,
+            normalization_factor=normalization_factor)
+        upper_errorbar = get_upper_errorbar(stars_count)
+        lower_errorbar = get_lower_errorbar(stars_count)
+        yield (average_magnitude,
+               stars_count_logarithm,
+               upper_errorbar,
+               lower_errorbar)
 
 
 def get_stars_count_logarithm(stars_count: int,
