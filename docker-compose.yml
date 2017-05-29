@@ -23,6 +23,8 @@ services:
       - --w-velocities-clouds
       - --w-velocities-vs-magnitude
       - --w-lepine-criterion
+      # Plotting
+      - plot
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 

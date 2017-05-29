@@ -14,6 +14,7 @@ from sqlalchemy_utils import (database_exists,
 
 from alcor.models.base import Base
 from alcor.services.processing import run_processing
+from alcor.services.plotting import make_plots
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
@@ -140,6 +141,18 @@ def init_db(ctx: click.Context) -> None:
     with get_engine(db_uri) as engine:
         logging.info(f'Creating "{db_uri_str}" database schema.')
         Base.metadata.create_all(bind=engine)
+
+
+@main.command()
+@click.pass_context
+def plot(ctx: click.Context) -> None:
+    db_uri = ctx.obj
+    check_connection(db_uri)
+
+    with get_engine(db_uri) as engine:
+        session_factory = sessionmaker(bind=engine)
+        session = session_factory()
+        make_plots()
 
 
 if __name__ == '__main__':
