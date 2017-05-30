@@ -21,28 +21,20 @@ def plot() -> None:
 
         header_row = next(reader)
 
-        average_bin_magnitude = []
-        star_count_logarithm = []
-        upper_errorbar = []
-        lower_errorbar = []
+        rows = (map(float, row) for row in reader)
+        (average_bin_magnitude,
+            star_count_logarithm,
+            upper_errorbar,
+            lower_errorbar) = zip(*rows)
 
-        for row in reader:
-            average_bin_magnitude.append(float(row[0]))
-            star_count_logarithm.append(float(row[1]))
-            upper_errorbar.append(float(row[2]))
-            lower_errorbar.append(float(row[3]))
-
-    # TODO: find out if we can omit legend here
     main_plot.line(average_bin_magnitude,
                    star_count_logarithm,
-                   legend="Temp.",
                    line_width=2)
     main_plot.square(average_bin_magnitude,
                      star_count_logarithm)
 
     multiline_x = []
     multiline_y = []
-
     for (magnitude, stars_count,
          error_up, error_down) in zip(average_bin_magnitude,
                                       star_count_logarithm,
