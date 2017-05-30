@@ -31,24 +31,32 @@ def make_plots() -> None:
 
             output_file("luminosity_function.html")
 
-        p = figure(title="luminosity function",
+        plot = figure(title="luminosity function",
                    x_axis_label='Mbol',  # Todo: rename axis
                    y_axis_label='logN')
 
         # TODO: find out if we can omit legend here
-        p.line(average_bin_magnitude,
-               star_count_logarithm,
-               legend="Temp.",
-               line_width=2)
-        p.square(average_bin_magnitude,
-                 star_count_logarithm)
-        p.multi_line(average_bin_magnitude,
-                     map(add,
-                         star_count_logarithm,
-                         upper_errorbar))
-        p.multi_line(average_bin_magnitude,
-                     map(sub,
-                         star_count_logarithm,
-                         lower_errorbar))
+        plot.line(average_bin_magnitude,
+                  star_count_logarithm,
+                  legend="Temp.",
+                  line_width=2)
+        plot.square(average_bin_magnitude,
+                    star_count_logarithm)
 
-        show(p)
+        multiline_x = []
+        multiline_y = []
+
+        for (magnitude, stars_count,
+             error_up, error_down) in zip(average_bin_magnitude,
+                                          star_count_logarithm,
+                                          upper_errorbar,
+                                          lower_errorbar):
+            multiline_x.append((magnitude,
+                                magnitude))
+            multiline_y.append((stars_count - error_down,
+                                stars_count + error_up))
+
+        plot.multi_line(multiline_x,
+                        multiline_y)
+
+        show(plot)
