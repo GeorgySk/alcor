@@ -84,6 +84,33 @@ def plot_velocities_vs_magnitude() -> None:
     bottom_plot.multi_line(multiline_x,
                            multiline_y_w)
 
+    with open('uvw_vs_mag_cloud.csv', 'r') as data_file:
+        reader = csv.reader(data_file)
+
+        header_row = next(reader)
+
+        bolometric_magnitude = []
+        velocity_u = []
+        velocity_v = []
+        velocity_w = []
+
+        for row in reader:
+            splitted_row = row[0].split()
+            bolometric_magnitude.append(float(splitted_row[0]))
+            velocity_u.append(float(splitted_row[1]))
+            velocity_v.append(float(splitted_row[2]))
+            velocity_w.append(float(splitted_row[3]))
+
+    top_plot.circle(bolometric_magnitude,
+                    velocity_u,
+                    size=1)
+    middle_plot.circle(bolometric_magnitude,
+                       velocity_v,
+                       size=1)
+    bottom_plot.circle(bolometric_magnitude,
+                       velocity_w,
+                       size=1)
+
     show(column(top_plot,
                 middle_plot,
                 bottom_plot))
