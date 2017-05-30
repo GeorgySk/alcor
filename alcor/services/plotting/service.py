@@ -1,16 +1,14 @@
-from .luminosity_function import plot_luminosity_function
-from .velocities_vs_magnitude import (
-    plot_velocities_vs_magnitude,
-    plot_velocities_vs_magnitude_lepine_case)
+from . import luminosity_function
+from . import velocities_vs_magnitude
 
 
-def make_plots(luminosity_function: bool,
-               velocities_vs_magnitude: bool,
+def make_plots(luminosity_function_flag: bool,
+               velocities_vs_magnitude_flag: bool,
                lepine_criterion: bool) -> None:
-    if luminosity_function:
-        plot_luminosity_function()
+    if luminosity_function_flag:
+        luminosity_function.plot()
 
-    if velocities_vs_magnitude and not lepine_criterion:
-        plot_velocities_vs_magnitude()
-    if velocities_vs_magnitude and lepine_criterion:
-        plot_velocities_vs_magnitude_lepine_case()
+    if velocities_vs_magnitude_flag and not lepine_criterion:
+        velocities_vs_magnitude.plot()
+    if velocities_vs_magnitude_flag and lepine_criterion:
+        velocities_vs_magnitude.plot_lepine_case()

@@ -6,12 +6,8 @@ from bokeh.plotting import (figure,
                             show)
 
 
-def plot_velocities_vs_magnitude() -> None:
+def plot() -> None:
     output_file("velocities_vs_magnitude.html")
-
-    plot = figure(title="velocities vs magnitude",
-                  x_axis_label='Mbol',
-                  y_axis_label='U')
 
     with open('uvw_vs_mag_bins.csv', 'r') as data_file:
         reader = csv.reader(data_file)
@@ -116,5 +112,5 @@ def plot_velocities_vs_magnitude() -> None:
                 bottom_plot))
 
 
-def plot_velocities_vs_magnitude_lepine_case():
+def plot_lepine_case():
     pass
