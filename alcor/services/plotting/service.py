@@ -1,13 +1,16 @@
 import csv
-from operator import (add,
-                      sub)
 
 from bokeh.plotting import (figure,
                             output_file,
                             show)
 
 
-def make_plots() -> None:
+def make_plots(luminosity_function: bool) -> None:
+    if luminosity_function:
+        plot_luminosity_function()
+
+
+def plot_luminosity_function() -> None:
     with open('luminosity_function.csv', 'r') as data_file:
         reader = csv.reader(data_file)
 

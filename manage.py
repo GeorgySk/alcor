@@ -116,6 +116,22 @@ def process(ctx: click.Context,
                        session=session)
 
 
+@main.command()
+@click.option('--luminosity-function', '-lf',
+              is_flag=True,
+              help='Plot luminosity function.')
+@click.pass_context
+def plot(ctx: click.Context,
+         luminosity_function: bool) -> None:
+    db_uri = ctx.obj
+    check_connection(db_uri)
+
+    with get_engine(db_uri) as engine:
+        session_factory = sessionmaker(bind=engine)
+        session = session_factory()
+        make_plots(luminosity_function)
+
+
 @main.command(name='clean_db')
 @click.pass_context
 def clean_db(ctx: click.Context) -> None:
@@ -141,18 +157,6 @@ def init_db(ctx: click.Context) -> None:
     with get_engine(db_uri) as engine:
         logging.info(f'Creating "{db_uri_str}" database schema.')
         Base.metadata.create_all(bind=engine)
-
-
-@main.command()
-@click.pass_context
-def plot(ctx: click.Context) -> None:
-    db_uri = ctx.obj
-    check_connection(db_uri)
-
-    with get_engine(db_uri) as engine:
-        session_factory = sessionmaker(bind=engine)
-        session = session_factory()
-        make_plots()
 
 
 if __name__ == '__main__':
