@@ -48,10 +48,10 @@ def main(ctx: click.Context) -> None:
               is_flag=True,
               help='Cleans destination keyspace.')
 @click.pass_context
-def run(ctx: click.Context,
-        settings_path: str,
-        project_dir: str,
-        clean: bool) -> None:
+def simulate(ctx: click.Context,
+             settings_path: str,
+             project_dir: str,
+             clean: bool) -> None:
     cluster_settings = ctx.obj
     contact_points = cluster_settings['contact_points']
     port = cluster_settings['port']

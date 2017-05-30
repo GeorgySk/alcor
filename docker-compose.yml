@@ -11,7 +11,7 @@ services:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
       # Generating stars:
-#      - run
+#      - simulate
 #      - --project-dir
 #      - test_project
       # Processing generated data:
