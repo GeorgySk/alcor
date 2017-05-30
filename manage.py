@@ -146,6 +146,9 @@ def process(ctx: click.Context,
 @click.option('--velocities-vs-magnitude', '-vm',
               is_flag=True,
               help='Plot velocities vs bol. magnitude .')
+@click.option('--velocity-clouds', '-uvw',
+              is_flag=True,
+              help='Plot velocity clouds.')
 @click.option('--lepine-criterion', '-lcr',
               is_flag=True,
               help='Use data with applied Lepine\'s criterion.')
@@ -153,6 +156,7 @@ def process(ctx: click.Context,
 def plot(ctx: click.Context,
          luminosity_function: bool,
          velocities_vs_magnitude: bool,
+         velocity_clouds: bool,
          lepine_criterion: bool) -> None:
     cluster_settings = ctx.obj
     contact_points = cluster_settings['contact_points']
@@ -167,6 +171,7 @@ def plot(ctx: click.Context,
                 session=session)
         draw_plots(luminosity_function,
                    velocities_vs_magnitude,
+                   velocity_clouds,
                    lepine_criterion)
 
 

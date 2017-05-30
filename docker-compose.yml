@@ -27,6 +27,7 @@ services:
       - plot
       - --luminosity-function
       - --velocities-vs-magnitude
+      - --velocity-clouds
       - --lepine-criterion
     environment:
       - CASSANDRA_RPC_ADDRESS=cassandra
