@@ -140,8 +140,12 @@ def process(ctx: click.Context,
 
 
 @main.command()
+@click.option('--luminosity-function', '-lf',
+              is_flag=True,
+              help='Plot luminosity function.')
 @click.pass_context
-def plot(ctx: click.Context) -> None:
+def plot(ctx: click.Context,
+         luminosity_function: bool) -> None:
     cluster_settings = ctx.obj
     contact_points = cluster_settings['contact_points']
     port = cluster_settings['port']
@@ -153,7 +157,7 @@ def plot(ctx: click.Context) -> None:
         session = cluster.connect()
         init_db(keyspace_name=keyspace_name,
                 session=session)
-        make_plots()
+        make_plots(luminosity_function)
 
 
 def init_db(*,
