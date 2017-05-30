@@ -21,7 +21,7 @@ from alcor.models import (Group,
                           velocities,
                           velocities_vs_magnitudes)
 from alcor.services.processing import run_processing
-from alcor.services.plotting import make_plots
+from alcor.services.plotting import draw_plots
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
@@ -165,7 +165,7 @@ def plot(ctx: click.Context,
         session = cluster.connect()
         init_db(keyspace_name=keyspace_name,
                 session=session)
-        make_plots(luminosity_function,
+        draw_plots(luminosity_function,
                    velocities_vs_magnitude,
                    lepine_criterion)
 

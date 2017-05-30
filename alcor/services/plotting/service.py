@@ -2,7 +2,7 @@ from . import luminosity_function
 from . import velocities_vs_magnitude
 
 
-def make_plots(luminosity_function_flag: bool,
+def draw_plots(luminosity_function_flag: bool,
                velocities_vs_magnitude_flag: bool,
                lepine_criterion: bool) -> None:
     if luminosity_function_flag:

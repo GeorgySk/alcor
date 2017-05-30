@@ -1,1 +1,1 @@
-from .service import make_plots
+from .service import draw_plots
