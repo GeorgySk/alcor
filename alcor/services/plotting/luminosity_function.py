@@ -5,12 +5,12 @@ from bokeh.plotting import (figure,
                             show)
 
 
-def plot_luminosity_function() -> None:
+def plot() -> None:
     output_file("luminosity_function.html")
 
-    plot = figure(title="luminosity function",
-                  x_axis_label='Mbol',  # Todo: rename axis
-                  y_axis_label='logN')
+    main_plot = figure(title="luminosity function",
+                       x_axis_label='Mbol',  # Todo: rename axis
+                       y_axis_label='logN')
 
     with open('luminosity_function.csv', 'r') as data_file:
         reader = csv.reader(data_file)
@@ -34,12 +34,12 @@ def plot_luminosity_function() -> None:
             lower_errorbar.append(float(splitted_row[3]))
 
     # TODO: find out if we can omit legend here
-    plot.line(average_bin_magnitude,
-              star_count_logarithm,
-              legend="Temp.",
-              line_width=2)
-    plot.square(average_bin_magnitude,
-                star_count_logarithm)
+    main_plot.line(average_bin_magnitude,
+                   star_count_logarithm,
+                   legend="Temp.",
+                   line_width=2)
+    main_plot.square(average_bin_magnitude,
+                     star_count_logarithm)
 
     multiline_x = []
     multiline_y = []
@@ -54,7 +54,7 @@ def plot_luminosity_function() -> None:
         multiline_y.append((stars_count - error_down,
                             stars_count + error_up))
 
-    plot.multi_line(multiline_x,
-                    multiline_y)
+    main_plot.multi_line(multiline_x,
+                         multiline_y)
 
-    show(plot)
+    show(main_plot)
