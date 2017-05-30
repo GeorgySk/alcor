@@ -120,16 +120,27 @@ def process(ctx: click.Context,
 @click.option('--luminosity-function', '-lf',
               is_flag=True,
               help='Plot luminosity function.')
+@click.option('--velocities-vs-magnitude', '-vm',
+              is_flag=True,
+              help='Plot velocities vs bol. magnitude .')
+@click.option('--lepine-criterion', '-lcr',
+              is_flag=True,
+              help='Use data with applied Lepine\'s criterion.')
 @click.pass_context
 def plot(ctx: click.Context,
-         luminosity_function: bool) -> None:
+         luminosity_function: bool,
+         velocities_vs_magnitude: bool,
+         lepine_criterion: bool
+         ) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
 
     with get_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
-        make_plots(luminosity_function)
+        make_plots(luminosity_function,
+                   velocities_vs_magnitude,
+                   lepine_criterion)
 
 
 @main.command(name='clean_db')

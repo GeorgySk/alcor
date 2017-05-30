@@ -1,0 +1,93 @@
+import csv
+
+from bokeh.layouts import column
+from bokeh.plotting import (figure,
+                            output_file,
+                            show)
+
+
+def plot_velocities_vs_magnitude() -> None:
+    output_file("velocities_vs_magnitude.html")
+
+    plot = figure(title="velocities vs magnitude",
+                  x_axis_label='Mbol',
+                  y_axis_label='U')
+
+    with open('uvw_vs_mag_bins.csv', 'r') as data_file:
+        reader = csv.reader(data_file)
+
+        header_row = next(reader)
+
+        average_bin_magnitude = []
+        average_velocity_u = []
+        average_velocity_v = []
+        average_velocity_w = []
+        velocity_u_std = []
+        velocity_v_std = []
+        velocity_w_std = []
+
+        for row in reader:
+            splitted_row = row[0].split()
+            average_bin_magnitude.append(float(splitted_row[0]))
+            average_velocity_u.append(float(splitted_row[1]))
+            average_velocity_v.append(float(splitted_row[2]))
+            average_velocity_w.append(float(splitted_row[3]))
+            velocity_u_std.append(float(splitted_row[4]))
+            velocity_v_std.append(float(splitted_row[5]))
+            velocity_w_std.append(float(splitted_row[6]))
+
+    top_plot = figure(width=500, height=250)
+    top_plot.line(average_bin_magnitude,
+                  average_velocity_u)
+    top_plot.square(average_bin_magnitude,
+                    average_velocity_u)
+
+    middle_plot = figure(width=500, height=250)
+    middle_plot.line(average_bin_magnitude,
+                     average_velocity_v)
+    middle_plot.square(average_bin_magnitude,
+                       average_velocity_v)
+
+    bottom_plot = figure(width=500, height=250)
+    bottom_plot.line(average_bin_magnitude,
+                     average_velocity_w)
+    bottom_plot.square(average_bin_magnitude,
+                       average_velocity_w)
+
+    multiline_x = []
+    multiline_y_u = []
+    multiline_y_v = []
+    multiline_y_w = []
+
+    for (magnitude,
+         velocity_u, velocity_v, velocity_w,
+         std_u, std_v, std_w) in zip(average_bin_magnitude,
+                                     average_velocity_u,
+                                     average_velocity_v,
+                                     average_velocity_w,
+                                     velocity_u_std,
+                                     velocity_v_std,
+                                     velocity_w_std):
+        multiline_x.append((magnitude,
+                            magnitude))
+        multiline_y_u.append((velocity_u - std_u,
+                              velocity_u + std_u))
+        multiline_y_v.append((velocity_v - std_v,
+                              velocity_v + std_v))
+        multiline_y_w.append((velocity_w - std_w,
+                              velocity_w + std_w))
+
+    top_plot.multi_line(multiline_x,
+                        multiline_y_u)
+    middle_plot.multi_line(multiline_x,
+                           multiline_y_v)
+    bottom_plot.multi_line(multiline_x,
+                           multiline_y_w)
+
+    show(column(top_plot,
+                middle_plot,
+                bottom_plot))
+
+
+def plot_velocities_vs_magnitude_lepine_case():
+    pass

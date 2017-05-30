@@ -25,6 +25,8 @@ services:
       - --w-lepine-criterion
       # Plotting
       - plot
+      - --luminosity-function
+      - --velocities-vs-magnitude
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 
