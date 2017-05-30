@@ -27,6 +27,7 @@ services:
       - plot
       - --luminosity-function
       - --velocities-vs-magnitude
+      - --lepine-criterion
     environment:
       - CASSANDRA_RPC_ADDRESS=cassandra
       - CASSANDRA_RPC_PORT=9042
