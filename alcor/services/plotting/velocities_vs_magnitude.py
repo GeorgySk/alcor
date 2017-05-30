@@ -10,7 +10,8 @@ def plot() -> None:
     output_file("velocities_vs_magnitude.html")
 
     with open('uvw_vs_mag_bins.csv', 'r') as data_file:
-        reader = csv.reader(data_file)
+        reader = csv.reader(data_file,
+                            delimiter=' ')
 
         header_row = next(reader)
 
@@ -23,14 +24,13 @@ def plot() -> None:
         velocity_w_std = []
 
         for row in reader:
-            splitted_row = row[0].split()
-            average_bin_magnitude.append(float(splitted_row[0]))
-            average_velocity_u.append(float(splitted_row[1]))
-            average_velocity_v.append(float(splitted_row[2]))
-            average_velocity_w.append(float(splitted_row[3]))
-            velocity_u_std.append(float(splitted_row[4]))
-            velocity_v_std.append(float(splitted_row[5]))
-            velocity_w_std.append(float(splitted_row[6]))
+            average_bin_magnitude.append(float(row[0]))
+            average_velocity_u.append(float(row[1]))
+            average_velocity_v.append(float(row[2]))
+            average_velocity_w.append(float(row[3]))
+            velocity_u_std.append(float(row[4]))
+            velocity_v_std.append(float(row[5]))
+            velocity_w_std.append(float(row[6]))
 
     top_plot = figure(width=500, height=250)
     top_plot.line(average_bin_magnitude,
@@ -81,7 +81,8 @@ def plot() -> None:
                            multiline_y_w)
 
     with open('uvw_vs_mag_cloud.csv', 'r') as data_file:
-        reader = csv.reader(data_file)
+        reader = csv.reader(data_file,
+                            delimiter=' ')
 
         header_row = next(reader)
 
@@ -91,11 +92,10 @@ def plot() -> None:
         velocity_w = []
 
         for row in reader:
-            splitted_row = row[0].split()
-            bolometric_magnitude.append(float(splitted_row[0]))
-            velocity_u.append(float(splitted_row[1]))
-            velocity_v.append(float(splitted_row[2]))
-            velocity_w.append(float(splitted_row[3]))
+            bolometric_magnitude.append(float(row[0]))
+            velocity_u.append(float(row[1]))
+            velocity_v.append(float(row[2]))
+            velocity_w.append(float(row[3]))
 
     top_plot.circle(bolometric_magnitude,
                     velocity_u,

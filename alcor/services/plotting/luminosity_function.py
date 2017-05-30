@@ -12,12 +12,12 @@ def plot() -> None:
                        x_axis_label='Mbol',  # Todo: rename axis
                        y_axis_label='logN')
 
-    with open('luminosity_function.csv', 'r') as data_file:
-        reader = csv.reader(data_file)
+    with open('luminosity_function.csv', 'r') as file:
+        reader = csv.reader(file,
+                            delimiter=' ')
 
         first_row = next(reader)
-        splitted_first_row = first_row[0].split()
-        normalization_factor = float(splitted_first_row[1])
+        normalization_factor = float(first_row[1])
 
         header_row = next(reader)
 
@@ -27,11 +27,10 @@ def plot() -> None:
         lower_errorbar = []
 
         for row in reader:
-            splitted_row = row[0].split()
-            average_bin_magnitude.append(float(splitted_row[0]))
-            star_count_logarithm.append(float(splitted_row[1]))
-            upper_errorbar.append(float(splitted_row[2]))
-            lower_errorbar.append(float(splitted_row[3]))
+            average_bin_magnitude.append(float(row[0]))
+            star_count_logarithm.append(float(row[1]))
+            upper_errorbar.append(float(row[2]))
+            lower_errorbar.append(float(row[3]))
 
     # TODO: find out if we can omit legend here
     main_plot.line(average_bin_magnitude,
