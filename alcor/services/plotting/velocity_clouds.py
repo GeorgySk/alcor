@@ -15,14 +15,8 @@ def plot() -> None:
 
         header_row = next(reader)
 
-        velocity_u = []
-        velocity_v = []
-        velocity_w = []
-
-        for row in reader:
-            velocity_u.append(float(row[0]))
-            velocity_v.append(float(row[1]))
-            velocity_w.append(float(row[2]))
+        rows = (map(float, row) for row in reader)
+        (velocity_u, velocity_v, velocity_w) = zip(*rows)
 
     top_plot = figure(width=250, height=250)
     top_plot.circle(velocity_u,
@@ -51,11 +45,8 @@ def plot_lepine_case():
         reader = csv.reader(file,
                             delimiter=' ')
         header_row = next(reader)
-        velocity_u = []
-        velocity_w = []
-        for row in reader:
-            velocity_u.append(float(row[0]))
-            velocity_w.append(float(row[1]))
+        rows = (map(float, row) for row in reader)
+        (velocity_u, velocity_w) = zip(*rows)
     top_plot = figure(width=250, height=250)
     top_plot.circle(velocity_u,
                     velocity_w,
@@ -65,11 +56,8 @@ def plot_lepine_case():
         reader = csv.reader(file,
                             delimiter=' ')
         header_row = next(reader)
-        velocity_u = []
-        velocity_v = []
-        for row in reader:
-            velocity_u.append(float(row[0]))
-            velocity_v.append(float(row[1]))
+        rows = (map(float, row) for row in reader)
+        (velocity_u, velocity_v) = zip(*rows)
     middle_plot = figure(width=250, height=250)
     middle_plot.circle(velocity_u,
                        velocity_v,
@@ -79,11 +67,8 @@ def plot_lepine_case():
         reader = csv.reader(file,
                             delimiter=' ')
         header_row = next(reader)
-        velocity_v = []
-        velocity_w = []
-        for row in reader:
-            velocity_v.append(float(row[0]))
-            velocity_w.append(float(row[1]))
+        rows = (map(float, row) for row in reader)
+        (velocity_v, velocity_w) = zip(*rows)
     bottom_plot = figure(width=250, height=250)
     bottom_plot.circle(velocity_v,
                        velocity_w,

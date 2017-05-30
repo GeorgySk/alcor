@@ -15,22 +15,14 @@ def plot() -> None:
 
         header_row = next(reader)
 
-        average_bin_magnitude = []
-        average_velocity_u = []
-        average_velocity_v = []
-        average_velocity_w = []
-        velocity_u_std = []
-        velocity_v_std = []
-        velocity_w_std = []
-
-        for row in reader:
-            average_bin_magnitude.append(float(row[0]))
-            average_velocity_u.append(float(row[1]))
-            average_velocity_v.append(float(row[2]))
-            average_velocity_w.append(float(row[3]))
-            velocity_u_std.append(float(row[4]))
-            velocity_v_std.append(float(row[5]))
-            velocity_w_std.append(float(row[6]))
+        rows = (map(float, row) for row in reader)
+        (average_bin_magnitude,
+            average_velocity_u,
+            average_velocity_v,
+            average_velocity_w,
+            velocity_u_std,
+            velocity_v_std,
+            velocity_w_std) = zip(*rows)
 
     top_plot = figure(width=500, height=250)
     top_plot.line(average_bin_magnitude,
@@ -86,16 +78,11 @@ def plot() -> None:
 
         header_row = next(reader)
 
-        bolometric_magnitude = []
-        velocity_u = []
-        velocity_v = []
-        velocity_w = []
-
-        for row in reader:
-            bolometric_magnitude.append(float(row[0]))
-            velocity_u.append(float(row[1]))
-            velocity_v.append(float(row[2]))
-            velocity_w.append(float(row[3]))
+        rows = (map(float, row) for row in reader)
+        (bolometric_magnitude,
+            velocity_u,
+            velocity_v,
+            velocity_w) = zip(*rows)
 
     top_plot.circle(bolometric_magnitude,
                     velocity_u,
@@ -114,50 +101,33 @@ def plot() -> None:
 
 def plot_lepine_case():
     output_file("velocities_vs_magnitude.html")
+
     with open('u_vs_mag_bins.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=' ')
-
         header_row = next(reader)
-
-        average_bin_magnitude_u = []
-        average_velocity_u = []
-        velocity_u_std = []
-
-        for row in reader:
-            average_bin_magnitude_u.append(float(row[0]))
-            average_velocity_u.append(float(row[1]))
-            velocity_u_std.append(float(row[2]))
+        rows = (map(float, row) for row in reader)
+        (average_bin_magnitude_u,
+            average_velocity_u,
+            velocity_u_std) = zip(*rows)
 
     with open('v_vs_mag_bins.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=' ')
-
         header_row = next(reader)
-
-        average_bin_magnitude_v = []
-        average_velocity_v = []
-        velocity_v_std = []
-
-        for row in reader:
-            average_bin_magnitude_v.append(float(row[0]))
-            average_velocity_v.append(float(row[1]))
-            velocity_v_std.append(float(row[2]))
+        rows = (map(float, row) for row in reader)
+        (average_bin_magnitude_v,
+            average_velocity_v,
+            velocity_v_std) = zip(*rows)
 
     with open('w_vs_mag_bins.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=' ')
-
         header_row = next(reader)
-
-        average_bin_magnitude_w = []
-        average_velocity_w = []
-        velocity_w_std = []
-
-        for row in reader:
-            average_bin_magnitude_w.append(float(row[0]))
-            average_velocity_w.append(float(row[1]))
-            velocity_w_std.append(float(row[2]))
+        rows = (map(float, row) for row in reader)
+        (average_bin_magnitude_w,
+            average_velocity_w,
+            velocity_w_std) = zip(*rows)
 
     top_plot = figure(width=500, height=250)
     top_plot.line(average_bin_magnitude_u,
@@ -218,41 +188,26 @@ def plot_lepine_case():
     with open('u_vs_mag_cloud.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=' ')
-
         header_row = next(reader)
-
-        bolometric_magnitude = []
-        velocity_u = []
-
-        for row in reader:
-            bolometric_magnitude.append(float(row[0]))
-            velocity_u.append(float(row[1]))
+        rows = (map(float, row) for row in reader)
+        (bolometric_magnitude,
+            velocity_u) = zip(*rows)
 
     with open('v_vs_mag_cloud.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=' ')
-
         header_row = next(reader)
-
-        bolometric_magnitude = []
-        velocity_v = []
-
-        for row in reader:
-            bolometric_magnitude.append(float(row[0]))
-            velocity_v.append(float(row[1]))
+        rows = (map(float, row) for row in reader)
+        (bolometric_magnitude,
+            velocity_v) = zip(*rows)
 
     with open('w_vs_mag_cloud.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=' ')
-
         header_row = next(reader)
-
-        bolometric_magnitude = []
-        velocity_w = []
-
-        for row in reader:
-            bolometric_magnitude.append(float(row[0]))
-            velocity_w.append(float(row[1]))
+        rows = (map(float, row) for row in reader)
+        (bolometric_magnitude,
+            velocity_w) = zip(*rows)
 
     top_plot.circle(bolometric_magnitude,
                     velocity_u,
