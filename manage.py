@@ -143,9 +143,17 @@ def process(ctx: click.Context,
 @click.option('--luminosity-function', '-lf',
               is_flag=True,
               help='Plot luminosity function.')
+@click.option('--velocities-vs-magnitude', '-vm',
+              is_flag=True,
+              help='Plot velocities vs bol. magnitude .')
+@click.option('--lepine-criterion', '-lcr',
+              is_flag=True,
+              help='Use data with applied Lepine\'s criterion.')
 @click.pass_context
 def plot(ctx: click.Context,
-         luminosity_function: bool) -> None:
+         luminosity_function: bool,
+         velocities_vs_magnitude: bool,
+         lepine_criterion: bool) -> None:
     cluster_settings = ctx.obj
     contact_points = cluster_settings['contact_points']
     port = cluster_settings['port']
@@ -157,7 +165,9 @@ def plot(ctx: click.Context,
         session = cluster.connect()
         init_db(keyspace_name=keyspace_name,
                 session=session)
-        make_plots(luminosity_function)
+        make_plots(luminosity_function,
+                   velocities_vs_magnitude,
+                   lepine_criterion)
 
 
 def init_db(*,
