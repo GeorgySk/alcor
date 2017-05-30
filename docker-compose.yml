@@ -18,7 +18,7 @@ services:
       - process
       - --data-path
       - test_project/5d0bd.res
-      - --sample
+      - --method
       - restricted
       - --nullify-radial-velocity
       - --luminosity-function

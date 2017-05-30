@@ -18,13 +18,14 @@ logging.basicConfig(format='%(filename)s %(funcName)s '
 logger = logging.getLogger(__name__)
 
 
-def run_processing(data_path,
-                   luminosity_function,
-                   velocity_clouds,
-                   velocities_vs_magnitude,
-                   sample,
-                   nullify_radial_velocity,
-                   lepine_criterion) -> None:
+def run_processing(*,
+                   data_path: str,
+                   method: str,
+                   nullify_radial_velocity: bool,
+                   luminosity_function: bool,
+                   velocity_clouds: bool,
+                   velocities_vs_magnitude: bool,
+                   lepine_criterion: bool) -> None:
     group_id = uuid.uuid4()
     with open(data_path, 'r') as input_file:
         stars = list(parse_stars(input_file, group_id))
@@ -33,15 +34,16 @@ def run_processing(data_path,
     apply_elimination_criteria = partial(
         check_elimination,
         eliminations_counter=eliminations_counter,
-        method=sample)
-    raw_sample_stars_count = len(list(stars))
-    if sample in {'restricted', 'full'}:
+        method=method)
+    if method in {'restricted', 'full'}:
         filtered_stars = list(filterfalse(apply_elimination_criteria,
                                           stars))
     else:
         filtered_stars = stars
+    raw_sample_stars_count = len(list(stars))
+    filtered_stars_count = len(filtered_stars)
     write_elimination_stats(raw_sample_stars_count=raw_sample_stars_count,
-                            filtered_stars_count=len(filtered_stars),
+                            filtered_stars_count=filtered_stars_count,
                             eliminations_counter=eliminations_counter)
 
     if nullify_radial_velocity:
@@ -50,9 +52,11 @@ def run_processing(data_path,
 
     if luminosity_function:
         write_luminosity_function_data(filtered_stars)
+
     if velocity_clouds:
         write_velocity_clouds_data(filtered_stars,
                                    lepine_criterion)
+
     if velocities_vs_magnitude:
         write_velocities_vs_magnitude_data(filtered_stars,
                                            lepine_criterion)

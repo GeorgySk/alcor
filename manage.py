@@ -83,14 +83,14 @@ def run(ctx: click.Context,
               type=click.Path(),
               help='Path to data to be processed '
                    '(absolute or relative).')
-@click.option('--sample', '-s',
+@click.option('--method', '-m',
               type=click.Choice(['raw',
                                  'full',
                                  'restricted']),
               default='restricted',
-              help='How we want to sort raw data.'
-                   '(raw - do nothing,'
-                   'full - only declination and parallax selection criteria,'
+              help='Raw data sorting method '
+                   '(raw - do nothing, '
+                   'full - only declination and parallax selection criteria, '
                    'restricted - apply all criteria)')
 @click.option('--nullify-radial-velocity', '-nrf',
               is_flag=True,
@@ -110,7 +110,7 @@ def run(ctx: click.Context,
 @click.pass_context
 def process(ctx: click.Context,
             data_path: str,
-            sample: str,
+            method: str,
             nullify_radial_velocity: bool,
             luminosity_function: bool,
             velocity_clouds: bool,
@@ -130,13 +130,13 @@ def process(ctx: click.Context,
         init_db(keyspace_name=keyspace_name,
                 session=session)
 
-        run_processing(data_path,
-                       luminosity_function,
-                       velocity_clouds,
-                       velocities_vs_magnitude,
-                       sample,
-                       nullify_radial_velocity,
-                       lepine_criterion)
+        run_processing(data_path=data_path,
+                       method=method,
+                       nullify_radial_velocity=nullify_radial_velocity,
+                       luminosity_function=luminosity_function,
+                       velocity_clouds=velocity_clouds,
+                       velocities_vs_magnitude=velocities_vs_magnitude,
+                       lepine_criterion=lepine_criterion)
 
 
 def init_db(*,
