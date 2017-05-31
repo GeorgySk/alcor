@@ -3,13 +3,14 @@ from decimal import Decimal
 from itertools import chain
 from typing import (Any,
                     Iterable,
-                    Dict)
+                    Dict, Tuple)
 
 import yaml
 
 from alcor.models import (Group,
                           Star)
 from alcor.models import STAR_PARAMETERS_NAMES
+from alcor.types import ColumnValueType
 
 
 def load_settings(path: str
@@ -35,3 +36,11 @@ def parse_stars(lines: Iterable[str],
                                  params))
         yield Star(group_id=group.id,
                    **values)
+
+
+def get_columns(rows: Iterable[Tuple[str, ...]],
+                data_type: ColumnValueType = float
+                ) -> Iterable[Tuple[ColumnValueType, ...]]:
+    converted_rows = (map(data_type, row)
+                      for row in rows)
+    return zip(*converted_rows)
