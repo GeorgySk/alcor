@@ -3,7 +3,8 @@ from decimal import Decimal
 from itertools import chain
 from typing import (Any,
                     Iterable,
-                    Dict, Tuple)
+                    Dict,
+                    Tuple)
 
 import yaml
 

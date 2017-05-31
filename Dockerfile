@@ -2,9 +2,9 @@ FROM python:3
 
 RUN apt-get update && \
     apt-get install -y gfortran \
-                       unzip && \
+                       unzip \
 #   bokeh requirement:
-    apt-get install -y nodejs
+                       nodejs
 
 WORKDIR /alcor
 
