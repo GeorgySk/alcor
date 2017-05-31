@@ -1,6 +1,8 @@
 import csv
 
-from bokeh.layouts import column
+from bokeh.io import save
+from bokeh.layouts import (column,
+                           gridplot)
 from bokeh.models.glyphs import Ellipse
 from bokeh.plotting import (figure,
                             output_file,
@@ -12,6 +14,8 @@ from bokeh.plotting import (figure,
 # thick disc and spheroid luminosity functions"
 # Mon. Not. R. Astron. Soc. 417, 93–113 (2011)
 # doi:10.1111/j.1365-2966.2011.18976.x
+from alcor.utils import get_columns
+
 AVERAGE_POPULATION_VELOCITY_U = -8.62
 AVERAGE_POPULATION_VELOCITY_V = -20.04
 AVERAGE_POPULATION_VELOCITY_W = -7.1
@@ -21,30 +25,29 @@ STD_POPULATION_W = 18.1
 
 CSV_DELIMITER = ' '
 
+PLOT_WIDTH = 250
+PLOT_HEIGHT = 250
+
 
 def plot() -> None:
     output_file("velocity_clouds.html")
 
+    top_plot = figure()
+    middle_plot = figure()
+    bottom_plot = figure()
+
     with open('uvw_cloud.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=CSV_DELIMITER)
-
         header_row = next(reader)
+        (velocity_u, velocity_v, velocity_w) = get_columns(reader)
 
-        rows = (map(float, row) for row in reader)
-        (velocity_u, velocity_v, velocity_w) = zip(*rows)
-
-    top_plot = figure(width=250, height=250)
     top_plot.circle(velocity_u,
                     velocity_w,
                     size=1)
-
-    middle_plot = figure(width=250, height=250)
     middle_plot.circle(velocity_u,
                        velocity_v,
                        size=1)
-
-    bottom_plot = figure(width=250, height=250)
     bottom_plot.circle(velocity_w,
                        velocity_v,
                        size=1)
@@ -97,21 +100,30 @@ def plot() -> None:
     bottom_plot.add_glyph(bottom_ellipse)
     bottom_plot.add_glyph(bottom_double_ellipse)
 
-    show(column(top_plot,
-                middle_plot,
-                bottom_plot))
+    main_plot = gridplot(children=[top_plot,
+                                   middle_plot,
+                                   bottom_plot],
+                         ncols=1,
+                         plot_width=PLOT_WIDTH,
+                         plot_height=PLOT_HEIGHT,
+                         merge_tools=True,
+                         toolbar_location='right')
+    save(main_plot)
 
 
 def plot_lepine_case():
     output_file("velocity_clouds.html")
 
+    top_plot = figure()
+    middle_plot = figure()
+    bottom_plot = figure()
+
     with open('uw_cloud.csv', 'r') as file:
         reader = csv.reader(file,
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
-        rows = (map(float, row) for row in reader)
-        (velocity_u, velocity_w) = zip(*rows)
-    top_plot = figure(width=250, height=250)
+        (velocity_u, velocity_w) = get_columns(reader)
+
     top_plot.circle(velocity_u,
                     velocity_w,
                     size=1)
@@ -120,9 +132,8 @@ def plot_lepine_case():
         reader = csv.reader(file,
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
-        rows = (map(float, row) for row in reader)
-        (velocity_u, velocity_v) = zip(*rows)
-    middle_plot = figure(width=250, height=250)
+        (velocity_u, velocity_v) = get_columns(reader)
+
     middle_plot.circle(velocity_u,
                        velocity_v,
                        size=1)
@@ -131,9 +142,8 @@ def plot_lepine_case():
         reader = csv.reader(file,
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
-        rows = (map(float, row) for row in reader)
-        (velocity_v, velocity_w) = zip(*rows)
-    bottom_plot = figure(width=250, height=250)
+        (velocity_v, velocity_w) = get_columns(reader)
+
     bottom_plot.circle(velocity_v,
                        velocity_w,
                        size=1)
@@ -184,6 +194,12 @@ def plot_lepine_case():
     bottom_plot.add_glyph(bottom_ellipse)
     bottom_plot.add_glyph(bottom_double_ellipse)
 
-    show(column(top_plot,
-                middle_plot,
-                bottom_plot))
+    main_plot = gridplot(children=[top_plot,
+                                   middle_plot,
+                                   bottom_plot],
+                         ncols=1,
+                         plot_width=PLOT_WIDTH,
+                         plot_height=PLOT_HEIGHT,
+                         merge_tools=True,
+                         toolbar_location='right')
+    save(main_plot)
