@@ -16,8 +16,6 @@ services:
 #      - test_project
       # Processing generated data:
       - process
-      - --data-path
-      - test_project/5d0bd.res
       - --method
       - restricted
       - --nullify-radial-velocity

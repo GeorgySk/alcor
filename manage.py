@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import logging
 import os
+from typing import List
 
 import click
 from cassandra.cluster import (Cluster,
                                Session)
 from cassandra.cqlengine import connection
+from cassandra.cqlengine.query import AbstractQuerySet
 from cassandra_helpers.connectable import check_connection
 from cassandra_helpers.keyspace import (keyspace_exists,
                                         create_keyspace,
@@ -15,8 +17,10 @@ from cassandra_helpers.models import sync_tables
 from alcor.config import PROJECT_NAME
 from alcor.models import (Parameter,
                           Star)
+from alcor.services.data_access import fetch
 from alcor.services.results_processing import run_processing
 from alcor.services.simulations import run_simulations
+from alcor.types import RecordType
 from alcor.utils import load_settings
 
 logger = logging.getLogger(__name__)
@@ -78,11 +82,6 @@ def simulate(ctx: click.Context,
 
 
 @main.command()
-@click.option('--data-path', '-p',
-              required=True,
-              type=click.Path(),
-              help='Path to data to be processed '
-                   '(absolute or relative).')
 @click.option('--method', '-m',
               type=click.Choice(['raw',
                                  'full',
@@ -109,7 +108,6 @@ def simulate(ctx: click.Context,
               help='Apply Lepine\'s criterion.')
 @click.pass_context
 def process(ctx: click.Context,
-            data_path: str,
             method: str,
             nullify_radial_velocity: bool,
             luminosity_function: bool,
@@ -130,13 +128,49 @@ def process(ctx: click.Context,
         init_db(keyspace_name=keyspace_name,
                 session=session)
 
-        run_processing(data_path=data_path,
-                       method=method,
-                       nullify_radial_velocity=nullify_radial_velocity,
-                       luminosity_function=luminosity_function,
-                       velocity_clouds=velocity_clouds,
-                       velocities_vs_magnitude=velocities_vs_magnitude,
-                       lepine_criterion=lepine_criterion)
+        def callback(records: List[RecordType]) -> None:
+            logger.debug(f'Successfully finished fetching '
+                         f'"{Star.__table_name__}" table\'s records, '
+                         f'number of records received: {len(records)}.')
+            stars = [Star(**raw_star) for raw_star in records]
+            run_processing(stars=stars,
+                           method=method,
+                           nullify_radial_velocity=nullify_radial_velocity,
+                           luminosity_function=luminosity_function,
+                           velocity_clouds=velocity_clouds,
+                           velocities_vs_magnitude=velocities_vs_magnitude,
+                           lepine_criterion=lepine_criterion)
+
+        model = Star
+        query = model.objects
+        records_count = fetch_records_count(query=query,
+                                            session=session)
+        logger.debug(f'Successfully finished fetching '
+                     f'"{Star.__table_name__}" table\'s records count, '
+                     f'number of records found: {records_count}.')
+        statement = f'SELECT * FROM {Star.__table_name__}'
+        fetch(statement=statement,
+              session=session,
+              callback=callback)
+        # stars = [Star(**raw_star) for raw_star in records]
+        # pydevd.settrace('dockerhost', port=19929)
+        # y = 5
+
+
+def fetch_records_count(*,
+                        query: AbstractQuerySet,
+                        session: Session
+                        ) -> int:
+    statement = count_query(query)
+    row, = fetch(statement=statement,
+                 session=session)
+    return row['count']
+
+
+def count_query(query: AbstractQuerySet) -> str:
+    statement = query._select_query()
+    statement.count = True
+    return str(statement)
 
 
 def init_db(*,
