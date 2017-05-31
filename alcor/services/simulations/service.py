@@ -8,8 +8,10 @@ from typing import (Dict,
 
 from cassandra.cluster import Session
 
+from alcor.models import Star
 from alcor.models.parameter import Parameter
-from alcor.services.data_access import insert
+from alcor.services.data_access import insert, insert_statement
+from alcor.services.data_access.creating import insert_statement
 from alcor.services.parameters import generate_parameters_values
 from alcor.types import NumericType
 from alcor.utils import parse_stars
@@ -50,11 +52,17 @@ def save_parameters(*,
                     values: Dict[str, Decimal],
                     group_id: uuid.UUID,
                     session: Session) -> None:
-    instances = [Parameter(group_id=group_id,
-                           name=parameter_name,
-                           value=parameter_value)
-                 for parameter_name, parameter_value in values.items()]
-    insert(instances=instances,
+    parameters = [Parameter(group_id=group_id,
+                            name=parameter_name,
+                            value=parameter_value)
+                  for parameter_name, parameter_value in values.items()]
+
+    table_name = Parameter.__table_name__
+    columns_names = Parameter().keys()
+    statement = insert_statement(table_name=table_name,
+                                 columns_names=columns_names)
+    insert(instances=parameters,
+           statement=statement,
            session=session)
 
 
@@ -83,7 +91,12 @@ def save_stars(file_name: str,
     with open(file_name) as output_file:
         stars = parse_stars(output_file,
                             group_id=group_id)
+        table_name = Star.__table_name__
+        columns_names = Star().keys()
+        statement = insert_statement(table_name=table_name,
+                                     columns_names=columns_names)
         insert(instances=stars,
+               statement=statement,
                session=session)
 
 

@@ -7,7 +7,6 @@ import click
 from cassandra.cluster import (Cluster,
                                Session)
 from cassandra.cqlengine import connection
-from cassandra.cqlengine.query import AbstractQuerySet
 from cassandra_helpers.connectable import check_connection
 from cassandra_helpers.keyspace import (keyspace_exists,
                                         create_keyspace,
@@ -17,7 +16,8 @@ from cassandra_helpers.models import sync_tables
 from alcor.config import PROJECT_NAME
 from alcor.models import (Parameter,
                           Star)
-from alcor.services.data_access import fetch
+from alcor.services.data_access import (fetch,
+                                        select_statement)
 from alcor.services.results_processing import run_processing
 from alcor.services.simulations import run_simulations
 from alcor.types import RecordType
@@ -141,36 +141,11 @@ def process(ctx: click.Context,
                            velocities_vs_magnitude=velocities_vs_magnitude,
                            lepine_criterion=lepine_criterion)
 
-        model = Star
-        query = model.objects
-        records_count = fetch_records_count(query=query,
-                                            session=session)
-        logger.debug(f'Successfully finished fetching '
-                     f'"{Star.__table_name__}" table\'s records count, '
-                     f'number of records found: {records_count}.')
-        statement = f'SELECT * FROM {Star.__table_name__}'
+        table_name = Star.__table_name__
+        statement = select_statement(table_name=table_name)
         fetch(statement=statement,
               session=session,
               callback=callback)
-        # stars = [Star(**raw_star) for raw_star in records]
-        # pydevd.settrace('dockerhost', port=19929)
-        # y = 5
-
-
-def fetch_records_count(*,
-                        query: AbstractQuerySet,
-                        session: Session
-                        ) -> int:
-    statement = count_query(query)
-    row, = fetch(statement=statement,
-                 session=session)
-    return row['count']
-
-
-def count_query(query: AbstractQuerySet) -> str:
-    statement = query._select_query()
-    statement.count = True
-    return str(statement)
 
 
 def init_db(*,
