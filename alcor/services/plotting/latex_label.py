@@ -1,6 +1,8 @@
 from bokeh.models import Label
 
 # All the following code was taken from goo.gl/U1V8uz
+# from alcor.config import LATEX_LABEL_JS_PATH
+
 JS_CODE = """
 import {Label, LabelView} from "models/annotations/label"
 
@@ -40,6 +42,8 @@ export class LatexLabel extends Label
 
 
 class LatexLabel(Label):
+    # with open(LATEX_LABEL_JS_PATH) as js_file:
+    #     JS_CODE = js_file.read()
     __javascript__ = [
         "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"]
     __css__ = [

@@ -2,7 +2,8 @@ from collections import OrderedDict
 from decimal import Decimal
 from typing import (Any,
                     Iterable,
-                    Dict, Tuple)
+                    Dict,
+                    Tuple)
 
 import yaml
 

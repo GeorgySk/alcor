@@ -19,13 +19,15 @@ STD_POPULATION_U = 32.4
 STD_POPULATION_V = 23.
 STD_POPULATION_W = 18.1
 
+CSV_DELIMITER = ' '
+
 
 def plot() -> None:
     output_file("velocity_clouds.html")
 
     with open('uvw_cloud.csv', 'r') as file:
         reader = csv.reader(file,
-                            delimiter=' ')
+                            delimiter=CSV_DELIMITER)
 
         header_row = next(reader)
 
@@ -105,7 +107,7 @@ def plot_lepine_case():
 
     with open('uw_cloud.csv', 'r') as file:
         reader = csv.reader(file,
-                            delimiter=' ')
+                            delimiter=CSV_DELIMITER)
         header_row = next(reader)
         rows = (map(float, row) for row in reader)
         (velocity_u, velocity_w) = zip(*rows)
@@ -116,7 +118,7 @@ def plot_lepine_case():
 
     with open('uv_cloud.csv', 'r') as file:
         reader = csv.reader(file,
-                            delimiter=' ')
+                            delimiter=CSV_DELIMITER)
         header_row = next(reader)
         rows = (map(float, row) for row in reader)
         (velocity_u, velocity_v) = zip(*rows)
@@ -127,7 +129,7 @@ def plot_lepine_case():
 
     with open('vw_cloud.csv', 'r') as file:
         reader = csv.reader(file,
-                            delimiter=' ')
+                            delimiter=CSV_DELIMITER)
         header_row = next(reader)
         rows = (map(float, row) for row in reader)
         (velocity_v, velocity_w) = zip(*rows)
