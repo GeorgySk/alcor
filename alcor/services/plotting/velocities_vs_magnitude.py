@@ -19,6 +19,7 @@ CSV_DELIMITER = ' '
 def plot() -> None:
     output_file("velocities_vs_magnitude.html")
 
+    # TODO: maybe I should use Plot here
     top_plot = figure()
     middle_plot = figure()
     bottom_plot = figure()
