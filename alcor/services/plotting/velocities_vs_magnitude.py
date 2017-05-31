@@ -28,7 +28,6 @@ def plot() -> None:
         reader = csv.reader(file,
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
-
         (average_bin_magnitude,
          average_velocity_u,
          average_velocity_v,
