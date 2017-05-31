@@ -1,9 +1,13 @@
 from threading import Event
-from typing import Callable, Optional, List
+from typing import (Optional,
+                    Callable,
+                    List)
 
 from cassandra.cluster import ResponseFuture
 
-from alcor.types import CallbackType, ResponseType, RecordType
+from alcor.types import (CallbackType,
+                         ResponseType,
+                         RecordType)
 
 
 class PagedResultHandler:
@@ -36,10 +40,6 @@ class PagedResultHandler:
         self.finished_event.set()
 
 
-def empty_callback(records: ResponseType) -> None:
-    pass
-
-
 def add_callback(*,
                  future: ResponseFuture,
                  callback: CallbackType
@@ -51,3 +51,7 @@ def add_callback(*,
         return
 
     return future.result()
+
+
+def empty_callback(records: ResponseType) -> None:
+    pass
