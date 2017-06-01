@@ -1,6 +1,5 @@
-import uuid
 import logging
-
+import uuid
 from decimal import Decimal
 from subprocess import check_call
 from typing import (Dict,
@@ -9,15 +8,14 @@ from typing import (Dict,
 from cassandra.cluster import Session
 
 from alcor.models import Star
-from alcor.models.parameter import Parameter
-from alcor.services.data_access import insert, insert_statement
-from alcor.services.data_access.creating import insert_statement
+from alcor.models.simulation import Parameter
+from alcor.services.data_access import (insert,
+                                        insert_statement)
 from alcor.services.parameters import generate_parameters_values
+from alcor.services.restrictions import (OUTPUT_FILE_EXTENSION,
+                                         MAX_OUTPUT_FILE_NAME_LENGTH)
 from alcor.types import NumericType
 from alcor.utils import parse_stars
-
-OUTPUT_FILE_EXTENSION = '.res'
-MAX_OUTPUT_FILE_NAME_LENGTH = 5
 
 logger = logging.getLogger(__name__)
 

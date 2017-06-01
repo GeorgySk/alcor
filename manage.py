@@ -14,8 +14,8 @@ from cassandra_helpers.keyspace import (keyspace_exists,
 from cassandra_helpers.models import sync_tables
 
 from alcor.config import PROJECT_NAME
-from alcor.models import (Parameter,
-                          Star)
+from alcor.models import Star
+from alcor.models.simulation import Parameter
 from alcor.services.data_access import (fetch,
                                         select_statement)
 from alcor.services.results_processing import run_processing
@@ -129,7 +129,7 @@ def process(ctx: click.Context,
                 session=session)
 
         def callback(records: List[RecordType]) -> None:
-            logger.debug(f'Successfully finished fetching '
+            logger.debug(f'Starting processing '
                          f'"{Star.__table_name__}" table\'s records, '
                          f'number of records received: {len(records)}.')
             stars = [Star(**raw_star) for raw_star in records]
@@ -140,6 +140,9 @@ def process(ctx: click.Context,
                            velocity_clouds=velocity_clouds,
                            velocities_vs_magnitude=velocities_vs_magnitude,
                            lepine_criterion=lepine_criterion)
+            logger.debug(f'Successfully finished processing '
+                         f'"{Star.__table_name__}" table\'s records, '
+                         f'number of records processed: {len(records)}.')
 
         table_name = Star.__table_name__
         statement = select_statement(table_name=table_name)
