@@ -108,6 +108,14 @@ def plot_lepine_case():
         (average_bin_magnitude_u,
          average_velocity_u,
          velocity_u_std) = get_columns(reader)
+    top_plot.line(average_bin_magnitude_u,
+                  average_velocity_u)
+    top_plot.square(average_bin_magnitude_u,
+                    average_velocity_u)
+    add_errorbars(fig=top_plot,
+                  x=average_bin_magnitude_u,
+                  y=average_velocity_u,
+                  y_err=velocity_u_std)
 
     with open('v_vs_mag_bins.csv', 'r') as file:
         reader = csv.reader(file,
@@ -116,6 +124,14 @@ def plot_lepine_case():
         (average_bin_magnitude_v,
          average_velocity_v,
          velocity_v_std) = get_columns(reader)
+    middle_plot.line(average_bin_magnitude_v,
+                     average_velocity_v)
+    middle_plot.square(average_bin_magnitude_v,
+                       average_velocity_v)
+    add_errorbars(fig=middle_plot,
+                  x=average_bin_magnitude_v,
+                  y=average_velocity_v,
+                  y_err=velocity_v_std)
 
     with open('w_vs_mag_bins.csv', 'r') as file:
         reader = csv.reader(file,
@@ -124,30 +140,10 @@ def plot_lepine_case():
         (average_bin_magnitude_w,
          average_velocity_w,
          velocity_w_std) = get_columns(reader)
-
-    top_plot.line(average_bin_magnitude_u,
-                  average_velocity_u)
-    top_plot.square(average_bin_magnitude_u,
-                    average_velocity_u)
-
-    middle_plot.line(average_bin_magnitude_v,
-                     average_velocity_v)
-    middle_plot.square(average_bin_magnitude_v,
-                       average_velocity_v)
-
     bottom_plot.line(average_bin_magnitude_w,
                      average_velocity_w)
     bottom_plot.square(average_bin_magnitude_w,
                        average_velocity_w)
-
-    add_errorbars(fig=top_plot,
-                  x=average_bin_magnitude_u,
-                  y=average_velocity_u,
-                  y_err=velocity_u_std)
-    add_errorbars(fig=middle_plot,
-                  x=average_bin_magnitude_v,
-                  y=average_velocity_v,
-                  y_err=velocity_v_std)
     add_errorbars(fig=bottom_plot,
                   x=average_bin_magnitude_w,
                   y=average_velocity_w,
@@ -159,6 +155,9 @@ def plot_lepine_case():
         header_row = next(reader)
         (bolometric_magnitude,
          velocity_u) = get_columns(reader)
+    top_plot.circle(bolometric_magnitude,
+                    velocity_u,
+                    size=1)
 
     with open('v_vs_mag_cloud.csv', 'r') as file:
         reader = csv.reader(file,
@@ -166,6 +165,9 @@ def plot_lepine_case():
         header_row = next(reader)
         (bolometric_magnitude,
          velocity_v) = get_columns(reader)
+    middle_plot.circle(bolometric_magnitude,
+                       velocity_v,
+                       size=1)
 
     with open('w_vs_mag_cloud.csv', 'r') as file:
         reader = csv.reader(file,
@@ -173,13 +175,6 @@ def plot_lepine_case():
         header_row = next(reader)
         (bolometric_magnitude,
          velocity_w) = get_columns(reader)
-
-    top_plot.circle(bolometric_magnitude,
-                    velocity_u,
-                    size=1)
-    middle_plot.circle(bolometric_magnitude,
-                       velocity_v,
-                       size=1)
     bottom_plot.circle(bolometric_magnitude,
                        velocity_w,
                        size=1)
