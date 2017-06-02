@@ -41,7 +41,6 @@ def plot() -> None:
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
         (velocity_u, velocity_v, velocity_w) = get_columns(reader)
-
     top_plot.circle(velocity_u,
                     velocity_w,
                     size=1)
@@ -123,7 +122,6 @@ def plot_lepine_case():
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
         (velocity_u, velocity_w) = get_columns(reader)
-
     top_plot.circle(velocity_u,
                     velocity_w,
                     size=1)
@@ -133,7 +131,6 @@ def plot_lepine_case():
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
         (velocity_u, velocity_v) = get_columns(reader)
-
     middle_plot.circle(velocity_u,
                        velocity_v,
                        size=1)
@@ -143,7 +140,6 @@ def plot_lepine_case():
                             delimiter=CSV_DELIMITER)
         header_row = next(reader)
         (velocity_v, velocity_w) = get_columns(reader)
-
     bottom_plot.circle(velocity_v,
                        velocity_w,
                        size=1)
@@ -169,6 +165,7 @@ def plot_lepine_case():
                              width=STD_POPULATION_U * 2,
                              height=STD_POPULATION_V * 2,
                              fill_color='white',
+                             line_dash='dashed',
                              fill_alpha=0.)
     middle_double_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_U,
                                     y=AVERAGE_POPULATION_VELOCITY_V,
@@ -184,6 +181,7 @@ def plot_lepine_case():
                              width=STD_POPULATION_U * 2,
                              height=STD_POPULATION_V * 2,
                              fill_color='white',
+                             line_dash='dashed',
                              fill_alpha=0.)
     bottom_double_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_V,
                                     y=AVERAGE_POPULATION_VELOCITY_W,
