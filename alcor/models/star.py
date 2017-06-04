@@ -43,7 +43,8 @@ class Star(Model):
 
     id = UUID(primary_key=True,
               default=uuid.uuid4)
-    group_id = UUID(required=True)
+    group_id = UUID(required=True,
+                    index=True)
     luminosity = Decimal(required=True)
     proper_motion = Decimal(required=True)
     proper_motion_component_b = Decimal(required=True)
