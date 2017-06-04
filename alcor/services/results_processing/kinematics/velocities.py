@@ -4,6 +4,7 @@ from typing import (List,
                     Tuple)
 
 from alcor.models.star import Star
+from alcor.models.velocities import LepineCaseUVCloud
 
 
 def write_velocity_clouds_data(stars: List[Star],

@@ -13,7 +13,7 @@ class Bin(Model):
     id = UUID(primary_key=True,
               default=uuid.uuid4)
     group_id = UUID(required=True)
-    avg_bin_magnitude = Decimal(required=True)
+    avg_magnitude = Decimal(required=True)
     avg_velocity_u = Decimal(required=True)
     avg_velocity_v = Decimal(required=True)
     avg_velocity_w = Decimal(required=True)
@@ -29,7 +29,7 @@ class LepineCaseUBin(Model):
     id = UUID(primary_key=True,
               default=uuid.uuid4)
     group_id = UUID(required=True)
-    avg_bin_magnitude = Decimal(required=True)
+    avg_magnitude = Decimal(required=True)
     avg_velocity_u = Decimal(required=True)
     velocity_u_std = Decimal(required=True)
     updated_timestamp = DateTime(default=datetime.now)
@@ -41,7 +41,7 @@ class LepineCaseVBin(Model):
     id = UUID(primary_key=True,
               default=uuid.uuid4)
     group_id = UUID(required=True)
-    avg_bin_magnitude = Decimal(required=True)
+    avg_magnitude = Decimal(required=True)
     avg_velocity_v = Decimal(required=True)
     velocity_v_std = Decimal(required=True)
     updated_timestamp = DateTime(default=datetime.now)
@@ -53,7 +53,7 @@ class LepineCaseWBin(Model):
     id = UUID(primary_key=True,
               default=uuid.uuid4)
     group_id = UUID(required=True)
-    avg_bin_magnitude = Decimal(required=True)
+    avg_magnitude = Decimal(required=True)
     avg_velocity_w = Decimal(required=True)
     velocity_w_std = Decimal(required=True)
     updated_timestamp = DateTime(default=datetime.now)
