@@ -2,15 +2,15 @@ import logging
 import uuid
 from decimal import Decimal
 from subprocess import check_call
-from typing import (Dict,
-                    Any)
+from typing import (Any,
+                    Dict)
 
 from cassandra.cluster import Session
 
 from alcor.models import Star
 from alcor.models.simulation import Parameter
 from alcor.services.data_access import (insert,
-                                        insert_statement)
+                                        model_insert_statement)
 from alcor.services.parameters import generate_parameters_values
 from alcor.services.restrictions import (OUTPUT_FILE_EXTENSION,
                                          MAX_OUTPUT_FILE_NAME_LENGTH)
@@ -29,21 +29,25 @@ def run_simulations(*,
     for parameters_values in generate_parameters_values(
             parameters_info=parameters_info,
             precision=precision):
-        parameters_group_id = uuid.uuid4()
+        group_id = uuid.uuid4()
         save_parameters(values=parameters_values,
-                        group_id=parameters_group_id,
+                        group_id=group_id,
                         session=session)
 
-        output_file_name = generate_output_file_name(
-            parameters_group_id=str(parameters_group_id))
+        output_file_name = generate_output_file_name(group_id=str(group_id))
 
         run_simulation(parameters_values=parameters_values,
                        model_type=model_type,
                        output_file_name=output_file_name)
 
-        save_stars(file_name=output_file_name,
-                   group_id=parameters_group_id,
-                   session=session)
+        with open(output_file_name) as output_file:
+            stars = parse_stars(output_file,
+                                group_id=group_id)
+
+        insert_statement = model_insert_statement(Star)
+        insert(instances=stars,
+               statement=insert_statement,
+               session=session)
 
 
 def save_parameters(*,
@@ -55,10 +59,7 @@ def save_parameters(*,
                             value=parameter_value)
                   for parameter_name, parameter_value in values.items()]
 
-    table_name = Parameter.__table_name__
-    columns_names = Parameter().keys()
-    statement = insert_statement(table_name=table_name,
-                                 columns_names=columns_names)
+    statement = model_insert_statement(Parameter)
     insert(instances=parameters,
            statement=statement,
            session=session)
@@ -83,22 +84,6 @@ def run_simulation(*,
     check_call(args)
 
 
-def save_stars(file_name: str,
-               group_id: uuid.UUID,
-               session: Session) -> None:
-    with open(file_name) as output_file:
-        stars = parse_stars(output_file,
-                            group_id=group_id)
-        table_name = Star.__table_name__
-        columns_names = Star().keys()
-        statement = insert_statement(table_name=table_name,
-                                     columns_names=columns_names)
-        insert(instances=stars,
-               statement=statement,
-               session=session)
-
-
-def generate_output_file_name(parameters_group_id: str
-                              ) -> str:
-    base_name = parameters_group_id[:MAX_OUTPUT_FILE_NAME_LENGTH]
+def generate_output_file_name(group_id: str) -> str:
+    base_name = group_id[:MAX_OUTPUT_FILE_NAME_LENGTH]
     return ''.join([base_name, OUTPUT_FILE_EXTENSION])
