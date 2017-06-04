@@ -57,9 +57,9 @@ def generate_clouds(stars: List[Star],
     return u_clouds, v_clouds, w_clouds
 
 
-def u_bins(*,
-           stars_bins: StarsBinsType,
-           group_id: UUID) -> Iterable[LepineCaseUBin]:
+def generate_u_bins(*,
+                    stars_bins: StarsBinsType,
+                    group_id: UUID) -> Iterable[LepineCaseUBin]:
     non_empty_stars_bins = filter(None, stars_bins)
     for index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
@@ -77,9 +77,9 @@ def u_bins(*,
                              velocity_u_std=velocity_u_std)
 
 
-def v_bins(*,
-           stars_bins: StarsBinsType,
-           group_id: UUID) -> Iterable[LepineCaseVBin]:
+def generate_v_bins(*,
+                    stars_bins: StarsBinsType,
+                    group_id: UUID) -> Iterable[LepineCaseVBin]:
     non_empty_stars_bins = filter(None, stars_bins)
     for stars_bin_index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
@@ -97,9 +97,9 @@ def v_bins(*,
                              velocity_v_std=velocity_v_std)
 
 
-def w_bins(*,
-           stars_bins: StarsBinsType,
-           group_id: UUID) -> Iterable[RowType]:
+def generate_w_bins(*,
+                    stars_bins: StarsBinsType,
+                    group_id: UUID) -> Iterable[RowType]:
     non_empty_stars_bins = filter(None, stars_bins)
     for stars_bin_index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
@@ -157,9 +157,9 @@ def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
     return res
 
 
-def bins(*,
-         stars_bins: StarsBinsType,
-         group_id: UUID) -> Iterable[Bin]:
+def generate_bins(*,
+                  stars_bins: StarsBinsType,
+                  group_id: UUID) -> Iterable[Bin]:
     non_empty_stars_bins = filter(None, stars_bins)
     for index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE

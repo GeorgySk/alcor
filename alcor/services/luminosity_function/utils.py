@@ -20,15 +20,15 @@ OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
-def stars_bins(stars: List[Star]) -> StarsBinsType:
-    bins = [[] for _ in range(BINS_COUNT)]
+def generate_stars_bins(stars: List[Star]) -> StarsBinsType:
+    stars_bins = [[] for _ in range(BINS_COUNT)]
     for star in stars:
-        index = get_magnitude_bin_index(star)
-        bins[index].append(star)
-    return bins
+        index = get_stars_bin_index(star)
+        stars_bins[index].append(star)
+    return stars_bins
 
 
-def get_magnitude_bin_index(star: Star) -> int:
+def get_stars_bin_index(star: Star) -> int:
     return int(ceil((float(star.bolometric_magnitude)
                      - MIN_BOLOMETRIC_MAGNITUDE)
                     / BIN_SIZE))
@@ -48,7 +48,8 @@ def points(*,
             normalization_factor=normalization_factor)
         upper_error_bar = get_upper_error_bar(stars_count)
         lower_error_bar = get_lower_error_bar(stars_count)
-        yield Point(avg_bin_magnitude=avg_bin_magnitude,
+        yield Point(group_id=group_id,
+                    avg_bin_magnitude=avg_bin_magnitude,
                     stars_count_logarithm=stars_count_logarithm,
                     upper_error_bar=upper_error_bar,
                     lower_error_bar=lower_error_bar)
