@@ -16,6 +16,7 @@ class StarsCounter(Model):
     raw = Integer(required=True)
     by_parallax = Integer(required=True)
     by_declination = Integer(required=True)
+    by_velocity = Integer(required=True)
     by_proper_motion = Integer(required=True)
     by_reduced_proper_motion = Integer(required=True)
     by_apparent_magnitude = Integer(required=True)
