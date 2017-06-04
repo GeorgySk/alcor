@@ -7,7 +7,7 @@ from cassandra.cqlengine.columns import (UUID,
 from cassandra.cqlengine.models import Model
 
 
-class Graph(Model):
+class Point(Model):
     __table_name__ = 'luminosity_function_graph'
 
     id = UUID(primary_key=True,
