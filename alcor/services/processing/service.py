@@ -6,7 +6,7 @@ from cassandra.cqlengine.statements import UpdateStatement
 
 from alcor.models import (Group,
                           Star)
-from alcor.services.data_access import fetch_query
+from alcor.services.data_access import fetch
 from alcor.services.data_access.execution import execute_base_statement
 from alcor.services.group_processing import process_stars_group
 
@@ -49,8 +49,8 @@ def fetch_unprocessed_groups(*,
     query = (Group.objects
              .filter(Group.processed == False)
              .limit(None))
-    records = fetch_query(query=query,
-                          session=session)
+    records = fetch(query=query,
+                    session=session)
     return [Group(**record)
             for record in records]
 
@@ -62,6 +62,6 @@ def fetch_stars(*,
     query = (Star.objects
              .filter(Star.group_id == group.id)
              .limit(None))
-    records = fetch_query(query=query,
-                          session=session)
+    records = fetch(query=query,
+                    session=session)
     return [Star(**record) for record in records]

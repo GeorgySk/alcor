@@ -11,13 +11,13 @@ from .execution import execute_base_statement
 from .statements import query_to_select_statement
 
 
-def fetch_query(*,
-                query: AbstractQuerySet,
-                session: Session,
-                callback: CallbackType = None,
-                statement_cls=SimpleStatement,
-                **kwargs
-                ) -> Optional[List[RecordType]]:
+def fetch(*,
+          query: AbstractQuerySet,
+          session: Session,
+          callback: CallbackType = None,
+          statement_cls=SimpleStatement,
+          **kwargs
+          ) -> Optional[List[RecordType]]:
     select_statement = query_to_select_statement(query)
     return execute_base_statement(base_statement=select_statement,
                                   session=session,
