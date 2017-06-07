@@ -1,9 +1,9 @@
 from typing import List
-from uuid import UUID
 
 from cassandra.cluster import Session
 
-from alcor.models import Star
+from alcor.models import (Group,
+                          Star)
 from alcor.models.luminosity_function import Point
 from alcor.services.data_access import (insert,
                                         model_insert_statement)
@@ -18,7 +18,7 @@ MAGIC_STARS_BINS_INDEXES = {16, 17, 18}
 
 def process_stars_group_luminosity_function(*,
                                             stars: List[Star],
-                                            group_id: UUID,
+                                            group: Group,
                                             session: Session
                                             ) -> None:
     stars_bins = generate_stars_bins(stars)
@@ -29,7 +29,7 @@ def process_stars_group_luminosity_function(*,
                             * magic_bins_lengths_sum
                             / OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT)
     graph_points = points(bins=stars_bins,
-                          group_id=group_id,
+                          group=group,
                           normalization_factor=normalization_factor)
     statement = model_insert_statement(Point)
     insert(instances=graph_points,

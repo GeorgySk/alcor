@@ -1,9 +1,9 @@
 from typing import List
-from uuid import UUID
 
 from cassandra.cluster import Session
 
-from alcor.models import Star
+from alcor.models import (Group,
+                          Star)
 from alcor.models.velocities import (Cloud,
                                      LepineCaseUVCloud,
                                      LepineCaseUWCloud,
@@ -15,7 +15,7 @@ from .utils import generate_clouds
 
 def process_stars_group_velocities_clouds(*,
                                           stars: List[Star],
-                                          group_id: UUID,
+                                          group: Group,
                                           lepine_criterion: bool,
                                           session: Session
                                           ) -> None:
@@ -25,7 +25,7 @@ def process_stars_group_velocities_clouds(*,
                   LepineCaseUWCloud: uw_clouds,
                   LepineCaseVWCloud: vw_clouds}
     else:
-        clouds = {Cloud: [Cloud(group_id=group_id,
+        clouds = {Cloud: [Cloud(group_id=group.id,
                                 velocity_u=star.velocity_u,
                                 velocity_v=star.velocity_v,
                                 velocity_w=star.velocity_w)

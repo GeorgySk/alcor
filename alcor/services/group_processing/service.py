@@ -3,11 +3,11 @@ from collections import Counter
 from functools import partial
 from itertools import filterfalse
 from typing import List
-from uuid import UUID
 
 from cassandra.cluster import Session
 
-from alcor.models import Star
+from alcor.models import (Group,
+                          Star)
 from alcor.models.eliminations import StarsCounter
 from alcor.services.data_access import (insert,
                                         model_insert_statement)
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def process_stars_group(*,
                         stars: List[Star],
-                        group_id: UUID,
+                        group: Group,
                         filtration_method: str,
                         nullify_radial_velocity: bool,
                         luminosity_function: bool,
@@ -46,7 +46,7 @@ def process_stars_group(*,
                                  stars))
 
     counter = StarsCounter(
-        group_id=group_id,
+        group_id=group.id,
         raw=stars_count,
         by_parallax=eliminations_counter['parallax'],
         by_declination=eliminations_counter['declination'],
@@ -66,19 +66,19 @@ def process_stars_group(*,
     if luminosity_function:
         process_stars_group_luminosity_function(
             stars=stars,
-            group_id=group_id,
+            group=group,
             session=session)
 
     if velocities_clouds:
         process_stars_group_velocities_clouds(
             stars=stars,
-            group_id=group_id,
+            group=group,
             lepine_criterion=lepine_criterion,
             session=session)
 
     if velocities_vs_magnitude:
         process_stars_group_velocities_vs_magnitudes(
             stars=stars,
-            group_id=group_id,
+            group=group,
             lepine_criterion=lepine_criterion,
             session=session)

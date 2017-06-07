@@ -3,10 +3,10 @@ from math import (ceil,
                   sqrt)
 from typing import (List,
                     Iterable)
-from uuid import UUID
 
+from alcor.models import (Group,
+                          Star)
 from alcor.models.luminosity_function import Point
-from alcor.models.star import Star
 from alcor.types import StarsBinsType
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.
@@ -36,7 +36,7 @@ def get_stars_bin_index(star: Star) -> int:
 
 def points(*,
            bins: StarsBinsType,
-           group_id: UUID,
+           group: Group,
            normalization_factor: float) -> Iterable[Point]:
     non_empty_bins = filter(None, bins)
     for stars_bin_index, stars_bin in enumerate(non_empty_bins):
@@ -48,7 +48,7 @@ def points(*,
             normalization_factor=normalization_factor)
         upper_error_bar = get_upper_error_bar(stars_count)
         lower_error_bar = get_lower_error_bar(stars_count)
-        yield Point(group_id=group_id,
+        yield Point(group_id=group.id,
                     avg_bin_magnitude=avg_bin_magnitude,
                     stars_count_logarithm=stars_count_logarithm,
                     upper_error_bar=upper_error_bar,

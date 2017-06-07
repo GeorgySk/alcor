@@ -6,7 +6,8 @@ from typing import (Iterable,
                     List)
 from uuid import UUID
 
-from alcor.models.star import Star
+from alcor.models import (Group,
+                          Star)
 from alcor.models.velocities_vs_magnitudes import (Bin,
                                                    LepineCaseUBin,
                                                    LepineCaseVBin,
@@ -27,9 +28,9 @@ DEFAULT_VELOCITY_STD = 100.
 
 
 def generate_clouds(stars: List[Star],
-                    group_id: UUID) -> Tuple[List[LepineCaseUCloud],
-                                             List[LepineCaseVCloud],
-                                             List[LepineCaseWCloud]]:
+                    group: Group) -> Tuple[List[LepineCaseUCloud],
+                                           List[LepineCaseVCloud],
+                                           List[LepineCaseWCloud]]:
     u_clouds = []
     v_clouds = []
     w_clouds = []
@@ -40,17 +41,17 @@ def generate_clouds(stars: List[Star],
                                  star.coordinate_z)
         if star.coordinate_x == highest_coordinate:
             u_clouds.append(
-                LepineCaseUCloud(group_id=group_id,
+                LepineCaseUCloud(group_id=group.id,
                                  velocity_u=star.velocity_u,
                                  bolometric_magnitude=star.bolometric_magnitude))
         elif star.coordinate_y == highest_coordinate:
             v_clouds.append(
-                LepineCaseVCloud(group_id=group_id,
+                LepineCaseVCloud(group_id=group.id,
                                  velocity_v=star.velocity_v,
                                  bolometric_magnitude=star.bolometric_magnitude))
         else:
             w_clouds.append(
-                LepineCaseWCloud(group_id=group_id,
+                LepineCaseWCloud(group_id=group.id,
                                  velocity_w=star.velocity_w,
                                  bolometric_magnitude=star.bolometric_magnitude))
 
@@ -59,7 +60,7 @@ def generate_clouds(stars: List[Star],
 
 def generate_u_bins(*,
                     stars_bins: StarsBinsType,
-                    group_id: UUID) -> Iterable[LepineCaseUBin]:
+                    group: Group) -> Iterable[LepineCaseUBin]:
     non_empty_stars_bins = filter(None, stars_bins)
     for index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
@@ -71,7 +72,7 @@ def generate_u_bins(*,
         else:
             velocity_u_std = stdev(star.velocity_u
                                    for star in stars_bin)
-        yield LepineCaseUBin(group_id=group_id,
+        yield LepineCaseUBin(group_id=group.id,
                              avg_magnitude=avg_magnitude,
                              avg_velocity_u=avg_velocity_u,
                              velocity_u_std=velocity_u_std)
@@ -79,7 +80,7 @@ def generate_u_bins(*,
 
 def generate_v_bins(*,
                     stars_bins: StarsBinsType,
-                    group_id: UUID) -> Iterable[LepineCaseVBin]:
+                    group: Group) -> Iterable[LepineCaseVBin]:
     non_empty_stars_bins = filter(None, stars_bins)
     for stars_bin_index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
@@ -91,7 +92,7 @@ def generate_v_bins(*,
         else:
             velocity_v_std = stdev(star.velocity_v
                                    for star in stars_bin)
-        yield LepineCaseVBin(group_id=group_id,
+        yield LepineCaseVBin(group_id=group.id,
                              avg_magnitude=avg_magnitude,
                              avg_velocity_v=avg_velocity_v,
                              velocity_v_std=velocity_v_std)
@@ -99,7 +100,7 @@ def generate_v_bins(*,
 
 def generate_w_bins(*,
                     stars_bins: StarsBinsType,
-                    group_id: UUID) -> Iterable[RowType]:
+                    group: Group) -> Iterable[RowType]:
     non_empty_stars_bins = filter(None, stars_bins)
     for stars_bin_index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
@@ -111,7 +112,7 @@ def generate_w_bins(*,
         else:
             velocity_w_std = stdev(star.velocity_w
                                    for star in stars_bin)
-        yield LepineCaseWBin(group_id=group_id,
+        yield LepineCaseWBin(group_id=group.id,
                              avg_magnitude=avg_magnitude,
                              avg_velocity_w=avg_velocity_w,
                              velocity_w_std=velocity_w_std)
@@ -159,7 +160,7 @@ def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
 
 def generate_bins(*,
                   stars_bins: StarsBinsType,
-                  group_id: UUID) -> Iterable[Bin]:
+                  group: Group) -> Iterable[Bin]:
     non_empty_stars_bins = filter(None, stars_bins)
     for index, stars_bin in enumerate(non_empty_stars_bins):
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
@@ -181,7 +182,7 @@ def generate_bins(*,
             velocity_u_std = DEFAULT_VELOCITY_STD
             velocity_v_std = DEFAULT_VELOCITY_STD
             velocity_w_std = DEFAULT_VELOCITY_STD
-        yield Bin(group_id=group_id,
+        yield Bin(group_id=group.id,
                   avg_magnitude=avg_magnitude,
                   avg_velocity_u=avg_velocity_u,
                   avg_velocity_v=avg_velocity_v,
