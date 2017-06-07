@@ -3,11 +3,12 @@ import uuid
 from decimal import Decimal
 from subprocess import check_call
 from typing import (Any,
+                    Iterable,
                     Dict)
 
 from cassandra.cluster import Session
 
-from alcor.models import Star
+from alcor.models import Group, Star
 from alcor.models.simulation import Parameter
 from alcor.services.data_access import (insert,
                                         model_insert_statement)
@@ -30,9 +31,10 @@ def run_simulations(*,
             parameters_info=parameters_info,
             precision=precision):
         group_id = uuid.uuid4()
-        save_parameters(values=parameters_values,
-                        group_id=group_id,
-                        session=session)
+        group = Group(id=group_id)
+
+        parameters = generate_parameters(values=parameters_values,
+                                         group=group)
 
         output_file_name = generate_output_file_name(group_id=str(group_id))
 
@@ -41,28 +43,32 @@ def run_simulations(*,
                        output_file_name=output_file_name)
 
         with open(output_file_name) as output_file:
-            stars = parse_stars(output_file,
-                                group_id=group_id)
+            stars = list(parse_stars(output_file,
+                                     group=group))
 
-        insert_statement = model_insert_statement(Star)
+        insert_groups_statement = model_insert_statement(Group)
+        insert(instances=[group],
+               statement=insert_groups_statement,
+               session=session)
+
+        insert_parameters_statement = model_insert_statement(Parameter)
+        insert(instances=parameters,
+               statement=insert_parameters_statement,
+               session=session)
+
+        insert_stars_statement = model_insert_statement(Star)
         insert(instances=stars,
-               statement=insert_statement,
+               statement=insert_stars_statement,
                session=session)
 
 
-def save_parameters(*,
-                    values: Dict[str, Decimal],
-                    group_id: uuid.UUID,
-                    session: Session) -> None:
-    parameters = [Parameter(group_id=group_id,
-                            name=parameter_name,
-                            value=parameter_value)
-                  for parameter_name, parameter_value in values.items()]
-
-    statement = model_insert_statement(Parameter)
-    insert(instances=parameters,
-           statement=statement,
-           session=session)
+def generate_parameters(*,
+                        values: Dict[str, Decimal],
+                        group: Group) -> Iterable[Parameter]:
+    for parameter_name, parameter_value in values.items():
+        yield Parameter(group_id=group.id,
+                        name=parameter_name,
+                        value=parameter_value)
 
 
 def run_simulation(*,
