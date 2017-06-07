@@ -7,6 +7,7 @@ from math import (cos,
                   asin,
                   atan)
 from typing import Tuple
+
 from cassandra.cqlengine.columns import (UUID,
                                          Decimal,
                                          DateTime,

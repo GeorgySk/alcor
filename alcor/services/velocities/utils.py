@@ -1,7 +1,7 @@
 from typing import (Tuple,
                     List)
 
-from alcor.models.star import Star
+from alcor.models import Star
 from alcor.models.velocities import (LepineCaseUVCloud,
                                      LepineCaseUWCloud,
                                      LepineCaseVWCloud)

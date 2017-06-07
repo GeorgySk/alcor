@@ -4,7 +4,7 @@ from math import log10
 
 from cassandra.deserializers import Decimal
 
-from alcor.models.star import Star
+from alcor.models import Star
 
 MIN_PARALLAX = 0.025
 MIN_DECLINATION = 0.

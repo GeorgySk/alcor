@@ -1,3 +1,3 @@
+from .group import Group
 from .star import (STAR_PARAMETERS_NAMES,
                    Star)
-from .group import Group

@@ -6,9 +6,9 @@ from typing import (Any,
 
 import yaml
 
-from alcor.models import (Group,
+from alcor.models import (STAR_PARAMETERS_NAMES,
+                          Group,
                           Star)
-from alcor.models.star import STAR_PARAMETERS_NAMES
 
 
 def load_settings(path: str

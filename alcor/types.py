@@ -9,7 +9,7 @@ from typing import (Union,
 
 from cassandra.query import Statement
 
-from alcor.models.star import Star
+from alcor.models import Star
 
 NumericType = Union[int, float]
 StarsBinsType = List[List[Star]]

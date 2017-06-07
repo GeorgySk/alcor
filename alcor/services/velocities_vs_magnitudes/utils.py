@@ -4,7 +4,6 @@ from statistics import (mean,
 from typing import (Iterable,
                     Tuple,
                     List)
-from uuid import UUID
 
 from alcor.models import (Group,
                           Star)
