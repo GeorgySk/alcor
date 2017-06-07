@@ -13,7 +13,8 @@ from cassandra_helpers.keyspace import (keyspace_exists,
 from cassandra_helpers.models import sync_tables
 
 from alcor.config import PROJECT_NAME
-from alcor.models import (Star,
+from alcor.models import (Group,
+                          Star,
                           eliminations,
                           luminosity_function,
                           simulation,
@@ -144,7 +145,8 @@ def init_db(*,
                   session=session)
     session.set_keyspace(keyspace_name)
     connection.set_session(session)
-    sync_tables(Star,
+    sync_tables(Group,
+                Star,
                 simulation.Parameter,
                 eliminations.StarsCounter,
                 luminosity_function.Point,
