@@ -2,12 +2,12 @@ from datetime import datetime
 from typing import List
 
 from cassandra.cluster import Session
-from cassandra.cqlengine.statements import UpdateStatement
 
 from alcor.models import (Group,
                           Star)
 from alcor.services.data_access import fetch
-from alcor.services.data_access.execution import execute_base_statement
+from alcor.services.data_access.execution import execute_prepared_statement
+from alcor.services.data_access.statements import model_update_statement
 from alcor.services.group_processing import process_stars_group
 
 
@@ -23,6 +23,8 @@ def run_processing(*,
     for group in groups:
         stars = fetch_stars(group=group,
                             session=session)
+        update_group(group,
+                     session=session)
         process_stars_group(stars=stars,
                             group=group,
                             filtration_method=filtration_method,
@@ -33,13 +35,18 @@ def run_processing(*,
                             lepine_criterion=lepine_criterion,
                             session=session)
 
-        update_statement = UpdateStatement(table=Group.__table_name__,
-                                           where=[Group.id == group.id])
-        update_statement.add_update(Group.processed.column,
-                                    True)
-        update_statement.add_update(Group.updated_timestamp.column,
-                                    datetime.now())
-        execute_base_statement(base_statement=update_statement,
+
+def update_group(group: Group,
+                 *,
+                 session: Session) -> None:
+    columns = [Group.processed, Group.updated_timestamp]
+    where = [Group.id == group.id]
+    update_group_statement = model_update_statement(Group,
+                                                    columns=columns,
+                                                    where_clauses=where,
+                                                    include_keyspace=False)
+    execute_prepared_statement(statement=update_group_statement,
+                               parameters_collection=[(True, datetime.now())],
                                session=session)
 
 

@@ -5,7 +5,7 @@ from typing import (Union,
                     Callable,
                     Dict,
                     Tuple,
-                    List)
+                    List, Iterable)
 
 from cassandra.query import Statement
 
@@ -22,3 +22,4 @@ RecordType = Dict[str, ColumnValueType]
 ResponseType = Optional[List[RecordType]]
 CallbackType = Callable[[ResponseType], None]
 StatementType = Union[str, Statement]
+StatementParametersType = Iterable[ColumnValueType]
