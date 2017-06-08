@@ -1,16 +1,16 @@
 from typing import (Optional,
                     Dict,
-                    List)
+                    List, Iterable)
 
 from cassandra.cluster import Session
 from cassandra.cqlengine.statements import BaseCQLStatement
 from cassandra.query import SimpleStatement
 
-from alcor.services.data_access.callbacks import add_callback
 from alcor.types import (CallbackType,
                          StatementType,
                          RecordType,
-                         ColumnValueType)
+                         ColumnValueType, StatementParametersType)
+from .callbacks import add_callback, empty_callback
 
 
 def execute_base_statement(*,
@@ -39,3 +39,16 @@ def execute_statement(*,
                                    parameters=parameters)
     return add_callback(future=future,
                         callback=callback)
+
+
+def execute_prepared_statement(*,
+                               statement: str,
+                               parameters_collection: Iterable[StatementParametersType],
+                               callback: CallbackType = empty_callback,
+                               session: Session) -> None:
+    prepared_statement = session.prepare(statement)
+    for parameters in parameters_collection:
+        future = session.execute_async(prepared_statement,
+                                       parameters=parameters)
+        add_callback(future=future,
+                     callback=callback)
