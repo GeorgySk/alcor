@@ -5,9 +5,9 @@ from cassandra.cluster import Session
 
 from alcor.models import (Group,
                           Star)
-from alcor.services.data_access import fetch
+from alcor.services.data_access import (fetch,
+                                        model_update_statement)
 from alcor.services.data_access.execution import execute_prepared_statement
-from alcor.services.data_access.statements import model_update_statement
 from alcor.services.group_processing import process_stars_group
 
 
@@ -40,12 +40,12 @@ def update_group(group: Group,
                  *,
                  session: Session) -> None:
     columns = [Group.processed, Group.updated_timestamp]
-    where = [Group.id == group.id]
-    update_group_statement = model_update_statement(Group,
-                                                    columns=columns,
-                                                    where_clauses=where,
-                                                    include_keyspace=False)
-    execute_prepared_statement(statement=update_group_statement,
+    where_clauses = [Group.id == group.id]
+    statement = model_update_statement(Group,
+                                       columns=columns,
+                                       where_clauses=where_clauses,
+                                       include_keyspace=False)
+    execute_prepared_statement(statement=statement,
                                parameters_collection=[(True, datetime.now())],
                                session=session)
 
