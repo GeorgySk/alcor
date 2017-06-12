@@ -23,6 +23,7 @@ def run_simulations(*,
                     settings: Dict[str, Any],
                     session: Session) -> None:
     model_type = settings['model_type']
+    geometry = settings['geometry']
     precision = settings['precision']
     parameters_info = settings['parameters']
     for parameters_values in generate_parameters_values(
@@ -38,6 +39,7 @@ def run_simulations(*,
 
         run_simulation(parameters_values=parameters_values,
                        model_type=model_type,
+                       geometry=geometry,
                        output_file_name=output_file_name)
 
         with open(output_file_name) as output_file:
@@ -62,6 +64,7 @@ def generate_parameters(*,
 def run_simulation(*,
                    parameters_values: Dict[str, NumericType],
                    model_type: int,
+                   geometry: str,
                    output_file_name: str) -> None:
     args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
@@ -71,7 +74,8 @@ def run_simulation(*,
             '-bt', parameters_values['burst_time'],
             '-mr', parameters_values['mass_reduction_factor'],
             '-km', model_type,
-            '-o', output_file_name]
+            '-o', output_file_name,
+            '-geom', geometry]
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')
