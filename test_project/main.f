@@ -207,9 +207,15 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
       call incoolea
 
       write(6,*) '2. Calling the IMF and SFR (2/9)'
-      call gen(iseed,parameterOfSFR,areaOfSector,numberOfStarsInSample,
-     &     galacticDiskAge,timeOfBurst,massReductionFactor,
-     &     kinematicModel)
+      if (geometry = 'sphere') then
+        call gen(iseed,parameterOfSFR,areaOfSector,
+     &           numberOfStarsInSample,galacticDiskAge,timeOfBurst,
+     &           massReductionFactor,kinematicModel)
+      else if (geometry = 'cone') then
+        call generate_cone_stars()
+      else 
+        write(6,*) "wrong geometry name, use 'sphere' or 'cone'"
+      end if
       write(6,*) "numberOfStarsInSample=", numberOfStarsInSample
       
       write(6,*) '3. Calculating luminosities (3/9)'
@@ -250,6 +256,8 @@ C       call volum_40pc
       end
 C***********************************************************************
       include 'code/star_generation/generator.f'
+
+      include 'code/star_generation/cone.f'
      
       include 'code/cooling/DA/DA_cooling.f'
 
