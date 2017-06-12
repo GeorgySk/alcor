@@ -2,7 +2,7 @@ model_type: 1
 
 # sphere - for original spatial distribution
 # cone - to be implemented
-geometry: cone
+geometry: sphere
 
 # specifies to which decimal place
 # floating point numbers should be rounded

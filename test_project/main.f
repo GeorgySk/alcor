@@ -207,11 +207,11 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
       call incoolea
 
       write(6,*) '2. Calling the IMF and SFR (2/9)'
-      if (geometry = 'sphere') then
+      if (geometry == 'sphere') then
         call gen(iseed,parameterOfSFR,areaOfSector,
      &           numberOfStarsInSample,galacticDiskAge,timeOfBurst,
      &           massReductionFactor,kinematicModel)
-      else if (geometry = 'cone') then
+      else if (geometry == 'cone') then
         call generate_cone_stars()
       else 
         write(6,*) "wrong geometry name, use 'sphere' or 'cone'"

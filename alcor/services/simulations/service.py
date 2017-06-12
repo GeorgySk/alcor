@@ -1,3 +1,4 @@
+import csv
 import logging
 import uuid
 from decimal import Decimal
@@ -26,30 +27,65 @@ def run_simulations(*,
     geometry = settings['geometry']
     precision = settings['precision']
     parameters_info = settings['parameters']
-    for parameters_values in generate_parameters_values(
-            parameters_info=parameters_info,
-            precision=precision):
-        group_id = uuid.uuid4()
-        group = Group(id=group_id)
 
-        parameters = generate_parameters(values=parameters_values,
-                                         group=group)
+    if geometry == 'sphere':
+        for parameters_values in generate_parameters_values(
+                parameters_info=parameters_info,
+                precision=precision):
+            group_id = uuid.uuid4()
+            group = Group(id=group_id)
 
-        output_file_name = generate_output_file_name(group_id=str(group_id))
+            parameters = generate_parameters(values=parameters_values,
+                                             group=group)
 
-        run_simulation(parameters_values=parameters_values,
-                       model_type=model_type,
-                       geometry=geometry,
-                       output_file_name=output_file_name)
+            output_file_name = generate_output_file_name(group_id=str(group_id))
 
-        with open(output_file_name) as output_file:
-            stars = list(parse_stars(output_file,
-                                     group=group))
+            run_simulation(parameters_values=parameters_values,
+                           model_type=model_type,
+                           geometry=geometry,
+                           output_file_name=output_file_name)
 
-        session.add(group)
-        session.add_all(parameters)
-        session.add_all(stars)
-        session.commit()
+            with open(output_file_name) as output_file:
+                stars = list(parse_stars(output_file,
+                                         group=group))
+
+    elif geometry == 'cone':
+        with open('angles_file.csv', 'r') as angles_file:
+            angles_reader = csv.reader(angles_file, delimiter=' ')
+            for row in angles_reader:
+                longitude = row[0]
+                latitude = row[1]
+                # No need to walk through parameters here. We only need to
+                # run simulations for all angles in the file with the same
+                # standard parameters. How do we do it?
+                # TODO: delete this loop, use only run_simulation
+                for parameters_values in generate_parameters_values(
+                        parameters_info=parameters_info,
+                        precision=precision):
+                    group_id = uuid.uuid4()
+                    group = Group(id=group_id)
+
+                    parameters = generate_parameters(values=parameters_values,
+                                                     group=group)
+
+                    output_file_name = generate_output_file_name(
+                        group_id=str(group_id))
+
+                    run_simulation(parameters_values=parameters_values,
+                                   model_type=model_type,
+                                   geometry=geometry,
+                                   cone_longitude=longitude,
+                                   cone_latitude=latitude,
+                                   output_file_name=output_file_name)
+
+                    with open(output_file_name) as output_file:
+                        stars = list(parse_stars(output_file,
+                                                 group=group))
+
+    session.add(group)
+    session.add_all(parameters)
+    session.add_all(stars)
+    session.commit()
 
 
 def generate_parameters(*,
@@ -65,6 +101,8 @@ def run_simulation(*,
                    parameters_values: Dict[str, NumericType],
                    model_type: int,
                    geometry: str,
+                   cone_longitude: float,
+                   cone_latitude: float,
                    output_file_name: str) -> None:
     args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
@@ -75,7 +113,9 @@ def run_simulation(*,
             '-mr', parameters_values['mass_reduction_factor'],
             '-km', model_type,
             '-o', output_file_name,
-            '-geom', geometry]
+            '-geom', geometry,
+            '-cl', cone_longitude,
+            '-cb', cone_latitude ]
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')
