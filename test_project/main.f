@@ -62,6 +62,7 @@ C     For terminal:
       double precision :: massReductionFactor
       integer :: kinematicModel
       character(len = 100) :: output_filename
+      character(len = 6) :: geometry
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
@@ -125,6 +126,8 @@ C           call get_command_argument(i, args(i))
               read(temp_string, *) kinematicModel
             case ("-o")
               call getarg(i + 1, output_filename)
+            case ('-geom')
+              call getarg(i + 1, geometry)
           end select
         end do
       end if
