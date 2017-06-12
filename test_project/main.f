@@ -63,6 +63,8 @@ C     For terminal:
       integer :: kinematicModel
       character(len = 100) :: output_filename
       character(len = 6) :: geometry
+      double precision :: cone_height_longitude,
+     &                    cone_height_latitude
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
@@ -128,6 +130,12 @@ C           call get_command_argument(i, args(i))
               call getarg(i + 1, output_filename)
             case ('-geom')
               call getarg(i + 1, geometry)
+            case ('-cl')
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) cone_height_longitude
+            case ('-cb')
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) cone_height_latitude
           end select
         end do
       end if
@@ -212,7 +220,10 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
      &           numberOfStarsInSample,galacticDiskAge,timeOfBurst,
      &           massReductionFactor,kinematicModel)
       else if (geometry == 'cone') then
-        call generate_cone_stars()
+        call generate_cone_stars(cone_height_longitude,
+     &                           cone_height_latitude,
+     &                           numberOfStarsInSample,iseed,
+     &                           kinematicModel)
       else 
         write(6,*) "wrong geometry name, use 'sphere' or 'cone'"
       end if
