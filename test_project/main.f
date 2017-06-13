@@ -223,7 +223,7 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
         call generate_cone_stars(cone_height_longitude,
      &                           cone_height_latitude,
      &                           numberOfStarsInSample,iseed,
-     &                           kinematicModel)
+     &                           kinematicModel,galacticDiskAge)
       else 
         write(6,*) "wrong geometry name, use 'sphere' or 'cone'"
       end if
@@ -232,10 +232,13 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
       write(6,*) '3. Calculating luminosities (3/9)'
       call lumx(iseed,numberOfStarsInSample)      
 
-      write(6,*) '4. Calculating polar coordinates (4/9)'
-      call polar(iseed,minimumSectorRadius,maximumSectorRadius,
-     &     angleCoveringSector,radiusOfSector,
-     &     solarGalactocentricDistance,scaleLength)
+      ! if cone then we already calculated them
+      if (geometry == 'sphere') then
+        write(6,*) '4. Calculating polar coordinates (4/9)'
+        call polar(iseed,minimumSectorRadius,maximumSectorRadius,
+     &         angleCoveringSector,radiusOfSector,
+     &         solarGalactocentricDistance,scaleLength)
+      end if
 
       write(6,*) '5. Generating heliocentric velocities (5/9)'
       call velh(iseed,numberOfStarsInSample)
