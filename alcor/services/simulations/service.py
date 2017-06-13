@@ -1,21 +1,22 @@
-import uuid
 import logging
-
+import uuid
 from decimal import Decimal
 from subprocess import check_call
-from typing import (Dict,
-                    Any)
+from typing import (Any,
+                    Iterable,
+                    Dict)
 
 from cassandra.cluster import Session
 
-from alcor.models.parameter import Parameter
-from alcor.services.data_access import insert
+from alcor.models import Group, Star
+from alcor.models.simulation import Parameter
+from alcor.services.data_access import (insert,
+                                        model_insert_statement)
 from alcor.services.parameters import generate_parameters_values
+from alcor.services.restrictions import (OUTPUT_FILE_EXTENSION,
+                                         MAX_OUTPUT_FILE_NAME_LENGTH)
 from alcor.types import NumericType
 from alcor.utils import parse_stars
-
-OUTPUT_FILE_EXTENSION = '.res'
-MAX_OUTPUT_FILE_NAME_LENGTH = 5
 
 logger = logging.getLogger(__name__)
 
@@ -29,33 +30,45 @@ def run_simulations(*,
     for parameters_values in generate_parameters_values(
             parameters_info=parameters_info,
             precision=precision):
-        parameters_group_id = uuid.uuid4()
-        save_parameters(values=parameters_values,
-                        group_id=parameters_group_id,
-                        session=session)
+        group_id = uuid.uuid4()
+        group = Group(id=group_id)
 
-        output_file_name = generate_output_file_name(
-            parameters_group_id=str(parameters_group_id))
+        parameters = generate_parameters(values=parameters_values,
+                                         group=group)
+
+        output_file_name = generate_output_file_name(group_id=str(group_id))
 
         run_simulation(parameters_values=parameters_values,
                        model_type=model_type,
                        output_file_name=output_file_name)
 
-        save_stars(file_name=output_file_name,
-                   group_id=parameters_group_id,
-                   session=session)
+        with open(output_file_name) as output_file:
+            stars = list(parse_stars(output_file,
+                                     group=group))
+
+        insert_groups_statement = model_insert_statement(Group)
+        insert(instances=[group],
+               statement=insert_groups_statement,
+               session=session)
+
+        insert_parameters_statement = model_insert_statement(Parameter)
+        insert(instances=parameters,
+               statement=insert_parameters_statement,
+               session=session)
+
+        insert_stars_statement = model_insert_statement(Star)
+        insert(instances=stars,
+               statement=insert_stars_statement,
+               session=session)
 
 
-def save_parameters(*,
-                    values: Dict[str, Decimal],
-                    group_id: uuid.UUID,
-                    session: Session) -> None:
-    instances = [Parameter(group_id=group_id,
-                           name=parameter_name,
-                           value=parameter_value)
-                 for parameter_name, parameter_value in values.items()]
-    insert(instances=instances,
-           session=session)
+def generate_parameters(*,
+                        values: Dict[str, Decimal],
+                        group: Group) -> Iterable[Parameter]:
+    for parameter_name, parameter_value in values.items():
+        yield Parameter(group_id=group.id,
+                        name=parameter_name,
+                        value=parameter_value)
 
 
 def run_simulation(*,
@@ -77,17 +90,6 @@ def run_simulation(*,
     check_call(args)
 
 
-def save_stars(file_name: str,
-               group_id: uuid.UUID,
-               session: Session) -> None:
-    with open(file_name) as output_file:
-        stars = parse_stars(output_file,
-                            group_id=group_id)
-        insert(instances=stars,
-               session=session)
-
-
-def generate_output_file_name(parameters_group_id: str
-                              ) -> str:
-    base_name = parameters_group_id[:MAX_OUTPUT_FILE_NAME_LENGTH]
+def generate_output_file_name(group_id: str) -> str:
+    base_name = group_id[:MAX_OUTPUT_FILE_NAME_LENGTH]
     return ''.join([base_name, OUTPUT_FILE_EXTENSION])

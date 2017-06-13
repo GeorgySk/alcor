@@ -9,7 +9,7 @@ from cassandra.cqlengine.models import Model
 
 
 class Parameter(Model):
-    __table_name__ = 'parameters'
+    __table_name__ = 'simulations_parameters'
 
     id = UUID(primary_key=True,
               default=uuid.uuid4)

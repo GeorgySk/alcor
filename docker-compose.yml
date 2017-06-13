@@ -11,18 +11,16 @@ services:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
       # Generating stars:
-#      - run
+#      - simulate
 #      - --project-dir
 #      - test_project
       # Processing generated data:
       - process
-      - --data-path
-      - test_project/5d0bd.res
-      - --sample
+      - --filtration-method
       - restricted
       - --nullify-radial-velocity
       - --luminosity-function
-      - --velocity-clouds
+      - --velocities-clouds
       - --velocities-vs-magnitude
 #      - --lepine-criterion
     environment:

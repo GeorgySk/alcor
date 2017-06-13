@@ -13,9 +13,14 @@ from cassandra_helpers.keyspace import (keyspace_exists,
 from cassandra_helpers.models import sync_tables
 
 from alcor.config import PROJECT_NAME
-from alcor.models import (Parameter,
-                          Star)
-from alcor.services.results_processing import run_processing
+from alcor.models import (Group,
+                          Star,
+                          eliminations,
+                          luminosity_function,
+                          simulation,
+                          velocities,
+                          velocities_vs_magnitudes)
+from alcor.services.processing import run_processing
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
@@ -48,10 +53,10 @@ def main(ctx: click.Context) -> None:
               is_flag=True,
               help='Cleans destination keyspace.')
 @click.pass_context
-def run(ctx: click.Context,
-        settings_path: str,
-        project_dir: str,
-        clean: bool) -> None:
+def simulate(ctx: click.Context,
+             settings_path: str,
+             project_dir: str,
+             clean: bool) -> None:
     cluster_settings = ctx.obj
     contact_points = cluster_settings['contact_points']
     port = cluster_settings['port']
@@ -78,42 +83,36 @@ def run(ctx: click.Context,
 
 
 @main.command()
-@click.option('--data-path', '-p',
-              required=True,
-              type=click.Path(),
-              help='Path to data to be processed '
-                   '(absolute or relative).')
-@click.option('--sample', '-s',
+@click.option('--filtration-method', '-m',
               type=click.Choice(['raw',
                                  'full',
                                  'restricted']),
               default='restricted',
-              help='How we want to sort raw data.'
-                   '(raw - do nothing,'
-                   'full - only declination and parallax selection criteria,'
-                   'restricted - apply all criteria)')
+              help='Raw data filtration method: '
+                   '"raw" - do nothing, '
+                   '"full" - only declination and parallax selection criteria, '
+                   '"restricted" - apply all criteria (default)')
 @click.option('--nullify-radial-velocity', '-nrf',
               is_flag=True,
               help='Sets radial velocities to zero.')
 @click.option('--luminosity-function', '-lf',
               is_flag=True,
               help='Prepare data for plotting luminosity function.')
-@click.option('--velocity-clouds', '-uvw',
+@click.option('--velocities-clouds', '-uvw',
               is_flag=True,
               help='Prepare data for plotting velocity clouds.')
 @click.option('--velocities-vs-magnitude', '-vm',
               is_flag=True,
-              help='Prepare data for plots of velocities vs bol. magnitude .')
+              help='Prepare data for plots of velocities vs bol. magnitude.')
 @click.option('--lepine-criterion', '-lcr',
               is_flag=True,
               help='Apply Lepine\'s criterion.')
 @click.pass_context
 def process(ctx: click.Context,
-            data_path: str,
-            sample: str,
+            filtration_method: str,
             nullify_radial_velocity: bool,
             luminosity_function: bool,
-            velocity_clouds: bool,
+            velocities_clouds: bool,
             velocities_vs_magnitude: bool,
             lepine_criterion: bool) -> None:
     cluster_settings = ctx.obj
@@ -130,13 +129,13 @@ def process(ctx: click.Context,
         init_db(keyspace_name=keyspace_name,
                 session=session)
 
-        run_processing(data_path,
-                       luminosity_function,
-                       velocity_clouds,
-                       velocities_vs_magnitude,
-                       sample,
-                       nullify_radial_velocity,
-                       lepine_criterion)
+        run_processing(filtration_method=filtration_method,
+                       nullify_radial_velocity=nullify_radial_velocity,
+                       luminosity_function=luminosity_function,
+                       velocities_clouds=velocities_clouds,
+                       velocities_vs_magnitude=velocities_vs_magnitude,
+                       lepine_criterion=lepine_criterion,
+                       session=session)
 
 
 def init_db(*,
@@ -146,7 +145,23 @@ def init_db(*,
                   session=session)
     session.set_keyspace(keyspace_name)
     connection.set_session(session)
-    sync_tables(Parameter, Star)
+    sync_tables(Group,
+                Star,
+                simulation.Parameter,
+                eliminations.StarsCounter,
+                luminosity_function.Point,
+                velocities.Cloud,
+                velocities.LepineCaseUVCloud,
+                velocities.LepineCaseUWCloud,
+                velocities.LepineCaseVWCloud,
+                velocities_vs_magnitudes.Cloud,
+                velocities_vs_magnitudes.LepineCaseUCloud,
+                velocities_vs_magnitudes.LepineCaseVCloud,
+                velocities_vs_magnitudes.LepineCaseWCloud,
+                velocities_vs_magnitudes.Bin,
+                velocities_vs_magnitudes.LepineCaseUBin,
+                velocities_vs_magnitudes.LepineCaseVBin,
+                velocities_vs_magnitudes.LepineCaseWBin)
 
 
 def init_keyspace(name: str,

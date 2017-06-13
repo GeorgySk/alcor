@@ -1,14 +1,14 @@
-import uuid
 from collections import OrderedDict
+from decimal import Decimal
 from typing import (Any,
                     Iterable,
                     Dict)
 
 import yaml
-from decimal import Decimal
 
-from alcor.models import Star
-from alcor.models.star import STAR_PARAMETERS_NAMES
+from alcor.models import (STAR_PARAMETERS_NAMES,
+                          Group,
+                          Star)
 
 
 def load_settings(path: str
@@ -22,12 +22,12 @@ def join_str(items: Iterable[Any], sep: str = ', ') -> str:
 
 
 def parse_stars(lines: Iterable[str],
-                group_id: uuid.UUID
+                group: Group
                 ) -> Iterable[Star]:
     for line in lines:
         parts = line.split()
         params = map(Decimal, parts)
         values = OrderedDict(zip(STAR_PARAMETERS_NAMES,
                                  params))
-        yield Star(group_id=group_id,
+        yield Star(group_id=group.id,
                    **values)

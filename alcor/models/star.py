@@ -7,6 +7,7 @@ from math import (cos,
                   asin,
                   atan)
 from typing import Tuple
+
 from cassandra.cqlengine.columns import (UUID,
                                          Decimal,
                                          DateTime,
@@ -43,7 +44,8 @@ class Star(Model):
 
     id = UUID(primary_key=True,
               default=uuid.uuid4)
-    group_id = UUID(required=True)
+    group_id = UUID(required=True,
+                    index=True)
     luminosity = Decimal(required=True)
     proper_motion = Decimal(required=True)
     proper_motion_component_b = Decimal(required=True)
@@ -94,14 +96,8 @@ class Star(Model):
         x = sin(declination) - sin(latitude) * sin(DEC_GPOLE)
         y = cos(declination) * sin(right_ascension - RA_GPOLE) * cos(DEC_GPOLE)
         longitude = atan(x / y) + AUX_ANGLE - pi / 2.
-        if y < 0. and x > 0.:
+        if x > 0. and 0. > y or x <= 0. and y <= 0.:
             longitude += pi
-        elif x < 0. and y < 0.:
-            longitude += pi
-        elif x < 0. and y > 0.:
-            longitude += 2. * pi
-        elif longitude > 2. * pi:
-            longitude -= 2. * pi
         coordinate_x = distance * cos(latitude) * cos(longitude)
         coordinate_y = distance * cos(latitude) * sin(longitude)
         coordinate_z = distance * sin(latitude)
@@ -124,7 +120,7 @@ class Star(Model):
         b1 = (-ASTRONOMICAL_UNIT * sin(galactocentric_coordinate_b)
               * cos(galactocentric_coordinate_l))
         self.velocity_u = ((a1 * proper_motion_component_l
-                           + b1 * proper_motion_component_b)
+                            + b1 * proper_motion_component_b)
                            * distance_in_pc)
 
         a2 = (ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
@@ -132,7 +128,7 @@ class Star(Model):
         b2 = (-ASTRONOMICAL_UNIT * sin(galactocentric_coordinate_b)
               * sin(galactocentric_coordinate_l))
         self.velocity_v = ((a2 * proper_motion_component_l
-                           + b2 * proper_motion_component_b)
+                            + b2 * proper_motion_component_b)
                            * distance_in_pc)
 
         b3 = ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
