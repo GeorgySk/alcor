@@ -50,7 +50,7 @@ def run_simulations(*,
                                          group=group))
 
     elif geometry == 'cone':
-        with open('angles_file.csv', 'r') as angles_file:
+        with open('../angles_file.csv', 'r') as angles_file:
             angles_reader = csv.reader(angles_file, delimiter=' ')
             for row in angles_reader:
                 longitude = row[0]

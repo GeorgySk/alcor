@@ -53,12 +53,18 @@ C     with its height direction set by longitude and latitude
      &                        latitude,
      &                        density,
      &                        random_valid_density,
-     &                        star_mass,
      &                        get_cone_mass,
      &                        get_max_density,
      &                        distance,
      &                        get_density,
-     &                        generate_star_mass
+     &                        generate_star_mass,
+     &                        tmax,
+     &                        tmdisk,
+     &                        tau,
+     &                        ttry,
+     &                        ttdisk,
+     &                        ft,
+     &                        fz
           integer :: stars_count
 
           common /tm/ starBirthTime,
@@ -94,6 +100,7 @@ C     with its height direction set by longitude and latitude
                   stars_count = stars_count + 1
       
                   disk_belonging(stars_count) = 1
+                  heightPattern(stars_count) = THIN_DISK_SCALEHEIGHT
       
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
@@ -113,10 +120,16 @@ C                 assuming uniform distribution
                       if (random_valid_density <= density) exit
                   end do inner_do1
       
-                  star_mass = generate_star_mass(iseed)
+C                 mass
+                  m(stars_count) = generate_star_mass(iseed)
+C                 converting from galactic to cylindrical
+                  coordinate_R(stars_count) = distance * dcos(latitude)
+                  coordinate_Theta(stars_count) = longitude
+                  coordinate_Zcylindr(stars_count) = distance 
+     &                                               * dsin(latitude)
       
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
-                      total_mass = total_mass + star_mass
+                      total_mass = total_mass + m(stars_count)
                   endif
       
                   if (total_mass >= normalization_cone_mass) exit
@@ -138,6 +151,7 @@ C                 assuming uniform distribution
                   stars_count = stars_count + 1
       
                   disk_belonging(stars_count) = 1
+                  heightPattern(stars_count) = THIN_DISK_SCALEHEIGHT
       
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
@@ -157,10 +171,16 @@ C                 assuming uniform distribution
                       if (random_valid_density <= density) exit
                   end do inner_do2
       
-                  star_mass = generate_star_mass(iseed)
+C                 mass
+                  m(stars_count) = generate_star_mass(iseed)
+C                 converting from galactic to cylindrical
+                  coordinate_R(stars_count) = distance * dcos(latitude)
+                  coordinate_Theta(stars_count) = longitude
+                  coordinate_Zcylindr(stars_count) = distance 
+     &                                               * dsin(latitude)
       
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
-                      total_mass = total_mass + star_mass
+                      total_mass = total_mass + m(stars_count)
                   endif
       
                   if (total_mass >= normalization_cone_mass) exit
@@ -168,6 +188,9 @@ C                 assuming uniform distribution
                   ! Assuming constant star formation rate
                   starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
               end do outer_do2
+
+            total_mass = 0.0
+
             normalization_cone_mass=get_cone_mass(cone_height_longitude, 
      &                                            cone_height_latitude,
      &              THIN_DISK_DENSITY * THICK_DISK_STARS_COUNT_FRACTION,
@@ -182,6 +205,7 @@ C                 assuming uniform distribution
                   stars_count = stars_count + 1
       
                   disk_belonging(stars_count) = 2
+                  heightPattern(stars_count) = THICK_DISK_SCALEHEIGHT
       
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
@@ -201,16 +225,31 @@ C                 assuming uniform distribution
                       if (random_valid_density <= density) exit
                   end do inner_do3
       
-                  star_mass = generate_star_mass(iseed)
+C                 mass
+                  m(stars_count) = generate_star_mass(iseed)
+C                 converting from galactic to cylindrical
+                  coordinate_R(stars_count) = distance * dcos(latitude)
+                  coordinate_Theta(stars_count) = longitude
+                  coordinate_Zcylindr(stars_count) = distance 
+     &                                               * dsin(latitude)
       
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
-                      total_mass = total_mass + star_mass
+                      total_mass = total_mass + m(stars_count)
                   endif
       
                   if (total_mass >= normalization_cone_mass) exit
       
                   ! Assuming constant star formation rate
                   starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
+                  tmax = tmdisk * dexp(-tmdisk/tau)
+ 33               ttry = ttdisk * ran(iseed)
+                  ft = ttry * dexp(-ttry/tau)
+                  fz = tmax * ran(iseed)
+                  if (fz .le. ft) then
+                      starBirthTime(stars_count) = ttry
+                  else
+                      goto 33
+                  end if
               end do outer_do3
 
           end if

@@ -185,6 +185,10 @@ C     This style ensures maximum precision when assigning a value to PI.
       pi=4.0*atan(1.0)
       areaOfSector=pi*radiusOfSector**2
 
+C     converting cone height parameters from deg to rad      
+      cone_height_longitude = cone_height_longitude * pi / 180.0
+      cone_height_latitude = cone_height_latitude * pi / 180.0
+
 
 C     ---  Program itself  ---
 C ======================================================================
