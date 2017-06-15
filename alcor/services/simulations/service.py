@@ -50,11 +50,21 @@ def run_simulations(*,
                                          group=group))
 
     elif geometry == 'cone':
-        with open('../angles_file.csv', 'r') as angles_file:
-            angles_reader = csv.reader(angles_file, delimiter=' ')
+        with open('../plates_info_arebassa_0.csv', 'r') as angles_file:
+            angles_reader = csv.reader(angles_file,
+                                       delimiter=' ',
+                                       skipinitialspace=True)
+            prev_plate_number = 0
             for row in angles_reader:
-                longitude = row[0]
-                latitude = row[1]
+                plate_number = row[1]
+                if plate_number == prev_plate_number:
+                    continue
+                else:
+                    prev_plate_number = plate_number
+                logger.info(f'Generating stars for values of the plate Nº '
+                            f'{plate_number}')
+                longitude = row[7]
+                latitude = row[8]
                 # No need to walk through parameters here. We only need to
                 # run simulations for all angles in the file with the same
                 # standard parameters. How do we do it?
@@ -78,6 +88,8 @@ def run_simulations(*,
                                    cone_latitude=latitude,
                                    output_file_name=output_file_name)
 
+                    # TODO: uncomment this after I figure out what to do
+                    # with cone output data
                     with open(output_file_name) as output_file:
                         stars = list(parse_stars(output_file,
                                                  group=group))
@@ -115,7 +127,7 @@ def run_simulation(*,
             '-o', output_file_name,
             '-geom', geometry,
             '-cl', cone_longitude,
-            '-cb', cone_latitude ]
+            '-cb', cone_latitude]
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')

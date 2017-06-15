@@ -116,6 +116,7 @@ C     ---   Taking the stars that are WDs ---
         zzeb(i)=metallicityOfWD(i)
         ztborn(i)=starBirthTime(i)
         ztms(i)=tms(i)
+C         zdisk_belonging(i)=disk_belonging(i)
  2    continue
 
       k=0
@@ -128,6 +129,7 @@ C     ---   Making the transfer   ---
           metallicityOfWD(k)=zzeb(i)
           starBirthTime(k)=ztborn(i)
           tms(k)=ztms(i)
+          disk_belonging(k)=disk_belonging(i)
 C           write (81,81) massOfWD(k),metallicityOfWD(k),starBirthTime(k),
 C      &                  tms(k),coolingTime(k)
         endif

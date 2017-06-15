@@ -98,7 +98,11 @@ C       ---  model of constant sigmas
             sigma(2)=56.0
             sigma(3)=34.0
         else
-            write(6, *) "Error in velh"
+            write(6, *) "Error in velh:"
+            write(6, *) "    Number of WD's =", numberOfWDs
+            write(6, *) "    index =", i
+            write(6, *) "    disk_belonging =", disk_belonging(i)
+            stop
         end if
         
 C       ---   Calling to the function of gaussian distribution  ---

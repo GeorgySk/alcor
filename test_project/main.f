@@ -169,7 +169,18 @@ C      &                parameterIFMR,timeOfBurst
 C     ---Reading seeds line from $temporary_files/seeds_line.in
 C ======================================================================
       iseed=-9
-      read(72,100) iseed1,iseed2
+C       read(72,100) iseed1,iseed2
+C     This is done for cone geometry and 5000 plates as we don't want 
+C     the sequence of RNs to repeat itself(init:805577 133547):
+      open(unit=772,file='input_data/seeds_line.in')
+      read(unit=772,fmt=*) iseed1, iseed2
+      close(unit=772)
+      iseed1 = iseed1 - 1
+      iseed2 = iseed2 + 1
+      open(unit=772,file='input_data/seeds_line.in',status='replace')
+      write(unit=772,fmt=100) iseed1,iseed2
+      close(unit=772)
+C     finished rewriting seeds here
 100   format(I6,2x,I6)  
       write(6,*) 'iseed1=',iseed1
       write(6,*) 'iseed2=',iseed2
@@ -264,7 +275,7 @@ C     TODO: give a better description to this step
 C     NOTE: This will be in a separate processing module
 C       write(6,*) '9. Working with obtained sample (9/9)'
 C       call volum_40pc
-      call printForProcessing(output_filename)
+      call printForProcessing(output_filename, geometry, iseed)
 
 
       write (6,*) 'End'
@@ -325,10 +336,13 @@ C***********************************************************************
 
       include 'code/tables_linking.f'
 
-      subroutine printForProcessing(output_filename)
+      subroutine printForProcessing(output_filename, geometry, iseed)
       implicit none
+      external ran
+      real ran
       character(len = 100), intent(in) :: output_filename
-      integer i,j
+      character(len = 6) :: geometry
+      integer i,j, iseed
       logical eleminationFlag
       integer numberOfStars,numberOfWDs
       integer eleminatedByParallax,eleminatedByDeclination,
@@ -417,6 +431,7 @@ C     TODO: make dynamic array or linked list
 C     2D-array of bolometric magnitudes for each WD; indexes are the 
 C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision arrayOfMagnitudes(25,50000)
+      double precision x_coordinate,y_coordinate,z_coordinate
       integer disk_belonging(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
@@ -432,26 +447,45 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       common /johnson/ V
       common /vel/ uu,vv,ww
 
-      open(421, file = output_filename)
+      if (geometry == 'sphere') then
 
-      do i = 1, numberOfWDs
-          write(421, *) luminosityOfWD(i),
-     &                  properMotion(i),
-     &                  mpb(i),
-     &                  mpl(i),
-     &                  vr(i),
-     &                  rightAscension(i),
-     &                  declination(i),
-     &                  rgac(i),
-     &                  bgac(i),
-     &                  lgac(i),
-     &                  go(i),
-     &                  gr(i),
-     &                  rz(i),
-     &                  V(i),
-     &                  uu(i),
-     &                  vv(i),
-     &                  ww(i),
-     &                  typeOfWD(i)
-      end do
+          open(421, file = output_filename)
+
+          do i = 1, numberOfWDs
+              write(421, *) luminosityOfWD(i),
+     &                      properMotion(i),
+     &                      mpb(i),
+     &                      mpl(i),
+     &                      vr(i),
+     &                      rightAscension(i),
+     &                      declination(i),
+     &                      rgac(i),
+     &                      bgac(i),
+     &                      lgac(i),
+     &                      go(i),
+     &                      gr(i),
+     &                      rz(i),
+     &                      V(i),
+     &                      uu(i),
+     &                      vv(i),
+     &                      ww(i),
+     &                      typeOfWD(i)
+          end do
+      else if (geometry == 'cone') then
+         open(422,file='CONE_PLATES_KINEMATIC_DATA.csv',access='append')
+
+         do i = 1, numberOfWDs
+            if (ran(iseed) < 0.02) then
+              x_coordinate = rgac(i)*cos(bgac(i))*cos(lgac(i))
+              y_coordinate = rgac(i)*cos(bgac(i))*sin(lgac(i))
+              z_coordinate = rgac(i)*sin(bgac(i))
+              write(422,"(6(es11.2e3,x))") uu(i),
+     &                                     vv(i),
+     &                                     ww(i),
+     &                                     x_coordinate,
+     &                                     y_coordinate,
+     &                                     z_coordinate
+            end if
+         end do
+      end if
       end subroutine
