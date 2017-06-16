@@ -39,7 +39,8 @@ C     with its height direction set by longitude and latitude
      &                         THICK_DISK_STARS_COUNT_FRACTION = 1.0 
      &                                 - THIN_DISK_STARS_COUNT_FRACTION,
      &                                  THIN_DISK_SCALEHEIGHT = 0.25,
-     &                                  THICK_DISK_SCALEHEIGHT = 1.5
+     &                                  THICK_DISK_SCALEHEIGHT = 1.5,
+     &                                  MASS_REDUCTION_FACTOR = 0.297
           double precision :: delta_longitude,
      &                        min_longitude,
      &                        max_longitude,
@@ -91,6 +92,8 @@ C     with its height direction set by longitude and latitude
      &                                            cone_height_latitude,
      &                                            THIN_DISK_DENSITY,
      &                                            THIN_DISK_SCALEHEIGHT)
+            normalization_cone_mass = normalization_cone_mass 
+     &                                * MASS_REDUCTION_FACTOR
 
             max_density = get_max_density(cone_height_longitude,
      &                                    cone_height_latitude,
@@ -149,6 +152,8 @@ C                 converting from galactic to cylindrical
      &                                            cone_height_latitude,
      &               THIN_DISK_DENSITY * THIN_DISK_STARS_COUNT_FRACTION,
      &                                            THIN_DISK_SCALEHEIGHT)
+            normalization_cone_mass = normalization_cone_mass 
+     &                                * MASS_REDUCTION_FACTOR
 
             max_density = get_max_density(cone_height_longitude,
      &                                    cone_height_latitude,
@@ -202,6 +207,8 @@ C                 converting from galactic to cylindrical
      &                                            cone_height_latitude,
      &              THIN_DISK_DENSITY * THICK_DISK_STARS_COUNT_FRACTION,
      &                                          THICK_DISK_SCALEHEIGHT)
+            normalization_cone_mass = normalization_cone_mass 
+     &                                * MASS_REDUCTION_FACTOR
 
             max_density = get_max_density(cone_height_longitude,
      &                                    cone_height_latitude,
