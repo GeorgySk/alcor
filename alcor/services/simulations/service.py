@@ -51,6 +51,7 @@ def run_simulations(*,
 
     elif geometry == 'cone':
         with open('../plates_info_arebassa_0.csv', 'r') as angles_file:
+        # with open('../test_angles.csv', 'r') as angles_file:
             angles_reader = csv.reader(angles_file,
                                        delimiter=' ',
                                        skipinitialspace=True)

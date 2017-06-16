@@ -99,6 +99,13 @@ C     with its height direction set by longitude and latitude
               outer_do1: do
                   stars_count = stars_count + 1
       
+                  if (stars_count > numberOfStars) then
+                      open(unit=725,file='SKIPPED_PLATES.txt')
+                      write(unit=725,fmt=*) cone_height_longitude,
+     &                                      cone_height_latitude
+                      stop
+                  end if
+
                   disk_belonging(stars_count) = 1
                   heightPattern(stars_count) = THIN_DISK_SCALEHEIGHT
       
