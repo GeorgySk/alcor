@@ -122,7 +122,7 @@ C         zdisk_belonging(i)=disk_belonging(i)
       k=0
 C     ---   Making the transfer   ---
       do 3 i=1,numberOfStarsInSample
-        if (flagOfWD(i).eq.1) then
+        if (flagOfWD(i) > 0.95 .and. flagOfWD(i) < 1.05) then
           k=k+1
           coolingTime(k)=ztcool(i)
           massOfWD(k)=zmeb(i)

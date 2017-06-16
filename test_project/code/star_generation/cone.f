@@ -59,10 +59,10 @@ C     with its height direction set by longitude and latitude
      &                        get_density,
      &                        generate_star_mass,
      &                        tmax,
-     &                        tmdisk,
-     &                        tau,
+     &                        tmdisk = 10.0,
+     &                        tau = 2.0,
      &                        ttry,
-     &                        ttdisk,
+     &                        ttdisk = 12.0,
      &                        ft,
      &                        fz
           integer :: stars_count

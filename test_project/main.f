@@ -57,8 +57,8 @@ C         mfinal_new=parameterIFMR*mfinal_old
       double precision parameterIFMR
 C     For terminal:
       integer :: num_args
-      character(len = 10) :: arg
-      character(len = 10) :: temp_string
+      character(len = 30) :: arg
+      character(len = 30) :: temp_string
       double precision :: massReductionFactor
       integer :: kinematicModel
       character(len = 100) :: output_filename

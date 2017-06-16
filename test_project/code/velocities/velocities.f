@@ -70,7 +70,7 @@ C     ---  Making the transfer of heightPattern, of z  ---
 
       k=0      
       do 3 i=1,numberOfStarsInSample
-        if (flagOfWD(i).eq.1) then
+        if (flagOfWD(i) > 0.95 .and. flagOfWD(i) < 1.05) then
           k=k+1
           heightPattern(k)=zh(i)
           coordinate_Zcylindr(k)=zz(i)
