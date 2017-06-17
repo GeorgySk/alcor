@@ -479,7 +479,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
               x_coordinate = rgac(i)*cos(bgac(i))*cos(lgac(i))
               y_coordinate = rgac(i)*cos(bgac(i))*sin(lgac(i))
               z_coordinate = rgac(i)*sin(bgac(i))
-              write(422,"(6(es11.2e3,x))") uu(i),
+              write(422,"(6(es12.3e3,x))") uu(i),
      &                                     vv(i),
      &                                     ww(i),
      &                                     x_coordinate,

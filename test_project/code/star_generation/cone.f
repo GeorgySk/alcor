@@ -103,7 +103,8 @@ C     with its height direction set by longitude and latitude
                   stars_count = stars_count + 1
       
                   if (stars_count > numberOfStars) then
-                      open(unit=725,file='SKIPPED_PLATES.txt')
+                      open(unit=725,file='SKIPPED_PLATES.txt',
+     &                     access='append')
                       write(unit=725,fmt=*) cone_height_longitude,
      &                                      cone_height_latitude
                       stop
