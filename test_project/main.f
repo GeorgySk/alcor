@@ -476,9 +476,9 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
 
          do i = 1, numberOfWDs
             if (ran(iseed) < 0.02) then
-              x_coordinate = rgac(i)*cos(bgac(i))*cos(lgac(i))
-              y_coordinate = rgac(i)*cos(bgac(i))*sin(lgac(i))
-              z_coordinate = rgac(i)*sin(bgac(i))
+              x_coordinate = coordinate_R(i) * cos(coordinate_Theta(i))
+              y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
+              z_coordinate = coordinate_Zcylindr(i)
               write(422,"(6(es12.3e3,x))") uu(i),
      &                                     vv(i),
      &                                     ww(i),
