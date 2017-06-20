@@ -51,10 +51,10 @@ def run_simulations(*,
 
     elif geometry == 'cone':
         with open('../plates_info_arebassa_0.csv', 'r') as angles_file:
-        # with open('../test_angles.csv', 'r') as angles_file:
             angles_reader = csv.reader(angles_file,
                                        delimiter=' ',
                                        skipinitialspace=True)
+            used_plates = []
             prev_plate_number = 0
             for row in angles_reader:
                 plate_number = row[1]
@@ -62,10 +62,15 @@ def run_simulations(*,
                     continue
                 else:
                     prev_plate_number = plate_number
-                logger.info(f'Generating stars for values of the plate Nº '
-                            f'{plate_number}')
                 longitude = row[7]
                 latitude = row[8]
+                plate_angles = (longitude, latitude)
+                if plate_angles in used_plates:
+                    continue
+                else:
+                    used_plates.append(plate_angles)
+                logger.info(f'Generating stars for values of the plate Nº '
+                            f'{plate_number}')
                 # No need to walk through parameters here. We only need to
                 # run simulations for all angles in the file with the same
                 # standard parameters. How do we do it?
