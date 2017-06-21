@@ -40,7 +40,7 @@ C     with its height direction set by longitude and latitude
      &                                 - THIN_DISK_STARS_COUNT_FRACTION,
      &                                  THIN_DISK_SCALEHEIGHT = 0.25,
      &                                  THICK_DISK_SCALEHEIGHT = 1.5,
-     &                                  MASS_REDUCTION_FACTOR = 0.297
+     &                                  MASS_REDUCTION_FACTOR = 0.003
           double precision :: delta_longitude,
      &                        min_longitude,
      &                        max_longitude,
