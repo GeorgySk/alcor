@@ -2,11 +2,15 @@ from . import (luminosity_function,
                velocities_vs_magnitude,
                velocity_clouds)
 
+from cassandra.cluster import Session
 
-def draw_plots(luminosity_function_flag: bool,
+
+def draw_plots(*,
+               luminosity_function_flag: bool,
                velocities_vs_magnitude_flag: bool,
                velocity_clouds_flag: bool,
-               lepine_criterion: bool) -> None:
+               lepine_criterion: bool,
+               session: Session) -> None:
     if luminosity_function_flag:
         luminosity_function.plot()
 
