@@ -6,6 +6,7 @@ from bokeh.layouts import gridplot
 from bokeh.plotting import (figure,
                             output_file)
 from bokeh.plotting.figure import Figure
+from cassandra.cluster import Session
 
 from alcor.utils import get_columns
 
@@ -16,7 +17,7 @@ PLOT_HEIGHT = 250
 CSV_DELIMITER = ' '
 
 
-def plot() -> None:
+def plot(session: Session) -> None:
     output_file("velocities_vs_magnitude.html")
 
     # TODO: maybe I should use Plot here
@@ -94,7 +95,7 @@ def plot() -> None:
     save(main_plot)
 
 
-def plot_lepine_case():
+def plot_lepine_case(session: Session):
     output_file("velocities_vs_magnitude.html")
 
     top_plot = figure()

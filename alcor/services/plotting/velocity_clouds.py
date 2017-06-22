@@ -7,6 +7,7 @@ from bokeh.models.glyphs import Ellipse
 from bokeh.plotting import (figure,
                             output_file,
                             show)
+from cassandra.cluster import Session
 
 # Kinematic properties of the thin disk taken from the paper of
 # N.Rowell and N.C.Hambly (mean motions are relative to the Sun):
@@ -29,7 +30,7 @@ PLOT_WIDTH = 250
 PLOT_HEIGHT = 250
 
 
-def plot() -> None:
+def plot(session: Session) -> None:
     output_file("velocity_clouds.html")
 
     top_plot = figure()
@@ -119,7 +120,7 @@ def plot() -> None:
     save(main_plot)
 
 
-def plot_lepine_case():
+def plot_lepine_case(session: Session):
     output_file("velocity_clouds.html")
 
     top_plot = figure()
