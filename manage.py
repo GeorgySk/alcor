@@ -172,7 +172,8 @@ def plot(ctx: click.Context,
         draw_plots(luminosity_function,
                    velocities_vs_magnitude,
                    velocity_clouds,
-                   lepine_criterion)
+                   lepine_criterion,
+                   session=session)
 
 
 def init_db(*,

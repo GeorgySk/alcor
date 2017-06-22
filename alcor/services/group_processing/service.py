@@ -11,7 +11,8 @@ from alcor.models import (Group,
 from alcor.models.eliminations import StarsCounter
 from alcor.services.data_access import (insert,
                                         model_insert_statement)
-from alcor.services.luminosity_function import process_stars_group_luminosity_function
+from alcor.services.luminosity_function import (
+    process_stars_group_luminosity_function)
 from alcor.services.velocities import process_stars_group_velocities_clouds
 from alcor.services.velocities_vs_magnitudes import (
     process_stars_group_velocities_vs_magnitudes)
