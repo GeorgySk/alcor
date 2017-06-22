@@ -3,6 +3,7 @@ from math import pi
 from typing import List
 
 from bokeh.plotting.figure import Figure
+from cassandra.cluster import Session
 
 from alcor.utils import get_columns
 from .latex_label import LatexLabel
@@ -14,7 +15,7 @@ from bokeh.plotting import (figure,
 CSV_DELIMITER = ' '
 
 
-def plot() -> None:
+def plot(session: Session) -> None:
     output_file("luminosity_function.html")
 
     main_plot = figure(title="Luminosity function")

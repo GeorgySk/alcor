@@ -12,16 +12,16 @@ def draw_plots(*,
                lepine_criterion: bool,
                session: Session) -> None:
     if luminosity_function_flag:
-        luminosity_function.plot()
+        luminosity_function.plot(session=session)
 
     if velocities_vs_magnitude_flag:
         if lepine_criterion:
-            velocities_vs_magnitude.plot_lepine_case()
+            velocities_vs_magnitude.plot_lepine_case(session=session)
         else:
-            velocities_vs_magnitude.plot()
+            velocities_vs_magnitude.plot(session=session)
 
     if velocity_clouds_flag:
         if lepine_criterion:
-            velocity_clouds.plot_lepine_case()
+            velocity_clouds.plot_lepine_case(session=session)
         else:
-            velocity_clouds.plot()
+            velocity_clouds.plot(session=session)
