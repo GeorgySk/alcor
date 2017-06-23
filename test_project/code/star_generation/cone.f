@@ -148,7 +148,9 @@ C                 converting from galactic to cylindrical
                   ! Assuming constant star formation rate
                   starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
               end do outer_do1
+
           else if (kinematicModel == 2) then
+
             normalization_cone_mass=get_cone_mass(cone_height_longitude, 
      &                                            cone_height_latitude,
      &               THIN_DISK_DENSITY * THIN_DISK_STARS_COUNT_FRACTION,
@@ -158,7 +160,7 @@ C                 converting from galactic to cylindrical
 
             max_density = get_max_density(cone_height_longitude,
      &                                    cone_height_latitude,
-     &                                   THIN_DISK_SCALEHEIGHT)
+     &                                    THIN_DISK_SCALEHEIGHT)
               !running for 92% of thin disk stars:
               outer_do2: do
                   stars_count = stars_count + 1
@@ -174,8 +176,10 @@ C                 assuming uniform distribution
                       ! Distance between Sun and random point in the cone
                       distance = CONE_HEIGHT * ran(iseed)
       
-                      density = get_density(distance,longitude,latitude,
-     &                                          THIN_DISK_SCALEHEIGHT)
+                      density = get_density(distance,
+     &                                      longitude,
+     &                                      latitude,
+     &                                      THIN_DISK_SCALEHEIGHT)
       
                       ! Monte-Carlo accepting/rejecting method
                       ! QUESTION: can this be outside the inner loop?
@@ -213,7 +217,7 @@ C                 converting from galactic to cylindrical
 
             max_density = get_max_density(cone_height_longitude,
      &                                    cone_height_latitude,
-     :                                    THICK_DISK_SCALEHEIGHT)
+     &                                    THICK_DISK_SCALEHEIGHT)
 
               !running for 8% of thin disk stars:
               outer_do3: do
@@ -335,7 +339,7 @@ C                 converting from galactic to cylindrical
           if (min_latitude >= 0.0
      &        .and. max_latitude <= PI / 2.0) then
                   mass = density * longitude_range 
-     &                   * THIN_DISK_SCALEHEIGHT 
+     &                   * scaleheight 
      &                   * (get_kappa_integral(min_latitude,scaleheight) 
      &                      - get_kappa_integral(max_latitude,
      &                                           scaleheight))
@@ -502,7 +506,7 @@ C                 converting from galactic to cylindrical
           iota = (NORMALIZATION_CONE_HEIGHT * NORMALIZATION_CONE_HEIGHT 
      &             / 2.0
      &             - get_kappa_integral(latitude,scaleheight))
-     &               * THIN_DISK_SCALEHEIGHT
+     &               * scaleheight
       end function
   
   
@@ -516,7 +520,7 @@ C                 converting from galactic to cylindrical
      &                                   NORMALIZATION_CONE_HEIGHT=0.2
           double precision, parameter :: PI = 4.0 * atan(1.0)
   
-          lambda = -THIN_DISK_SCALEHEIGHT
+          lambda = -scaleheight
      &               * (get_kappa_integral((PI / 2.0),scaleheight)
      &                  - get_kappa_integral(latitude,scaleheight))
       end function 

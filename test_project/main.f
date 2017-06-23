@@ -479,12 +479,13 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
               x_coordinate = coordinate_R(i) * cos(coordinate_Theta(i))
               y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
               z_coordinate = coordinate_Zcylindr(i)
-              write(422,"(6(es12.3e3,x))") uu(i),
-     &                                     vv(i),
-     &                                     ww(i),
-     &                                     x_coordinate,
-     &                                     y_coordinate,
-     &                                     z_coordinate
+              write(422,"(6(es12.3e3,x),i1)") uu(i),
+     &                                        vv(i),
+     &                                        ww(i),
+     &                                        x_coordinate,
+     &                                        y_coordinate,
+     &                                        z_coordinate,
+     &                                        disk_belonging(i)
             end if
          end do
       end if
