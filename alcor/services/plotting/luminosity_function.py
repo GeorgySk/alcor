@@ -5,6 +5,8 @@ from typing import List
 from bokeh.plotting.figure import Figure
 from cassandra.cluster import Session
 
+from alcor.models.luminosity_function import Point
+from alcor.services.data_access.reading import fetch
 from alcor.utils import get_columns
 from .latex_label import LatexLabel
 
@@ -15,7 +17,11 @@ from bokeh.plotting import (figure,
 CSV_DELIMITER = ' '
 
 
-def plot(session: Session) -> None:
+def plot(*,
+         session: Session) -> None:
+
+    graph_points = fetch_last_graph_points(session=session)
+
     output_file("luminosity_function.html")
 
     main_plot = figure(title="Luminosity function")
@@ -29,30 +35,17 @@ def plot(session: Session) -> None:
                      y_label_xpos=-60,
                      y_label_ypos=300)
 
-    with open('luminosity_function.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        first_row = next(reader)
-        # TODO: figure out what do do with normalization_factor
-        normalization_factor = float(first_row[1])
-        header_row = next(reader)
-
-        (average_bin_magnitude,
-         star_count_logarithm,
-         upper_errorbar,
-         lower_errorbar) = get_columns(reader)
-
-    main_plot.line(average_bin_magnitude,
-                   star_count_logarithm,
+    main_plot.line(graph_points.avg_bin_magnitude,
+                   graph_points.star_count_logarithm,
                    line_width=2)
-    main_plot.square(average_bin_magnitude,
-                     star_count_logarithm)
+    main_plot.square(graph_points.avg_bin_magnitude,
+                     graph_points.star_count_logarithm)
 
     add_errorbars(fig=main_plot,
-                  x=average_bin_magnitude,
-                  y=star_count_logarithm,
-                  y_err_up=upper_errorbar,
-                  y_err_down=lower_errorbar)
+                  x=graph_points.average_bin_magnitude,
+                  y=graph_points.star_count_logarithm,
+                  y_err_up=graph_points.upper_error_bar,
+                  y_err_down=graph_points.lower_error_bar)
 
     show(main_plot)
 
@@ -101,3 +94,13 @@ def add_errorbars(fig: Figure,
 
     fig.multi_line(multiline_x,
                    multiline_y)
+
+
+def fetch_last_graph_points(*,
+                            session: Session) -> List[Point]:
+    query = (Point.objects.all().order_by('-updated_timestamp'))
+    query = query[0]
+    records = fetch(query=query,
+                    session=session)
+    return [Point(**record)
+            for record in records]
