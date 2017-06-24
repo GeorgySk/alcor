@@ -157,8 +157,9 @@ C=======================================================================
       
       double precision r,th,a,b,solarGalactocentricDistance,vo,vom
 
-      vom=vo+((3.0-(2.0*r)/solarGalactocentricDistance)*a-b)*r*cos(th)-
-     &    (a-b)*solarGalactocentricDistance
+      vom = vo + ((3.0 - (2.0 * r) / solarGalactocentricDistance) * a 
+     &            - b) * r * cos(th) - (a - b) 
+     &                                 * solarGalactocentricDistance
 
       return
       end

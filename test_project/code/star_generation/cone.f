@@ -40,7 +40,8 @@ C     with its height direction set by longitude and latitude
      &                                 - THIN_DISK_STARS_COUNT_FRACTION,
      &                                  THIN_DISK_SCALEHEIGHT = 0.25,
      &                                  THICK_DISK_SCALEHEIGHT = 1.5,
-     &                                  MASS_REDUCTION_FACTOR = 0.003
+     &                                  MASS_REDUCTION_FACTOR = 0.003,
+     &                               SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
           double precision :: delta_longitude,
      &                        min_longitude,
      &                        max_longitude,
@@ -65,7 +66,8 @@ C     with its height direction set by longitude and latitude
      &                        ttry,
      &                        ttdisk = 12.0,
      &                        ft,
-     &                        fz
+     &                        fz,
+     &                        opposite_triangle_side
           integer :: stars_count
 
           common /tm/ starBirthTime,
@@ -133,9 +135,15 @@ C                 assuming uniform distribution
       
 C                 mass
                   m(stars_count) = generate_star_mass(iseed)
-C                 converting from galactic to cylindrical
-                  coordinate_R(stars_count) = distance * dcos(latitude)
-                  coordinate_Theta(stars_count) = longitude
+C                 converting from galactic to cyl.galactocentric
+                  coordinate_R(stars_count) 
+     &                = opposite_triangle_side(
+     &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
+     &                      distance * dabs(dcos(latitude)), 
+     &                      longitude)
+                  coordinate_Theta(stars_count) 
+     &               = dasin(distance*dabs(dcos(latitude))
+     &                 *dsin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * dsin(latitude)
       
@@ -190,9 +198,15 @@ C                 assuming uniform distribution
       
 C                 mass
                   m(stars_count) = generate_star_mass(iseed)
-C                 converting from galactic to cylindrical
-                  coordinate_R(stars_count) = distance * dcos(latitude)
-                  coordinate_Theta(stars_count) = longitude
+C                 converting from galactic to cyl.galactocentric
+                  coordinate_R(stars_count) 
+     &                = opposite_triangle_side(
+     &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
+     &                      distance * dabs(dcos(latitude)), 
+     &                      longitude)
+                  coordinate_Theta(stars_count) 
+     &                = dasin(distance*dabs(dcos(latitude))
+     &                  *dsin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * dsin(latitude)
       
@@ -246,9 +260,15 @@ C                 assuming uniform distribution
       
 C                 mass
                   m(stars_count) = generate_star_mass(iseed)
-C                 converting from galactic to cylindrical
-                  coordinate_R(stars_count) = distance * dcos(latitude)
-                  coordinate_Theta(stars_count) = longitude
+C                 converting from galactic to cyl.galactocentric
+                  coordinate_R(stars_count) 
+     &                = opposite_triangle_side(
+     &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
+     &                      distance * dabs(dcos(latitude)), 
+     &                      longitude)
+                  coordinate_Theta(stars_count) 
+     &                = dasin(distance*dabs(dcos(latitude))
+     &                  *dsin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * dsin(latitude)
       

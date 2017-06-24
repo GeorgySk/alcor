@@ -475,8 +475,8 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
          open(422,file='CONE_PLATES_KINEMATIC_DATA.csv',access='append')
 
          do i = 1, numberOfWDs
-            if (ran(iseed) < 1.0) then
-              x_coordinate = coordinate_R(i) * cos(coordinate_Theta(i))
+            if (ran(iseed) < 1.0) then       
+             x_coordinate=8.5-coordinate_R(i) * cos(coordinate_Theta(i))
               y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
               z_coordinate = coordinate_Zcylindr(i)
               write(422,"(6(es12.3e3,x),i1)") uu(i),
