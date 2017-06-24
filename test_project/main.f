@@ -164,7 +164,7 @@ C ======================================================================
       write(6,*) 'iseed2=',iseed2
 C     QUESTION: why do we need this part?      
       do i=1,10
-        randomNumber=ran(iseed)
+        randomNumber=dble(ran(iseed))
         write (6,*) i,randomNumber
       end do  
 
