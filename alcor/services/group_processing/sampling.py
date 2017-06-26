@@ -27,12 +27,12 @@ def check_elimination(star: Star,
     gz = star.gr_photometry + star.rz_photometry
 
     if parallax < MIN_PARALLAX:
-        eliminations_counter['by_parallax'] += 1
+        eliminations_counter['parallax'] += 1
         return True
 
     northern_hemisphere_star = star.declination < MIN_DECLINATION
     if northern_hemisphere_star:
-        eliminations_counter['by_declination'] += 1
+        eliminations_counter['declination'] += 1
         return True
 
     hypervelocity_star = (star.velocity_u ** 2
