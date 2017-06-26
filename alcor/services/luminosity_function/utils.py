@@ -42,7 +42,7 @@ def points(*,
     for stars_bin_index, stars_bin in enumerate(non_empty_bins):
         stars_count = len(stars_bin)
         avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                             + BIN_SIZE * (stars_bin_index - 0.5))
+                             + BIN_SIZE * (stars_bin_index + 0.5))
         stars_count_logarithm = get_stars_count_logarithm(
             stars_count=stars_count,
             normalization_factor=normalization_factor)
