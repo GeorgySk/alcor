@@ -1,4 +1,4 @@
-import csv
+import logging
 from math import pi
 from typing import List
 
@@ -7,7 +7,6 @@ from cassandra.cluster import Session
 
 from alcor.models.luminosity_function import Point
 from alcor.services.data_access.reading import fetch
-from alcor.utils import get_columns
 from .latex_label import LatexLabel
 
 from bokeh.plotting import (figure,
@@ -19,8 +18,8 @@ CSV_DELIMITER = ' '
 
 def plot(*,
          session: Session) -> None:
-
-    graph_points = fetch_last_graph_points(session=session)
+    # TODO: Implement getting last points by time(ok?)
+    graph_points = fetch_all_graph_points(session=session)
 
     output_file("luminosity_function.html")
 
@@ -35,17 +34,30 @@ def plot(*,
                      y_label_xpos=-60,
                      y_label_ypos=300)
 
-    main_plot.line(graph_points.avg_bin_magnitude,
-                   graph_points.star_count_logarithm,
+    avg_bin_magnitudes = [graph_point.avg_bin_magnitude
+                          for graph_point in graph_points]
+    stars_count_logarithms = [graph_point.stars_count_logarithm
+                              for graph_point in graph_points]
+    (avg_bin_magnitudes,
+     stars_count_logarithms) = (list(_)
+                                for _ in zip(
+                                    *sorted(zip(avg_bin_magnitudes,
+                                                stars_count_logarithms))))
+    main_plot.line(avg_bin_magnitudes,
+                   stars_count_logarithms,
                    line_width=2)
-    main_plot.square(graph_points.avg_bin_magnitude,
-                     graph_points.star_count_logarithm)
+    main_plot.square(avg_bin_magnitudes,
+                     stars_count_logarithms)
 
     add_errorbars(fig=main_plot,
-                  x=graph_points.average_bin_magnitude,
-                  y=graph_points.star_count_logarithm,
-                  y_err_up=graph_points.upper_error_bar,
-                  y_err_down=graph_points.lower_error_bar)
+                  x=[graph_point.avg_bin_magnitude
+                     for graph_point in graph_points],
+                  y=[graph_point.stars_count_logarithm
+                     for graph_point in graph_points],
+                  y_err_up=[graph_point.upper_error_bar
+                            for graph_point in graph_points],
+                  y_err_down=[graph_point.lower_error_bar
+                              for graph_point in graph_points])
 
     show(main_plot)
 
@@ -96,10 +108,9 @@ def add_errorbars(fig: Figure,
                    multiline_y)
 
 
-def fetch_last_graph_points(*,
-                            session: Session) -> List[Point]:
-    query = (Point.objects.all().order_by('-updated_timestamp'))
-    query = query[0]
+def fetch_all_graph_points(*,
+                           session: Session):
+    query = (Point.objects.all())  # 10000 hidden limit here
     records = fetch(query=query,
                     session=session)
     return [Point(**record)
