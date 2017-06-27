@@ -135,14 +135,6 @@ def plot(session: Session) -> None:
     velocities_w = [_.velocity_w
                     for _ in clouds]
 
-    (magnitudes,
-     velocities_u,
-     velocities_v,
-     velocities_w) = (_ for _ in zip(*sorted(zip(magnitudes,
-                                                 velocities_u,
-                                                 velocities_v,
-                                                 velocities_w))))
-
     subplot_u.scatter(x=magnitudes,
                       y=velocities_u,
                       color=CLOUD_COLOR,
