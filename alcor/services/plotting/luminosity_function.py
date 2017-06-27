@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from alcor.models.luminosity_function import Point
 from alcor.services.data_access.reading import fetch
 
+
 FILENAME = 'luminosity_function.ps'
 
 FIGURE_SIZE = (8, 8)
