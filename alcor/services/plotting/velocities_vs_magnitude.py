@@ -12,7 +12,6 @@ import matplotlib
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator # added
 
 from alcor.models.velocities_vs_magnitudes.bins import Bin
 from alcor.models.velocities_vs_magnitudes.clouds import Cloud
@@ -88,13 +87,10 @@ def plot(session: Session) -> None:
                                        figsize=FIGURE_SIZE)
 
     # TODO: find the way to apply limits once for all subplots
-
-    subplot_u.set(xlabel=MAGNITUDE_LABEL,
-                  ylabel=U_LABEL,
+    subplot_u.set(ylabel=U_LABEL,
                   xlim=MAGNITUDE_LIMITS,
                   ylim=VELOCITIES_LIMITS)
-    subplot_v.set(xlabel=MAGNITUDE_LABEL,
-                  ylabel=V_LABEL,
+    subplot_v.set(ylabel=V_LABEL,
                   xlim=MAGNITUDE_LIMITS,
                   ylim=VELOCITIES_LIMITS)
     subplot_w.set(xlabel=MAGNITUDE_LABEL,
