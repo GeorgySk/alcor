@@ -1,11 +1,3 @@
-import csv
-from typing import List
-
-from bokeh.io import save
-from bokeh.layouts import gridplot
-from bokeh.plotting import (figure,
-                            output_file)
-from bokeh.plotting.figure import Figure
 from cassandra.cluster import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details

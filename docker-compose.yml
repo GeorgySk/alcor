@@ -15,20 +15,20 @@ services:
 #      - --project-dir
 #      - test_project
       # Processing generated data:
-#      - process
-#      - --filtration-method
-#      - restricted
+      - process
+      - --filtration-method
+      - restricted
 #      - --nullify-radial-velocity
 #      - --luminosity-function
 #      - --velocities-clouds
-#      - --velocities-vs-magnitude
+      - --velocities-vs-magnitude
 #      - --lepine-criterion
       # Plotting
-      - plot
+#      - plot
 #      - --luminosity-function
-      - --velocities-vs-magnitude
+#      - --velocities-vs-magnitude
 #      - --velocity-clouds
-      - --lepine-criterion
+#      - --lepine-criterion
     environment:
       - CASSANDRA_RPC_ADDRESS=cassandra
       - CASSANDRA_RPC_PORT=9042
