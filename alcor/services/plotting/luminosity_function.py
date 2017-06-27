@@ -1,111 +1,78 @@
-import logging
-from math import pi
-from typing import List
-
-from bokeh.plotting.figure import Figure
 from cassandra.cluster import Session
+import matplotlib
+# See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
+# TODO: use this: https://stackoverflow.com/a/37605654/7851470
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 from alcor.models.luminosity_function import Point
 from alcor.services.data_access.reading import fetch
-from .latex_label import LatexLabel
 
-from bokeh.plotting import (figure,
-                            output_file,
-                            show)
+FILENAME = 'luminosity_function.ps'
 
-CSV_DELIMITER = ' '
+FIGURE_SIZE = (8, 8)
+DESIRED_DIMENSIONS_RATIO = 10 / 13
+
+X_LABEL = '$M_{bol}$'
+Y_LABEL = '$\log N (pc^{-3}M_{bol}^{-1})$'
+
+X_LIMITS = [7, 19]
+Y_LIMITS = [-6, -2]
+
+LINE_COLOR = 'k'
+MARKER = 's'
+CAP_SIZE = 5
 
 
 def plot(*,
          session: Session) -> None:
+
     # TODO: Implement getting last points by time(ok?)
     graph_points = fetch_all_graph_points(session=session)
-
-    output_file("luminosity_function.html")
-
-    main_plot = figure(title="Luminosity function")
-
-    # TODO: get coordinates for labels automatically
-    add_latex_labels(fig=main_plot,
-                     x_label_text='M_{bol}',
-                     x_label_xpos=300,
-                     x_label_ypos=0,
-                     y_label_text='\log N (pc^{-3}M_{bol}^{-1})',
-                     y_label_xpos=-60,
-                     y_label_ypos=300)
 
     avg_bin_magnitudes = [graph_point.avg_bin_magnitude
                           for graph_point in graph_points]
     stars_count_logarithms = [graph_point.stars_count_logarithm
                               for graph_point in graph_points]
+    upper_errorbars = [graph_point.upper_error_bar
+                       for graph_point in graph_points]
+    lower_errorbars = [graph_point.lower_error_bar
+                       for graph_point in graph_points]
+
     (avg_bin_magnitudes,
-     stars_count_logarithms) = (list(_)
-                                for _ in zip(
-                                    *sorted(zip(avg_bin_magnitudes,
-                                                stars_count_logarithms))))
-    main_plot.line(avg_bin_magnitudes,
-                   stars_count_logarithms,
-                   line_width=2)
-    main_plot.square(avg_bin_magnitudes,
-                     stars_count_logarithms)
+     stars_count_logarithms,
+     upper_errorbars,
+     lower_errorbars) = (list(_) for _ in zip(*sorted(
+                                                zip(avg_bin_magnitudes,
+                                                    stars_count_logarithms,
+                                                    upper_errorbars,
+                                                    lower_errorbars))))
 
-    add_errorbars(fig=main_plot,
-                  x=[graph_point.avg_bin_magnitude
-                     for graph_point in graph_points],
-                  y=[graph_point.stars_count_logarithm
-                     for graph_point in graph_points],
-                  y_err_up=[graph_point.upper_error_bar
-                            for graph_point in graph_points],
-                  y_err_down=[graph_point.lower_error_bar
-                              for graph_point in graph_points])
+    asymmetric_errorbars = [lower_errorbars,
+                            upper_errorbars]
 
-    show(main_plot)
+    figure, subplot = plt.subplots(figsize=FIGURE_SIZE)
 
+    subplot.set(xlabel=X_LABEL,
+                ylabel=Y_LABEL,
+                xlim=X_LIMITS,
+                ylim=Y_LIMITS)
 
-def add_latex_labels(fig: Figure,
-                     x_label_text: str,
-                     x_label_xpos: int,
-                     x_label_ypos: int,
-                     y_label_text: str,
-                     y_label_xpos: int,
-                     y_label_ypos: int) -> None:
-    x_label_latex = LatexLabel(text=x_label_text,
-                               x=x_label_xpos,
-                               y=x_label_ypos,
-                               x_units='screen',
-                               y_units='screen',
-                               render_mode='css',
-                               text_font_size='8pt',
-                               background_fill_color='#ffffff')
-    fig.add_layout(x_label_latex)
-    y_label_latex = LatexLabel(text=y_label_text,
-                               x=y_label_xpos,
-                               y=y_label_ypos,
-                               angle=pi / 2.,
-                               x_units='screen',
-                               y_units='screen',
-                               render_mode='css',
-                               text_font_size='8pt',
-                               background_fill_color='#ffffff')
-    fig.add_layout(y_label_latex)
+    subplot.errorbar(x=avg_bin_magnitudes,
+                     y=stars_count_logarithms,
+                     yerr=asymmetric_errorbars,
+                     marker=MARKER,
+                     color=LINE_COLOR,
+                     capsize=CAP_SIZE)
 
+    plt.minorticks_on()
 
-def add_errorbars(fig: Figure,
-                  x: List[float],
-                  y: List[float],
-                  y_err_up: List[float],
-                  y_err_down: List[float]) -> None:
-    multiline_x = []
-    multiline_y = []
-    for (x_coordinate, y_coordinate,
-         error_up, error_down) in zip(x, y, y_err_up, y_err_down):
-        multiline_x.append((x_coordinate,
-                            x_coordinate))
-        multiline_y.append((y_coordinate - error_down,
-                            y_coordinate + error_up))
+    subplot.xaxis.set_ticks_position('both')
+    subplot.yaxis.set_ticks_position('both')
 
-    fig.multi_line(multiline_x,
-                   multiline_y)
+    subplot.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot.get_data_ratio())
+
+    plt.savefig(FILENAME)
 
 
 def fetch_all_graph_points(*,
