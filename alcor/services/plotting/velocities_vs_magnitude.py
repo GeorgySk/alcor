@@ -13,8 +13,14 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from alcor.models.velocities_vs_magnitudes.bins import Bin
-from alcor.models.velocities_vs_magnitudes.clouds import Cloud
+from alcor.models.velocities_vs_magnitudes.bins import (Bin,
+                                                        LepineCaseUBin,
+                                                        LepineCaseVBin,
+                                                        LepineCaseWBin)
+from alcor.models.velocities_vs_magnitudes.clouds import (Cloud,
+                                                          LepineCaseUCloud,
+                                                          LepineCaseVCloud,
+                                                          LepineCaseWCloud)
 from alcor.services.data_access.reading import fetch
 from alcor.utils import get_columns
 
@@ -171,115 +177,141 @@ def plot(session: Session) -> None:
 
 
 def plot_lepine_case(session: Session):
-    output_file("velocities_vs_magnitude.html")
 
-    top_plot = figure()
-    middle_plot = figure()
-    bottom_plot = figure()
+    # TODO: fetch only last by time(ok?) bins
+    u_vs_mag_bins = fetch_all_u_vs_mag_bins(session=session)
+    v_vs_mag_bins = fetch_all_v_vs_mag_bins(session=session)
+    w_vs_mag_bins = fetch_all_w_vs_mag_bins(session=session)
 
-    with open('u_vs_mag_bins.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (average_bin_magnitude_u,
-         average_velocity_u,
-         velocity_u_std) = get_columns(reader)
-    top_plot.line(average_bin_magnitude_u,
-                  average_velocity_u)
-    top_plot.square(average_bin_magnitude_u,
-                    average_velocity_u)
-    add_errorbars(fig=top_plot,
-                  x=average_bin_magnitude_u,
-                  y=average_velocity_u,
-                  y_err=velocity_u_std)
+    u_bins_avg_magnitudes = [_.avg_magnitude
+                             for _ in u_vs_mag_bins]
+    avg_velocities_u = [_.avg_velocity_u
+                        for _ in u_vs_mag_bins]
+    velocities_u_std = [_.velocity_u_std
+                        for _ in u_vs_mag_bins]
+    v_bins_avg_magnitudes = [_.avg_magnitude
+                             for _ in v_vs_mag_bins]
+    avg_velocities_v = [_.avg_velocity_v
+                        for _ in v_vs_mag_bins]
+    velocities_v_std = [_.velocity_v_std
+                        for _ in v_vs_mag_bins]
+    w_bins_avg_magnitudes = [_.avg_magnitude
+                             for _ in w_vs_mag_bins]
+    avg_velocities_w = [_.avg_velocity_w
+                        for _ in w_vs_mag_bins]
+    velocities_w_std = [_.velocity_w_std
+                        for _ in w_vs_mag_bins]
 
-    with open('v_vs_mag_bins.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (average_bin_magnitude_v,
-         average_velocity_v,
-         velocity_v_std) = get_columns(reader)
-    middle_plot.line(average_bin_magnitude_v,
-                     average_velocity_v)
-    middle_plot.square(average_bin_magnitude_v,
-                       average_velocity_v)
-    add_errorbars(fig=middle_plot,
-                  x=average_bin_magnitude_v,
-                  y=average_velocity_v,
-                  y_err=velocity_v_std)
+    (u_bins_avg_magnitudes,
+     avg_velocities_u,
+     velocities_u_std) = (_ for _ in zip(*sorted(zip(u_bins_avg_magnitudes,
+                                                     avg_velocities_u,
+                                                     velocities_u_std))))
+    (v_bins_avg_magnitudes,
+     avg_velocities_v,
+     velocities_v_std) = (_ for _ in zip(*sorted(zip(v_bins_avg_magnitudes,
+                                                     avg_velocities_v,
+                                                     velocities_v_std))))
+    (w_bins_avg_magnitudes,
+     avg_velocities_w,
+     velocities_w_std) = (_ for _ in zip(*sorted(zip(w_bins_avg_magnitudes,
+                                                     avg_velocities_w,
+                                                     velocities_w_std))))
 
-    with open('w_vs_mag_bins.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (average_bin_magnitude_w,
-         average_velocity_w,
-         velocity_w_std) = get_columns(reader)
-    bottom_plot.line(average_bin_magnitude_w,
-                     average_velocity_w)
-    bottom_plot.square(average_bin_magnitude_w,
-                       average_velocity_w)
-    add_errorbars(fig=bottom_plot,
-                  x=average_bin_magnitude_w,
-                  y=average_velocity_w,
-                  y_err=velocity_w_std)
+    # TODO: do I need to use sharex or sharey attrs?
+    figure, (subplot_u,
+             subplot_v,
+             subplot_w) = plt.subplots(nrows=3,
+                                       figsize=FIGURE_SIZE)
 
-    with open('u_vs_mag_cloud.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (bolometric_magnitude,
-         velocity_u) = get_columns(reader)
-    top_plot.circle(bolometric_magnitude,
-                    velocity_u,
-                    size=1)
+    # TODO: find the way to apply limits once for all subplots
+    subplot_u.set(ylabel=U_LABEL,
+                  xlim=MAGNITUDE_LIMITS,
+                  ylim=VELOCITIES_LIMITS)
+    subplot_v.set(ylabel=V_LABEL,
+                  xlim=MAGNITUDE_LIMITS,
+                  ylim=VELOCITIES_LIMITS)
+    subplot_w.set(xlabel=MAGNITUDE_LABEL,
+                  ylabel=W_LABEL,
+                  xlim=MAGNITUDE_LIMITS,
+                  ylim=VELOCITIES_LIMITS)
 
-    with open('v_vs_mag_cloud.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (bolometric_magnitude,
-         velocity_v) = get_columns(reader)
-    middle_plot.circle(bolometric_magnitude,
-                       velocity_v,
-                       size=1)
+    subplot_u.errorbar(x=u_bins_avg_magnitudes,
+                       y=avg_velocities_u,
+                       yerr=velocities_u_std,
+                       marker=MARKER,
+                       markersize=MARKERSIZE,
+                       color=LINE_COLOR,
+                       capsize=CAP_SIZE,
+                       linewidth=LINEWIDTH)
+    subplot_v.errorbar(x=v_bins_avg_magnitudes,
+                       y=avg_velocities_v,
+                       yerr=velocities_v_std,
+                       marker=MARKER,
+                       markersize=MARKERSIZE,
+                       color=LINE_COLOR,
+                       capsize=CAP_SIZE,
+                       linewidth=LINEWIDTH)
+    subplot_w.errorbar(x=w_bins_avg_magnitudes,
+                       y=avg_velocities_w,
+                       yerr=velocities_w_std,
+                       marker=MARKER,
+                       markersize=MARKERSIZE,
+                       color=LINE_COLOR,
+                       capsize=CAP_SIZE,
+                       linewidth=LINEWIDTH)
 
-    with open('w_vs_mag_cloud.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (bolometric_magnitude,
-         velocity_w) = get_columns(reader)
-    bottom_plot.circle(bolometric_magnitude,
-                       velocity_w,
-                       size=1)
+    # TODO: fetch only last by time(ok?) clouds
+    u_vs_mag_cloud = fetch_all_u_vs_mag_clouds(session=session)
+    v_vs_mag_cloud = fetch_all_v_vs_mag_clouds(session=session)
+    w_vs_mag_cloud = fetch_all_w_vs_mag_clouds(session=session)
 
-    main_plot = gridplot(children=[top_plot,
-                                   middle_plot,
-                                   bottom_plot],
-                         ncols=1,
-                         plot_width=PLOT_WIDTH,
-                         plot_height=PLOT_HEIGHT,
-                         merge_tools=True,
-                         toolbar_location='right')
-    save(main_plot)
+    u_magnitudes = [_.bolometric_magnitude
+                    for _ in u_vs_mag_cloud]
+    velocities_u = [_.velocity_u
+                    for _ in u_vs_mag_cloud]
+    v_magnitudes = [_.bolometric_magnitude
+                    for _ in v_vs_mag_cloud]
+    velocities_v = [_.velocity_v
+                    for _ in v_vs_mag_cloud]
+    w_magnitudes = [_.bolometric_magnitude
+                    for _ in w_vs_mag_cloud]
+    velocities_w = [_.velocity_w
+                    for _ in w_vs_mag_cloud]
 
+    subplot_u.scatter(x=u_magnitudes,
+                      y=velocities_u,
+                      color=CLOUD_COLOR,
+                      s=CLOUD_POINT_SIZE)
+    subplot_v.scatter(x=v_magnitudes,
+                      y=velocities_v,
+                      color=CLOUD_COLOR,
+                      s=CLOUD_POINT_SIZE)
+    subplot_w.scatter(x=w_magnitudes,
+                      y=velocities_w,
+                      color=CLOUD_COLOR,
+                      s=CLOUD_POINT_SIZE)
 
-def add_errorbars(fig: Figure,
-                  x: List[float],
-                  y: List[float],
-                  y_err: List[float]) -> None:
-    multiline_x = []
-    multiline_y = []
-    for (x_coordinate, y_coordinate, error) in zip(x, y, y_err):
-        multiline_x.append((x_coordinate,
-                            x_coordinate))
-        multiline_y.append((y_coordinate - error,
-                            y_coordinate + error))
+    # TODO: why does this apply minorticks only to the last subplot?
+    plt.minorticks_on()
 
-    fig.multi_line(multiline_x,
-                   multiline_y)
+    subplot_u.xaxis.set_ticks_position('both')
+    subplot_u.yaxis.set_ticks_position('both')
+    subplot_v.xaxis.set_ticks_position('both')
+    subplot_v.yaxis.set_ticks_position('both')
+    subplot_w.xaxis.set_ticks_position('both')
+    subplot_w.yaxis.set_ticks_position('both')
+
+    subplot_u.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_u.get_data_ratio())
+    subplot_v.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_v.get_data_ratio())
+    subplot_w.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_w.get_data_ratio())
+
+    # TODO: delete overlapping y-labels
+    # TODO: delete unnecessary x-labels for top and middle subplots
+    figure.subplots_adjust(hspace=0)
+
+    # FIXME: cloud and bins are not correlated!
+    plt.savefig(FILENAME)
 
 
 def fetch_all_bins(*,
@@ -297,4 +329,58 @@ def fetch_all_clouds(*,
     records = fetch(query=query,
                     session=session)
     return [Cloud(**record)
+            for record in records]
+
+
+def fetch_all_u_vs_mag_bins(*,
+                            session: Session):
+    query = (LepineCaseUBin.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseUBin(**record)
+            for record in records]
+
+
+def fetch_all_v_vs_mag_bins(*,
+                            session: Session):
+    query = (LepineCaseVBin.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseVBin(**record)
+            for record in records]
+
+
+def fetch_all_w_vs_mag_bins(*,
+                            session: Session):
+    query = (LepineCaseWBin.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseWBin(**record)
+            for record in records]
+
+
+def fetch_all_u_vs_mag_clouds(*,
+                              session: Session):
+    query = (LepineCaseUCloud.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseUCloud(**record)
+            for record in records]
+
+
+def fetch_all_v_vs_mag_clouds(*,
+                              session: Session):
+    query = (LepineCaseVCloud.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseVCloud(**record)
+            for record in records]
+
+
+def fetch_all_w_vs_mag_clouds(*,
+                              session: Session):
+    query = (LepineCaseWCloud.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseWCloud(**record)
             for record in records]
