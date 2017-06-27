@@ -28,7 +28,7 @@ services:
 #      - --luminosity-function
 #      - --velocities-vs-magnitude
       - --velocity-clouds
-#      - --lepine-criterion
+      - --lepine-criterion
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 

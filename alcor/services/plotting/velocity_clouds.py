@@ -1,12 +1,3 @@
-import csv
-
-from bokeh.io import save
-from bokeh.layouts import (column,
-                           gridplot)
-from bokeh.models.glyphs import Ellipse
-from bokeh.plotting import (figure,
-                            output_file,
-                            show)
 from cassandra.cluster import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
@@ -15,8 +6,10 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 
-from alcor.utils import get_columns
-from alcor.models.velocities.clouds import Cloud
+from alcor.models.velocities.clouds import (Cloud,
+                                            LepineCaseUVCloud,
+                                            LepineCaseUWCloud,
+                                            LepineCaseVWCloud)
 from alcor.services.data_access.reading import fetch
 
 
@@ -72,12 +65,6 @@ def plot(session: Session) -> None:
     velocities_w = [_.velocity_w
                     for _ in cloud_points]
 
-    (velocities_u,
-     velocities_v,
-     velocities_w) = (_ for _ in zip(*sorted(zip(velocities_u,
-                                                 velocities_v,
-                                                 velocities_w))))
-
     # TODO: do I need to use sharex or sharey attrs?
     figure, (subplot_uv,
              subplot_uw,
@@ -106,6 +93,7 @@ def plot(session: Session) -> None:
                        y=velocities_w,
                        color=CLOUD_COLOR,
                        s=POINT_SIZE)
+    # TODO: check if points count is ok relative to other clouds. I had 35<250
     subplot_vw.scatter(x=velocities_v,
                        y=velocities_w,
                        color=CLOUD_COLOR,
@@ -181,96 +169,125 @@ def plot(session: Session) -> None:
 
 
 def plot_lepine_case(session: Session):
-    output_file("velocity_clouds.html")
 
-    top_plot = figure()
-    middle_plot = figure()
-    bottom_plot = figure()
+    # TODO: Implement getting last points by time(ok?)
+    uv_points = fetch_all_lepine_case_uv_cloud_points(session=session)
+    uw_points = fetch_all_lepine_case_uw_cloud_points(session=session)
+    vw_points = fetch_all_lepine_case_vw_cloud_points(session=session)
 
-    with open('uw_cloud.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (velocity_u, velocity_w) = get_columns(reader)
-    top_plot.circle(velocity_u,
-                    velocity_w,
-                    size=1)
+    uv_cloud_velocities_u = [_.velocity_u
+                             for _ in uv_points]
+    uv_cloud_velocities_v = [_.velocity_v
+                             for _ in uv_points]
+    uw_cloud_velocities_u = [_.velocity_u
+                             for _ in uw_points]
+    uw_cloud_velocities_w = [_.velocity_w
+                             for _ in uw_points]
+    vw_cloud_velocities_v = [_.velocity_v
+                             for _ in vw_points]
+    vw_cloud_velocities_w = [_.velocity_w
+                             for _ in vw_points]
 
-    with open('uv_cloud.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (velocity_u, velocity_v) = get_columns(reader)
-    middle_plot.circle(velocity_u,
-                       velocity_v,
-                       size=1)
+    # TODO: do I need to use sharex or sharey attrs?
+    figure, (subplot_uv,
+             subplot_uw,
+             subplot_vw) = plt.subplots(nrows=3,
+                                        figsize=FIGURE_SIZE)
 
-    with open('vw_cloud.csv', 'r') as file:
-        reader = csv.reader(file,
-                            delimiter=CSV_DELIMITER)
-        header_row = next(reader)
-        (velocity_v, velocity_w) = get_columns(reader)
-    bottom_plot.circle(velocity_v,
-                       velocity_w,
-                       size=1)
+    # TODO: find the way to apply limits once for all subplots
+    subplot_uv.set(xlabel=U_LABEL,
+                   ylabel=V_LABEL,
+                   xlim=U_LIMITS,
+                   ylim=V_LIMITS)
+    subplot_uw.set(xlabel=U_LABEL,
+                   ylabel=W_LABEL,
+                   xlim=U_LIMITS,
+                   ylim=W_LIMITS)
+    subplot_vw.set(xlabel=V_LABEL,
+                   ylabel=W_LABEL,
+                   xlim=V_LIMITS,
+                   ylim=W_LIMITS)
 
-    top_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_U,
-                          y=AVERAGE_POPULATION_VELOCITY_W,
-                          width=STD_POPULATION_U * 2,
-                          height=STD_POPULATION_W * 2,
-                          fill_color='white',
-                          fill_alpha=0.,
-                          line_dash='dashed')
-    top_double_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_U,
-                                 y=AVERAGE_POPULATION_VELOCITY_W,
-                                 width=STD_POPULATION_U * 4,
-                                 height=STD_POPULATION_W * 4,
-                                 fill_color='white',
-                                 fill_alpha=0.)
-    top_plot.add_glyph(top_ellipse)
-    top_plot.add_glyph(top_double_ellipse)
+    subplot_uv.scatter(x=uv_cloud_velocities_u,
+                       y=uv_cloud_velocities_v,
+                       color=CLOUD_COLOR,
+                       s=POINT_SIZE)
+    subplot_uw.scatter(x=uw_cloud_velocities_u,
+                       y=uw_cloud_velocities_w,
+                       color=CLOUD_COLOR,
+                       s=POINT_SIZE)
+    subplot_vw.scatter(x=vw_cloud_velocities_v,
+                       y=vw_cloud_velocities_w,
+                       color=CLOUD_COLOR,
+                       s=POINT_SIZE)
 
-    middle_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_U,
-                             y=AVERAGE_POPULATION_VELOCITY_V,
+    uv_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
+                                 AVERAGE_POPULATION_VELOCITY_V),
                              width=STD_POPULATION_U * 2,
                              height=STD_POPULATION_V * 2,
-                             fill_color='white',
-                             line_dash='dashed',
-                             fill_alpha=0.)
-    middle_double_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_U,
-                                    y=AVERAGE_POPULATION_VELOCITY_V,
-                                    width=STD_POPULATION_U * 4,
-                                    height=STD_POPULATION_V * 4,
-                                    fill_color='white',
-                                    fill_alpha=0.)
-    middle_plot.add_glyph(middle_ellipse)
-    middle_plot.add_glyph(middle_double_ellipse)
-
-    bottom_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_V,
-                             y=AVERAGE_POPULATION_VELOCITY_W,
+                             fill=False,
+                             edgecolor=ELLIPSE_COLOR,
+                             linestyle='dashed')
+    uw_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
+                                 AVERAGE_POPULATION_VELOCITY_W),
                              width=STD_POPULATION_U * 2,
-                             height=STD_POPULATION_V * 2,
-                             fill_color='white',
-                             line_dash='dashed',
-                             fill_alpha=0.)
-    bottom_double_ellipse = Ellipse(x=AVERAGE_POPULATION_VELOCITY_V,
-                                    y=AVERAGE_POPULATION_VELOCITY_W,
+                             height=STD_POPULATION_W * 2,
+                             fill=False,
+                             edgecolor=ELLIPSE_COLOR,
+                             linestyle='dashed')
+    vw_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_V,
+                                 AVERAGE_POPULATION_VELOCITY_W),
+                             width=STD_POPULATION_V * 2,
+                             height=STD_POPULATION_W * 2,
+                             fill=False,
+                             edgecolor=ELLIPSE_COLOR,
+                             linestyle='dashed')
+    uv_double_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
+                                        AVERAGE_POPULATION_VELOCITY_V),
                                     width=STD_POPULATION_U * 4,
                                     height=STD_POPULATION_V * 4,
-                                    fill_color='white',
-                                    fill_alpha=0.)
-    bottom_plot.add_glyph(bottom_ellipse)
-    bottom_plot.add_glyph(bottom_double_ellipse)
+                                    fill=False,
+                                    edgecolor=ELLIPSE_COLOR)
+    uw_double_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
+                                        AVERAGE_POPULATION_VELOCITY_W),
+                                    width=STD_POPULATION_U * 4,
+                                    height=STD_POPULATION_W * 4,
+                                    fill=False,
+                                    edgecolor=ELLIPSE_COLOR)
+    vw_double_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_V,
+                                        AVERAGE_POPULATION_VELOCITY_W),
+                                    width=STD_POPULATION_V * 4,
+                                    height=STD_POPULATION_W * 4,
+                                    fill=False,
+                                    edgecolor=ELLIPSE_COLOR)
 
-    main_plot = gridplot(children=[top_plot,
-                                   middle_plot,
-                                   bottom_plot],
-                         ncols=1,
-                         plot_width=PLOT_WIDTH,
-                         plot_height=PLOT_HEIGHT,
-                         merge_tools=True,
-                         toolbar_location='right')
-    save(main_plot)
+    subplot_uv.add_artist(uv_std_ellipse)
+    subplot_uw.add_artist(uw_std_ellipse)
+    subplot_vw.add_artist(vw_std_ellipse)
+    subplot_uv.add_artist(uv_double_std_ellipse)
+    subplot_uw.add_artist(uw_double_std_ellipse)
+    subplot_vw.add_artist(vw_double_std_ellipse)
+
+    # TODO: why does this apply minorticks only to the last subplot?
+    plt.minorticks_on()
+
+    subplot_uv.xaxis.set_ticks_position('both')
+    subplot_uv.yaxis.set_ticks_position('both')
+    subplot_uw.xaxis.set_ticks_position('both')
+    subplot_uw.yaxis.set_ticks_position('both')
+    subplot_vw.xaxis.set_ticks_position('both')
+    subplot_vw.yaxis.set_ticks_position('both')
+
+    subplot_uv.set_aspect(DESIRED_DIMENSIONS_RATIO
+                          / subplot_uv.get_data_ratio())
+    subplot_uw.set_aspect(DESIRED_DIMENSIONS_RATIO
+                          / subplot_uw.get_data_ratio())
+    subplot_vw.set_aspect(DESIRED_DIMENSIONS_RATIO
+                          / subplot_vw.get_data_ratio())
+
+    figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
+
+    plt.savefig(FILENAME)
 
 
 def fetch_all_cloud_points(*,
@@ -279,5 +296,32 @@ def fetch_all_cloud_points(*,
     records = fetch(query=query,
                     session=session)
     return [Cloud(**record)
+            for record in records]
+
+
+def fetch_all_lepine_case_uv_cloud_points(*,
+                                          session: Session):
+    query = (LepineCaseUVCloud.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseUVCloud(**record)
+            for record in records]
+
+
+def fetch_all_lepine_case_uw_cloud_points(*,
+                                          session: Session):
+    query = (LepineCaseUWCloud.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseUWCloud(**record)
+            for record in records]
+
+
+def fetch_all_lepine_case_vw_cloud_points(*,
+                                          session: Session):
+    query = (LepineCaseVWCloud.objects.all().limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [LepineCaseVWCloud(**record)
             for record in records]
 
