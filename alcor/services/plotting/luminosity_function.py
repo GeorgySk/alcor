@@ -42,8 +42,7 @@ def plot(*,
     (avg_bin_magnitudes,
      stars_count_logarithms,
      upper_errorbars,
-     lower_errorbars) = (list(_) for _ in zip(*sorted(
-                                                zip(avg_bin_magnitudes,
+     lower_errorbars) = (_ for _ in zip(*sorted(zip(avg_bin_magnitudes,
                                                     stars_count_logarithms,
                                                     upper_errorbars,
                                                     lower_errorbars))))
