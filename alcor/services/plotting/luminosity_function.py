@@ -76,7 +76,7 @@ def plot(*,
 
 def fetch_all_graph_points(*,
                            session: Session):
-    query = (Point.objects.all())  # 10000 hidden limit here
+    query = (Point.objects.all().limit(None))
     records = fetch(query=query,
                     session=session)
     return [Point(**record)
