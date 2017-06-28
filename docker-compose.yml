@@ -24,11 +24,11 @@ services:
       - --w-velocities-vs-magnitude
       - --w-lepine-criterion
       # Plotting
-#      - plot
+      - plot
 #      - --luminosity-function
-#      - --velocities-vs-magnitude
-#      - --velocity-clouds
-#      - --lepine-criterion
+      - --velocities-vs-magnitude
+      - --velocity-clouds
+      - --lepine-criterion
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 

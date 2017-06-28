@@ -16,6 +16,7 @@ def run_processing(*,
                    w_velocities_vs_magnitude: bool,
                    w_lepine_criterion: bool,
                    session: Session) -> None:
+    # TODO: add an option to process already processed groups
     groups = fetch_unprocessed_groups(session=session)
     for group in groups:
         stars = fetch_stars(group=group,

@@ -30,84 +30,98 @@ def generate_clouds(stars: List[Star],
                                            List[LepineCaseVCloud],
                                            List[LepineCaseWCloud]]:
     for star in stars:
-        highest_coordinate = max(star.coordinate_x,
-                                 star.coordinate_y,
-                                 star.coordinate_z)
-        if star.coordinate_x == highest_coordinate:
-            yield LepineCaseUCloud(
-                group_id=group.id,
-                bolometric_magnitude=star.bolometric_magnitude,
-                velocity_u=star.velocity_u)
-        elif star.coordinate_y == highest_coordinate:
-            yield LepineCaseVCloud(
-                group_id=group.id,
-                bolometric_magnitude=star.bolometric_magnitude,
-                velocity_v=star.velocity_v)
+        highest_coordinate = max(abs(star.coordinate_x),
+                                 abs(star.coordinate_y),
+                                 abs(star.coordinate_z))
+        if abs(star.coordinate_x) == highest_coordinate:
+            v_clouds.append(
+                LepineCaseVCloud(group_id=group.id,
+                                 velocity_v=star.velocity_v,
+                                 bolometric_magnitude=star.bolometric_magnitude))
+            w_clouds.append(
+                LepineCaseWCloud(group_id=group.id,
+                                 velocity_w=star.velocity_w,
+                                 bolometric_magnitude=star.bolometric_magnitude))
+        elif abs(star.coordinate_y) == highest_coordinate:
+            u_clouds.append(
+                LepineCaseUCloud(group_id=group.id,
+                                 velocity_u=star.velocity_u,
+                                 bolometric_magnitude=star.bolometric_magnitude))
+            w_clouds.append(
+                LepineCaseWCloud(group_id=group.id,
+                                 velocity_w=star.velocity_w,
+                                 bolometric_magnitude=star.bolometric_magnitude))
         else:
-            yield LepineCaseWCloud(
-                group_id=group.id,
-                bolometric_magnitude=star.bolometric_magnitude,
-                velocity_w=star.velocity_w)
+            u_clouds.append(
+                LepineCaseUCloud(group_id=group.id,
+                                 velocity_u=star.velocity_u,
+                                 bolometric_magnitude=star.bolometric_magnitude))
+            v_clouds.append(
+                LepineCaseVCloud(group_id=group.id,
+                                 velocity_v=star.velocity_v,
+                                 bolometric_magnitude=star.bolometric_magnitude))
+
+    return u_clouds, v_clouds, w_clouds
 
 
 def generate_u_bins(*,
                     stars_bins: StarsBinsType,
                     group: Group) -> Iterable[LepineCaseUBin]:
-    non_empty_stars_bins = filter(None, stars_bins)
-    for stars_bin_index, stars_bin in enumerate(non_empty_stars_bins):
-        avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (stars_bin_index - 0.5))
-        avg_velocity_u = mean(star.velocity_u
-                              for star in stars_bin)
-        if len(stars_bin) == 1:
-            velocity_u_std = DEFAULT_VELOCITY_STD
-        else:
-            velocity_u_std = stdev(star.velocity_u
-                                   for star in stars_bin)
-        yield LepineCaseUBin(group_id=group.id,
-                             avg_magnitude=avg_magnitude,
-                             avg_velocity_u=avg_velocity_u,
-                             velocity_u_std=velocity_u_std)
+    for index, stars_bin in enumerate(stars_bins):
+        if len(stars_bin) > 0:
+            avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (index + 0.5))
+            avg_velocity_u = mean(star.velocity_u
+                                  for star in stars_bin)
+            if len(stars_bin) == 1:
+                velocity_u_std = DEFAULT_VELOCITY_STD
+            else:
+                velocity_u_std = stdev(star.velocity_u
+                                       for star in stars_bin)
+            yield LepineCaseUBin(group_id=group.id,
+                                 avg_magnitude=avg_magnitude,
+                                 avg_velocity_u=avg_velocity_u,
+                                 velocity_u_std=velocity_u_std)
 
 
 def generate_v_bins(*,
                     stars_bins: StarsBinsType,
                     group: Group) -> Iterable[LepineCaseVBin]:
-    non_empty_stars_bins = filter(None, stars_bins)
-    for stars_bin_index, stars_bin in enumerate(non_empty_stars_bins):
-        avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (stars_bin_index - 0.5))
-        avg_velocity_v = mean(star.velocity_v
-                              for star in stars_bin)
-        if len(stars_bin) == 1:
-            velocity_v_std = DEFAULT_VELOCITY_STD
-        else:
-            velocity_v_std = stdev(star.velocity_v
-                                   for star in stars_bin)
-        yield LepineCaseVBin(group_id=group.id,
-                             avg_magnitude=avg_magnitude,
-                             avg_velocity_v=avg_velocity_v,
-                             velocity_v_std=velocity_v_std)
+    for stars_bin_index, stars_bin in enumerate(stars_bins):
+        if len(stars_bin) > 0:
+            avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index + 0.5))
+            avg_velocity_v = mean(star.velocity_v
+                                  for star in stars_bin)
+            if len(stars_bin) == 1:
+                velocity_v_std = DEFAULT_VELOCITY_STD
+            else:
+                velocity_v_std = stdev(star.velocity_v
+                                       for star in stars_bin)
+            yield LepineCaseVBin(group_id=group.id,
+                                 avg_magnitude=avg_magnitude,
+                                 avg_velocity_v=avg_velocity_v,
+                                 velocity_v_std=velocity_v_std)
 
 
 def generate_w_bins(*,
                     stars_bins: StarsBinsType,
-                    group: Group) -> Iterable[LepineCaseWBin]:
-    non_empty_stars_bins = filter(None, stars_bins)
-    for stars_bin_index, stars_bin in enumerate(non_empty_stars_bins):
-        avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (stars_bin_index - 0.5))
-        avg_velocity_w = mean(star.velocity_w
-                              for star in stars_bin)
-        if len(stars_bin) == 1:
-            velocity_w_std = DEFAULT_VELOCITY_STD
-        else:
-            velocity_w_std = stdev(star.velocity_w
-                                   for star in stars_bin)
-        yield LepineCaseWBin(group_id=group.id,
-                             avg_magnitude=avg_magnitude,
-                             avg_velocity_w=avg_velocity_w,
-                             velocity_w_std=velocity_w_std)
+                    group: Group) -> Iterable[RowType]:
+    for stars_bin_index, stars_bin in enumerate(stars_bins):
+        if len(stars_bin) > 0:
+            avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index + 0.5))
+            avg_velocity_w = mean(star.velocity_w
+                                  for star in stars_bin)
+            if len(stars_bin) == 1:
+                velocity_w_std = DEFAULT_VELOCITY_STD
+            else:
+                velocity_w_std = stdev(star.velocity_w
+                                       for star in stars_bin)
+            yield LepineCaseWBin(group_id=group.id,
+                                 avg_magnitude=avg_magnitude,
+                                 avg_velocity_w=avg_velocity_w,
+                                 velocity_w_std=velocity_w_std)
 
 
 def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
@@ -120,13 +134,13 @@ def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
     for star in stars:
         index = get_stars_bin_index(star)
 
-        highest_coordinate = max(star.coordinate_x,
-                                 star.coordinate_y,
-                                 star.coordinate_z)
-        if star.coordinate_x == highest_coordinate:
+        highest_coordinate = max(abs(star.coordinate_x),
+                                 abs(star.coordinate_y),
+                                 abs(star.coordinate_z))
+        if abs(star.coordinate_x) == highest_coordinate:
             v_stars_bins[index].append(star)
             w_stars_bins[index].append(star)
-        elif star.coordinate_y == highest_coordinate:
+        elif abs(star.coordinate_y) == highest_coordinate:
             u_stars_bins[index].append(star)
             w_stars_bins[index].append(star)
         else:
@@ -134,6 +148,13 @@ def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
             v_stars_bins[index].append(star)
 
     return u_stars_bins, v_stars_bins, w_stars_bins
+
+
+def get_stars_bin_index(star: Star) -> int:
+    # TODO: maybe it's better to use 'floor' and take away '-1'?
+    return int(ceil((float(star.bolometric_magnitude)
+                     - MIN_BOLOMETRIC_MAGNITUDE)
+                    / BIN_SIZE)) - 1
 
 
 def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
@@ -147,38 +168,32 @@ def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
 def generate_bins(*,
                   stars_bins: StarsBinsType,
                   group: Group) -> Iterable[Bin]:
-    non_empty_stars_bins = filter(None, stars_bins)
-    for index, stars_bin in enumerate(non_empty_stars_bins):
-        avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (index - 0.5))
-        avg_velocity_u = mean(star.velocity_u
-                              for star in stars_bin)
-        avg_velocity_v = mean(star.velocity_v
-                              for star in stars_bin)
-        avg_velocity_w = mean(star.velocity_w
-                              for star in stars_bin)
-        if len(stars_bin) > 1:
-            velocity_u_std = stdev(star.velocity_u
-                                   for star in stars_bin)
-            velocity_v_std = stdev(star.velocity_v
-                                   for star in stars_bin)
-            velocity_w_std = stdev(star.velocity_w
-                                   for star in stars_bin)
-        else:
-            velocity_u_std = DEFAULT_VELOCITY_STD
-            velocity_v_std = DEFAULT_VELOCITY_STD
-            velocity_w_std = DEFAULT_VELOCITY_STD
-        yield Bin(group_id=group.id,
-                  avg_magnitude=avg_magnitude,
-                  avg_velocity_u=avg_velocity_u,
-                  avg_velocity_v=avg_velocity_v,
-                  avg_velocity_w=avg_velocity_w,
-                  velocity_u_std=velocity_u_std,
-                  velocity_v_std=velocity_v_std,
-                  velocity_w_std=velocity_w_std)
-
-
-def get_stars_bin_index(star: Star) -> int:
-    return int(ceil((float(star.bolometric_magnitude)
-                     - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE))
+    for index, stars_bin in enumerate(stars_bins):
+        if len(stars_bin) > 0:
+            avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (index + 0.5))
+            avg_velocity_u = mean(star.velocity_u
+                                  for star in stars_bin)
+            avg_velocity_v = mean(star.velocity_v
+                                  for star in stars_bin)
+            avg_velocity_w = mean(star.velocity_w
+                                  for star in stars_bin)
+            if len(stars_bin) > 1:
+                velocity_u_std = stdev(star.velocity_u
+                                       for star in stars_bin)
+                velocity_v_std = stdev(star.velocity_v
+                                       for star in stars_bin)
+                velocity_w_std = stdev(star.velocity_w
+                                       for star in stars_bin)
+            else:
+                velocity_u_std = DEFAULT_VELOCITY_STD
+                velocity_v_std = DEFAULT_VELOCITY_STD
+                velocity_w_std = DEFAULT_VELOCITY_STD
+            yield Bin(group_id=group.id,
+                      avg_magnitude=avg_magnitude,
+                      avg_velocity_u=avg_velocity_u,
+                      avg_velocity_v=avg_velocity_v,
+                      avg_velocity_w=avg_velocity_w,
+                      velocity_u_std=velocity_u_std,
+                      velocity_v_std=velocity_v_std,
+                      velocity_w_std=velocity_w_std)
