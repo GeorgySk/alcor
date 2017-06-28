@@ -15,14 +15,14 @@ def generate_clouds(stars: List[Star]
     uw_clouds = []
     vw_clouds = []
     for star in stars:
-        highest_coordinate = max(star.coordinate_x,
-                                 star.coordinate_y,
-                                 star.coordinate_z)
-        if star.coordinate_x == highest_coordinate:
+        highest_coordinate = max(abs(star.coordinate_x),
+                                 abs(star.coordinate_y),
+                                 abs(star.coordinate_z))
+        if abs(star.coordinate_x) == highest_coordinate:
             vw_clouds.append(LepineCaseVWCloud(group_id=star.group_id,
                                                velocity_v=star.velocity_v,
                                                velocity_w=star.velocity_w))
-        elif star.coordinate_y == highest_coordinate:
+        elif abs(star.coordinate_y) == highest_coordinate:
             uw_clouds.append(LepineCaseUWCloud(group_id=star.group_id,
                                                velocity_u=star.velocity_u,
                                                velocity_w=star.velocity_w))
