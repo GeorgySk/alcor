@@ -10,7 +10,7 @@ from .utils import (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME,
                     points)
 
 # TODO: find out the name for set of indexes
-MAGIC_STARS_BINS_INDEXES = {16, 17, 18}
+MAGIC_STARS_BINS_INDEXES = {16 - 1, 17 - 1, 18 - 1}  # Thanks, Python!
 
 
 def process_stars_group(*,
