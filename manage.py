@@ -21,6 +21,7 @@ from alcor.models import (Group,
                           velocities,
                           velocities_vs_magnitudes)
 from alcor.services.processing import run_processing
+from alcor.services.plotting import draw_plots
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
@@ -136,6 +137,43 @@ def process(ctx: click.Context,
                        velocities_vs_magnitude=velocities_vs_magnitude,
                        lepine_criterion=lepine_criterion,
                        session=session)
+
+
+@main.command()
+@click.option('--luminosity-function', '-lf',
+              is_flag=True,
+              help='Plot luminosity function.')
+@click.option('--velocities-vs-magnitude', '-vm',
+              is_flag=True,
+              help='Plot velocities vs bol. magnitude .')
+@click.option('--velocity-clouds', '-uvw',
+              is_flag=True,
+              help='Plot velocity clouds.')
+@click.option('--lepine-criterion', '-lcr',
+              is_flag=True,
+              help='Use data with applied Lepine\'s criterion.')
+@click.pass_context
+def plot(ctx: click.Context,
+         luminosity_function: bool,
+         velocities_vs_magnitude: bool,
+         velocity_clouds: bool,
+         lepine_criterion: bool) -> None:
+    cluster_settings = ctx.obj
+    contact_points = cluster_settings['contact_points']
+    port = cluster_settings['port']
+    keyspace_name = PROJECT_NAME
+    check_connection(contact_points=contact_points,
+                     port=port)
+    with Cluster(contact_points=contact_points,
+                 port=port) as cluster:
+        session = cluster.connect()
+        init_db(keyspace_name=keyspace_name,
+                session=session)
+        draw_plots(luminosity_function,
+                   velocities_vs_magnitude,
+                   velocity_clouds,
+                   lepine_criterion,
+                   session=session)
 
 
 def init_db(*,

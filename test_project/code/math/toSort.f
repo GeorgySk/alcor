@@ -29,7 +29,7 @@ C     /RSEED/.
       
       IF(IZ.LT.1) IZ=IZ+2147483562
     
-      RAN=IZ*USCALE
+      RAN=sngl(IZ*USCALE)
 
        
       RETURN

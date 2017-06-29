@@ -17,4 +17,6 @@ class Point(Model):
     stars_count_logarithm = Decimal(required=True)
     upper_error_bar = Decimal(required=True)
     lower_error_bar = Decimal(required=True)
-    updated_timestamp = DateTime(default=datetime.now)
+    updated_timestamp = DateTime(default=datetime.now,
+                                 primary_key=True,
+                                 clustering_order='DESC')
