@@ -20,39 +20,46 @@ OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
+
 def generate_stars_bins(stars: List[Star]) -> StarsBinsType:
     stars_bins = [[] for _ in range(BINS_COUNT)]
     for star in stars:
         index = get_stars_bin_index(star)
-        stars_bins[index].append(star)
+        if index >= 0:
+            stars_bins[index].append(star)
     return stars_bins
 
 
 def get_stars_bin_index(star: Star) -> int:
+    # TODO: make floor and delete -1?
     return int(ceil((float(star.bolometric_magnitude)
                      - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE))
+                    / BIN_SIZE)) - 1
 
 
 def points(*,
            bins: StarsBinsType,
            group: Group,
            normalization_factor: float) -> Iterable[Point]:
-    non_empty_bins = filter(None, bins)
-    for stars_bin_index, stars_bin in enumerate(non_empty_bins):
+    for stars_bin_index, stars_bin in enumerate(bins):
         stars_count = len(stars_bin)
-        avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                             + BIN_SIZE * (stars_bin_index + 0.5))
-        stars_count_logarithm = get_stars_count_logarithm(
-            stars_count=stars_count,
-            normalization_factor=normalization_factor)
-        upper_error_bar = get_upper_error_bar(stars_count)
-        lower_error_bar = get_lower_error_bar(stars_count)
-        yield Point(group_id=group.id,
-                    avg_bin_magnitude=avg_bin_magnitude,
-                    stars_count_logarithm=stars_count_logarithm,
-                    upper_error_bar=upper_error_bar,
-                    lower_error_bar=lower_error_bar)
+        if stars_count > 0:
+            avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                                 + BIN_SIZE * (stars_bin_index + 0.5))
+            stars_count_logarithm = get_stars_count_logarithm(
+                stars_count=stars_count,
+                normalization_factor=normalization_factor)
+            if avg_bin_magnitude > 18:
+                logger.debug(f'Mbol = {avg_bin_magnitude}')
+                logger.debug(f'N = {stars_count}')
+                logger.debug(f'logN = {stars_count_logarithm}')
+            upper_error_bar = get_upper_error_bar(stars_count)
+            lower_error_bar = get_lower_error_bar(stars_count)
+            yield Point(group_id=group.id,
+                        avg_bin_magnitude=avg_bin_magnitude,
+                        stars_count_logarithm=stars_count_logarithm,
+                        upper_error_bar=upper_error_bar,
+                        lower_error_bar=lower_error_bar)
 
 
 def get_stars_count_logarithm(stars_count: int,
