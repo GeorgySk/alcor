@@ -75,11 +75,11 @@ def generate_parameters_values_ranges_by_names(
                                                items()):
 
         # Parameter is const during all simulations:
-        if type(parameter_settings) is float:
+        if isinstance(parameter_settings, float):
             values_range = [round(parameter_settings, precision)]
             yield parameter_name, values_range
 
-        elif type(parameter_settings) is dict:
+        elif isinstance(parameter_settings, dict):
 
             # Parameter is generated for every simulation:
             if all(key in parameter_settings
