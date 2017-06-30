@@ -30,34 +30,40 @@ def generate_parameters_values(*,
         if type(list_instance[0]) is str:
             str_lists_indexes.append(list_index)
 
-    file_lines_count = len(list(
-        parameters_values_ranges_by_names.values())[str_lists_indexes[0]])
-
-    all_simulations_parameters = []
-    one_simulation_parameters = []
-    for line_index in range(file_lines_count):
-        for list_index, list_instance in enumerate(
-                parameters_values_ranges_by_names.values()):
-            if list_index in str_lists_indexes:
-                one_simulation_parameters.append([list_instance[line_index]])
-            else:
-                one_simulation_parameters.append(list_instance)
-        all_simulations_parameters.append(one_simulation_parameters)
+    if str_lists_indexes:
+        file_lines_count = len(list(
+            parameters_values_ranges_by_names.values())[str_lists_indexes[0]])
+        all_simulations_parameters = []
         one_simulation_parameters = []
+        for line_index in range(file_lines_count):
+            for list_index, list_instance in enumerate(
+                    parameters_values_ranges_by_names.values()):
+                if list_index in str_lists_indexes:
+                    one_simulation_parameters.append([list_instance[line_index]])
+                else:
+                    one_simulation_parameters.append(list_instance)
+            all_simulations_parameters.append(one_simulation_parameters)
+            one_simulation_parameters = []
 
-    product_list = []
-    for one_simulation_parameters in all_simulations_parameters:
-        product_list.append(tuple(product(*one_simulation_parameters)))
+        product_list = []
+        for one_simulation_parameters in all_simulations_parameters:
+            product_list.append(tuple(product(*one_simulation_parameters)))
 
-    unpacked_product_list = []
-    for tuple_instance in product_list:
-        for tuple_inner_instance in tuple_instance:
-            unpacked_product_list.append(tuple_inner_instance)
+        unpacked_product_list = []
+        for tuple_instance in product_list:
+            for tuple_inner_instance in tuple_instance:
+                unpacked_product_list.append(tuple_inner_instance)
 
-    parameters_names = list(parameters_values_ranges_by_names.keys())
+        parameters_names = list(parameters_values_ranges_by_names.keys())
 
-    for values in unpacked_product_list:
-        yield dict(zip(parameters_names, values))
+        for values in unpacked_product_list:
+            yield dict(zip(parameters_names, values))
+    else:
+        parameters_names = list(parameters_values_ranges_by_names.keys())
+
+        for values in product(*parameters_values_ranges_by_names.values()):
+            yield dict(zip(parameters_names,
+                           values))
 
 
 def generate_parameters_values_ranges_by_names(
