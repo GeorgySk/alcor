@@ -41,19 +41,21 @@ def points(*,
            normalization_factor: float) -> Iterable[Point]:
     for stars_bin_index, stars_bin in enumerate(bins):
         stars_count = len(stars_bin)
-        if stars_count > 0:
-            avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                                 + BIN_SIZE * (stars_bin_index + 0.5))
-            stars_count_logarithm = get_stars_count_logarithm(
-                stars_count=stars_count,
-                normalization_factor=normalization_factor)
-            upper_error_bar = get_upper_error_bar(stars_count)
-            lower_error_bar = get_lower_error_bar(stars_count)
-            yield Point(group_id=group.id,
-                        avg_bin_magnitude=avg_bin_magnitude,
-                        stars_count_logarithm=stars_count_logarithm,
-                        upper_error_bar=upper_error_bar,
-                        lower_error_bar=lower_error_bar)
+        if not stars_count:
+            continue
+
+        avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
+                             + BIN_SIZE * (stars_bin_index + 0.5))
+        stars_count_logarithm = get_stars_count_logarithm(
+            stars_count=stars_count,
+            normalization_factor=normalization_factor)
+        upper_error_bar = get_upper_error_bar(stars_count)
+        lower_error_bar = get_lower_error_bar(stars_count)
+        yield Point(group_id=group.id,
+                    avg_bin_magnitude=avg_bin_magnitude,
+                    stars_count_logarithm=stars_count_logarithm,
+                    upper_error_bar=upper_error_bar,
+                    lower_error_bar=lower_error_bar)
 
 
 def get_stars_count_logarithm(stars_count: int,
