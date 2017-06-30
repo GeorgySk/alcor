@@ -1,4 +1,5 @@
 import csv
+import logging
 from itertools import product
 from typing import (Iterable,
                     Dict,
@@ -6,6 +7,9 @@ from typing import (Iterable,
                     List)
 
 from alcor.types import NumericType
+
+
+logger = logging.getLogger(__name__)
 
 
 def generate_parameters_values(*,
@@ -103,9 +107,9 @@ def generate_parameters_values_ranges_by_names(
                 yield parameter_name, values_range
 
             else:
-                print('Wrong set of keys. Possible sets are '
-                      '(start, step, count) and (csv, column)')
+                logger.error('Wrong set of keys. Possible sets are '
+                             '(start, step, count) and (csv, column)')
         else:
-            print(f'Wrong type of settings {parameter_settings}. '
-                  f'Expected float or dict, got {type(parameter_settings)} '
-                  'instead')
+            logger.error(f'Wrong type of settings {parameter_settings}. '
+                         f'Expected float or dict, got '
+                         f'{type(parameter_settings)} instead')
