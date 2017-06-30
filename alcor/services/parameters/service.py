@@ -14,7 +14,7 @@ def generate_parameters_values(*,
                                geometry: str
                                ) -> Iterable[Dict[str, NumericType]]:
     parameters_values_ranges_by_names = dict(
-        generate_parameters_values_ranges_by_names(parameters=parameters,
+        generate_parameters_values_ranges_by_names(parameters_dict=parameters,
                                                    precision=precision,
                                                    geometry=geometry))
 
@@ -58,14 +58,14 @@ def generate_parameters_values(*,
 
 def generate_parameters_values_ranges_by_names(
         *,
-        parameters: Dict[str, Dict[str, NumericType]],
+        parameters_dict: Dict[str, Dict[str, NumericType]],
         precision: int,
         geometry: str) -> Iterable[Tuple[str, List[NumericType]]]:
 
-    parameters_set = parameters['commons']
+    parameters_set = parameters_dict['commons']
 
     if geometry == 'cone':
-        parameters_set.update(parameters['cone'])
+        parameters_set.update(parameters_dict['cone'])
 
     for parameter_name, parameter_settings in parameters_set.items():
 
