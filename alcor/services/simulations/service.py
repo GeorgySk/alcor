@@ -28,82 +28,31 @@ def run_simulations(*,
     precision = settings['precision']
     parameters_info = settings['parameters']
 
-    if geometry == 'sphere':
-        for parameters_values in generate_parameters_values(
-                parameters_info=parameters_info,
-                precision=precision):
-            group_id = uuid.uuid4()
-            group = Group(id=group_id)
+    for parameters_values in generate_parameters_values(
+            parameters=parameters_info,
+            precision=precision,
+            geometry=geometry):
+        group_id = uuid.uuid4()
+        group = Group(id=group_id)
 
-            parameters = generate_parameters(values=parameters_values,
-                                             group=group)
+        parameters = generate_parameters(values=parameters_values,
+                                         group=group)
 
-            output_file_name = generate_output_file_name(group_id=str(group_id))
+        output_file_name = generate_output_file_name(group_id=str(group_id))
 
-            run_simulation(parameters_values=parameters_values,
-                           model_type=model_type,
-                           geometry=geometry,
-                           output_file_name=output_file_name)
+        run_simulation(parameters_values=parameters_values,
+                       model_type=model_type,
+                       geometry=geometry,
+                       output_file_name=output_file_name)
 
-            with open(output_file_name) as output_file:
-                stars = list(parse_stars(output_file,
-                                         group=group))
+        with open(output_file_name) as output_file:
+            stars = list(parse_stars(output_file,
+                                     group=group))
 
-    elif geometry == 'cone':
-        with open('../plates_info_arebassa_0.csv', 'r') as angles_file:
-            angles_reader = csv.reader(angles_file,
-                                       delimiter=' ',
-                                       skipinitialspace=True)
-            used_plates = []
-            prev_plate_number = 0
-            for row in angles_reader:
-                plate_number = row[1]
-                if plate_number == prev_plate_number:
-                    continue
-                else:
-                    prev_plate_number = plate_number
-                longitude = row[7]
-                latitude = row[8]
-                plate_angles = (longitude, latitude)
-                if plate_angles in used_plates:
-                    continue
-                else:
-                    used_plates.append(plate_angles)
-                logger.info(f'Generating stars for values of the plate Nº '
-                            f'{plate_number}')
-                # No need to walk through parameters here. We only need to
-                # run simulations for all angles in the file with the same
-                # standard parameters. How do we do it?
-                # TODO: delete this loop, use only run_simulation
-                for parameters_values in generate_parameters_values(
-                        parameters_info=parameters_info,
-                        precision=precision):
-                    group_id = uuid.uuid4()
-                    group = Group(id=group_id)
-
-                    parameters = generate_parameters(values=parameters_values,
-                                                     group=group)
-
-                    output_file_name = generate_output_file_name(
-                        group_id=str(group_id))
-
-                    run_simulation(parameters_values=parameters_values,
-                                   model_type=model_type,
-                                   geometry=geometry,
-                                   cone_longitude=longitude,
-                                   cone_latitude=latitude,
-                                   output_file_name=output_file_name)
-
-                    # TODO: uncomment this after I figure out what to do
-                    # with cone output data
-                    with open(output_file_name) as output_file:
-                        stars = list(parse_stars(output_file,
-                                                 group=group))
-
-    session.add(group)
-    session.add_all(parameters)
-    session.add_all(stars)
-    session.commit()
+        session.add(group)
+        session.add_all(parameters)
+        session.add_all(stars)
+        session.commit()
 
 
 def generate_parameters(*,
@@ -119,21 +68,20 @@ def run_simulation(*,
                    parameters_values: Dict[str, NumericType],
                    model_type: int,
                    geometry: str,
-                   cone_longitude: float = 0.,
-                   cone_latitude: float = 0.,
                    output_file_name: str) -> None:
-    args = ['./main.e',
-            '-db', parameters_values['DB_fraction'],
-            '-g', parameters_values['galaxy_age'],
-            '-mf', parameters_values['initial_mass_function_exponent'],
-            '-ifr', parameters_values['lifetime_mass_ratio'],
-            '-bt', parameters_values['burst_time'],
-            '-mr', parameters_values['mass_reduction_factor'],
-            '-km', model_type,
-            '-o', output_file_name,
-            '-geom', geometry,
-            '-cl', cone_longitude,
-            '-cb', cone_latitude]
+    if geometry == 'cone':
+        args = ['./main.e',
+                '-db', parameters_values['DB_fraction'],
+                '-g', parameters_values['galaxy_age'],
+                '-mf', parameters_values['initial_mass_function_exponent'],
+                '-ifr', parameters_values['lifetime_mass_ratio'],
+                '-bt', parameters_values['burst_time'],
+                '-mr', parameters_values['mass_reduction_factor'],
+                '-cl', parameters_values['longitude'],
+                '-cb', parameters_values['latitude'],
+                '-km', model_type,
+                '-o', output_file_name,
+                '-geom', geometry]
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')

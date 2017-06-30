@@ -472,14 +472,14 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      typeOfWD(i)
           end do
       else if (geometry == 'cone') then
-         open(422,file='CONE_PLATES_KINEMATIC_DATA.csv',access='append')
+         open(421,file=output_filename)
 
          do i = 1, numberOfWDs
             if (ran(iseed) < 1.0) then       
              x_coordinate=8.5-coordinate_R(i) * cos(coordinate_Theta(i))
               y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
               z_coordinate = coordinate_Zcylindr(i)
-              write(422,"(6(es12.3e3,x),i1)") uu(i),
+              write(421,"(6(es12.3e3,x),i1)") uu(i),
      &                                        vv(i),
      &                                        ww(i),
      &                                        x_coordinate,
