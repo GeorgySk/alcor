@@ -62,12 +62,13 @@ def generate_parameters_values_ranges_by_names(
         precision: int,
         geometry: str) -> Iterable[Tuple[str, List[NumericType]]]:
 
-    parameters_set = parameters_dict['commons']
+    variable_simulations_parameters = parameters_dict['commons']
 
     if geometry == 'cone':
-        parameters_set.update(parameters_dict['cone'])
+        variable_simulations_parameters.update(parameters_dict['cone'])
 
-    for parameter_name, parameter_settings in parameters_set.items():
+    for parameter_name, parameter_settings in (variable_simulations_parameters.
+                                               items()):
 
         # Parameter is const during all simulations:
         if type(parameter_settings) is float:
