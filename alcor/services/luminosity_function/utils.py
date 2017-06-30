@@ -31,10 +31,9 @@ def generate_stars_bins(stars: List[Star]) -> StarsBinsType:
 
 
 def get_stars_bin_index(star: Star) -> int:
-    # TODO: make floor and delete -1?
-    return int(ceil((float(star.bolometric_magnitude)
-                     - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE)) - 1
+    return int((float(star.bolometric_magnitude)
+                - MIN_BOLOMETRIC_MAGNITUDE)
+               / BIN_SIZE)
 
 
 def points(*,

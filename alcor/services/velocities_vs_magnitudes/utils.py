@@ -151,10 +151,9 @@ def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
 
 
 def get_stars_bin_index(star: Star) -> int:
-    # TODO: maybe it's better to use 'floor' and take away '-1'?
-    return int(ceil((float(star.bolometric_magnitude)
-                     - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE)) - 1
+    return int((float(star.bolometric_magnitude)
+                - MIN_BOLOMETRIC_MAGNITUDE)
+               / BIN_SIZE)
 
 
 def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
