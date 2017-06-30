@@ -17,5 +17,5 @@ setup(name=PROJECT_NAME,
       install_requires=[
           'psycopg2>=2.7.1',
           'PyYAML>=3.12.0',  # settings loading
-          'matplotlib'
+          'matplotlib>=2.0.2'  # plotting
       ])
