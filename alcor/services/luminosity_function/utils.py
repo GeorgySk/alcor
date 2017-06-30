@@ -20,7 +20,6 @@ OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
-
 def generate_stars_bins(stars: List[Star]) -> StarsBinsType:
     stars_bins = [[] for _ in range(BINS_COUNT)]
     for star in stars:
@@ -48,10 +47,6 @@ def points(*,
             stars_count_logarithm = get_stars_count_logarithm(
                 stars_count=stars_count,
                 normalization_factor=normalization_factor)
-            if avg_bin_magnitude > 18:
-                logger.debug(f'Mbol = {avg_bin_magnitude}')
-                logger.debug(f'N = {stars_count}')
-                logger.debug(f'logN = {stars_count_logarithm}')
             upper_error_bar = get_upper_error_bar(stars_count)
             lower_error_bar = get_lower_error_bar(stars_count)
             yield Point(group_id=group.id,
