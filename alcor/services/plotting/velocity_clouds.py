@@ -54,12 +54,12 @@ def plot(session: Session) -> None:
     # TODO: Implement getting last points by time(ok?)
     cloud_points = fetch_all_cloud_points(session=session)
 
-    velocities_u = [_.velocity_u
-                    for _ in cloud_points]
-    velocities_v = [_.velocity_v
-                    for _ in cloud_points]
-    velocities_w = [_.velocity_w
-                    for _ in cloud_points]
+    velocities_u = [star.velocity_u
+                    for star in cloud_points]
+    velocities_v = [star.velocity_v
+                    for star in cloud_points]
+    velocities_w = [star.velocity_w
+                    for star in cloud_points]
 
     # TODO: do I need to use sharex or sharey attrs?
     figure, (subplot_uv,
@@ -128,18 +128,18 @@ def plot_lepine_case(session: Session):
     uw_points = fetch_all_lepine_case_uw_cloud_points(session=session)
     vw_points = fetch_all_lepine_case_vw_cloud_points(session=session)
 
-    uv_cloud_velocities_u = [_.velocity_u
-                             for _ in uv_points]
-    uv_cloud_velocities_v = [_.velocity_v
-                             for _ in uv_points]
-    uw_cloud_velocities_u = [_.velocity_u
-                             for _ in uw_points]
-    uw_cloud_velocities_w = [_.velocity_w
-                             for _ in uw_points]
-    vw_cloud_velocities_v = [_.velocity_v
-                             for _ in vw_points]
-    vw_cloud_velocities_w = [_.velocity_w
-                             for _ in vw_points]
+    uv_cloud_velocities_u = [star.velocity_u
+                             for star in uv_points]
+    uv_cloud_velocities_v = [star.velocity_v
+                             for star in uv_points]
+    uw_cloud_velocities_u = [star.velocity_u
+                             for star in uw_points]
+    uw_cloud_velocities_w = [star.velocity_w
+                             for star in uw_points]
+    vw_cloud_velocities_v = [star.velocity_v
+                             for star in vw_points]
+    vw_cloud_velocities_w = [star.velocity_w
+                             for star in vw_points]
 
     # TODO: do I need to use sharex or sharey attrs?
     figure, (subplot_uv,
