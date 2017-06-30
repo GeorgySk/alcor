@@ -83,7 +83,7 @@ def generate_parameters_values_ranges_by_names(
 
             # Parameter is generated for every simulation:
             if all(key in parameter_settings
-                   for key in ('start', 'step', 'count')):
+                   for key in ['start', 'step', 'count']):
                 start_value = round(parameter_settings['start'], precision)
                 step_size = round(parameter_settings['step'], precision)
                 values_count = parameter_settings['count']
@@ -94,7 +94,7 @@ def generate_parameters_values_ranges_by_names(
 
             # Parameter is read from csv file:
             elif all(key in parameter_settings
-                     for key in ('csv', 'column')):
+                     for key in ['csv', 'column']):
                 file_path = parameter_settings['csv']
                 column = parameter_settings['column']
                 values_range = []
