@@ -22,26 +22,30 @@ def generate_parameters_values(*,
                                                    precision=precision,
                                                    geometry=geometry))
 
-    # Parameters read from file are saved in lists of strings
-    str_lists_indexes = []
+    parameters_keys_read_from_file = []
 
-    for list_index, list_instance in enumerate(
-            parameters_values_ranges_by_names.values()):
-        if type(list_instance[0]) is str:
-            str_lists_indexes.append(list_index)
+    for key, value in parameters_values_ranges_by_names.items():
+        try:
+            if isinstance(value[0], str):
+                parameters_keys_read_from_file.append(key)
+        except IndexError:
+            print(f'No values found in the file for parameter {key}')
 
-    if str_lists_indexes:
-        file_lines_count = len(list(
-            parameters_values_ranges_by_names.values())[str_lists_indexes[0]])
+    if parameters_keys_read_from_file:
+        file_lines_count = len(parameters_values_ranges_by_names[
+                                   parameters_keys_read_from_file[0]])
+
         all_simulations_parameters = []
         one_simulation_parameters = []
-        for line_index in range(file_lines_count):
-            for list_index, list_instance in enumerate(
-                    parameters_values_ranges_by_names.values()):
-                if list_index in str_lists_indexes:
-                    one_simulation_parameters.append([list_instance[line_index]])
+
+        for file_line in range(file_lines_count):
+            for key, value in parameters_values_ranges_by_names.items():
+                if key in parameters_keys_read_from_file:
+                    one_simulation_parameters.append(
+                        [parameters_values_ranges_by_names[key][file_line]])
                 else:
-                    one_simulation_parameters.append(list_instance)
+                    one_simulation_parameters.append(
+                        parameters_values_ranges_by_names[key])
             all_simulations_parameters.append(one_simulation_parameters)
             one_simulation_parameters = []
 
@@ -109,7 +113,11 @@ def generate_parameters_values_ranges_by_names(
                                              delimiter=' ',
                                              skipinitialspace=True)
                     for row in file_reader:
-                        values_range.append(row[column - 1])
+                        try:
+                            values_range.append(row[column - 1])
+                        except IndexError:
+                            logger.error('Inconsistent number of lines in '
+                                         'csv file with parameters')
                 yield parameter_name, values_range
 
             else:
