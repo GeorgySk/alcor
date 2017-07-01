@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import chain
@@ -14,6 +15,9 @@ from alcor.models import STAR_PARAMETERS_NAMES
 from alcor.types import ColumnValueType
 
 
+logger = logging.getLogger(__name__)
+
+
 def load_settings(path: str
                   ) -> Dict[str, Any]:
     with open(path) as file:
@@ -28,12 +32,15 @@ def join_str(items: Iterable[Any],
 def parse_stars(lines: Iterable[str],
                 group: Group
                 ) -> Iterable[Star]:
+    headers = next(lines).split()
+    for header in headers:
+        if not(header in STAR_PARAMETERS_NAMES):
+            logger.error(f'There is no parameter {header} in '
+                         f'STAR_PARAMETERS_NAMES')
     for line in lines:
         parts = line.split()
-        params = chain(map(Decimal, parts[:-1]),
-                       # spectral type is integer
-                       [int(parts[-1])])
-        values = OrderedDict(zip(STAR_PARAMETERS_NAMES,
+        params = map(Decimal, parts)
+        values = OrderedDict(zip(headers,
                                  params))
         yield Star(group_id=group.id,
                    **values)

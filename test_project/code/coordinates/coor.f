@@ -81,10 +81,15 @@ C     &        < 1.0) then
 C              lgac(i) = dasin(coordinate_R(i) * sin(coordinate_Theta(i))
 C     &                        / ros)
 C          else
+           if ((solarGalactocentricDistance ** 2 + ros**2
+     &                         - coordinate_R(i) ** 2)
+     &         /(2.d0 * solarGalactocentricDistance * ros) > 1.0) then
+            lgac(i) = 0.0
+           else
               lgac(i) = dacos((solarGalactocentricDistance ** 2 + ros**2
      &                         - coordinate_R(i) ** 2)
      &                      /(2.d0 * solarGalactocentricDistance * ros))
-C          end if
+           end if
         if (coordinate_R(i)*dcos(coordinate_Theta(i)).gt.
      &     solarGalactocentricDistance) then 
           lgac(i)=pi-lgac(i)

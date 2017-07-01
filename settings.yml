@@ -8,10 +8,7 @@ parameters:
   commons:
     burst_time: 0.6
     DB_fraction: 0.2
-    galaxy_age:
-      start: 9.2
-      step: 0.5
-      count: 2
+    galaxy_age: 9.2
     initial_mass_function_exponent: -2.35
     lifetime_mass_ratio: 1.0
     mass_reduction_factor: 3.7

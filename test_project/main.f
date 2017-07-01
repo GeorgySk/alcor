@@ -452,6 +452,25 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
 
           open(421, file = output_filename)
 
+          write(421, *) 'luminosity ',
+     &                  'proper_motion ',
+     &                  'proper_motion_component_b ',
+     &                  'proper_motion_component_l ',
+     &                  'proper_motion_component_vr ',
+     &                  'right_ascension ',
+     &                  'declination ',
+     &                  'galactocentric_distance ',
+     &                  'galactocentric_coordinate_b ',
+     &                  'galactocentric_coordinate_l ',
+     &                  'go_photometry ',
+     &                  'gr_photometry ',
+     &                  'rz_photometry ',
+     &                  'v_photometry ',
+     &                  'velocity_u ',
+     &                  'velocity_v ',
+     &                  'velocity_w ',
+     &                  'spectral_type'
+
           do i = 1, numberOfWDs
               write(421, *) luminosityOfWD(i),
      &                      properMotion(i),
@@ -474,6 +493,16 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
           end do
       else if (geometry == 'cone') then
          open(421,file=output_filename)
+
+
+C        TODO: write RA, DEC and distance instead of coords
+         write(421, *) 'velocity_u ',
+     &                 'velocity_v ',
+     &                 'velocity_w ',
+     &                 'coordinate_x ',
+     &                 'coordinate_y ',
+     &                 'coordinate_z ',
+     &                 'disk_belonging'
 
          do i = 1, numberOfWDs
             if (ran(iseed) < 1.0) then       

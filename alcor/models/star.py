@@ -39,7 +39,8 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'velocity_u',
                          'velocity_v',
                          'velocity_w',
-                         'spectral_type']
+                         'spectral_type',
+                         'disk_belonging']
 
 
 class Star(Base):
