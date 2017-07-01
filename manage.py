@@ -129,12 +129,20 @@ def process(ctx: click.Context,
 @click.option('--lepine-criterion', '-lcr',
               is_flag=True,
               help='Use data with applied Lepine\'s criterion.')
+@click.option('--heatmap', '-hm',
+              type=click.Choice(['coordinates',
+                                 'velocities']),
+              default='velocities',
+              help='Plot heatmaps: '
+                   '"coordinates" - for coordinates (X, Y, Z), '
+                   '"velocities" - for velocities (U, V, W) (default)')
 @click.pass_context
 def plot(ctx: click.Context,
          luminosity_function: bool,
          velocities_vs_magnitude: bool,
          velocity_clouds: bool,
-         lepine_criterion: bool
+         lepine_criterion: bool,
+         heatmap: str
          ) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
