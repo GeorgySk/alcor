@@ -1,3 +1,5 @@
+from typing import List
+
 from cassandra.cluster import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
@@ -11,18 +13,24 @@ from alcor.models.star import Star
 from alcor.services.data_access.reading import fetch
 
 
-FILENAME = 'heatmap.ps'
+UV_FILENAME = 'heatmap_uv.ps'
+UW_FILENAME = 'heatmap_uw.ps'
+VW_FILENAME = 'heatmap_vw.ps'
 
 FIGURE_SIZE = (8, 8)
 DESIRED_DIMENSIONS_RATIO = 10 / 13
 SUBPLOTS_SPACING = 0.25
+FIGURE_GRID_HEIGHT_RATIOS = [0.05, 1]
 
 COLORMAP = cm.get_cmap('jet').set_under('w')
 
 U_LABEL = '$U(km/s)$'
 V_LABEL = '$V(km/s)$'
 W_LABEL = '$W(km/s)$'
-VELOCITIES_BINS_COUNT = 75
+VELOCITIES_BINS_COUNT = 150
+
+# TODO: find out the meaning of this
+VMIN = 0.01
 
 
 def plot(*,
@@ -32,21 +40,9 @@ def plot(*,
     # groups by time/selected by ID/marked by some flag(series of simulations))
     stars = fetch_all_stars(session=session)
 
-    figure, (subplot_top,
-             subplot_middle,
-             subplot_bottom) = plt.subplots(nrows=3,
-                                            figsize=FIGURE_SIZE)
-
     # TODO: add coordinates
     if heatmaps_axes == 'velocities':
-        # TODO: add sliders
-        subplot_top.set(xlabel=U_LABEL,
-                        ylabel=V_LABEL)
-        subplot_middle.set(xlabel=U_LABEL,
-                           ylabel=W_LABEL)
-        subplot_bottom.set(xlabel=V_LABEL,
-                           ylabel=W_LABEL)
-
+        # TODO: add choosing frame: relative to Sun/LSR
         velocities_u = [star.velocity_u
                         for star in stars]
         velocities_v = [star.velocity_v
@@ -54,60 +50,21 @@ def plot(*,
         velocities_w = [star.velocity_w
                         for star in stars]
 
-        heatmap_uv, xedges_uv, yedges_uv = np.histogram2d(
-            x=velocities_u,
-            y=velocities_v,
-            bins=VELOCITIES_BINS_COUNT)
-        extent_uv = [xedges_uv[0], xedges_uv[-1],
-                     yedges_uv[0], yedges_uv[-1]]
-        heatmap_uw, xedges_uw, yedges_uw = np.histogram2d(
-            x=velocities_u,
-            y=velocities_w,
-            bins=VELOCITIES_BINS_COUNT)
-        extent_uw = [xedges_uw[0], xedges_uw[-1],
-                     yedges_uw[0], yedges_uw[-1]]
-        heatmap_vw, xedges_vw, yedges_vw = np.histogram2d(
-            x=velocities_v,
-            y=velocities_w,
-            bins=VELOCITIES_BINS_COUNT)
-        extent_vw = [xedges_vw[0], xedges_vw[-1],
-                     yedges_vw[0], yedges_vw[-1]]
-
-        subplot_top.imshow(X=heatmap_uv.T,
-                           cmap=COLORMAP,
-                           vmin=0.01,
-                           extent=extent_uv)
-        subplot_middle.imshow(X=heatmap_uw.T,
-                              cmap=COLORMAP,
-                              vmin=0.01,
-                              extent=extent_uw)
-        subplot_bottom.imshow(X=heatmap_vw.T,
-                              cmap=COLORMAP,
-                              vmin=0.01,
-                              extent=extent_vw)
-
-        # TODO: why does this apply minorticks only to the last subplot?
-        plt.minorticks_on()
-
-        subplot_top.xaxis.set_ticks_position('both')
-        subplot_top.yaxis.set_ticks_position('both')
-        subplot_middle.xaxis.set_ticks_position('both')
-        subplot_middle.yaxis.set_ticks_position('both')
-        subplot_bottom.xaxis.set_ticks_position('both')
-        subplot_bottom.yaxis.set_ticks_position('both')
-
-        subplot_top.set_aspect(DESIRED_DIMENSIONS_RATIO
-                               / subplot_top.get_data_ratio())
-        subplot_middle.set_aspect(DESIRED_DIMENSIONS_RATIO
-                                  / subplot_middle.get_data_ratio())
-        subplot_bottom.set_aspect(DESIRED_DIMENSIONS_RATIO
-                                  / subplot_bottom.get_data_ratio())
-
-        figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
-
-        # TODO: add colorbars
-
-        plt.savefig(FILENAME)
+        draw_plot(xlabel=U_LABEL,
+                  ylabel=V_LABEL,
+                  xdata=velocities_u,
+                  ydata=velocities_v,
+                  filename=UV_FILENAME)
+        draw_plot(xlabel=U_LABEL,
+                  ylabel=W_LABEL,
+                  xdata=velocities_u,
+                  ydata=velocities_w,
+                  filename=UW_FILENAME)
+        draw_plot(xlabel=V_LABEL,
+                  ylabel=W_LABEL,
+                  xdata=velocities_v,
+                  ydata=velocities_w,
+                  filename=VW_FILENAME)
 
 
 def fetch_all_stars(*,
@@ -117,3 +74,47 @@ def fetch_all_stars(*,
                     session=session)
     return [Star(**record)
             for record in records]
+
+
+def draw_plot(*,
+              xlabel: str,
+              ylabel: str,
+              xdata: List[Star],
+              ydata: List[Star],
+              filename: str) -> None:
+    figure, (colorbar, subplot) = plt.subplots(
+        ncols=2,
+        figsize=FIGURE_SIZE,
+        gridspec_kw={"height_ratios": FIGURE_GRID_HEIGHT_RATIOS})
+
+    # TODO: add sliders
+    subplot.set(xlabel=xlabel,
+                ylabel=ylabel)
+
+    heatmap, xedges, yedges = np.histogram2d(x=xdata,
+                                             y=ydata,
+                                             bins=VELOCITIES_BINS_COUNT)
+    extent = [xedges[0], xedges[-1],
+              yedges[0], yedges[-1]]
+
+    colorbar_src = subplot.imshow(X=heatmap.T,
+                                  cmap=COLORMAP,
+                                  vmin=VMIN,
+                                  extent=extent,
+                                  origin='lower')
+
+    plt.minorticks_on()
+
+    subplot.xaxis.set_ticks_position('both')
+    subplot.yaxis.set_ticks_position('both')
+
+    figure.colorbar(mappable=colorbar_src,
+                    cax=colorbar,
+                    orientation="horizontal")
+
+    subplot.set_aspect(DESIRED_DIMENSIONS_RATIO
+                       / subplot.get_data_ratio())
+
+    figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
+
+    plt.savefig(filename)
