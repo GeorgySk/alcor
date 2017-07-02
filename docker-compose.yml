@@ -29,8 +29,9 @@ services:
 #      - --velocities-vs-magnitude
 #      - --velocity-clouds
 #      - --lepine-criterion
-      - --heatmap
-      - velocities
+#      - --heatmap
+#      - velocities
+      - --toomre-diagram
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 

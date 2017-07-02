@@ -132,18 +132,20 @@ def process(ctx: click.Context,
 @click.option('--heatmap', '-hm',
               type=click.Choice(['velocities',
                                  'coordinates']),
-              default='velocities',
               help='Plot heatmaps for: '
-                   '"velocities" - velocities (default), '
+                   '"velocities" - velocities, '
                    '"coordinates" - coordinates')
+@click.option('--toomre-diagram', '-toomre',
+              is_flag=True,
+              help='Plot Toomre diagram.')
 @click.pass_context
 def plot(ctx: click.Context,
          luminosity_function: bool,
          velocities_vs_magnitude: bool,
          velocity_clouds: bool,
          lepine_criterion: bool,
-         heatmap: str
-         ) -> None:
+         heatmap: str,
+         toomre_diagram: bool) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
 
@@ -155,6 +157,7 @@ def plot(ctx: click.Context,
                    velocity_clouds,
                    lepine_criterion,
                    heatmap,
+                   toomre_diagram,
                    session=session)
 
 
