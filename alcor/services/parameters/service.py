@@ -36,27 +36,22 @@ def generate_parameters_values(*,
                                    parameters_keys_read_from_file[0]])
 
         all_simulations_parameters = []
-        one_simulation_parameters = []
 
         for file_line in range(file_lines_count):
-            for key, value in parameters_values_ranges_by_names.items():
-                if key in parameters_keys_read_from_file:
-                    one_simulation_parameters.append(
-                        [parameters_values_ranges_by_names[key][file_line]])
-                else:
-                    one_simulation_parameters.append(
-                        parameters_values_ranges_by_names[key])
+            one_simulation_parameters = [
+                parameters_values_ranges_by_names[key][file_line]
+                if key in parameters_keys_read_from_file
+                else parameters_values_ranges_by_names[key]
+                for key, value in parameters_values_ranges_by_names.items()]
             all_simulations_parameters.append(one_simulation_parameters)
-            one_simulation_parameters = []
 
-        product_list = []
-        for one_simulation_parameters in all_simulations_parameters:
-            product_list.append(tuple(product(*one_simulation_parameters)))
+        product_list = [tuple(product(*one_simulation_parameters))
+                        for one_simulation_parameters in
+                        all_simulations_parameters]
 
-        unpacked_product_list = []
-        for tuple_instance in product_list:
-            for tuple_inner_instance in tuple_instance:
-                unpacked_product_list.append(tuple_inner_instance)
+        unpacked_product_list = [tuple_inner_instance
+                                 for tuple_instance in product_list
+                                 for tuple_inner_instance in tuple_instance]
 
         parameters_names = list(parameters_values_ranges_by_names.keys())
 

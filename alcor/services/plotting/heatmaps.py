@@ -105,6 +105,8 @@ def plot(*,
 
         figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
 
+        # TODO: add colorbars
+
         plt.savefig(FILENAME)
 
 
