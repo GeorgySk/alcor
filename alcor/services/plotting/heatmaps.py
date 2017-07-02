@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from cassandra.cluster import Session
@@ -13,6 +14,9 @@ from alcor.models.star import Star
 from alcor.services.data_access.reading import fetch
 
 
+logger = logging.getLogger(__name__)
+
+
 UV_FILENAME = 'heatmap_uv.ps'
 UW_FILENAME = 'heatmap_uw.ps'
 VW_FILENAME = 'heatmap_vw.ps'
@@ -22,7 +26,8 @@ DESIRED_DIMENSIONS_RATIO = 10 / 13
 SUBPLOTS_SPACING = 0.25
 FIGURE_GRID_HEIGHT_RATIOS = [0.05, 1]
 
-COLORMAP = cm.get_cmap('jet').set_under('w')
+COLORMAP = cm.get_cmap('jet')
+COLORMAP.set_under('w')
 
 U_LABEL = '$U(km/s)$'
 V_LABEL = '$V(km/s)$'
@@ -40,21 +45,25 @@ PECULIAR_SOLAR_VELOCITY_W = 7
 
 def plot(*,
          session: Session,
-         heatmaps_axes: str) -> None:
+         axes: str) -> None:
     # TODO: Figure out what stars I should fetch (all/last group by time/last N
     # groups by time/selected by ID/marked by some flag(series of simulations))
     stars = fetch_all_stars(session=session)
 
     # TODO: add coordinates
-    if heatmaps_axes == 'velocities':
+    if axes == 'velocities':
         # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
-        velocities_u = [star.velocity_u + PECULIAR_SOLAR_VELOCITY_U
+        # TODO: how to work with Decimal type? If I leave it I get:
+        # TypeError: Cannot cast array data from dtype('O') to dtype('float64')
+        # according to the rule 'safe'
+        velocities_u = [float(star.velocity_u) + PECULIAR_SOLAR_VELOCITY_U
                         for star in stars]
-        velocities_v = [star.velocity_v + PECULIAR_SOLAR_VELOCITY_V
+        velocities_v = [float(star.velocity_v) + PECULIAR_SOLAR_VELOCITY_V
                         for star in stars]
-        velocities_w = [star.velocity_w + PECULIAR_SOLAR_VELOCITY_W
+        velocities_w = [float(star.velocity_w) + PECULIAR_SOLAR_VELOCITY_W
                         for star in stars]
 
+        # TODO: add option of plotting 3 heatmaps in one fig. at the same time
         draw_plot(xlabel=U_LABEL,
                   ylabel=V_LABEL,
                   xdata=velocities_u,
@@ -88,7 +97,7 @@ def draw_plot(*,
               ydata: List[float],
               filename: str) -> None:
     figure, (colorbar, subplot) = plt.subplots(
-        ncols=2,
+        nrows=2,
         figsize=FIGURE_SIZE,
         gridspec_kw={"height_ratios": FIGURE_GRID_HEIGHT_RATIOS})
 
