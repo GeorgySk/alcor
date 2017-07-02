@@ -32,6 +32,11 @@ VELOCITIES_BINS_COUNT = 150
 # TODO: find out the meaning of this
 VMIN = 0.01
 
+# TODO: in what reference frame?
+PECULIAR_SOLAR_VELOCITY_U = -11
+PECULIAR_SOLAR_VELOCITY_V = 12
+PECULIAR_SOLAR_VELOCITY_W = 7
+
 
 def plot(*,
          session: Session,
@@ -42,12 +47,12 @@ def plot(*,
 
     # TODO: add coordinates
     if heatmaps_axes == 'velocities':
-        # TODO: add choosing frame: relative to Sun/LSR
-        velocities_u = [star.velocity_u
+        # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
+        velocities_u = [star.velocity_u + PECULIAR_SOLAR_VELOCITY_U
                         for star in stars]
-        velocities_v = [star.velocity_v
+        velocities_v = [star.velocity_v + PECULIAR_SOLAR_VELOCITY_V
                         for star in stars]
-        velocities_w = [star.velocity_w
+        velocities_w = [star.velocity_w + PECULIAR_SOLAR_VELOCITY_W
                         for star in stars]
 
         draw_plot(xlabel=U_LABEL,
@@ -79,8 +84,8 @@ def fetch_all_stars(*,
 def draw_plot(*,
               xlabel: str,
               ylabel: str,
-              xdata: List[Star],
-              ydata: List[Star],
+              xdata: List[float],
+              ydata: List[float],
               filename: str) -> None:
     figure, (colorbar, subplot) = plt.subplots(
         ncols=2,

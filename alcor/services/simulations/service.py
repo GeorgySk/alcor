@@ -69,30 +69,19 @@ def run_simulation(*,
                    model_type: int,
                    geometry: str,
                    output_file_name: str) -> None:
+    args = ['./main.e',
+            '-db', parameters_values['DB_fraction'],
+            '-g', parameters_values['galaxy_age'],
+            '-mf', parameters_values['initial_mass_function_exponent'],
+            '-ifr', parameters_values['lifetime_mass_ratio'],
+            '-bt', parameters_values['burst_time'],
+            '-mr', parameters_values['mass_reduction_factor'],
+            '-km', model_type,
+            '-o', output_file_name,
+            '-geom', geometry]
     if geometry == 'cone':
-        args = ['./main.e',
-                '-db', parameters_values['DB_fraction'],
-                '-g', parameters_values['galaxy_age'],
-                '-mf', parameters_values['initial_mass_function_exponent'],
-                '-ifr', parameters_values['lifetime_mass_ratio'],
-                '-bt', parameters_values['burst_time'],
-                '-mr', parameters_values['mass_reduction_factor'],
-                '-cl', parameters_values['longitude'],
-                '-cb', parameters_values['latitude'],
-                '-km', model_type,
-                '-o', output_file_name,
-                '-geom', geometry]
-    else:
-        args = ['./main.e',
-                '-db', parameters_values['DB_fraction'],
-                '-g', parameters_values['galaxy_age'],
-                '-mf', parameters_values['initial_mass_function_exponent'],
-                '-ifr', parameters_values['lifetime_mass_ratio'],
-                '-bt', parameters_values['burst_time'],
-                '-mr', parameters_values['mass_reduction_factor'],
-                '-km', model_type,
-                '-o', output_file_name,
-                '-geom', geometry]
+        args.extend(['-cl', parameters_values['longitude'],
+                     '-cb', parameters_values['latitude']])
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')

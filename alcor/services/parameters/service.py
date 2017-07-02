@@ -29,7 +29,7 @@ def generate_parameters_values(*,
             if isinstance(value[0], str):
                 parameters_keys_read_from_file.append(key)
         except IndexError:
-            print(f'No values found in the file for parameter {key}')
+            logger.error(f'No values found in the file for parameter {key}')
 
     if parameters_keys_read_from_file:
         file_lines_count = len(parameters_values_ranges_by_names[
@@ -39,7 +39,7 @@ def generate_parameters_values(*,
 
         for file_line in range(file_lines_count):
             one_simulation_parameters = [
-                parameters_values_ranges_by_names[key][file_line]
+                [parameters_values_ranges_by_names[key][file_line]]
                 if key in parameters_keys_read_from_file
                 else parameters_values_ranges_by_names[key]
                 for key, value in parameters_values_ranges_by_names.items()]
