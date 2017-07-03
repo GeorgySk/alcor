@@ -446,7 +446,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      & star_longitude, star_latitude
       integer disk_belonging(numberOfStars)
       logical :: overlapping_cone
-      integer :: getNumberOfLines, overlapping_cones_count
+      integer :: getNumberOfLines, overlapping_cones_count, lines_count
       double precision, allocatable :: overlap_min_longitudes(:)
       double precision, allocatable :: overlap_max_longitudes(:)
       double precision, allocatable :: overlap_min_latitudes(:)
@@ -555,10 +555,11 @@ C        TODO: MOVE THIS FROM HERE!!!!!
                         overlap_max_longitudes(i) = prev_max_longitude
                         overlap_min_latitudes(i) = prev_min_latitude
                         overlap_max_latitudes(i) = prev_max_latitude
+                    end if
                 end if
-            end if
-         end do
-         close(733)
+            end do
+            close(733)
+         end if
 
 
 C         TODO: uncomment it when .res files will be deleted after
@@ -587,7 +588,7 @@ C      &                 'disk_belonging'
              star_latitude =atan(z_coordinate/sqrt(x_coordinate ** 2
      &                                             + y_coordinate ** 2))
              if overlapping_cones_count > 0 then
-                do j = 1, len(overlapping_cones_count)
+                do j = 1, size(overlapping_cones_count)
                   if (.not.(star_longitude > overlap_min_longitudes(j)
      &             .and. star_longitude < overlap_max_longitudes(j)
      &             .and. star_latitude > overlap_min_latitudes(j)

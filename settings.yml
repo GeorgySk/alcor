@@ -2,7 +2,7 @@ precision: 6
 
 model_type: 2
 
-geometry: sphere
+geometry: cone
 
 parameters:
   commons:
@@ -14,8 +14,8 @@ parameters:
     mass_reduction_factor: 3.7
   cone:
     longitude:
-      csv: ../plates_info_arebassa_0.csv
+      csv: ../cone_plates_no_repetitions.csv
       column: 8
     latitude:
-      csv: ../plates_info_arebassa_0.csv
+      csv: ../cone_plates_no_repetitions.csv
       column: 9
