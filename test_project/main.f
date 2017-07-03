@@ -561,17 +561,21 @@ C        TODO: MOVE THIS FROM HERE!!!!!
          close(733)
 
 
-         open(421,file=output_filename)
+C         TODO: uncomment it when .res files will be deleted after
+C         each simulation. I don't need 5000 files in the folder
+C          open(421,file=output_filename)
+         open(421,file='cone_stars_catalog.csv')
 
 
 C        TODO: write RA, DEC and distance instead of coords
-         write(421, *) 'velocity_u ',
-     &                 'velocity_v ',
-     &                 'velocity_w ',
-     &                 'coordinate_x ',
-     &                 'coordinate_y ',
-     &                 'coordinate_z ',
-     &                 'disk_belonging'
+C        TODO: uncomment this when reading from DB is ready
+C          write(421, *) 'velocity_u ',
+C      &                 'velocity_v ',
+C      &                 'velocity_w ',
+C      &                 'coordinate_x ',
+C      &                 'coordinate_y ',
+C      &                 'coordinate_z ',
+C      &                 'disk_belonging'
 
          do i = 1, numberOfWDs
            if (ran(iseed) < 1.0) then
