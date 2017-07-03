@@ -5,7 +5,11 @@ C     with its height direction set by longitude and latitude
      &                               numberOfStarsInSample,
      &                               iseed,
      &                               kinematicModel,
-     &                               galacticDiskAge)
+     &                               galacticDiskAge,
+     &                               min_longitude,
+     &                               max_longitude,
+     &                               min_latitude,
+     &                               max_latitude)
           implicit none
           
           external ran

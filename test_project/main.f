@@ -65,6 +65,8 @@ C     For terminal:
       character(len = 6) :: geometry
       double precision :: cone_height_longitude,
      &                    cone_height_latitude
+      double precision :: min_longitude, max_longitude, min_latitude,
+     &                    max_latitude     
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
@@ -239,7 +241,9 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
         call generate_cone_stars(cone_height_longitude,
      &                           cone_height_latitude,
      &                           numberOfStarsInSample,iseed,
-     &                           kinematicModel,galacticDiskAge)
+     &                           kinematicModel,galacticDiskAge,
+     &                           min_longitude, max_longitude,
+     &                           min_latitude, max_latitude)
       else 
         write(6,*) "wrong geometry name, use 'sphere' or 'cone'"
       end if
@@ -276,7 +280,8 @@ C     TODO: give a better description to this step
 C     NOTE: This will be in a separate processing module
 C       write(6,*) '9. Working with obtained sample (9/9)'
 C       call volum_40pc
-      call printForProcessing(output_filename, geometry, iseed)
+      call printForProcessing(output_filename, geometry, iseed,
+     &         min_longitude, max_longitude, min_latitude, max_latitude)
 
 
       write (6,*) 'End'
@@ -337,7 +342,8 @@ C***********************************************************************
 
       include 'code/tables_linking.f'
 
-      subroutine printForProcessing(output_filename, geometry, iseed)
+      subroutine printForProcessing(output_filename, geometry, iseed,
+     &         min_longitude, max_longitude, min_latitude, max_latitude)
       implicit none
       external ran
       real ran
@@ -355,6 +361,8 @@ C***********************************************************************
       double precision mbolmin,mbolinc,mbolmax      
       double precision errinfa,errsupa,mbol
       double precision fnora,fnor,pi,vvv,x,xx,xya
+      double precision min_longitude, max_longitude, min_latitude,
+     &                 max_latitude
       
       parameter (numberOfStars=6000000)
 C     (Only northern hemisphere)
