@@ -363,6 +363,8 @@ C***********************************************************************
       double precision fnora,fnor,pi,vvv,x,xx,xya
       double precision min_longitude, max_longitude, min_latitude,
      &                 max_latitude
+      double precision prev_min_longitude, prev_max_longitude, 
+     &                 prev_min_latitude, prev_max_latitude
       
       parameter (numberOfStars=6000000)
 C     (Only northern hemisphere)
@@ -440,8 +442,15 @@ C     TODO: make dynamic array or linked list
 C     2D-array of bolometric magnitudes for each WD; indexes are the 
 C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision arrayOfMagnitudes(25,50000)
-      double precision x_coordinate,y_coordinate,z_coordinate
+      double precision x_coordinate,y_coordinate,z_coordinate,
+     & star_longitude, star_latitude
       integer disk_belonging(numberOfStars)
+      logical :: overlapping_cone
+      integer :: getNumberOfLines, overlapping_cones_count
+      double precision, allocatable :: overlap_min_longitudes(:)
+      double precision, allocatable :: overlap_max_longitudes(:)
+      double precision, allocatable :: overlap_min_latitudes(:)
+      double precision, allocatable :: overlap_max_latitudes(:)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -500,6 +509,58 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      typeOfWD(i)
           end do
       else if (geometry == 'cone') then
+C        Ideally checking for overlapping should be in postprocessing
+C        TODO: MOVE THIS FROM HERE!!!!!
+         overlapping_cones_count = 0
+
+         lines_count = getNumberOfLines('coordinate_angles_ranges.txt')
+
+         open(unit=733,file='coordinate_angles_ranges.txt')
+         do i = 1, lines_count
+            read(733, *) prev_min_longitude, prev_max_longitude, 
+     &                   prev_min_latitude, prev_max_latitude
+            if ((min_longitude > prev_min_longitude .and.
+     &            min_longitude < prev_max_longitude)
+     &           .or. (max_longitude > prev_min_longitude .and.
+     &                 max_longitude < prev_max_longitude)) then
+                if ((min_latitude > prev_min_latitude .and.
+     &               min_latitude < prev_max_latitude)
+     &           .or. (max_latitude > prev_min_latitude .and.
+     &                 max_latitude < prev_max_latitude)) then
+                    overlapping_cones_count =overlapping_cones_count + 1
+                end if
+            end if
+         end do
+         close(733)
+
+         if (overlapping_cones_count > 0) then
+            allocate(overlap_min_longitudes(overlapping_cones_count))
+            allocate(overlap_max_longitudes(overlapping_cones_count))
+            allocate(overlap_min_latitudes(overlapping_cones_count))
+            allocate(overlap_max_latitudes(overlapping_cones_count))
+
+            open(unit=733,file='coordinate_angles_ranges.txt')
+            do i = 1, lines_count
+                read(733, *) prev_min_longitude, prev_max_longitude, 
+     &                    prev_min_latitude, prev_max_latitude
+                if ((min_longitude > prev_min_longitude .and.
+     &                min_longitude < prev_max_longitude)
+     &               .or. (max_longitude > prev_min_longitude .and.
+     &                     max_longitude < prev_max_longitude)) then
+                    if ((min_latitude > prev_min_latitude .and.
+     &                   min_latitude < prev_max_latitude)
+     &            .or. (max_latitude > prev_min_latitude .and.
+     &                     max_latitude < prev_max_latitude)) then
+                        overlap_min_longitudes(i) = prev_min_longitude
+                        overlap_max_longitudes(i) = prev_max_longitude
+                        overlap_min_latitudes(i) = prev_min_latitude
+                        overlap_max_latitudes(i) = prev_max_latitude
+                end if
+            end if
+         end do
+         close(733)
+
+
          open(421,file=output_filename)
 
 
@@ -513,18 +574,53 @@ C        TODO: write RA, DEC and distance instead of coords
      &                 'disk_belonging'
 
          do i = 1, numberOfWDs
-            if (ran(iseed) < 1.0) then       
+           if (ran(iseed) < 1.0) then
              x_coordinate=8.5-coordinate_R(i) * cos(coordinate_Theta(i))
-              y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
-              z_coordinate = coordinate_Zcylindr(i)
-              write(421,"(6(es12.3e3,x),i1)") uu(i),
-     &                                        vv(i),
-     &                                        ww(i),
-     &                                        x_coordinate,
-     &                                        y_coordinate,
-     &                                        z_coordinate,
-     &                                        disk_belonging(i)
-            end if
+             y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
+             z_coordinate = coordinate_Zcylindr(i)
+
+             star_longitude = atan(y_coordinate / x_coordinate)
+             star_latitude =atan(z_coordinate/sqrt(x_coordinate ** 2
+     &                                             + y_coordinate ** 2))
+             if overlapping_cones_count > 0 then
+                do j = 1, len(overlapping_cones_count)
+                  if (.not.(star_longitude > overlap_min_longitudes(j)
+     &             .and. star_longitude < overlap_max_longitudes(j)
+     &             .and. star_latitude > overlap_min_latitudes(j)
+     &             .and. star_latitude < overlap_max_latitudes(j)))then
+                        write(421,"(6(es12.3e3,x),i1)") uu(i),
+     &                                                  vv(i),
+     &                                                  ww(i),
+     &                                                 x_coordinate,
+     &                                                 y_coordinate,
+     &                                                 z_coordinate,
+     &                                                 disk_belonging(i)
+                  end if
+                end do
+             else
+                write(421,"(6(es12.3e3,x),i1)") uu(i),
+     &                                          vv(i),
+     &                                          ww(i),
+     &                                          x_coordinate,
+     &                                          y_coordinate,
+     &                                          z_coordinate,
+     &                                          disk_belonging(i)
+             end if
+           end if
          end do
       end if
       end subroutine
+
+
+      function getNumberOfLines(filePath) result(n)
+        character(len = *), intent(in) :: filePath
+        integer :: n, ioStatus
+        n = 0
+        open(832, file=filePath)
+        do
+            read(832, *, iostat=ioStatus)
+            if(is_iostat_end(ioStatus)) exit
+            n = n + 1
+        end do
+        close(832)
+      end function

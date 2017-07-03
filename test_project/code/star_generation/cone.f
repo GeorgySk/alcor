@@ -94,6 +94,7 @@ C     with its height direction set by longitude and latitude
      &         access='append')
           write(unit=733,fmt=*) min_longitude, max_longitude,
      &                          min_latitude, max_latitude
+          close(unit=733)
 
           total_mass = 0.0
           stars_count = 0
