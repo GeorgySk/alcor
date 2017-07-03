@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from typing import List
 
 from sqlalchemy.orm.session import Session
@@ -8,6 +9,9 @@ from alcor.models import (Group,
 from alcor.services.group_processing import process_stars_group
 
 
+logger = logging.getLogger(__name__)
+
+
 def run_processing(*,
                    filtration_method: str,
                    nullify_radial_velocity: bool,
@@ -15,9 +19,12 @@ def run_processing(*,
                    w_velocities_clouds: bool,
                    w_velocities_vs_magnitude: bool,
                    w_lepine_criterion: bool,
+                   last_groups_count: int,
+                   unprocessed_groups: bool,
                    session: Session) -> None:
-    # TODO: add an option to process already processed groups
-    groups = fetch_unprocessed_groups(session=session)
+    # TODO: add other options here
+    if unprocessed_groups:
+        groups = fetch_unprocessed_groups(session=session)
     for group in groups:
         stars = fetch_stars(group=group,
                             session=session)

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import logging
 import os
+import uuid
+from typing import List
 
 import click
 from sqlalchemy.engine.url import make_url
@@ -13,12 +15,46 @@ from sqlalchemy_utils import (database_exists,
                               drop_database)
 
 from alcor.models.base import Base
+from click.core import Option
+from click.exceptions import UsageError
+
+from alcor.config import PROJECT_NAME
+from alcor.models import (Group,
+                          Star,
+                          eliminations,
+                          luminosity_function,
+                          simulation,
+                          velocities,
+                          velocities_vs_magnitudes)
 from alcor.services.processing import run_processing
 from alcor.services.plotting import draw_plots
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
 logger = logging.getLogger(__name__)
+
+
+# TODO: hide this somewhere or find a better way
+class MutuallyExclusiveOption(Option):
+    def __init__(self, *args, **kwargs):
+        self.mutually_exclusive = set(kwargs.pop('mutually_exclusive', []))
+        help = kwargs.get('help', '')
+        if self.mutually_exclusive:
+            ex_str = ', '.join(self.mutually_exclusive)
+            kwargs['help'] = (
+                help + (' NOTE: This argument is mutually exclusive with '
+                        ' arguments: [' + ex_str + '].'))
+        super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
+
+    def handle_parse_result(self, ctx, opts, args):
+        if self.mutually_exclusive.intersection(opts) and self.name in opts:
+            raise UsageError("Illegal usage: `{}` is mutually exclusive with "
+                             "arguments `{}`."
+                             .format(self.name,
+                                     ', '.join(self.mutually_exclusive)))
+        return super(MutuallyExclusiveOption, self).handle_parse_result(ctx,
+                                                                        opts,
+                                                                        args)
 
 
 @click.group()
@@ -67,6 +103,25 @@ def simulate(ctx: click.Context,
 
 
 @main.command()
+# TODO: this flag will always stay True. How do i change it to false when using
+# --last or --id-groups options?
+@click.option('--unprocessed',
+              is_flag=True,
+              default=True,
+              cls=MutuallyExclusiveOption,
+              mutually_exclusive=['last', 'id_groups'],
+              help='Process all unprocessed groups')
+@click.option('--last',
+              type=int,
+              cls=MutuallyExclusiveOption,
+              mutually_exclusive=['unprocessed', 'id_groups'],
+              help='Process last N groups by time')
+# TODO: implement this
+# @click.option('--id_groups',
+#               cls=MutuallyExclusiveOption,
+#               mutually_exclusive=['unprocessed', 'last'],
+#               type=List[uuid.uuid4],
+#               help='Process list of groups by id')
 @click.option('--filtration-method', '-m',
               type=click.Choice(['raw',
                                  'full',
@@ -99,7 +154,12 @@ def process(ctx: click.Context,
             w_luminosity_function: bool,
             w_velocities_clouds: bool,
             w_velocities_vs_magnitude: bool,
-            w_lepine_criterion: bool) -> None:
+            w_lepine_criterion: bool,
+            unprocessed: bool,
+            last: int
+            # TODO: implement this
+            # ,id_groups: List[uuid.uuid4]
+            ) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
 
@@ -107,12 +167,19 @@ def process(ctx: click.Context,
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
 
+        # This is a workaround TODO: delete it after finding a better way
+        # TODO: implement id_groups and uncomment this:
+        # if last is not None or id_groups is not None:
+        if last is not None:
+            unprocessed = None
         run_processing(filtration_method=filtration_method,
                        nullify_radial_velocity=nullify_radial_velocity,
                        w_luminosity_function=w_luminosity_function,
                        w_velocities_clouds=w_velocities_clouds,
                        w_velocities_vs_magnitude=w_velocities_vs_magnitude,
                        w_lepine_criterion=w_lepine_criterion,
+                       last_groups_count=last,
+                       unprocessed_groups=unprocessed,
                        session=session)
 
 

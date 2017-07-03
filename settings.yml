@@ -2,7 +2,7 @@ precision: 6
 
 model_type: 2
 
-geometry: cone
+geometry: sphere
 
 parameters:
   commons:
