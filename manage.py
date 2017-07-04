@@ -126,7 +126,7 @@ def simulate(ctx: click.Context,
               type=click.Choice(['raw',
                                  'full',
                                  'restricted']),
-              default='restricted',
+              default='raw',
               help='Raw data filtration method: '
                    '"raw" - do nothing, '
                    '"full" - only declination '
@@ -147,6 +147,10 @@ def simulate(ctx: click.Context,
 @click.option('--w-lepine-criterion', '-lcr',
               is_flag=True,
               help='Apply Lepine\'s criterion.')
+@click.option('--delete-overlapping-cone-stars', '-docs',
+              is_flag=True,
+              help='Eliminate stars that were generated in areas previously '
+                   'taken into account')
 @click.pass_context
 def process(ctx: click.Context,
             filtration_method: str,
@@ -155,6 +159,7 @@ def process(ctx: click.Context,
             w_velocities_clouds: bool,
             w_velocities_vs_magnitude: bool,
             w_lepine_criterion: bool,
+            delete_overlapping_cone_stars: bool,
             unprocessed: bool,
             last: int
             # TODO: implement this
@@ -178,6 +183,7 @@ def process(ctx: click.Context,
                        w_velocities_clouds=w_velocities_clouds,
                        w_velocities_vs_magnitude=w_velocities_vs_magnitude,
                        w_lepine_criterion=w_lepine_criterion,
+                       no_overlapping_cones=delete_overlapping_cone_stars,
                        last_groups_count=last,
                        unprocessed_groups=unprocessed,
                        session=session)
