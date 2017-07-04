@@ -1,5 +1,5 @@
-import csv
 import logging
+import os
 import uuid
 from decimal import Decimal
 from subprocess import check_call
@@ -48,6 +48,7 @@ def run_simulations(*,
         with open(output_file_name) as output_file:
             stars = list(parse_stars(output_file,
                                      group=group))
+        os.remove(output_file_name)
 
         session.add(group)
         session.add_all(parameters)
