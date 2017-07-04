@@ -540,6 +540,7 @@ C        TODO: MOVE THIS FROM HERE!!!!!
             allocate(overlap_max_latitudes(overlapping_cones_count))
 
             open(unit=733,file='coordinate_angles_ranges.txt')
+            j = 1
             do i = 1, lines_count
                 read(733, *) prev_min_longitude, prev_max_longitude, 
      &                    prev_min_latitude, prev_max_latitude
@@ -551,10 +552,11 @@ C        TODO: MOVE THIS FROM HERE!!!!!
      &                   min_latitude < prev_max_latitude)
      &            .or. (max_latitude > prev_min_latitude .and.
      &                     max_latitude < prev_max_latitude)) then
-                        overlap_min_longitudes(i) = prev_min_longitude
-                        overlap_max_longitudes(i) = prev_max_longitude
-                        overlap_min_latitudes(i) = prev_min_latitude
-                        overlap_max_latitudes(i) = prev_max_latitude
+                        overlap_min_longitudes(j) = prev_min_longitude
+                        overlap_max_longitudes(j) = prev_max_longitude
+                        overlap_min_latitudes(j) = prev_min_latitude
+                        overlap_max_latitudes(j) = prev_max_latitude
+                        j = j + 1
                     end if
                 end if
             end do
@@ -565,7 +567,7 @@ C        TODO: MOVE THIS FROM HERE!!!!!
 C         TODO: uncomment it when .res files will be deleted after
 C         each simulation. I don't need 5000 files in the folder
 C          open(421,file=output_filename)
-         open(421,file='cone_stars_catalog.csv')
+         open(421,file='cone_stars_catalog.csv',access=append)
 
 
 C        TODO: write RA, DEC and distance instead of coords
@@ -587,8 +589,8 @@ C      &                 'disk_belonging'
              star_longitude = atan(y_coordinate / x_coordinate)
              star_latitude =atan(z_coordinate/sqrt(x_coordinate ** 2
      &                                             + y_coordinate ** 2))
-             if overlapping_cones_count > 0 then
-                do j = 1, size(overlapping_cones_count)
+             if (overlapping_cones_count > 0) then
+                do j = 1, overlapping_cones_count
                   if (.not.(star_longitude > overlap_min_longitudes(j)
      &             .and. star_longitude < overlap_max_longitudes(j)
      &             .and. star_latitude > overlap_min_latitudes(j)
@@ -600,6 +602,7 @@ C      &                 'disk_belonging'
      &                                                 y_coordinate,
      &                                                 z_coordinate,
      &                                                 disk_belonging(i)
+                        exit
                   end if
                 end do
              else
