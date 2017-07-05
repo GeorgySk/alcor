@@ -29,8 +29,6 @@ def run_processing(*,
     for group in groups:
         stars = fetch_stars(group=group,
                             session=session)
-        update_group(group,
-                     session=session)
         process_stars_group(stars=stars,
                             group=group,
                             filtration_method=filtration_method,

@@ -32,7 +32,6 @@ DELTA_LATITUDE = 2.64 * pi / 180.0
 def process_stars_group(*,
                         stars: List[Star],
                         group: Group,
-                        groups: List[Group],
                         filtration_method: str,
                         nullify_radial_velocity: bool,
                         w_luminosity_function: bool,
@@ -93,7 +92,24 @@ def process_stars_group(*,
         stars = eliminate_stars_lying_in_prev_cones(group_id=group.id,
                                                     stars=stars,
                                                     session=session)
-#   TODO: add saving processed stars
+
+    original_unprocessed_group_id = group.id
+    processed_group_id = uuid.uuid4()
+    processed_group = Group(
+        id=processed_group_id,
+        original_unprocessed_group_id=original_unprocessed_group_id,
+        processed=True)
+    insert_groups_statement = model_insert_statement(Group)
+    insert(instances=[processed_group],
+           statement=insert_groups_statement,
+           session=session)
+
+    for star in stars:
+        star.group_id = processed_group_id
+    insert_stars_statement = model_insert_statement(Star)
+    insert(instances=stars,
+           statement=insert_stars_statement,
+           session=session)
 
 
 def eliminate_stars_lying_in_prev_cones(group_id: uuid.uuid4,
@@ -149,7 +165,7 @@ def get_overlapping_cone_angles_ranges(min_longitude: float,
          processed_group_max_longitude,
          processed_group_min_latitude,
          processed_group_max_latitude) = get_cone_angles_ranges(
-            group_id=group.id,
+            group_id=group.original_unprocessed_group_id,
             session=session)
         longitude_overlapping = ((processed_group_min_longitude
                                   < min_longitude

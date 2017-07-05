@@ -156,7 +156,6 @@ class Star(Base):
                                                     float]:
         right_ascension = float(self.right_ascension)
         declination = float(self.declination)
-        # TODO: should it be centered at the Sun?
         distance = float(self.galactic_distance)
 
         latitude = (asin(cos(declination) * cos(DEC_GPOLE)
