@@ -509,66 +509,9 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      typeOfWD(i)
           end do
       else if (geometry == 'cone') then
-C        Ideally checking for overlapping should be in postprocessing
-C        TODO: MOVE THIS FROM HERE!!!!!
-         overlapping_cones_count = 0
-
-         lines_count = getNumberOfLines('coordinate_angles_ranges.txt')
-
-         open(unit=733,file='coordinate_angles_ranges.txt')
-         do i = 1, lines_count
-            read(733, *) prev_min_longitude, prev_max_longitude, 
-     &                   prev_min_latitude, prev_max_latitude
-            if ((min_longitude > prev_min_longitude .and.
-     &            min_longitude < prev_max_longitude)
-     &           .or. (max_longitude > prev_min_longitude .and.
-     &                 max_longitude < prev_max_longitude)) then
-                if ((min_latitude > prev_min_latitude .and.
-     &               min_latitude < prev_max_latitude)
-     &           .or. (max_latitude > prev_min_latitude .and.
-     &                 max_latitude < prev_max_latitude)) then
-                    overlapping_cones_count =overlapping_cones_count + 1
-                end if
-            end if
-         end do
-         close(733)
-
-         if (overlapping_cones_count > 0) then
-            allocate(overlap_min_longitudes(overlapping_cones_count))
-            allocate(overlap_max_longitudes(overlapping_cones_count))
-            allocate(overlap_min_latitudes(overlapping_cones_count))
-            allocate(overlap_max_latitudes(overlapping_cones_count))
-
-            open(unit=733,file='coordinate_angles_ranges.txt')
-            j = 1
-            do i = 1, lines_count
-                read(733, *) prev_min_longitude, prev_max_longitude, 
-     &                    prev_min_latitude, prev_max_latitude
-                if ((min_longitude > prev_min_longitude .and.
-     &                min_longitude < prev_max_longitude)
-     &               .or. (max_longitude > prev_min_longitude .and.
-     &                     max_longitude < prev_max_longitude)) then
-                    if ((min_latitude > prev_min_latitude .and.
-     &                   min_latitude < prev_max_latitude)
-     &            .or. (max_latitude > prev_min_latitude .and.
-     &                     max_latitude < prev_max_latitude)) then
-                        overlap_min_longitudes(j) = prev_min_longitude
-                        overlap_max_longitudes(j) = prev_max_longitude
-                        overlap_min_latitudes(j) = prev_min_latitude
-                        overlap_max_latitudes(j) = prev_max_latitude
-                        j = j + 1
-                    end if
-                end if
-            end do
-            close(733)
-         end if
 
          open(421,file=output_filename)
-C          TODO: delete this if writing to DB is ok         
-C          open(421,file='cone_stars_catalog.csv',access='append')
 
-
-C        TODO: write RA, DEC and distance instead of coords
          write(421, *) 'velocity_u ',
      &                 'velocity_v ',
      &                 'velocity_w ',
@@ -579,53 +522,21 @@ C        TODO: write RA, DEC and distance instead of coords
 
          do i = 1, numberOfWDs
            if (ran(iseed) < 1.0) then
-             x_coordinate=8.5-coordinate_R(i) * cos(coordinate_Theta(i))
-             y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
-             z_coordinate = coordinate_Zcylindr(i)
+C              x_coordinate=8.5-coordinate_R(i) * cos(coordinate_Theta(i))
+C              y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
+C              z_coordinate = coordinate_Zcylindr(i)
 
-             star_longitude = atan(y_coordinate / x_coordinate)
-             star_latitude =atan(z_coordinate/sqrt(x_coordinate ** 2
-     &                                             + y_coordinate ** 2))
-             if (overlapping_cones_count > 0) then
-                do j = 1, overlapping_cones_count
-                  if (.not.(star_longitude > overlap_min_longitudes(j)
-     &             .and. star_longitude < overlap_max_longitudes(j)
-     &             .and. star_latitude > overlap_min_latitudes(j)
-     &             .and. star_latitude < overlap_max_latitudes(j)))then
-                        write(421,"(6(es12.3e3,x),i1)") uu(i),
-     &                                                  vv(i),
-     &                                                  ww(i),
-     &                                               galactic_distance,
-     &                                               galactic_longitude,
-     &                                               galactic_latitude,
-     &                                               disk_belonging(i)
-                        exit
-                  end if
-                end do
-             else
+C              star_longitude = atan(y_coordinate / x_coordinate)
+C              star_latitude =atan(z_coordinate/sqrt(x_coordinate ** 2
+C    &                                             + y_coordinate ** 2))
                 write(421,"(6(es12.3e3,x),i1)") uu(i),
      &                                          vv(i),
      &                                          ww(i),
-     &                                          galactic_distance,
-     &                                          galactic_longitude,
-     &                                          galactic_latitude,
+     &                                          rgac(i),
+     &                                          lgac(i),
+     &                                          bgac(i),
      &                                          disk_belonging(i)
-             end if
            end if
          end do
       end if
       end subroutine
-
-
-      function getNumberOfLines(filePath) result(n)
-        character(len = *), intent(in) :: filePath
-        integer :: n, ioStatus
-        n = 0
-        open(832, file=filePath)
-        do
-            read(832, *, iostat=ioStatus)
-            if(is_iostat_end(ioStatus)) exit
-            n = n + 1
-        end do
-        close(832)
-      end function

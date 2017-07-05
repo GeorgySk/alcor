@@ -106,6 +106,7 @@ def process_stars_group(*,
 
     for star in stars:
         star.group_id = processed_group_id
+        star.id = uuid.uuid4()
     insert_stars_statement = model_insert_statement(Star)
     insert(instances=stars,
            statement=insert_stars_statement,
@@ -206,7 +207,7 @@ def fetch_processed_groups(*,
                            session: Session
                            ) -> List[Group]:
     query = (Group.objects
-             .filter(Group.processed)
+             .filter(Group.processed == True)
              .limit(None))
     records = fetch(query=query,
                     session=session)
@@ -216,11 +217,14 @@ def fetch_processed_groups(*,
 
 def get_cone_angles_ranges(group_id: uuid.uuid4,
                            session: Session) -> Tuple[float, ...]:
-    simulation_parameters = fetch_model_by_id(model=Parameter,
-                                              id_list=[group_id],
-                                              session=session)
-    height_longitude = simulation_parameters[0].longitude
-    height_latitude = simulation_parameters[0].latitude
+    simulation_parameters = fetch_model_by_group_id(model=Parameter,
+                                                    id_list=[group_id],
+                                                    session=session)
+    for parameter in simulation_parameters:
+        if parameter.name == 'longitude':
+            height_longitude = float(parameter.value)
+        if parameter.name == 'latitude':
+            height_latitude = float(parameter.value)
 
     delta_longitude = DELTA_LATITUDE / cos(height_latitude)
 
@@ -236,16 +240,18 @@ def get_cone_angles_ranges(group_id: uuid.uuid4,
             max_latitude)
 
 
-def fetch_model_by_id(*,
-                      session: Session,
-                      model: Model,
-                      # TODO: what if I supply not a list but one value?
-                      id_list: List[uuid.uuid4]
-                      ) -> List[Model]:
-    query = (model.objects
-             .filter(model.id in id_list)
-             .limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [Model(**record)
-            for record in records]
+def fetch_model_by_group_id(*,
+                            session: Session,
+                            model: Model,
+                            id_list: List[uuid.uuid4]
+                            ) -> List[Model]:
+    # TODO: next 3 statements should be placed in separate function fetch-all
+    query = (model.objects.all().limit(None))
+    result_set = fetch(query=query,
+                       session=session)
+    all_records = [model(**result)
+                   for result in result_set]
+    filtered_records = [record
+                        for record in all_records
+                        if record.group_id in id_list]
+    return filtered_records

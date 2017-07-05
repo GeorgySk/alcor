@@ -90,12 +90,6 @@ C     with its height direction set by longitude and latitude
           min_latitude = cone_height_latitude  - DELTA_LATITUDE / 2.0
           max_latitude = cone_height_latitude + DELTA_LATITUDE / 2.0
 
-          open(unit=733,file='coordinate_angles_ranges.txt',
-     &         access='append')
-          write(unit=733,fmt=*) min_longitude, max_longitude,
-     &                          min_latitude, max_latitude
-          close(unit=733)
-
           total_mass = 0.0
           stars_count = 0
 

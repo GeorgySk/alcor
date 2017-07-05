@@ -11,7 +11,6 @@ from .base import Base
 
 class Group(Base):
     __tablename__ = 'groups'
-
     id = Column(UUID(as_uuid=True),
                 primary_key=True)
     original_unprocessed_group_id = Column(UUID(as_uuid=True),

@@ -15,11 +15,10 @@ services:
 #      - --project-dir
 #      - test_project
       # Processing generated data:
-#      - process
+      - process
 #      - --last=2
 #      TODO: implement this:
 #      - --id_groups='fc70b148-ab3f-441c-b66d-8430f6d9ce21'
-<<<<<<< HEAD
       - --filtration-method
       - restricted
       - --nullify-radial-velocity
@@ -29,7 +28,7 @@ services:
       - --w-lepine-criterion
 #      - --delete-overlapping-cone-stars
       # Plotting
-      - plot
+#      - plot
 #      - --luminosity-function
 #      - --velocities-vs-magnitude
 #      - --velocity-clouds
