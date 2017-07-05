@@ -476,9 +476,9 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                  'proper_motion_component_vr ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'galactocentric_distance ',
-     &                  'galactocentric_coordinate_b ',
-     &                  'galactocentric_coordinate_l ',
+     &                  'galactic_distance ',
+     &                  'galactic_latitude ',
+     &                  'galactic_longitude ',
      &                  'go_photometry ',
      &                  'gr_photometry ',
      &                  'rz_photometry ',
@@ -572,9 +572,9 @@ C        TODO: write RA, DEC and distance instead of coords
          write(421, *) 'velocity_u ',
      &                 'velocity_v ',
      &                 'velocity_w ',
-     &                 'coordinate_x ',
-     &                 'coordinate_y ',
-     &                 'coordinate_z ',
+     &                 'galactic_distance ',
+     &                 'galactic_longitude ',
+     &                 'galactic_latitude ',
      &                 'disk_belonging'
 
          do i = 1, numberOfWDs
@@ -595,10 +595,10 @@ C        TODO: write RA, DEC and distance instead of coords
                         write(421,"(6(es12.3e3,x),i1)") uu(i),
      &                                                  vv(i),
      &                                                  ww(i),
-     &                                                 x_coordinate,
-     &                                                 y_coordinate,
-     &                                                 z_coordinate,
-     &                                                 disk_belonging(i)
+     &                                               galactic_distance,
+     &                                               galactic_longitude,
+     &                                               galactic_latitude,
+     &                                               disk_belonging(i)
                         exit
                   end if
                 end do
@@ -606,9 +606,9 @@ C        TODO: write RA, DEC and distance instead of coords
                 write(421,"(6(es12.3e3,x),i1)") uu(i),
      &                                          vv(i),
      &                                          ww(i),
-     &                                          x_coordinate,
-     &                                          y_coordinate,
-     &                                          z_coordinate,
+     &                                          galactic_distance,
+     &                                          galactic_longitude,
+     &                                          galactic_latitude,
      &                                          disk_belonging(i)
              end if
            end if

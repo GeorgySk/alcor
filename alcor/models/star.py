@@ -29,9 +29,9 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion_component_vr',
                          'right_ascension',
                          'declination',
-                         'galactocentric_distance',
-                         'galactocentric_coordinate_b',
-                         'galactocentric_coordinate_l',
+                         'galactic_distance',
+                         'galactic_latitude',
+                         'galactic_longitude',
                          'go_photometry',
                          'gr_photometry',
                          'rz_photometry',
@@ -64,12 +64,12 @@ class Star(Base):
                              nullable=False)
     declination = Column(Float(asdecimal=True),
                          nullable=False)
-    galactocentric_distance = Column(Float(asdecimal=True),
-                                     nullable=False)
-    galactocentric_coordinate_b = Column(Float(asdecimal=True),
-                                         nullable=False)
-    galactocentric_coordinate_l = Column(Float(asdecimal=True),
-                                         nullable=False)
+    galactic_distance = Column(Float(asdecimal=True),
+                               nullable=False)
+    galactic_coordinate_b = Column(Float(asdecimal=True),
+                                   nullable=False)
+    galactic_coordinate_l = Column(Float(asdecimal=True),
+                                   nullable=False)
     go_photometry = Column(Float(asdecimal=True),
                            nullable=False)
     gr_photometry = Column(Float(asdecimal=True),
@@ -86,6 +86,8 @@ class Star(Base):
                         nullable=False)
     spectral_type = Column(Integer(),
                            nullable=False)
+    disk_belonging = Column(Integer(),
+                            nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
@@ -98,9 +100,9 @@ class Star(Base):
                  proper_motion_component_vr: Decimal,
                  right_ascension: Decimal,
                  declination: Decimal,
-                 galactocentric_distance: Decimal,
-                 galactocentric_coordinate_b: Decimal,
-                 galactocentric_coordinate_l: Decimal,
+                 galactic_distance: Decimal,
+                 galactic_coordinate_b: Decimal,
+                 galactic_coordinate_l: Decimal,
                  go_photometry: Decimal,
                  gr_photometry: Decimal,
                  rz_photometry: Decimal,
@@ -108,7 +110,8 @@ class Star(Base):
                  velocity_u: Decimal,
                  velocity_v: Decimal,
                  velocity_w: Decimal,
-                 spectral_type: int):
+                 spectral_type: int,
+                 disk_belonging: int):
         self.group_id = group_id
         self.luminosity = luminosity
         self.proper_motion = proper_motion
@@ -117,9 +120,9 @@ class Star(Base):
         self.proper_motion_component_vr = proper_motion_component_vr
         self.right_ascension = right_ascension
         self.declination = declination
-        self.galactocentric_distance = galactocentric_distance
-        self.galactocentric_coordinate_b = galactocentric_coordinate_b
-        self.galactocentric_coordinate_l = galactocentric_coordinate_l
+        self.galactic_distance = galactic_distance
+        self.galactic_coordinate_b = galactic_coordinate_b
+        self.galactic_coordinate_l = galactic_coordinate_l
         self.go_photometry = go_photometry
         self.gr_photometry = gr_photometry
         self.rz_photometry = rz_photometry
@@ -128,6 +131,8 @@ class Star(Base):
         self.velocity_v = velocity_v
         self.velocity_w = velocity_w
         self.spectral_type = spectral_type
+        self.disk_belonging = disk_belonging
+
 
     @property
     def bolometric_magnitude(self) -> float:
@@ -151,7 +156,8 @@ class Star(Base):
                                                     float]:
         right_ascension = float(self.right_ascension)
         declination = float(self.declination)
-        distance = float(self.galactocentric_distance)
+        # TODO: should it be centered at the Sun?
+        distance = float(self.galactic_distance)
 
         latitude = (asin(cos(declination) * cos(DEC_GPOLE)
                          * cos(right_ascension - RA_GPOLE)
@@ -170,30 +176,30 @@ class Star(Base):
 
     def set_radial_velocity_to_zero(self) -> None:
         # TODO: implement pc/kpc units
-        galactocentric_distance = float(self.galactocentric_distance)
-        galactocentric_coordinate_b = float(self.galactocentric_coordinate_b)
-        galactocentric_coordinate_l = float(self.galactocentric_coordinate_l)
+        galactic_distance = float(self.galactic_distance)
+        galactic_latitude = float(self.galactic_latitude)
+        galactic_longitude = float(self.galactic_longitude)
         proper_motion_component_b = float(self.proper_motion_component_b)
         proper_motion_component_l = float(self.proper_motion_component_l)
 
-        distance_in_pc = galactocentric_distance * 1e3
+        distance_in_pc = galactic_distance * 1e3
 
-        a1 = (-ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
-              * sin(galactocentric_coordinate_l))
-        b1 = (-ASTRONOMICAL_UNIT * sin(galactocentric_coordinate_b)
-              * cos(galactocentric_coordinate_l))
+        a1 = (-ASTRONOMICAL_UNIT * cos(galactic_latitude)
+              * sin(galactic_longitude))
+        b1 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
+              * cos(galactic_longitude))
         self.velocity_u = ((a1 * proper_motion_component_l
                             + b1 * proper_motion_component_b)
                            * distance_in_pc)
 
-        a2 = (ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
-              * cos(galactocentric_coordinate_l))
-        b2 = (-ASTRONOMICAL_UNIT * sin(galactocentric_coordinate_b)
-              * sin(galactocentric_coordinate_l))
+        a2 = (ASTRONOMICAL_UNIT * cos(galactic_latitude)
+              * cos(galactic_longitude))
+        b2 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
+              * sin(galactic_longitude))
         self.velocity_v = ((a2 * proper_motion_component_l
                             + b2 * proper_motion_component_b)
                            * distance_in_pc)
 
-        b3 = ASTRONOMICAL_UNIT * cos(galactocentric_coordinate_b)
+        b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
         self.velocity_w = (b3 * proper_motion_component_b
                            * distance_in_pc)

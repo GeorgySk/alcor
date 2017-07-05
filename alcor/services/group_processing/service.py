@@ -125,11 +125,11 @@ def eliminate_stars_lying_in_prev_cones(group_id: uuid.uuid4,
                                            max_longitude,
                                            min_latitude,
                                            max_latitude)
-                 # FIXME: there are no longitude or latitude in star attrs
-                 if not (min_longitude < star.longitude < max_longitude
-                         and min_latitude < star.latitude < max_latitude)]
+                 if not (min_longitude < star.galactic_longitude
+                         < max_longitude
+                         and min_latitude < star.galactic_latitude
+                         < max_latitude)]
     return stars
-
 
 
 def get_overlapping_cone_angles_ranges(min_longitude: float,

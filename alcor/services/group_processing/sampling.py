@@ -19,8 +19,8 @@ def check_elimination(star: Star,
                       eliminations_counter: Counter,
                       filtration_method: str) -> bool:
     # TODO: implement pc/kpc units
-    galactocentric_distance = star.galactocentric_distance * Decimal(1e3)
-    parallax = Fraction(1, Fraction(galactocentric_distance))
+    galactic_distance = star.galactic_distance * Decimal(1e3)
+    parallax = Fraction(1, Fraction(galactic_distance))
     # TODO: find out the meaning of the following constants
     hrm = star.go_photometry + Decimal(5. * log10(star.proper_motion) + 5.)
     gz = star.gr_photometry + star.rz_photometry
