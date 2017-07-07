@@ -403,10 +403,7 @@ C     NOTE: this 70 comes from nowhere
      &                 vr(numberOfStars)
       double precision errora(70),ndfa(70)
 C     ugriz-color system and V-band from Johnson system
-      double precision go(numberOfStars),gr(numberOfStars),
-     &                 v(numberOfStars)
-      double precision gi(numberOfStars),ur(numberOfStars),
-     &                 rz(numberOfStars)
+      double precision v(numberOfStars)
       double precision massInBin(70)
       integer typeOfWD(numberOfStars)
 C     values of LF in each bin. o-observational
@@ -454,6 +451,11 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision, allocatable :: overlap_min_latitudes(:)
       double precision, allocatable :: overlap_max_latitudes(:)
       double precision latitude, longitude,ros,zzx,cone_height_longitude
+      double precision :: ugriz_ug(numberOfWDs),
+     &                    ugriz_gr(numberOfWDs),
+     &                    ugriz_ri(numberOfWDs),
+     &                    ugriz_iz(numberOfWDs),
+     &                    ugriz_g_apparent(numberOfWDs)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -463,7 +465,8 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
-      common /photo/ go,gr,gi,ur,rz
+      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
+     &               ugriz_g_apparent
       common /indexdb/ typeOfWD
       common /johnson/ V
       common /vel/ uu,vv,ww
@@ -483,9 +486,10 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                  'galactic_distance ',
      &                  'galactic_latitude ',
      &                  'galactic_longitude ',
-     &                  'go_photometry ',
-     &                  'gr_photometry ',
-     &                  'rz_photometry ',
+     &                  'ugriz_g_apparent ',
+     &                  'ugriz_gr ',    
+     &                  'ugriz_ri ',
+     &                  'ugriz_iz ',
      &                  'v_photometry ',
      &                  'velocity_u ',
      &                  'velocity_v ',
@@ -503,9 +507,10 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      rgac(i),
      &                      bgac(i),
      &                      lgac(i),
-     &                      go(i),
-     &                      gr(i),
-     &                      rz(i),
+     &                      ugriz_g_apparent(i),
+     &                      ugriz_gr(i),
+     &                      ugriz_ri(i),
+     &                      ugriz_iz(i),
      &                      V(i),
      &                      uu(i),
      &                      vv(i),
@@ -522,7 +527,13 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                 'galactic_distance ',
      &                 'galactic_longitude ',
      &                 'galactic_latitude ',
-     &                 'disk_belonging'
+     &                 'ugriz_g_apparent ',
+     &                 'ugriz_ug ',
+     &                 'ugriz_gr ',
+     &                 'ugriz_ri ',
+     &                 'ugriz_iz ',
+     &                 'disk_belonging ',
+     &                 'spectral_type'
 
          do i = 1, numberOfWDs
 C              x_coordinate=8.5-coordinate_R(i) * cos(coordinate_Theta(i))
@@ -573,13 +584,19 @@ C           if cone crosses 2pi, move it -2pi
             if (max_longitude > 2 * pi) then
                 longitude = longitude - 2 * pi
             end if
-            write(421,"(6(es17.8e3,x),i1)") uu(i),
-     &                                      vv(i),
-     &                                      ww(i),
-     &                                      rgac(i),
-     &                                      longitude,
-     &                                      latitude,
-     &                                      disk_belonging(i)
+            write(421,"(11(es17.8e3,x),i1,x,f3.1)") uu(i),
+     &                                              vv(i),
+     &                                              ww(i),
+     &                                              rgac(i),
+     &                                              longitude,
+     &                                              latitude,
+     &                                              ugriz_g_apparent(i),
+     &                                              ugriz_ug(i),
+     &                                              ugriz_gr(i),
+     &                                              ugriz_ri(i),
+     &                                              ugriz_iz(i),
+     &                                              disk_belonging(i),
+     &                                              spectral_type
          end do
       end if
       end subroutine

@@ -37,13 +37,17 @@ C     ---   Dimensions  ---
      &                 effTempOfWD(numberOfStars)
       double precision flagOfWD(numberOfStars)
       double precision rgac(numberOfStars)
-      double precision g(numberOfStars),go(numberOfStars),
-     &                 gr(numberOfStars),v(numberOfStars)
-      double precision gi(numberOfStars),ur(numberOfStars),
-     &                 rz(numberOfStars)
+      double precision g(numberOfWDs),v(numberOfStars)
       double precision coolingTime(numberOfStars)
       integer typeOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
+
+      double precision :: ugriz_ug(numberOfWDs),
+     &                    ugriz_gr(numberOfWDs),
+     &                    ugriz_ri(numberOfWDs),
+     &                    ugriz_iz(numberOfWDs),
+     &                    ugriz_g_apparent(numberOfWDs)
+
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
 C     ---   Commons   ---
@@ -51,7 +55,8 @@ C     ---   Commons   ---
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /paral/ rgac
-      common /photo/ go,gr,gi,ur,rz
+      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
+     &               ugriz_g_apparent
       common /johnson/ v
       common /cool/ coolingTime
       common /indexdb/ typeOfWD
@@ -109,13 +114,13 @@ C         ---  END IF CO/ONe ---
           VR=c3-c4
           RI=c4-c5
           call chanco(V(i),UB,BV,VR,RI,xg,xug,xgr,xri,xiz,xgi)
-          g(i)=xg
-          gr(i)=xgr
-          gi(i)=xgi
-          ur(i)=xug+xgr
-          rz(i)=xri+xiz
+          g(i) = xg
+          ugriz_ug(i) = xug
+          ugriz_gr(i) = xgr
+          ugriz_ri(i) = xri
+          ugriz_iz(i) = xiz
 C         ---  Making g and V apparent magnitude ---
-          go(i)=g(i)-5.0d0+5.0d0*(dlog10(rgac(i))+3.0d0)
+          ugriz_g_apparent(i) = g(i)-5.0d0+5.0d0*(dlog10(rgac(i))+3.0d0)
           V(i)=V(i)-5.0d0+5.0d0*(dlog10(rgac(i))+3.0d0)
 C       ---  ELSE mass >= 1.4  --- EXPLOTA, exceeding Chandrasekar limit
         else

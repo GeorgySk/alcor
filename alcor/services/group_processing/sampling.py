@@ -22,8 +22,8 @@ def check_elimination(star: Star,
     galactic_distance = star.galactic_distance * Decimal(1e3)
     parallax = Fraction(1, Fraction(galactic_distance))
     # TODO: find out the meaning of the following constants
-    hrm = star.go_photometry + Decimal(5. * log10(star.proper_motion) + 5.)
-    gz = star.gr_photometry + star.rz_photometry
+    hrm = star.ugriz_g_apparent + Decimal(5. * log10(star.proper_motion) + 5.)
+    gz = star.ugriz_gr + star.ugriz_rz
 
     if parallax < MIN_PARALLAX:
         eliminations_counter['parallax'] += 1

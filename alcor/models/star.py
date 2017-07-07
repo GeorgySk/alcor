@@ -32,9 +32,11 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'galactic_distance',
                          'galactic_latitude',
                          'galactic_longitude',
-                         'go_photometry',
-                         'gr_photometry',
-                         'rz_photometry',
+                         'ugriz_g_apparent',
+                         'ugriz_ug',
+                         'ugriz_gr',
+                         'ugriz_ri ',
+                         'ugriz_iz',
                          'v_photometry',
                          'velocity_u',
                          'velocity_v',
@@ -70,12 +72,16 @@ class Star(Base):
                                    nullable=False)
     galactic_coordinate_l = Column(Float(asdecimal=True),
                                    nullable=False)
-    go_photometry = Column(Float(asdecimal=True),
+    ugriz_g_apparent = Column(Float(asdecimal=True),
+                              nullable=False)
+    ugriz_ug = Column(Float(asdecimal=True),
+                      nullable=False)
+    ugriz_gr = Column(Float(asdecimal=True),
                            nullable=False)
-    gr_photometry = Column(Float(asdecimal=True),
-                           nullable=False)
-    rz_photometry = Column(Float(asdecimal=True),
-                           nullable=False)
+    ugriz_ri = Column(Float(asdecimal=True),
+                      nullable=False)
+    ugriz_iz = Column(Float(asdecimal=True),
+                      nullable=False)
     v_photometry = Column(Float(asdecimal=True),
                           nullable=False)
     velocity_u = Column(Float(asdecimal=True),
@@ -103,9 +109,11 @@ class Star(Base):
                  galactic_distance: Decimal,
                  galactic_coordinate_b: Decimal,
                  galactic_coordinate_l: Decimal,
-                 go_photometry: Decimal,
-                 gr_photometry: Decimal,
-                 rz_photometry: Decimal,
+                 ugriz_g_apparent: Decimal,
+                 ugriz_ug: Decimal,
+                 ugriz_gr: Decimal,
+                 ugriz_ri: Decimal,
+                 ugriz_iz: Decimal,
                  v_photometry: Decimal,
                  velocity_u: Decimal,
                  velocity_v: Decimal,
@@ -123,9 +131,11 @@ class Star(Base):
         self.galactic_distance = galactic_distance
         self.galactic_coordinate_b = galactic_coordinate_b
         self.galactic_coordinate_l = galactic_coordinate_l
-        self.go_photometry = go_photometry
-        self.gr_photometry = gr_photometry
-        self.rz_photometry = rz_photometry
+        self.ugriz_g_apparent = ugriz_g_apparent
+        self.ugriz_ug = ugriz_ug
+        self.ugriz_gr = ugriz_gr
+        self.ugriz_ri = ugriz_ri
+        self.ugriz_iz = ugriz_iz
         self.v_photometry = v_photometry
         self.velocity_u = velocity_u
         self.velocity_v = velocity_v
@@ -150,6 +160,10 @@ class Star(Base):
     @property
     def coordinate_z(self) -> float:
         return float(self.to_cartesian_from_equatorial()[2])
+
+    @property
+    def ugriz_rz(self) -> float:
+        return float(self.ugriz_ri) + float(self.ugriz_iz)
 
     def to_cartesian_from_equatorial(self) -> Tuple[float,
                                                     float,
