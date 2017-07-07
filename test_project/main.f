@@ -261,7 +261,7 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
       end if
 
       write(6,*) '5. Generating heliocentric velocities (5/9)'
-      call velh(iseed,numberOfStarsInSample)
+      call velh(iseed,numberOfStarsInSample,geometry)
 
 C     QUESTION: why are we missing the next step?
       goto 7
@@ -281,7 +281,8 @@ C     NOTE: This will be in a separate processing module
 C       write(6,*) '9. Working with obtained sample (9/9)'
 C       call volum_40pc
       call printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude)
+     &         min_longitude, max_longitude, min_latitude, max_latitude,
+     &         solarGalactocentricDistance,cone_height_longitude)
 
 
       write (6,*) 'End'
@@ -343,7 +344,8 @@ C***********************************************************************
       include 'code/tables_linking.f'
 
       subroutine printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude)
+     &         min_longitude, max_longitude, min_latitude, max_latitude,
+     &         solarGalactocentricDistance,cone_height_longitude)
       implicit none
       external ran
       real ran
@@ -362,7 +364,7 @@ C***********************************************************************
       double precision errinfa,errsupa,mbol
       double precision fnora,fnor,pi,vvv,x,xx,xya
       double precision min_longitude, max_longitude, min_latitude,
-     &                 max_latitude
+     &                 max_latitude, solarGalactocentricDistance
       double precision prev_min_longitude, prev_max_longitude, 
      &                 prev_min_latitude, prev_max_latitude
       
@@ -451,6 +453,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision, allocatable :: overlap_max_longitudes(:)
       double precision, allocatable :: overlap_min_latitudes(:)
       double precision, allocatable :: overlap_max_latitudes(:)
+      double precision latitude, longitude,ros,zzx,cone_height_longitude
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -464,6 +467,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       common /indexdb/ typeOfWD
       common /johnson/ V
       common /vel/ uu,vv,ww
+      pi = 4.0 * atan(1.0)
 
       if (geometry == 'sphere') then
 
@@ -521,7 +525,6 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                 'disk_belonging'
 
          do i = 1, numberOfWDs
-           if (ran(iseed) < 1.0) then
 C              x_coordinate=8.5-coordinate_R(i) * cos(coordinate_Theta(i))
 C              y_coordinate = coordinate_R(i) * sin(coordinate_Theta(i))
 C              z_coordinate = coordinate_Zcylindr(i)
@@ -529,14 +532,54 @@ C              z_coordinate = coordinate_Zcylindr(i)
 C              star_longitude = atan(y_coordinate / x_coordinate)
 C              star_latitude =atan(z_coordinate/sqrt(x_coordinate ** 2
 C    &                                             + y_coordinate ** 2))
-                write(421,"(6(es12.3e3,x),i1)") uu(i),
-     &                                          vv(i),
-     &                                          ww(i),
-     &                                          rgac(i),
-     &                                          lgac(i),
-     &                                          bgac(i),
-     &                                          disk_belonging(i)
-           end if
+C           TODO: i took this from coor.f
+            ros=solarGalactocentricDistance*solarGalactocentricDistance+
+     &          coordinate_R(i)*coordinate_R(i)-2*coordinate_R(i)*
+     &          solarGalactocentricDistance*dcos(coordinate_Theta(i))
+            ros=dsqrt(ros)
+C           TODO: figurre out what to do with ill-conditioned cases            
+            if ((solarGalactocentricDistance ** 2 + ros**2
+     &           - coordinate_R(i) ** 2)
+     &          /(2.d0 * solarGalactocentricDistance * ros) > 1.0) then
+              longitude = 0.0
+            else
+            longitude = dacos((solarGalactocentricDistance ** 2 + ros**2
+     &                         - coordinate_R(i) ** 2)
+     &                      /(2.d0 * solarGalactocentricDistance * ros))
+            end if
+            zzx=coordinate_Zcylindr(i)/ros
+            latitude=datan(zzx)
+C           TODO: i am confused about how all this works now.
+C           the reason for these conditions is that for angles > pi
+C           longitude is simmetrically reflected on the top half-plane
+            if (coordinate_Theta(i) < 0
+     &          .and. cone_height_longitude > 3.0 * pi / 2) then
+                longitude = 2.0 * pi - longitude
+            end if
+            if (coordinate_Theta(i) > 0 
+     &          .and. cone_height_longitude > 3.0 * pi / 2) then
+                longitude = 2.0 * pi + longitude
+            end if
+            if (coordinate_Theta(i) < 0 
+     &          .and. cone_height_longitude < pi / 2) then
+                longitude = -longitude
+            end if
+            if (coordinate_Theta(i) < 0 
+     &          .and. cone_height_longitude < 3.0 * pi / 2
+     &          .and. cone_height_longitude > pi / 2) then
+                longitude = 2.0 * pi - longitude
+            end if
+C           if cone crosses 2pi, move it -2pi
+            if (max_longitude > 2 * pi) then
+                longitude = longitude - 2 * pi
+            end if
+            write(421,"(6(es17.8e3,x),i1)") uu(i),
+     &                                      vv(i),
+     &                                      ww(i),
+     &                                      rgac(i),
+     &                                      longitude,
+     &                                      latitude,
+     &                                      disk_belonging(i)
          end do
       end if
       end subroutine

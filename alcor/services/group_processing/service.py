@@ -88,6 +88,7 @@ def process_stars_group(*,
             w_lepine_criterion=w_lepine_criterion,
             session=session)
 
+    # TODO: put this in correct place (where?)
     if no_overlapping_cones:
         stars = eliminate_stars_lying_in_prev_cones(group_id=group.id,
                                                     stars=stars,
@@ -138,14 +139,16 @@ def eliminate_stars_lying_in_prev_cones(group_id: uuid.uuid4,
                  for (min_longitude,
                       max_longitude,
                       min_latitude,
-                      max_latitude) in zip(min_longitude,
-                                           max_longitude,
-                                           min_latitude,
-                                           max_latitude)
+                      max_latitude) in zip(min_longitudes,
+                                           max_longitudes,
+                                           min_latitudes,
+                                           max_latitudes)
                  if not (min_longitude < star.galactic_longitude
                          < max_longitude
                          and min_latitude < star.galactic_latitude
                          < max_latitude)]
+    logger.info(f'Number of stars left in the group after checking for '
+                f'overlapping: {len(stars)}')
     return stars
 
 
@@ -168,30 +171,41 @@ def get_overlapping_cone_angles_ranges(min_longitude: float,
          processed_group_max_latitude) = get_cone_angles_ranges(
             group_id=group.original_unprocessed_group_id,
             session=session)
+        # Cross-zero overlap cases:
+        if (min_longitude < (processed_group_max_longitude - 2 * pi)
+                and min_longitude < 0):
+            processed_group_min_longitude -= 2 * pi
+            processed_group_max_longitude -= 2 * pi
+        if (processed_group_min_longitude < (max_longitude - 2 * pi)
+                and processed_group_min_longitude < 0):
+            min_longitude -= 2 * pi
+            max_longitude -= 2 * pi
+
+        # TODO: use this: https://stackoverflow.com/questions/2953967/built-in-function-for-computing-overlap-in-python
         longitude_overlapping = ((processed_group_min_longitude
-                                  < min_longitude
-                                  < processed_group_max_longitude)
+                                  <= min_longitude
+                                  <= processed_group_max_longitude)
                                  or (processed_group_min_longitude
-                                     < max_longitude
-                                     < processed_group_max_longitude)
+                                     <= max_longitude
+                                     <= processed_group_max_longitude)
                                  or (min_longitude
-                                     < processed_group_min_longitude
-                                     < max_longitude)
+                                     <= processed_group_min_longitude
+                                     <= max_longitude)
                                  or (min_longitude
-                                     < processed_group_max_longitude
-                                     < max_longitude))
+                                     <= processed_group_max_longitude
+                                     <= max_longitude))
         latitude_overlapping = ((processed_group_min_latitude
-                                 < min_latitude
-                                 < processed_group_max_latitude)
+                                 <= min_latitude
+                                 <= processed_group_max_latitude)
                                 or (processed_group_min_latitude
-                                    < max_latitude
-                                    < processed_group_max_latitude)
+                                    <= max_latitude
+                                    <= processed_group_max_latitude)
                                 or (min_latitude
-                                    < processed_group_min_latitude
-                                    < max_latitude)
+                                    <= processed_group_min_latitude
+                                    <= max_latitude)
                                 or (min_latitude
-                                    < processed_group_max_latitude
-                                    < max_latitude))
+                                    <= processed_group_max_latitude
+                                    <= max_latitude))
         if longitude_overlapping and latitude_overlapping:
             min_longitudes.append(processed_group_min_longitude)
             max_longitudes.append(processed_group_max_longitude)
@@ -220,11 +234,12 @@ def get_cone_angles_ranges(group_id: uuid.uuid4,
     simulation_parameters = fetch_model_by_group_id(model=Parameter,
                                                     id_list=[group_id],
                                                     session=session)
+    # TODO: all angles should be recorded in radians when reading csv!
     for parameter in simulation_parameters:
         if parameter.name == 'longitude':
-            height_longitude = float(parameter.value)
+            height_longitude = float(parameter.value) * pi / 180
         if parameter.name == 'latitude':
-            height_latitude = float(parameter.value)
+            height_latitude = float(parameter.value) * pi / 180
 
     delta_longitude = DELTA_LATITUDE / cos(height_latitude)
 

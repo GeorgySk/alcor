@@ -1,6 +1,6 @@
 C***********************************************************************
 C     TODO: rewrite      
-      subroutine velh(iseed,numberOfStarsInSample)
+      subroutine velh(iseed,numberOfStarsInSample,geometry)
 C=======================================================================
 C
 C     This subroutine calculates the heliocentrical velocities. 
@@ -19,6 +19,7 @@ C=======================================================================
       integer numberOfStars,iseed,numberOfStarsInSample,i,k,numberOfWDs
       double precision uo,vo,wo,a,b,solarGalactocentricDistance,uop,vop,
      &                 yy,gasdev,uom,vom
+      character(len = 6) :: geometry
           
 C     ---   Parameters   ---
 C--------------------------------------------------------------------
@@ -74,6 +75,10 @@ C     ---  Making the transfer of heightPattern, of z  ---
           k=k+1
           heightPattern(k)=zh(i)
           coordinate_Zcylindr(k)=zz(i)
+          if (geometry == 'cone') then
+              coordinate_R(k) = coordinate_R(i)
+              coordinate_Theta(k) = coordinate_Theta(i)
+          end if
         else
       endif
 3     continue

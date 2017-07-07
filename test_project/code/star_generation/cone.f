@@ -71,7 +71,11 @@ C     with its height direction set by longitude and latitude
      &                        ttdisk = 12.0,
      &                        ft,
      &                        fz,
-     &                        opposite_triangle_side
+     &                        opposite_triangle_side,
+     &                        min_gen_l = 1E6,
+     &                        max_gen_l = -(1E6),
+     &                        min_gen_b = 1E6,
+     &                        max_gen_b = -(1E6)
           integer :: stars_count
 
           common /tm/ starBirthTime,
@@ -81,6 +85,9 @@ C     with its height direction set by longitude and latitude
      &                     coordinate_Zcylindr
           common /patron/ heightPattern
           common /index/ flagOfWD,numberOfWDs,disk_belonging
+
+          write(6,*) 'DEBUG: cone.f got: ', cone_height_longitude
+          write(6,*) 'DEBUG: cone.f got: ', cone_height_latitude
 
           ! NOTE: this can be infinity
           delta_longitude = DELTA_LATITUDE / dcos(cone_height_latitude)
@@ -183,6 +190,26 @@ C                 converting from galactic to cyl.galactocentric
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
                   latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
+
+                  if (longitude < min_gen_l) then
+                    min_gen_l = longitude
+                  end if
+                  if (longitude > max_gen_l) then
+                    max_gen_l = longitude
+                  end if
+                  if (latitude < min_gen_b) then
+                    min_gen_b = latitude
+                  end if
+                  if (latitude > max_gen_b) then
+                    max_gen_b = latitude
+                  end if
+
+                  if (stars_count < 6) then
+                    write(6,*) 'DEBUG: random generated l: ', longitude
+                  end if
+                  if (stars_count < 6) then
+                    write(6,*) 'DEBUG: random generated b: ', latitude
+                  end if
       
                   inner_do2: do
                       ! Distance between Sun and random point in the cone
@@ -298,6 +325,11 @@ C                 converting from galactic to cyl.galactocentric
           end if
 
           numberOfStarsInSample = stars_count
+
+          write(6,*) 'DEBUG: cone.f min l: ', min_gen_l
+          write(6,*) 'DEBUG: cone.f max l: ', max_gen_l
+          write(6,*) 'DEBUG: cone.f min b: ', min_gen_b
+          write(6,*) 'DEBUG: cone.f max b: ', max_gen_b
       end subroutine
 
 
