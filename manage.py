@@ -211,6 +211,9 @@ def process(ctx: click.Context,
 @click.option('--toomre-diagram', '-toomre',
               is_flag=True,
               help='Plot Toomre diagram.')
+@click.option('--ugriz-color-color-diagram', '-ugriz',
+              is_flag=True,
+              help='Plot color-color diagrams for ugriz photometry.')
 @click.pass_context
 def plot(ctx: click.Context,
          luminosity_function: bool,
@@ -218,7 +221,8 @@ def plot(ctx: click.Context,
          velocity_clouds: bool,
          lepine_criterion: bool,
          heatmap: str,
-         toomre_diagram: bool) -> None:
+         toomre_diagram: bool,
+         ugriz_color_color_diagram: bool) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
 
@@ -231,6 +235,7 @@ def plot(ctx: click.Context,
                    lepine_criterion,
                    heatmap,
                    toomre_diagram,
+                   ugriz_color_color_diagram,
                    session=session)
 
 

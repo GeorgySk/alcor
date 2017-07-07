@@ -51,6 +51,7 @@ def update_group(group: Group,
                   Group.updated_timestamp: current_date_time})
 
 
+# TODO: move this to reading
 def fetch_unprocessed_groups(*,
                              session: Session) -> List[Group]:
     query = (session.query(Group)

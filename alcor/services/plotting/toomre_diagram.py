@@ -1,7 +1,6 @@
 import logging
 from math import sqrt
 from random import random
-from typing import List
 
 from cassandra.cluster import Session
 import matplotlib

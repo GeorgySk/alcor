@@ -2,7 +2,8 @@ from . import (luminosity_function,
                velocities_vs_magnitude,
                velocity_clouds,
                heatmaps,
-               toomre_diagram)
+               toomre_diagram,
+               ugriz_diagrams)
 
 from cassandra.cluster import Session
 
@@ -13,6 +14,7 @@ def draw_plots(with_luminosity_function: bool,
                lepine_criterion: bool,
                heatmaps_axes: str,
                with_toomre_diagram: bool,
+               with_ugriz_diagrams: bool,
                session: Session) -> None:
     if with_luminosity_function:
         luminosity_function.plot(session=session)
@@ -35,3 +37,6 @@ def draw_plots(with_luminosity_function: bool,
 
     if with_toomre_diagram:
         toomre_diagram.plot(session=session)
+
+    if with_ugriz_diagrams:
+        ugriz_diagrams.plot(session=session)
