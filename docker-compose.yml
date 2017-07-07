@@ -11,11 +11,11 @@ services:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
       # Generating stars:
-#      - simulate
-#      - --project-dir
-#      - test_project
+      - simulate
+      - --project-dir
+      - test_project
       # Processing generated data:
-      - process
+#      - process
 #      - --last=2
 #      TODO: implement this:
 #      - --id_groups='fc70b148-ab3f-441c-b66d-8430f6d9ce21'

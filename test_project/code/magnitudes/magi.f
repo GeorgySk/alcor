@@ -42,11 +42,11 @@ C     ---   Dimensions  ---
       integer typeOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
 
-      double precision :: ugriz_ug(numberOfWDs),
-     &                    ugriz_gr(numberOfWDs),
-     &                    ugriz_ri(numberOfWDs),
-     &                    ugriz_iz(numberOfWDs),
-     &                    ugriz_g_apparent(numberOfWDs)
+      double precision :: ugriz_ug(numberOfStars),
+     &                    ugriz_gr(numberOfStars),
+     &                    ugriz_ri(numberOfStars),
+     &                    ugriz_iz(numberOfStars),
+     &                    ugriz_g_apparent(numberOfStars)
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 

@@ -451,11 +451,11 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision, allocatable :: overlap_min_latitudes(:)
       double precision, allocatable :: overlap_max_latitudes(:)
       double precision latitude, longitude,ros,zzx,cone_height_longitude
-      double precision :: ugriz_ug(numberOfWDs),
-     &                    ugriz_gr(numberOfWDs),
-     &                    ugriz_ri(numberOfWDs),
-     &                    ugriz_iz(numberOfWDs),
-     &                    ugriz_g_apparent(numberOfWDs)
+      double precision :: ugriz_ug(numberOfStars),
+     &                    ugriz_gr(numberOfStars),
+     &                    ugriz_ri(numberOfStars),
+     &                    ugriz_iz(numberOfStars),
+     &                    ugriz_g_apparent(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -596,7 +596,7 @@ C           if cone crosses 2pi, move it -2pi
      &                                              ugriz_ri(i),
      &                                              ugriz_iz(i),
      &                                              disk_belonging(i),
-     &                                              spectral_type
+     &                                              typeOfWD(i)
          end do
       end if
       end subroutine
