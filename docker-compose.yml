@@ -8,8 +8,12 @@ services:
     volumes:
       - .:/alcor/
     extra_hosts:
-      - "dockerhost:$DOCKERHOST"  # for debugging
+#      - "dockerhost:$DOCKERHOST"  # for debugging
+       - "dockerhost:172.17.0.1"  # for debugging
     command:
+      # Manage database:
+#      - manage_db
+#      - --delete-processed-data
       # Generating stars:
 #      - simulate
 #      - --project-dir
