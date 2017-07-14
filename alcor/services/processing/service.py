@@ -8,7 +8,6 @@ from alcor.models import (Group,
                           Star)
 from alcor.services.group_processing import process_stars_group
 
-
 logger = logging.getLogger(__name__)
 
 

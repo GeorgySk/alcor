@@ -55,6 +55,17 @@ def run_simulations(*,
         session.add_all(stars)
         session.commit()
 
+        # TODO: write it to postgres db
+        with open(file='../test_project/processed_cones.txt',
+                  mode='a') as file:
+            for parameter in parameters:
+                if parameter.name == 'longitude':
+                    longitude = parameter.value
+                if parameter.name == 'latitude':
+                    latitude = parameter.value
+            row = str(longitude) + ' ' + str(latitude) + '\n'
+            file.write(row)
+
 
 def generate_parameters(*,
                         values: Dict[str, Decimal],

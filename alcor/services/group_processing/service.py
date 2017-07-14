@@ -30,7 +30,6 @@ DELTA_LATITUDE = 2.64 * pi / 180.0
 
 
 def process_stars_group(*,
-                        stars: List[Star],
                         group: Group,
                         filtration_method: str,
                         nullify_radial_velocity: bool,
@@ -40,9 +39,14 @@ def process_stars_group(*,
                         w_lepine_criterion: bool,
                         no_overlapping_cones: bool,
                         session: Session) -> None:
-    stars_count = len(stars)
-    logger.info('Starting processing stars, '
-                f'objects number: {stars_count}.')
+    if no_overlapping_cones:
+        eliminate_stars_lying_in_prev_cones(group=group,
+                                            session=session)
+        return None
+
+    stars = fetch_stars(group=group,
+                        session=session)
+
     eliminations_counter = Counter()
     apply_elimination_criteria = partial(
         check_elimination,
@@ -52,9 +56,10 @@ def process_stars_group(*,
         stars = list(filterfalse(apply_elimination_criteria,
                                  stars))
 
+    # TODO: shouldn't it be in the models?
     counter = StarsCounter(
         group_id=group.id,
-        raw=stars_count,
+        raw=len(stars),
         by_parallax=eliminations_counter['parallax'],
         by_declination=eliminations_counter['declination'],
         by_velocity=eliminations_counter['velocity'],
@@ -88,12 +93,6 @@ def process_stars_group(*,
             w_lepine_criterion=w_lepine_criterion,
             session=session)
 
-    # TODO: put this in correct place (where?)
-    if no_overlapping_cones:
-        stars = eliminate_stars_lying_in_prev_cones(group_id=group.id,
-                                                    stars=stars,
-                                                    session=session)
-
     original_unprocessed_group_id = group.id
     processed_group_id = uuid.uuid4()
     processed_group = Group(
@@ -114,13 +113,13 @@ def process_stars_group(*,
            session=session)
 
 
-def eliminate_stars_lying_in_prev_cones(group_id: uuid.uuid4,
-                                        stars: List[Star],
-                                        session: Session) -> List[Star]:
+# TODO: the logic is broken here. Get rid of Cassandra 1st then come here
+def eliminate_stars_lying_in_prev_cones(group: Group,
+                                        session: Session) -> None:
     (min_longitude,
      max_longitude,
      min_latitude,
-     max_latitude) = get_cone_angles_ranges(group_id=group_id,
+     max_latitude) = get_cone_angles_ranges(group_id=group.id,
                                             session=session)
 
     (min_longitudes,
@@ -133,23 +132,41 @@ def eliminate_stars_lying_in_prev_cones(group_id: uuid.uuid4,
         max_latitude=min_latitude,
         session=session)
 
-    if min_longitudes:
-        stars = [star
-                 for star in stars
-                 for (min_longitude,
-                      max_longitude,
-                      min_latitude,
-                      max_latitude) in zip(min_longitudes,
-                                           max_longitudes,
-                                           min_latitudes,
-                                           max_latitudes)
-                 if not (min_longitude < star.galactic_longitude
-                         < max_longitude
-                         and min_latitude < star.galactic_latitude
-                         < max_latitude)]
-    logger.info(f'Number of stars left in the group after checking for '
-                f'overlapping: {len(stars)}')
-    return stars
+    original_unprocessed_group_id = group.id
+    processed_group_id = uuid.uuid4()
+
+    stars = fetch_stars(group=group,
+                        session=session)
+    stars = [star
+             for star in stars
+             for (min_longitude,
+                  max_longitude,
+                  min_latitude,
+                  max_latitude) in zip(min_longitudes,
+                                       max_longitudes,
+                                       min_latitudes,
+                                       max_latitudes)
+             if not (min_longitude < star.galactic_longitude
+                     < max_longitude
+                     and min_latitude < star.galactic_latitude
+                     < max_latitude)]
+
+    processed_group = Group(
+        id=processed_group_id,
+        original_unprocessed_group_id=original_unprocessed_group_id,
+        processed=True)
+    insert_groups_statement = model_insert_statement(Group)
+    insert(instances=[processed_group],
+           statement=insert_groups_statement,
+           session=session)
+
+    for star in stars:
+        star.group_id = processed_group_id
+        star.id = uuid.uuid4()
+    insert_stars_statement = model_insert_statement(Star)
+    insert(instances=stars,
+           statement=insert_stars_statement,
+           session=session)
 
 
 def get_overlapping_cone_angles_ranges(min_longitude: float,
@@ -159,6 +176,8 @@ def get_overlapping_cone_angles_ranges(min_longitude: float,
                                        session: Session
                                        ) -> Tuple[List[float], ...]:
     processed_groups = fetch_processed_groups(session=session)
+    logger.debug(f'By this moment there are {len(processed_groups)} processed'
+                 f'groups')
 
     min_longitudes = []
     max_longitudes = []
@@ -270,3 +289,16 @@ def fetch_model_by_group_id(*,
                         for record in all_records
                         if record.group_id in id_list]
     return filtered_records
+
+
+# TODO: I already have it somewhere
+def fetch_stars(*,
+                group: Group,
+                session: Session
+                ) -> List[Star]:
+    query = (Star.objects
+             .filter(Star.group_id == group.id)
+             .limit(None))
+    records = fetch(query=query,
+                    session=session)
+    return [Star(**record) for record in records]
