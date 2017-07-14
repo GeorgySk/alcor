@@ -11,12 +11,12 @@ C     Adapted for G_Var 14.05.15 by S.Torres
 C-----------------------------------------------------------------------
 C     TODO: figure out what I/O parameters are 
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
 C     ---   Definition of variables  ---
       integer iseed,numberOfStarsInSample,numberOfWDs,numberOfStars,
      &        ntwdone,igorda,i,k,param
-      double precision galacticDiskAge,mebmin,mebmax,xntwd,mone,
+      real galacticDiskAge,mebmin,mebmax,xntwd,mone,
      &                 parameterIFMR
 
 C     ---   Parameters   ---
@@ -34,17 +34,17 @@ C       flagOfWD: 0 - it's not WD, 1 - it's a WD
 C       m: mass in the main sequence
 C       numberOfWDs: total number of WDs
 C-----------------------------------------------------------------------
-      double precision starBirthTime(numberOfStars),tms(numberOfStars),
-     &                 coolingTime(numberOfStars)
-      double precision luminosityOfWD(numberOfStars),
+      real starBirthTime(numberOfStars),tms(numberOfStars)
+      real :: coolingTime(numberOfStars)
+      real luminosityOfWD(numberOfStars),
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
-      double precision flagOfWD(numberOfStars)
-      double precision m(numberOfStars)
-      double precision ztcool(numberOfStars),zmeb(numberOfStars),
+      real flagOfWD(numberOfStars)
+      real m(numberOfStars)
+      real ztcool(numberOfStars),zmeb(numberOfStars),
      &                 zzeb(numberOfStars),ztms(numberOfStars)
-      double precision ztborn(numberOfStars)
+      real ztborn(numberOfStars)
       integer disk_belonging(numberOfStars)
 
 C     ---  Commons  ---
@@ -166,7 +166,7 @@ C     Output parameters:
 C       t: lifetime in the SP.
 C
 C====================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
 C     ---   Dimensions  ---
       dimension mms(10),tms(10)
@@ -283,9 +283,9 @@ C ======================================================================
 C     IFMR according to model by Catalán et al.2008
 C     combination with the model by Iben for Mi>6Mo
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
-      double precision mass,massOfWD
+      real mass,massOfWD
       
       if(mass.lt.2.7)then
         massOfWD=0.096d0*mass+0.429d0

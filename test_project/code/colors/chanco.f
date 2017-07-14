@@ -5,10 +5,10 @@ C     Transformation between the Johnson-Cousins UBVRI photometry
 C     system and the SDSS ugriz system.
 C     Follow the eq. 1 to 8 from Jordi,Grebel & Ammon, 2006, A&A, 460
 C---------------------------------------------------------------------
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       
-      double precision a1,a2,a3,a5,a7,b1,b2,b3,b5,b7,c5
-      double precision V,UB,BV,VR,RI,g,xug,xgr,xri,xiz,xgi
+      real a1,a2,a3,a5,a7,b1,b2,b3,b5,b7,c5
+      real V,UB,BV,VR,RI,g,xug,xgr,xri,xiz,xgi
 
 C     --- Used parameters (Table 3) ----
       parameter(a1=0.630, b1=-0.124)

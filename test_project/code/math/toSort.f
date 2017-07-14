@@ -10,7 +10,7 @@ C     THE 'SEEDS' ISEED1 AND ISEED2 MUST BE INITIALIZED IN THE
 C     MAIN PROGRAM AND TRANSFERRED THROUGH THE NAMED COMMON BLOCK
 C     /RSEED/.
         
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT real (A-H,O-Z)
       real ran
       PARAMETER (USCALE=1.0D0/2.0D0**31)
       COMMON /RSEED/ ISEED1,ISEED2
@@ -47,14 +47,14 @@ C***********************************************************************
 
       SUBROUTINE ODEINT(YSTART,NVAR,X1,X2,EPS,H1,HMIN,NOK,
      &           NBAD,DERIVS,RKQC,yscal,y,dydx)
-      implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
       PARAMETER (MAXSTP=10000,NMAX=10,TWO=2.0,ZERO=0.0,TINY=1.E-30)
       COMMON /PATH/ KMAX,KOUNT,DXSAV,XP(200),YP(10,200)
       DIMENSION YSTART(NVAR),YSCAL(Nvar),Y(Nvar),DYDX(Nvar)
       EXTERNAL DERIVS
       EXTERNAL RKQC
       X=X1
-      H=dSIGN(H1,X2-X1)
+      H=SIGN(H1,X2-X1)
       NOK=0
       NBAD=0
       KOUNT=0
@@ -65,10 +65,10 @@ C***********************************************************************
         DO 16 NSTP=1,MAXSTP
           CALL DERIVS(X,Y,DYDX,xpla,ypla)
           DO 12 I=1,NVAR
-            YSCAL(I)=DABS(Y(I))+DABS(H*DYDX(I))+TINY
+            YSCAL(I)=ABS(Y(I))+ABS(H*DYDX(I))+TINY
 12        CONTINUE
           IF(KMAX.GT.0)THEN
-            IF(DABS(X-XSAV).GT.DABS(DXSAV)) THEN
+            IF(ABS(X-XSAV).GT.ABS(DXSAV)) THEN
               IF(KOUNT.LT.KMAX-1)THEN
                 KOUNT=KOUNT+1
                 XP(KOUNT)=X
@@ -99,7 +99,7 @@ C***********************************************************************
             ENDIF
             RETURN
           ENDIF
-          IF(dABS(HNEXT).LT.HMIN) stop 'Stepsize smaller than minimum.'
+          IF(ABS(HNEXT).LT.HMIN) stop 'Stepsize smaller than minimum.'
             H=HNEXT
 16      CONTINUE
         STOP 'Too many steps.'
@@ -117,7 +117,7 @@ C     results are
 C     ("Numerical recipes in Fortran", Willian H. Press)
 C***********************************************************************
       SUBROUTINE RKQC(Y,DYDX,N,X,HTRY,EPS,YSCAL,HDID,HNEXT,DERIVS)
-      implicit double precision(a-h,o-z)
+      implicit real(a-h,o-z)
       PARAMETER (NMAX=10,FCOR=.0666666667,ONE=1.,SAFETY=0.9,
      &          ERRCON=6.E-4)
       EXTERNAL DERIVS
@@ -141,7 +141,7 @@ C***********************************************************************
       ERRMAX=0.
       DO 12 I=1,N
         YTEMP(I)=Y(I)-YTEMP(I)
-        ERRMAX=dMAX1(ERRMAX,DABS(YTEMP(I)/YSCAL(I)))
+        ERRMAX = MAX1(ERRMAX, ABS(YTEMP(I) / YSCAL(I)))
 12    CONTINUE
       ERRMAX=ERRMAX/EPS
       IF(ERRMAX.GT.ONE) THEN
@@ -174,7 +174,7 @@ C     negative). The routine that has three calls to derivs
 C     ("Numerical recipes in Fortran", Willian H. Press)
 C***********************************************************************        
       SUBROUTINE RK4(Y,DYDX,N,X,H,YOUT,DERIVS)
-      implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
       
       PARAMETER (NMAX=10)
       DIMENSION Y(N),DYDX(N),YOUT(N),YT(NMAX),DYT(NMAX),DYM(NMAX)
@@ -213,7 +213,7 @@ C=======================================================================
 C     This subroutine provides the values of the derivatives of the 
 C     variables y_i
 C-------------------------------------------------------------------
-      implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
 
 C     ---   Dimensions   ---      
       dimension y(2),dydx(2)
@@ -228,7 +228,7 @@ C     ---   Calculating the derivatives    ---
 C***********************************************************************   
 
       SUBROUTINE CHSTWO(BINS1,BINS2,NBINS,KNSTRN,DF,CHSQ,PROB)
-      implicit double precision(a-h,o-z)
+      implicit real(a-h,o-z)
       integer knstrn
       DIMENSION BINS1(NBINS),BINS2(NBINS)
       DF=dfloat(NBINS-1-KNSTRN)
@@ -245,7 +245,7 @@ C***********************************************************************
       END
 
       FUNCTION GAMMQ(A,X)
-      implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
       IF(X.LT.0..OR.A.LE.0.)read (*,*)
       IF(X.LT.A+1.)THEN
         CALL GSER(GAMSER,A,X,GLN)
@@ -257,7 +257,7 @@ C***********************************************************************
       END
       
       SUBROUTINE GSER(GAMSER,A,X,GLN)
-      implicit double precision(a-h,o-z)
+      implicit real(a-h,o-z)
       PARAMETER (ITMAX=100,EPS=3.E-7)
       GLN=GAMMLN(A)
       IF(X.LE.0.)THEN
@@ -272,16 +272,16 @@ C***********************************************************************
         AP=AP+1.
         DEL=DEL*X/AP
         SUM=SUM+DEL
-        IF(dABS(DEL).LT.dABS(SUM)*EPS)GO TO 1
+        IF (ABS(DEL) .LT. ABS(SUM) * EPS) GO TO 1
 11    CONTINUE
       write(6,*) 'A too large, ITMAX too small'
       read(*,*)
-1     GAMSER=SUM*dEXP(-X+A*dLOG(X)-GLN)
+1     GAMSER = SUM * EXP(-X + A * LOG(X) - GLN)
       RETURN
       END
 
       SUBROUTINE GCF(GAMMCF,A,X,GLN)
-      implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
       PARAMETER (ITMAX=100,EPS=3.E-7)
       GLN=GAMMLN(A)
       GOLD=0.
@@ -291,29 +291,29 @@ C***********************************************************************
       B1=1.
       FAC=1.
       DO 11 N=1,ITMAX
-        AN=dFLOAT(N)
-        ANA=AN-A
-        A0=(A1+A0*ANA)*FAC
-        B0=(B1+B0*ANA)*FAC
-        ANF=AN*FAC
-        A1=X*A0+ANF*A1
-        B1=X*B0+ANF*B1
-        IF(A1.NE.0.)THEN
-          FAC=1./A1
-          G=B1*FAC
-          IF(dABS((G-GOLD)/G).LT.EPS)GO TO 1
-          GOLD=G
+        AN = FLOAT(N)
+        ANA = AN - A
+        A0 = (A1 + A0 * ANA) * FAC
+        B0 = (B1 + B0 * ANA) * FAC
+        ANF = AN * FAC
+        A1 = X * A0 + ANF * A1
+        B1 = X * B0 + ANF * B1
+        IF (A1 .NE. 0.0) THEN
+          FAC = 1.0 / A1
+          G = B1 * FAC
+          IF (ABS((G - GOLD) / G) .LT. EPS) GO TO 1
+          GOLD = G
         ENDIF
 11    CONTINUE
       write(6,*) 'A too large, ITMAX too small'
       read(*,*)
-1     GAMMCF=dEXP(-X+A*dLOG(X)-GLN)*G
+1     GAMMCF = EXP(-X + A * LOG(X) - GLN) * G
       RETURN
       END
 
 
       FUNCTION GAMMLN(XX)
-      implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
       REAL*8 COF(6),STP,HALF,ONE,FPF,X,TMP,SER
       DATA COF,STP/76.18009173D0,-86.50532033D0,24.01409822D0,
      *    -1.231739516D0,.120858003D-2,-.536382D-5,2.50662827465D0/
@@ -326,6 +326,6 @@ C***********************************************************************
         X=X+ONE
         SER=SER+COF(J)/X
 11    CONTINUE
-      GAMMLN=TMP+dLOG(STP*SER)
+      GAMMLN = TMP + LOG(STP * SER)
       RETURN
       END

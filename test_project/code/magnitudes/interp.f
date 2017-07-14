@@ -26,23 +26,23 @@ C-------------------------------------------------------------------
 C     Output parameters:
 C       xout: measure of interest
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
 C     ---   Declaration de variables   ---
       integer ncol,ii,jj,k,ns,j1,j2,case1,case2,model,modlog
 C     TIME      
-      double precision y,y1,y2,y3,y4,ym1,ym2
+      real y,y1,y2,y3,y4,ym1,ym2
 C     MASS
-      double precision m,m1,m2
+      real m,m1,m2
 C     Measure of interest
-      double precision x1,x2,x3,x4,xm1,xm2,xout
+      real x1,x2,x3,x4,xm1,xm2,xout
       
-      double precision deltf,den,s,b,t
+      real deltf,den,s,b,t
 
 C     ---   Dimensions   ---
       integer ntrk(ncol)
-      double precision mtrk(ncol),ttrkk(ncol,*)
-      double precision tprewd(ncol),xtrk(ncol,*)
+      real mtrk(ncol),ttrkk(ncol,*)
+      real tprewd(ncol),xtrk(ncol,*)
      
 C     ---  Interpolating measure from tcool and mwd  ---
 

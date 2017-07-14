@@ -24,18 +24,18 @@ C     Output parameters:blanca
 C       c1,c2,c3,c4,c5: Johnson colors
 C
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
 C     ---   Declaraеion of variables   ---
       integer numberOfMassesWithColors,i,k,check1,check2,check3
       integer i1,i2,ntrk(numberOfMassesWithColors),ns1,ns2
-      double precision mass,lumi,c1,c2,c3,c4,c5
-      double precision c_1,c_2,a1,a2,b1,b2
-      double precision mtrk(numberOfMassesWithColors)
-      double precision luminosity(numberOfMassesWithColors,*),
+      real mass,lumi,c1,c2,c3,c4,c5
+      real c_1,c_2,a1,a2,b1,b2
+      real mtrk(numberOfMassesWithColors)
+      real luminosity(numberOfMassesWithColors,*),
      &                 color_U(numberOfMassesWithColors,*),
      &                 color_B(numberOfMassesWithColors,*)
-      double precision color_V(numberOfMassesWithColors,*),
+      real color_V(numberOfMassesWithColors,*),
      &                 color_R(numberOfMassesWithColors,*),
      &                 color_I(numberOfMassesWithColors,*)
 
@@ -486,8 +486,8 @@ C***********************************************************************
 C     TODO:rewrite      
       subroutine extrap1(lumi,x1,x2,l1,l2,c)
       
-      implicit double precision (a-h,m,o-z)
-      double precision lumi,x1,x2,l1,l2,c,s,b
+      implicit real (a-h,m,o-z)
+      real lumi,x1,x2,l1,l2,c,s,b
       
       s=(x2-x1)/(l2-l1)
       b=x1-s*l1

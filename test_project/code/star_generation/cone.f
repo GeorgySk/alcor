@@ -15,7 +15,7 @@ C     with its height direction set by longitude and latitude
           external ran
           real ran
 
-          double precision :: cone_height_longitude,
+          real :: cone_height_longitude,
      &                        cone_height_latitude,
      &                        galacticDiskAge
           integer :: iseed,
@@ -23,22 +23,22 @@ C     with its height direction set by longitude and latitude
      &               kinematicModel
 
           integer, parameter :: numberOfStars = 6000000
-          double precision :: starBirthTime(numberOfStars),
+          real :: starBirthTime(numberOfStars),
      &                        m(numberOfStars),
-     &                        coordinate_Theta(numberOfStars),
-     &                        coordinate_R(numberOfStars),
-     &                        coordinate_Zcylindr(numberOfStars),
      &                        heightPattern(numberOfStars),
      &                        flagOfWD(numberOfStars)
+          double precision :: coordinate_Theta(numberOfStars),
+     &                        coordinate_R(numberOfStars),
+     &                        coordinate_Zcylindr(numberOfStars)
           integer :: numberOfWDs,
      &               disk_belonging(numberOfStars)
 
-          double precision, parameter :: PI = 4.0 * atan(1.0),
+          real, parameter :: PI = 4.0 * atan(1.0),
      &                                   FI = PI / 180.0,
      &                                   DELTA_LATITUDE = 2.64 * FI,
      &                                  NORMALIZATION_CONE_HEIGHT = 0.2,
      &                                   CONE_HEIGHT = 5.0,
-     &                                THIN_DISK_DENSITY = 0.095 * 1.0d9,
+     &                                THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                         THIN_DISK_STARS_COUNT_FRACTION = 0.92,
      &                         THICK_DISK_STARS_COUNT_FRACTION = 1.0 
      &                                 - THIN_DISK_STARS_COUNT_FRACTION,
@@ -46,7 +46,7 @@ C     with its height direction set by longitude and latitude
      &                                  THICK_DISK_SCALEHEIGHT = 1.5,
      &                                  MASS_REDUCTION_FACTOR = 0.003,
      &                               SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
-          double precision :: delta_longitude,
+          real :: delta_longitude,
      &                        min_longitude,
      &                        max_longitude,
      &                        longitude_range,
@@ -83,7 +83,7 @@ C     with its height direction set by longitude and latitude
           common /index/ flagOfWD,numberOfWDs,disk_belonging
 
           ! NOTE: this can be infinity
-          delta_longitude = DELTA_LATITUDE / dcos(cone_height_latitude)
+          delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
           min_longitude = cone_height_longitude  - delta_longitude / 2.0
           max_longitude = cone_height_longitude  + delta_longitude / 2.0
           longitude_range = max_longitude - min_longitude
@@ -143,13 +143,13 @@ C                 converting from galactic to cyl.galactocentric
                   coordinate_R(stars_count) 
      &                = opposite_triangle_side(
      &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
-     &                      distance * dabs(dcos(latitude)), 
+     &                      distance * abs(cos(latitude)), 
      &                      longitude)
                   coordinate_Theta(stars_count) 
-     &               = dasin(distance*dabs(dcos(latitude))
-     &                 *dsin(longitude)/coordinate_R(stars_count))
+     &               = asin(distance*abs(cos(latitude))
+     &                 *sin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
-     &                                               * dsin(latitude)
+     &                                               * sin(latitude)
       
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
@@ -206,13 +206,13 @@ C                 converting from galactic to cyl.galactocentric
                   coordinate_R(stars_count) 
      &                = opposite_triangle_side(
      &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
-     &                      distance * dabs(dcos(latitude)), 
+     &                      distance * abs(cos(latitude)), 
      &                      longitude)
                   coordinate_Theta(stars_count) 
-     &                = dasin(distance*dabs(dcos(latitude))
-     &                  *dsin(longitude)/coordinate_R(stars_count))
+     &                = asin(distance*abs(cos(latitude))
+     &                  *sin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
-     &                                               * dsin(latitude)
+     &                                               * sin(latitude)
       
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
@@ -268,13 +268,13 @@ C                 converting from galactic to cyl.galactocentric
                   coordinate_R(stars_count) 
      &                = opposite_triangle_side(
      &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
-     &                      distance * dabs(dcos(latitude)), 
+     &                      distance * abs(cos(latitude)), 
      &                      longitude)
                   coordinate_Theta(stars_count) 
-     &                = dasin(distance*dabs(dcos(latitude))
-     &                  *dsin(longitude)/coordinate_R(stars_count))
+     &                = asin(distance*abs(cos(latitude))
+     &                  *sin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
-     &                                               * dsin(latitude)
+     &                                               * sin(latitude)
       
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
@@ -284,9 +284,9 @@ C                 converting from galactic to cyl.galactocentric
       
                   ! Assuming constant star formation rate
                   starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
-                  tmax = tmdisk * dexp(-tmdisk/tau)
+                  tmax = tmdisk * exp(-tmdisk/tau)
  33               ttry = ttdisk * ran(iseed)
-                  ft = ttry * dexp(-ttry/tau)
+                  ft = ttry * exp(-ttry/tau)
                   fz = tmax * ran(iseed)
                   if (fz .le. ft) then
                       starBirthTime(stars_count) = ttry
@@ -306,14 +306,14 @@ C                 converting from galactic to cyl.galactocentric
      &                       density,
      &                       scaleheight) result(mass)
           implicit none
-          double precision, intent(in) :: cone_height_longitude, 
+          real, intent(in) :: cone_height_longitude, 
      &                                  cone_height_latitude
-          double precision, parameter :: PI = 4.0 * atan(1.0),
+          real, parameter :: PI = 4.0 * atan(1.0),
      &                                   FI = PI / 180.0,
      &                                   DELTA_LATITUDE = 2.64 * FI,
-     &                                THIN_DISK_DENSITY = 0.095 * 1.0d9,
+     &                                THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                                   THIN_DISK_SCALEHEIGHT = 0.25
-          double precision :: muted_cone_height_longitude, 
+          real :: muted_cone_height_longitude, 
      &                        muted_cone_height_latitude, 
      &                        mass, 
      &                        delta_longitude, 
@@ -346,7 +346,7 @@ C                 converting from galactic to cyl.galactocentric
           end if
 
           delta_longitude = DELTA_LATITUDE 
-     &                      / dcos(muted_cone_height_latitude)
+     &                      / cos(muted_cone_height_latitude)
           min_longitude=muted_cone_height_longitude-delta_longitude/2.0
           max_longitude=muted_cone_height_longitude+delta_longitude/2.0
           longitude_range = max_longitude - min_longitude
@@ -372,7 +372,7 @@ C                 converting from galactic to cyl.galactocentric
           ! Case 2:
           if (min_latitude < 0.0) then
               mass = density * longitude_range
-     &               * (get_iota_integral(dabs(min_latitude),
+     &               * (get_iota_integral(abs(min_latitude),
      &                                    scaleheight)
      &                 + get_iota_integral(max_latitude,scaleheight))
           end if
@@ -392,28 +392,28 @@ C                 converting from galactic to cyl.galactocentric
      &                         latitude,
      &                         scaleheight) result(max_density)
           implicit none
-          double precision, intent(in) :: longitude,
+          real, intent(in) :: longitude,
      &                                    latitude
-          double precision :: max_density,
+          real :: max_density,
      &                        density,
      &                        distance,
      &                        get_density,
      &                        scaleheight
           integer :: distance_index
           integer, parameter :: DISTANCE_ITER_COUNT = 1000
-          double precision, parameter :: CONE_HEIGHT = 5.0,
+          real, parameter :: CONE_HEIGHT = 5.0,
      &                                   DISTANCE_INCREMENT=CONE_HEIGHT
-     &                                   / dfloat(DISTANCE_ITER_COUNT),
+     &                                   / float(DISTANCE_ITER_COUNT),
      &                               MONTE_CARLO_MAX_SHIFT_FACTOR = 1.1
   
           do distance_index = 1, DISTANCE_ITER_COUNT
-              distance = DISTANCE_INCREMENT * dfloat(distance_index)
+              distance = DISTANCE_INCREMENT * float(distance_index)
   
               density = get_density(distance, 
      &                              longitude,
      &                              latitude,
      &                              scaleheight)
-              max_density = dmax1(max_density, density)
+              max_density = max1(max_density, density)
           end do
   
           max_density = MONTE_CARLO_MAX_SHIFT_FACTOR * max_density
@@ -423,19 +423,19 @@ C                 converting from galactic to cyl.galactocentric
       function get_density(distance,longitude,latitude,scaleheight)
      &                                           result(density)
           implicit none
-          double precision, intent(in) :: distance, longitude, latitude
-          double precision :: density, 
+          real, intent(in) :: distance, longitude, latitude
+          real :: density, 
      &                        pole_projection, 
      &                        plane_projection, 
      &                        galactocentric_distance,
      &                        opposite_triangle_side,
      &                        scaleheight
-          double precision, parameter :: 
+          real, parameter :: 
      &          SOLAR_GALACTOCENTRIC_DISTANCE = 8.5,
      &          THICK_DISK_SCALELENGTH = 3.0
   
-          pole_projection = distance * dabs(dsin(latitude))
-          plane_projection = distance * dabs(dcos(latitude))
+          pole_projection = distance * abs(sin(latitude))
+          plane_projection = distance * abs(cos(latitude))
           
           galactocentric_distance  = opposite_triangle_side(
      &                                  plane_projection, 
@@ -443,8 +443,8 @@ C                 converting from galactic to cyl.galactocentric
      &                                  longitude)
   
           density = distance * distance
-     &            * dexp(-dabs(pole_projection) / scaleheight)
-     &            * dexp(-dabs(galactocentric_distance)
+     &            * exp(-abs(pole_projection) / scaleheight)
+     &            * exp(-abs(galactocentric_distance)
      &                         / THICK_DISK_SCALELENGTH)
       end function
 
@@ -456,12 +456,12 @@ C                 converting from galactic to cyl.galactocentric
           real ran
 
           integer, intent(inout) :: iseed
-          double precision, parameter :: MIN_MASS = 0.4,
+          real, parameter :: MIN_MASS = 0.4,
      &                            MAX_MASS = 50.0,
      &                            MASS_RANGE = MAX_MASS - MIN_MASS,
      &                            ALPHA_IMF = -2.35, 
      &                            YMAX = MIN_MASS ** ALPHA_IMF
-          double precision :: zy,
+          real :: zy,
      &                        zx, 
      &                        zyimf, 
      &                        mass
@@ -489,16 +489,16 @@ C                 converting from galactic to cyl.galactocentric
      &                                adjacent_2, 
      &                                enclosed_angle) result(opposite)
           implicit none
-          double precision, intent(in) :: adjacent_1,
+          real, intent(in) :: adjacent_1,
      &                                    adjacent_2,
      &                                    enclosed_angle
-          double precision :: opposite
+          real :: opposite
   
           ! cosines law
-          opposite = dsqrt(adjacent_1 * adjacent_1
+          opposite = sqrt(adjacent_1 * adjacent_1
      &                      + adjacent_2 * adjacent_2
      &                      - 2.0 * adjacent_1 * adjacent_2
-     &                        * dcos(enclosed_angle))
+     &                        * cos(enclosed_angle))
       end function
 
 
@@ -506,14 +506,14 @@ C                 converting from galactic to cyl.galactocentric
       ! spherical square pyramid. Name kappa is chosen randomly.
       function get_kappa_integral(latitude,scaleheight) result(kappa)
           implicit none
-          double precision, intent(in) :: latitude
-          double precision :: kappa, gamma, scaleheight
-          double precision, parameter :: NORMALIZATION_CONE_HEIGHT=0.2
+          real, intent(in) :: latitude
+          real :: kappa, gamma, scaleheight
+          real, parameter :: NORMALIZATION_CONE_HEIGHT=0.2
   
           ! We use this constant just to simplify the next expressions
           gamma = scaleheight / sin(latitude)
   
-          kappa = gamma*(gamma-dexp(-NORMALIZATION_CONE_HEIGHT / gamma)
+          kappa = gamma*(gamma-exp(-NORMALIZATION_CONE_HEIGHT / gamma)
      &                         * (gamma + NORMALIZATION_CONE_HEIGHT))
       end function
   
@@ -522,9 +522,9 @@ C                 converting from galactic to cyl.galactocentric
       ! spherical square pyramid. Case 2. Name iota is chosen randomly.
       function get_iota_integral(latitude,scaleheight) result(iota)
           implicit none
-          double precision, intent(in) :: latitude
-          double precision :: iota, get_kappa_integral,scaleheight
-          double precision, parameter :: THIN_DISK_SCALEHEIGHT = 0.25,
+          real, intent(in) :: latitude
+          real :: iota, get_kappa_integral,scaleheight
+          real, parameter :: THIN_DISK_SCALEHEIGHT = 0.25,
      &                                   NORMALIZATION_CONE_HEIGHT=0.2
   
           iota = (NORMALIZATION_CONE_HEIGHT * NORMALIZATION_CONE_HEIGHT 
@@ -538,11 +538,11 @@ C                 converting from galactic to cyl.galactocentric
       ! spherical square pyramid. Case 3. Name lambda is chosen randomly.
       function get_lambda_integral(latitude,scaleheight) result(lambda)
           implicit none
-          double precision, intent(in) :: latitude
-          double precision :: lambda, get_kappa_integral,scaleheight
-          double precision, parameter :: THIN_DISK_SCALEHEIGHT = 0.25,
+          real, intent(in) :: latitude
+          real :: lambda, get_kappa_integral,scaleheight
+          real, parameter :: THIN_DISK_SCALEHEIGHT = 0.25,
      &                                   NORMALIZATION_CONE_HEIGHT=0.2
-          double precision, parameter :: PI = 4.0 * atan(1.0)
+          real, parameter :: PI = 4.0 * atan(1.0)
   
           lambda = -scaleheight
      &               * (get_kappa_integral((PI / 2.0),scaleheight)

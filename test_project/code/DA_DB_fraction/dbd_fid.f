@@ -11,13 +11,13 @@ C
 C     Created by ER Cojocaru (11/2012)
 C
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       
 C     ---   Declaration of variables  ---
       external ran
       real ran
       integer iseed,in
-      double precision x,fractionOfDB
+      real x,fractionOfDB
       
 C     --- Fiducial model: 20% DB, 80% DA
       x=ran(iseed)

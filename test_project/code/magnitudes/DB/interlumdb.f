@@ -27,17 +27,17 @@ C       c1,c2,c3,c4,c5: Johnson colors Johnson (UBVRI)
 C
 C=======================================================================
       use external_types
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
 C     ---   Declaration of variables   ---
       integer numberOfSequencesInGroup_1,numberOfSequencesInGroup_2,
      &        numberOfSequencesInGroup_3,numberOfSequences,nrowb,nrowb2,
      &        model,modlog   
-      double precision tcool,mass,Z,lum,teff,logg
-      double precision Z1,lum1,teff1,logg1
-      double precision Z2,lum2,teff2,logg2
-      double precision c1,c2,c3,c4,c5
-      double precision zet1,zet2,zet3
+      real tcool,mass,Z,lum,teff,logg
+      real Z1,lum1,teff1,logg1
+      real Z2,lum2,teff2,logg2
+      real c1,c2,c3,c4,c5
+      real zet1,zet2,zet3
       
 C     ---   Parameters   ---
       parameter (nrowb=400)
@@ -48,23 +48,23 @@ C     ---   Dimensions   ---
      &        vectorOfPointsNumberOfSeq_2(9),
      &        vectorOfPointsNumberOfSeq_3(9),
      &        numberOfPointsInSequence(7)
-      double precision vectorOfMasses_1(7),vectorOfPreviousTimes_1(7)
-      double precision matrixOfCoolingTimes_1(7,nrowb),
+      real vectorOfMasses_1(7),vectorOfPreviousTimes_1(7)
+      real matrixOfCoolingTimes_1(7,nrowb),
      &                 matrixOfLuminosities_1(7,nrowb)
-      double precision matrixOfEffectiveTemperatures_1(7,nrowb),
+      real matrixOfEffectiveTemperatures_1(7,nrowb),
      &                 matrixOfLog_g_1(7,nrowb)
-      double precision vectorOfMasses_2(9),vectorOfPreviousTimes_2(9)
-      double precision matrixOfCoolingTimes_2(9,nrowb),
+      real vectorOfMasses_2(9),vectorOfPreviousTimes_2(9)
+      real matrixOfCoolingTimes_2(9,nrowb),
      &                 matrixOfLuminosities_2(9,nrowb)
-      double precision matrixOfEffectiveTemperatures_2(9,nrowb),
+      real matrixOfEffectiveTemperatures_2(9,nrowb),
      &                 matrixOfLog_g_2(9,nrowb)
-      double precision vectorOfMasses_3(9),vectorOfPreviousTimes_3(9)
-      double precision matrixOfCoolingTimes_3(9,nrowb),
+      real vectorOfMasses_3(9),vectorOfPreviousTimes_3(9)
+      real matrixOfCoolingTimes_3(9,nrowb),
      &                 matrixOfLuminosities_3(9,nrowb)
-      double precision matrixOfEffectiveTemperatures_3(9,nrowb),
+      real matrixOfEffectiveTemperatures_3(9,nrowb),
      &                 matrixOfLog_g_3(9,nrowb)
-      double precision massSequence(7),luminosityDB(7,nrowb2)
-      double precision colorDB_U(7,nrowb2),colorDB_B(7,nrowb2),
+      real massSequence(7),luminosityDB(7,nrowb2)
+      real colorDB_U(7,nrowb2),colorDB_B(7,nrowb2),
      &                 colorDB_V(7,nrowb2),colorDB_R(7,nrowb2),
      &                 colorDB_I(7,nrowb2)
 

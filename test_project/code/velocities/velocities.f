@@ -14,11 +14,12 @@ C       NOTE: I should give iseed following descriptive name
 C       iseed: random number generator parameter
 C       numberOfStarsInSample
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       
       integer numberOfStars,iseed,numberOfStarsInSample,i,k,numberOfWDs
-      double precision uo,vo,wo,a,b,solarGalactocentricDistance,uop,vop,
+      real uo,vo,wo,a,b,uop,vop,
      &                 yy,gasdev,uom,vom
+      double precision :: solarGalactocentricDistance
       character(len = 6) :: geometry
           
 C     ---   Parameters   ---
@@ -36,16 +37,16 @@ C--------------------------------------------------------------------
 C     (uu,vv,ww): heliocentric velocities, B3 system
 C     sigma(3): dispersion of velocities
 C--------------------------------------------------------------------
-      double precision uu(numberOfStars),vv(numberOfStars),
+      real uu(numberOfStars),vv(numberOfStars),
      &                 ww(numberOfStars)
-      double precision sigma(3)
-      double precision coordinate_R(numberOfStars),
-     &                 coordinate_Theta(numberOfStars),
-     &                 coordinate_Zcylindr(numberOfStars)
-      double precision heightPattern(numberOfStars)
-      double precision flagOfWD(numberOfStars)
+      real sigma(3)
+      double precision :: coordinate_R(numberOfStars),
+     &                    coordinate_Theta(numberOfStars),
+     &                    coordinate_Zcylindr(numberOfStars)
+      real heightPattern(numberOfStars)
+      real flagOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
-      double precision zz(numberOfStars),zh(numberOfStars)
+      real zz(numberOfStars),zh(numberOfStars)
       
 C     ---  Commons  ---
       common /vel/ uu,vv,ww
@@ -112,12 +113,20 @@ C       ---  model of constant sigmas
         
 C       ---   Calling to the function of gaussian distribution  ---
         yy=gasdev(iseed)
-        uop=uom(coordinate_R(i),coordinate_Theta(i),a,b,
-     &      solarGalactocentricDistance,uo)
-        uu(i)=sigma(1)*yy+uop
-        yy=gasdev(iseed)
-        vop=vom(coordinate_R(i),coordinate_Theta(i),a,b,
-     &      solarGalactocentricDistance,vo)
+        uop = uom(coordinate_R(i),
+     &            coordinate_Theta(i),
+     &            a, 
+     &            b,
+     &            solarGalactocentricDistance,
+     &            uo)
+        uu(i) = sigma(1) * yy + uop
+        yy = gasdev(iseed)
+        vop = vom(coordinate_R(i),
+     &            coordinate_Theta(i),
+     &            a, 
+     &            b,
+     &            solarGalactocentricDistance,
+     &            vo)
         vv(i)=sigma(2)*yy+vop-sigma(1)*sigma(1)/120.0
         yy=gasdev(iseed)
         ww(i)=sigma(3)*yy+wo
@@ -139,11 +148,13 @@ C
 C     Calculating uo taking into account the effect of galactic rotation
 C
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       
-      double precision r,th,a,b,solarGalactocentricDistance,uo,uom
+      real a,b,uo,uom
+      double precision :: r, th, solarGalactocentricDistance
       
-      uom=uo+((3.0-(2.0*r)/solarGalactocentricDistance)*a-b)*r*sin(th)
+      uom = uo + ((3.0 - (2.0 * r) / solarGalactocentricDistance) * a 
+     &             - b) * r * sin(th)
       
       return
       end
@@ -158,9 +169,10 @@ C
 C     Calculating vo taking into account the effect of galactic rotation
 C
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       
-      double precision r,th,a,b,solarGalactocentricDistance,vo,vom
+      real a,b,vo,vom
+      double precision :: r, th, solarGalactocentricDistance
 
       vom = vo + ((3.0 - (2.0 * r) / solarGalactocentricDistance) * a 
      &            - b) * r * cos(th) - (a - b) 

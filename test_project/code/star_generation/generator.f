@@ -19,7 +19,7 @@ C           Output parameters:
 C           numberOfStarsInSample: number of participating stars
 C=======================================================================
 C     TODO: change to implicit none
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
 C     overloading intrinsic 'ran' function by our own RNG
       external ran
@@ -28,7 +28,7 @@ C     overloading intrinsic 'ran' function by our own RNG
      &        nbins,
      &        iseed,
      &        sfr_model
-      double precision zDistribution_zo,
+      real zDistribution_zo,
      &                 deltaT_SFRThickDisk,
      &                 heightSFR_ThickDisk,
      &                 sheight, 
@@ -60,20 +60,20 @@ C     Parameters of the thick disk
       parameter (tau = 2.0)
       
       integer numberOfStarsInSample, i, k, in
-      double precision parameterOfSFR,areaOfSector,galacticDiskAge,cte,
+      real parameterOfSFR,areaOfSector,galacticDiskAge,cte,
      &                 deltat,massReductionFactor,psi
-      double precision me,mgen,mrep,t,tf,to,xseed,xx,zmaxbin,zz
+      real me,mgen,mrep,t,tf,to,xseed,xx,zmaxbin,zz
 C     NOTE: ximf - mass from IMF by Salpeter, cnorm - const.of 
 C           normalization of SFR. Both are from functions with same name
-      double precision ximf,cnorm  
-      double precision coordinate_Theta(numberOfStars),
-     &                 coordinate_R(numberOfStars),
-     &                 coordinate_Zcylindr(numberOfStars)
+      real ximf,cnorm  
+      double precision :: coordinate_Theta(numberOfStars),
+     &                    coordinate_R(numberOfStars),
+     &                    coordinate_Zcylindr(numberOfStars)
 C     QUESTION: what is m? massInMainSequence? 
-      double precision m(numberOfStars)
-      double precision starBirthTime(numberOfStars)
-      double precision heightPattern(numberOfStars)
-      double precision flagOfWD(numberOfStars)
+      real m(numberOfStars)
+      real starBirthTime(numberOfStars)
+      real heightPattern(numberOfStars)
+      real flagOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
 
       common /tm/ starBirthTime,m
@@ -112,7 +112,7 @@ C     ---  Calculating the mass to be distributed at each interval ---
       do 3 i = 1, nbins
           zmaxbin = 0.0
           psi = cte * deltat
-          mrep = psi * areaOfSector * 1.0d6
+          mrep = psi * areaOfSector * 1.06
           mrep = mrep / massReductionFactor
           mgen = 0.0
 
@@ -122,7 +122,7 @@ C         NOTE: we don't need so many parameters
           tago = galacticDiskAge - tago
           tfin = galacticDiskAge
 
-          tsfr = to + dfloat(i-1) * deltat
+          tsfr = to + float(i-1) * deltat
       
           if(tsfr.ge.tago .and. tsfr.lt.tfin) then
               mrep = mrep * 5.0
@@ -152,9 +152,9 @@ C         --- disk_belonging = 1 (thin disk), = 2 (thick disk)
           if (sfr_model == 2) then
               if (ran(iseed) .le. 0.08) then
                   disk_belonging(k) = 2
-                  tmax = tmdisk * dexp(-tmdisk/tau)
+                  tmax = tmdisk * exp(-tmdisk/tau)
  33               ttry = ttdisk * ran(iseed)
-                  ft = ttry * dexp(-ttry/tau)
+                  ft = ttry * exp(-ttry/tau)
                   fz = tmax * ran(iseed)
                   if (fz .le. ft) then
                       starBirthTime(k) = ttry
@@ -195,7 +195,7 @@ C         --- Calculating z ---
 C         TODO: delete this goto and put a loop here
 2         xx=zDistribution_zo*heightPattern(k)*ran(iseed)
           if (xx.eq.0.0) goto 2 
-          zz=heightPattern(k)*DLOG(zDistribution_zo*heightPattern(k)/xx)
+          zz=heightPattern(k)*LOG(zDistribution_zo*heightPattern(k)/xx)
 
 C         QUESTION: what is this?
 C-------------------------------------------------------------------    
@@ -235,8 +235,8 @@ C***********************************************************************
 C=======================================================================
 C     Calculating the normalization constant of the SFR
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
-      double precision sigma,parameterOfSFR,galacticDiskAge,cnorm
+      implicit real (a-h,m,o-z)
+      real sigma,parameterOfSFR,galacticDiskAge,cnorm
 C     ---   Parameters   ---
       parameter (sigma=51.0)
 C     ---   Calculating   ---
@@ -254,7 +254,7 @@ C
 C     Calculating the mass following the IMF by Salpeter.
 C    
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       external ran
       real ran
 

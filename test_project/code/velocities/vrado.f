@@ -6,21 +6,22 @@ C     This subroutine calculates the heliocentric velocities, starting
 C     from the proper motions in galactic coordinates, making zero
 C     the component of radial velocity
 C***********************************************************************
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
        
       integer numberOfStars,i,numberOfWDs
-      double precision k,xcb,xsb,xcl,xsl,r
-      double precision a1,a2,b1,b2,b3,c1,c2,c3
+      real k,xcb,xsb,xcl,xsl,r
+      real a1,a2,b1,b2,b3,c1,c2,c3
 C     ---   Parameters  ---
       parameter (numberOfStars=6000000)
-      parameter (k=4.74d0)
+      parameter (k=4.740)
 C     ---   Dimensiones   --- 
-      double precision mpl(numberOfStars),mpb(numberOfStars),
+      real mpl(numberOfStars),mpb(numberOfStars),
      &                 vr(numberOfStars)
-      double precision rgac(numberOfStars),lgac(numberOfStars),
-     &                 bgac(numberOfStars)
-      double precision flagOfWD(numberOfStars)
-      double precision u(numberOfWDs),v(numberOfWDs),w(numberOfWDs)
+      real rgac(numberOfStars)
+      double precision :: lgac(numberOfStars),
+     &                    bgac(numberOfStars)
+      real flagOfWD(numberOfStars)
+      real u(numberOfWDs),v(numberOfWDs),w(numberOfWDs)
       integer disk_belonging(numberOfStars)
 
 C    ---   Commons  ---

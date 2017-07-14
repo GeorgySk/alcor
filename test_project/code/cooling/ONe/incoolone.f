@@ -14,10 +14,10 @@ C       mvtabone: visual absolute magnitude visual
 C       lgtabone: logarithm of the cooling time in years
 C
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       
       integer nrow,ncol,nrow2,ncol2
-      double precision a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13 
+      real a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13 
 
 C   ---  Parameter ---
       parameter(ncol=6)
@@ -28,12 +28,12 @@ C   ---  Parameter ---
 C   ---  Dimension  ---
       integer i,j,ird
       integer ndatsone(ncol),ndatsone2(ncol2)
-      double precision mtabone(ncol),mtabone2(ncol2)
-      double precision lgtabone(ncol,nrow),ltabone(ncol,nrow)
-      double precision mvtabone(ncol,nrow),lgtetabone(ncol,nrow)
-      double precision bvtabone(ncol,nrow),vitabone(ncol,nrow)
-      double precision vrtabone(ncol,nrow),uvtabone(ncol,nrow)
-      double precision lgrtabone(ncol2,nrow2),lgt2tabone(ncol2,nrow2)
+      real mtabone(ncol),mtabone2(ncol2)
+      real lgtabone(ncol,nrow),ltabone(ncol,nrow)
+      real mvtabone(ncol,nrow),lgtetabone(ncol,nrow)
+      real bvtabone(ncol,nrow),vitabone(ncol,nrow)
+      real vrtabone(ncol,nrow),uvtabone(ncol,nrow)
+      real lgrtabone(ncol2,nrow2),lgt2tabone(ncol2,nrow2)
 
 C  ---  Commons ---
       common /fredone/ lgtabone,ltabone,mvtabone,lgtetabone
@@ -83,7 +83,7 @@ C      ---  Reading the data of log Teff and log g ---
 C         ---  Reconverting radii in cm to radii in solar radius ---
           a3=10.0**a3
           a3=a3/(6.96d10)
-          a3=dlog10(a3)
+          a3=log10(a3)
           lgrtabone(i,j)=a3
           lgt2tabone(i,j)=a5 
         end do      

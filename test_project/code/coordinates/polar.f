@@ -23,28 +23,29 @@ C     solarGalactocentricDistance: galactocentric distance of the Sun
 C     scaleLength: scale length
 C     numberOfWDs: total number of WDs
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
 C     --- Declaration of variables  ---
       external ran       
       real ran
       integer numberOfWDs,iseed,j
-      double precision dospi,minimumSectorRadius,maximumSectorRadius,
+      real dospi,minimumSectorRadius,maximumSectorRadius,
      &                 angleCoveringSector,radiusOfSector,
-     &                 solarGalactocentricDistance,scaleLength,asr
-      double precision drsun2,dist,pi,xmin,xmax,zzz,zzr,zzy,zz,xx,xc,yc
-      double precision xcte,xinc
+     &                 scaleLength,asr
+      double precision :: solarGalactocentricDistance
+      real drsun2,dist,pi,xmin,xmax,zzz,zzr,zzy,zz,xx,xc,yc
+      real xcte,xinc
        
 C     ---  Parameters  ---
       integer numberOfStars
       parameter (numberOfStars=6000000)
            
 C     ---  Dimensions  ---
-      double precision coordinate_R(numberOfStars),
-     &                 coordinate_Theta(numberOfStars),
-     &                 coordinate_Zcylindr(numberOfStars)
-      double precision x(numberOfStars),y(numberOfStars)
-      double precision flagOfWD(numberOfStars)
+      double precision :: coordinate_R(numberOfStars),
+     &                    coordinate_Theta(numberOfStars),
+     &                    coordinate_Zcylindr(numberOfStars)
+      real x(numberOfStars),y(numberOfStars)
+      real flagOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
 
 C     ---  Commons  ---
@@ -73,16 +74,16 @@ C      and radius between minimumSectorRadius and maximumSectorRadius ---
         endif
 31      zzz=minimumSectorRadius+xinc*ran(iseed)
         zzy=0.16*ran(iseed)
-        zzr=dexp(-zzz/scaleLength)
+        zzr=exp(-zzz/scaleLength)
         if (zzy.gt.zzr) then
           goto 31
         else
         endif
         zz=(zzz-minimumSectorRadius)/xinc
         xx=xmin+(xcte*zz)
-        coordinate_R(j)=dsqrt(xx)  
-        xc=coordinate_R(j)*dcos(coordinate_Theta(j))
-        yc=coordinate_R(j)*dsin(coordinate_Theta(j))
+        coordinate_R(j)=sqrt(xx)  
+        xc=coordinate_R(j)*cos(coordinate_Theta(j))
+        yc=coordinate_R(j)*sin(coordinate_Theta(j))
         dist=((xc-solarGalactocentricDistance)*
      &       (xc-solarGalactocentricDistance)+yc*yc)
 C       QUESTION: what does it mean?       

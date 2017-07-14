@@ -12,7 +12,7 @@ C-------------------------------------------------------------------
 C     ---   Parameters  ---
 C     TODO: fill in 
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       external ran
       real ran
 
@@ -23,12 +23,12 @@ C     NOTE:too many variables. whole subr needs to be splited
       integer eleminatedByParallax,eleminatedByDeclination,
      &        eleminatedByProperMotion,eleminatedByApparentMagn,
      &        eleminatedByReducedPropM
-      double precision parameterIFMR
-      double precision minimumProperMotion,declinationLimit,
+      real parameterIFMR
+      real minimumProperMotion,declinationLimit,
      &                 minimumParallax
-      double precision mbolmin,mbolinc,mbolmax      
-      double precision errinfa,errsupa,mbol
-      double precision fnora,fnor,pi,vvv,x,xx,xya
+      real mbolmin,mbolinc,mbolmax      
+      real errinfa,errsupa,mbol
+      real fnora,fnor,pi,vvv,x,xx,xya
       
       parameter (numberOfStars=6000000)
 C     (Only northern hemisphere)
@@ -44,67 +44,67 @@ C     Parameters of mass histograms
       parameter (xmasf=1.4)
       parameter (xmasinc=0.05)
 
-      double precision properMotion(numberOfStars),
+      real properMotion(numberOfStars),
      &                 rightAscension(numberOfStars),
      &                 declination(numberOfStars)
-      double precision luminosityOfWD(numberOfStars),
+      real luminosityOfWD(numberOfStars),
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
-      double precision flagOfWD(numberOfStars)
+      real flagOfWD(numberOfStars)
 C     rgac - galactocentric distance to WD TODO: give a better name
-      double precision rgac(numberOfStars)
-      double precision coolingTime(numberOfStars)
+      real rgac(numberOfStars)
+      real :: coolingTime(numberOfStars)
 C     NOTE: this 70 comes from nowhere      
       integer numberOfWDsInBin(70),numberOfBins
-      double precision coordinate_R(numberOfStars),
-     &                 coordinate_Theta(numberOfStars),
-     &                 coordinate_Zcylindr(numberOfStars)
-      double precision parallax(numberOfStars)
-      double precision tangenVelo(numberOfStars)
-      double precision errora(70),ndfa(70)
+      double precision :: coordinate_R(numberOfStars),
+     &                    coordinate_Theta(numberOfStars),
+     &                    coordinate_Zcylindr(numberOfStars)
+      real parallax(numberOfStars)
+      real tangenVelo(numberOfStars)
+      real errora(70),ndfa(70)
 C     ugriz-color system and V-band from Johnson system
-      double precision go(numberOfStars),gr(numberOfStars),
+      real go(numberOfStars),gr(numberOfStars),
      &                 v(numberOfStars)
-      double precision gi(numberOfStars),ur(numberOfStars),
+      real gi(numberOfStars),ur(numberOfStars),
      &                 rz(numberOfStars)
-      double precision massInBin(70)
-      integer typeOfWD(numberOfStars)
+      real massInBin(70)
+      integer :: typeOfWD(numberOfStars)
 C     values of LF in each bin. o-observational
-      double precision xfl(19),xflo(19),xflcut(3),xflocut(3)
-      double precision xflhot(11),xflohot(11)
+      real xfl(19),xflo(19),xflcut(3),xflocut(3)
+      real xflhot(11),xflohot(11)
 C     bins for max-region: for synthetic and observational samples
-      double precision xflMaxRegion(6), xfloMaxRegion(6)
+      real xflMaxRegion(6), xfloMaxRegion(6)
 C     number of WDs in bin of mass histogram
-      double precision nbinmass(26)
+      real nbinmass(26)
 C     WDs velocities. QUESTION: relative to what?
-      double precision uu(numberOfStars), vv(numberOfStars), 
+      real uu(numberOfStars), vv(numberOfStars), 
      &                 ww(numberOfStars)
 C     sum of WDs velocities in specific bin, _u/_v/_w - components
-      double precision sumOfWDVelocitiesInBin_u(70),
+      real sumOfWDVelocitiesInBin_u(70),
      &                 sumOfWDVelocitiesInBin_v(70),
      &                 sumOfWDVelocitiesInBin_w(70)
 C     average velocity for WDs in specific bin      
-      double precision averageWDVelocityInBin_u(70),
+      real averageWDVelocityInBin_u(70),
      &                 averageWDVelocityInBin_v(70),
      &                 averageWDVelocityInBin_w(70)  
 C     this is used to calculate sigma (SD)
-      double precision sumOfSquareDifferences_u,
+      real sumOfSquareDifferences_u,
      &                 sumOfSquareDifferences_v,
      &                 sumOfSquareDifferences_w
 C     SD for velocities in each bin
-      double precision standardDeviation_u(70),standardDeviation_v(70),
+      real standardDeviation_u(70),standardDeviation_v(70),
      &                 standardDeviation_w(70) 
 C     2D-array of velocities (nº of bin; newly assigned to WD nº in bin)
 C     needed to calculate Standart Deviation (SD) for velocities in each 
 C     bin
 C     TODO: make dinamic array or linked list
-      double precision arrayOfVelocitiesForSD_u(25,50000)
-      double precision arrayOfVelocitiesForSD_v(25,50000)
-      double precision arrayOfVelocitiesForSD_w(25,50000)
+      real arrayOfVelocitiesForSD_u(25,50000)
+      real arrayOfVelocitiesForSD_v(25,50000)
+      real arrayOfVelocitiesForSD_w(25,50000)
 C     2D-array of bolometric magnitudes for each WD; indexes are the 
 C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
-      double precision arrayOfMagnitudes(25,50000)
+      real arrayOfMagnitudes(25,50000)
       integer disk_belonging(numberOfStars)
 
 
@@ -116,7 +116,7 @@ C     TODO: make a WD-class with these args
       common /paral/ rgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
-      common /photo/ go,gr,gi,ur,rz
+C       common /photo/ go,gr,gi,ur,rz
       common /indexdb/ typeOfWD
       common /johnson/ V
       common /param/ fractionOfDB,galacticDiskAge,parameterIMF,
@@ -276,28 +276,28 @@ C       old definition of binning
 C         x=mbolmin+(mbolinc)*dfloat(i)
 C       new definition of binning -- when changing, go to BINNING WDLF 
 C       and check the values
-        x=mbolmin+(mbolinc)*dfloat(i)-mbolinc/2.0
+        x = mbolmin + mbolinc * float(i) - mbolinc / 2.0
 C       QUESTION: Why is this line here?
-        xx=(x-4.75)/2.5
+        xx = (x - 4.75) / 2.5
       
         if (numberOfWDsInBin(i) .eq. 0) then
-          xya=0.0d0
-          errsupa=0.0d0
-          errinfa=0.0d0
+          xya = 0.0
+          errsupa = 0.0
+          errinfa = 0.0
           go to 9
         end if 
       
-        xya=dlog10(ndfa(i))
+        xya = log10(ndfa(i))
 C       NOTE: errora was never properly initialized!        
-        errsupa=dlog10(ndfa(i)+errora(i))-xya
+        errsupa = log10(ndfa(i) + errora(i)) - xya
         if (numberOfWDsInBin(i).eq.1) then
-          errinfa=-25.0
+          errinfa = -25.0
         else
-          errinfa=dlog10(ndfa(i)-errora(i))-xya
+          errinfa = log10(ndfa(i) - errora(i)) - xya
         endif
 
-        vvv=0.000
-        massInBin(i)=massInBin(i)/dfloat(numberOfWDsInBin(i))
+        vvv=0.0
+        massInBin(i) = massInBin(i) / float(numberOfWDsInBin(i))
       
 C       NOTE vvv is always 0      
 9       write(155,200) vvv,xx,xya,errsupa,errinfa,numberOfWDsInBin(i),i,
@@ -449,12 +449,12 @@ C-----------------------------------------------------------------------
      &     eleminatedByParallax,eleminatedByDeclination,
      &     eleminatedByReducedPropM,eleminatedByProperMotion,
      &     eleminatedByApparentMagn)
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       integer i
       integer numberOfWDsInBin(70),eleminatedByParallax,
      &  eleminatedByDeclination,eleminatedByReducedPropM,
      &  eleminatedByProperMotion,eleminatedByApparentMagn
-      double precision ndfa(70),massInBin(70),
+      real ndfa(70),massInBin(70),
      &  sumOfWDVelocitiesInBin_u(70),sumOfWDVelocitiesInBin_v(70),
      &  sumOfWDVelocitiesInBin_w(70),averageWDVelocityInBin_u(70),
      &  averageWDVelocityInBin_v(70),averageWDVelocityInBin_w(70),
@@ -499,12 +499,12 @@ C-----------------------------------------------------------------------
       subroutine eleminateWD(i,eleminationFlag,eleminatedByParallax,
      &  eleminatedByDeclination,eleminatedByProperMotion,
      &  eleminatedByReducedPropM,eleminatedByApparentMagn)
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       integer i,numberOfStars,eleminatedByParallax,
      &  eleminatedByDeclination,eleminatedByProperMotion,
      &  eleminatedByReducedPropM,eleminatedByApparentMagn
       logical eleminationFlag
-      double precision minimumParallax,declinationLimit,
+      real minimumParallax,declinationLimit,
      &  minimumProperMotion
       integer numberOfWDs
 C     TODO:pass parameters in common block? pass commons as I/O vars      
@@ -512,34 +512,34 @@ C     TODO:pass parameters in common block? pass commons as I/O vars
       parameter (minimumParallax=0.025)
       parameter (declinationLimit=0.0)
       parameter (minimumProperMotion=0.04)
-      double precision flagOfWD(numberOfStars)
-      double precision properMotion(numberOfStars),
-     &                 rightAscension(numberOfStars),
-     &                 declination(numberOfStars)
-      double precision rg,rgac(numberOfStars)
-      double precision parallax,tangenVelo
-      double precision uu(numberOfStars), vv(numberOfStars), 
+      real flagOfWD(numberOfStars)
+      double precision :: properMotion(numberOfStars),
+     &                    rightAscension(numberOfStars),
+     &                    declination(numberOfStars)
+      real rg,rgac(numberOfStars)
+      real parallax,tangenVelo
+      real uu(numberOfStars), vv(numberOfStars), 
      &                 ww(numberOfStars)
-      double precision hrm
-      double precision go(numberOfStars),gr(numberOfStars),
+      real hrm
+      real go(numberOfStars),gr(numberOfStars),
      &                 gi(numberOfStars),ur(numberOfStars),
      &                 rz(numberOfStars)
-      double precision v(numberOfStars)
+      real v(numberOfStars)
       integer disk_belonging(numberOfStars)
 
       common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /mad/ properMotion,rightAscension,declination
       common /paral/ rgac
-      common /photo/ go,gr,gi,ur,rz
+C       common /photo/ go,gr,gi,ur,rz
       common /johnson/ V      
       common /vel/ uu,vv,ww
 
 
-      rg=rgac(i)*1000.0
-      parallax=1.0/rg
-      tangenVelo=4.74*properMotion(i)*rg
-      hrm=go(i)+5.0*dlog10(properMotion(i))+5.0
-      gz=gr(i)+rz(i)
+      rg = rgac(i)*1000.0
+      parallax = 1.0 / rg
+      tangenVelo = 4.74 * properMotion(i) * rg
+      hrm = go(i) + 5.0 * log10(properMotion(i)) + 5.0
+      gz = gr(i) + rz(i)
 
 C     TODO: make signals warning about skipping steps
 C      go to 93212
@@ -593,7 +593,7 @@ C         eleminationFlag=.TRUE.
       subroutine makeMassHistogram(massOfWD,nbinmass)
       implicit none
       integer k
-      double precision xi,xmasi,xmasinc,xf,massOfWD,nbinmass(26)
+      real xi,xmasi,xmasinc,xf,massOfWD,nbinmass(26)
       parameter (xmasi=0.1)
       parameter (xmasinc=0.05)
 
@@ -601,7 +601,7 @@ C         eleminationFlag=.TRUE.
       k=0  
       do
         k=k+1
-        xi=xmasi+dfloat(k-1)*xmasinc
+        xi = xmasi + float(k-1) * xmasinc
         xf=xi+xmasinc
         if (massOfWD.gt.xi.and.massOfWD.lt.xf) exit
       end do

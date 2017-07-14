@@ -17,35 +17,41 @@ C-----------------------------------------------------------------------
 C     Output parameters
 C       none
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
       integer numberOfStars,iseed,i,numberOfWDs,in
       
 C     ---   Variables  ---
-      double precision lum,teff,xlog,c1,c2,c3,c4,c5,n1,n2,n3,n4,n5
-      double precision UB,BV,VR,RI,xg,xug,xgr,xri,xiz,xgi,fractionOfDB
-      double precision mone
+      real lum,teff,xlog,c1,c2,c3,c4,c5,n1,n2,n3,n4,n5
+C       real UB,BV,VR,RI
+      real xg,xug,xgr,xri,xiz,xgi,fractionOfDB
+      real mone
 
 C     ---   Parameters  ---
       parameter (numberOfStars=6000000)
       parameter (mone=1.14)
 
 C     ---   Dimensions  ---
-      double precision luminosityOfWD(numberOfStars),
+      real luminosityOfWD(numberOfStars),
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
-      double precision flagOfWD(numberOfStars)
-      double precision rgac(numberOfStars)
-      double precision g(numberOfWDs),v(numberOfStars)
-      double precision coolingTime(numberOfStars)
+      real flagOfWD(numberOfStars)
+      real rgac(numberOfStars)
+      real g(numberOfWDs),v(numberOfStars)
+      real :: coolingTime(numberOfStars)
       integer typeOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
 
-      double precision :: ugriz_ug(numberOfStars),
-     &                    ugriz_gr(numberOfStars),
-     &                    ugriz_ri(numberOfStars),
-     &                    ugriz_iz(numberOfStars),
+C       TODO: uncomment this after UBVRI diag-s plotted
+C       real :: ugriz_ug(numberOfStars),
+C      &                    ugriz_gr(numberOfStars),
+C      &                    ugriz_ri(numberOfStars),
+C      &                    ugriz_iz(numberOfStars),
+C      &                    ugriz_g_apparent(numberOfStars)
+
+      real :: UB(numberOfStars), BV(numberOfStars), 
+     &                    VRR(numberOfStars), RI(numberOfStars),
      &                    ugriz_g_apparent(numberOfStars)
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
@@ -55,11 +61,13 @@ C     ---   Commons   ---
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /paral/ rgac
-      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
-     &               ugriz_g_apparent
+C       TODO: uncomment this after UBVRI diag-s plotted
+C       common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
+C      &               ugriz_g_apparent
       common /johnson/ v
       common /cool/ coolingTime
       common /indexdb/ typeOfWD
+      common /ubvri/ UB, BV, VRR, RI, ugriz_g_apparent
 
       n1=0
       n2=0
@@ -109,22 +117,27 @@ C         ---  END IF CO/ONe ---
           luminosityOfWD(i)=-lum
           effTempOfWD(i)=teff            
           V(i)=c3
-          UB=c1-c2
-          BV=c2-c3
-          VR=c3-c4
-          RI=c4-c5
-          call chanco(V(i),UB,BV,VR,RI,xg,xug,xgr,xri,xiz,xgi)
+C         TODO: delete indexes after UBVRI diag-s are plotted
+C         TODO: rename VRR to VR also after diag-s
+          UB(i)=c1-c2
+          BV(i)=c2-c3
+          VRR(i)=c3-c4
+          RI(i)=c4-c5
+          call chanco(V(i),UB(i),BV(i),VRR(i),RI(i),xg,xug,xgr,xri,xiz,
+     &                xgi)
           g(i) = xg
-          ugriz_ug(i) = xug
-          ugriz_gr(i) = xgr
-          ugriz_ri(i) = xri
-          ugriz_iz(i) = xiz
+C           TODO: uncomment this after UBVRI color diagrams are plotted
+C           ugriz_ug(i) = xug
+C           ugriz_gr(i) = xgr
+C           ugriz_ri(i) = xri
+C           ugriz_iz(i) = xiz
 C         ---  Making g and V apparent magnitude ---
-          ugriz_g_apparent(i) = g(i)-5.0d0+5.0d0*(dlog10(rgac(i))+3.0d0)
-          V(i)=V(i)-5.0d0+5.0d0*(dlog10(rgac(i))+3.0d0)
+          ugriz_g_apparent(i) = g(i) - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          V(i) = V(i) - 5.0 + 5.0 * (log10(rgac(i)) + 3.0)
 C       ---  ELSE mass >= 1.4  --- EXPLOTA, exceeding Chandrasekar limit
         else
-          typeOfWD(i)=5
+          typeOfWD(i) = 5
         end if
 C       ---  END IF about WD mass ---
       end do

@@ -17,10 +17,10 @@ C       mtrk:  Mass of the WD. [M0]
 C       ttrk:  Cooling time. [Gyr]
 C
 C=======================================================================
-      implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
 
 C     ---   Declaration of variables   ---
-      double precision mtrk,luminosity
+      real mtrk,luminosity
 
 C     ---   Parameters   ---
       parameter (ncol=3)

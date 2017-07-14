@@ -7,20 +7,20 @@ C     I/O parameters:
 C       table: instance of FileGroupInfo
 C=======================================================================
       use external_types
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
-      double precision vtanmin
+      real vtanmin
       parameter (vtanmin=30)
 
       TYPE(FileGroupInfo) :: table
       integer i,k
-      double precision a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14
-      double precision a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26
-      double precision a27,a28
+      real a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14
+      real a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26
+      real a27,a28
 C     TODO: size should be table%nrow      
-      double precision Hg(650),ggii(650),Hbj(650),
+      real Hg(650),ggii(650),Hbj(650),
      &                 bjr(650)
-      double precision g,gr,bj,term
+      real g,gr,bj,term
 
 C     Curve to delimit RPMD, for Mwd=0.61Mo
 C     NOTE: these common blocks are never used      

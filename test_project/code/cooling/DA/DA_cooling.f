@@ -12,11 +12,11 @@ C       table: instance of FileGroupInfo class, see external_types and
 C              tables_linking for details
 C=======================================================================
       use external_types
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
       integer j,k
-      double precision a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14
-      double precision a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26
+      real a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14
+      real a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26
       TYPE(FileGroupInfo) :: table
       
 C     reading the masses, depending on the format of the input files,
