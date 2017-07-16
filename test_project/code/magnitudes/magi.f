@@ -44,10 +44,10 @@ C     ---   Dimensions  ---
       integer disk_belonging(numberOfStars)
 
 C       TODO: uncomment this after UBVRI diag-s plotted
-C       real :: ugriz_ug(numberOfStars),
-C      &                    ugriz_gr(numberOfStars),
-C      &                    ugriz_ri(numberOfStars),
-C      &                    ugriz_iz(numberOfStars),
+      real :: ugriz_ug(numberOfStars),
+     &                    ugriz_gr(numberOfStars),
+     &                    ugriz_ri(numberOfStars),
+     &                    ugriz_iz(numberOfStars)
 C      &                    ugriz_g_apparent(numberOfStars)
 
       real :: UB(numberOfStars), BV(numberOfStars), 
@@ -62,12 +62,13 @@ C     ---   Commons   ---
       common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /paral/ rgac
 C       TODO: uncomment this after UBVRI diag-s plotted
-C       common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
-C      &               ugriz_g_apparent
+      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
+     &               ugriz_g_apparent
       common /johnson/ v
       common /cool/ coolingTime
       common /indexdb/ typeOfWD
-      common /ubvri/ UB, BV, VRR, RI, ugriz_g_apparent
+      common /ubvri/ UB, BV, VRR, RI
+C      & , ugriz_g_apparent
 
       n1=0
       n2=0
@@ -127,10 +128,10 @@ C         TODO: rename VRR to VR also after diag-s
      &                xgi)
           g(i) = xg
 C           TODO: uncomment this after UBVRI color diagrams are plotted
-C           ugriz_ug(i) = xug
-C           ugriz_gr(i) = xgr
-C           ugriz_ri(i) = xri
-C           ugriz_iz(i) = xiz
+          ugriz_ug(i) = xug
+          ugriz_gr(i) = xgr
+          ugriz_ri(i) = xri
+          ugriz_iz(i) = xiz
 C         ---  Making g and V apparent magnitude ---
           ugriz_g_apparent(i) = g(i) - 5.0 + 5.0 * (log10(rgac(i)) 
      &                                              + 3.0)

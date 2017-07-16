@@ -15,9 +15,9 @@ services:
 #      - manage_db
 #      - --delete-processed-data
       # Generating stars:
-#      - simulate
-#      - --project-dir
-#      - test_project
+      - simulate
+      - --project-dir
+      - test_project
       # Processing generated data:
 #      - process
 #      - --last=2
@@ -32,7 +32,7 @@ services:
       - --w-lepine-criterion
 #      - --delete-overlapping-cone-stars
       # Plotting
-      - plot
+#      - plot
 #      - --luminosity-function
 #      - --velocities-vs-magnitude
 #      - --velocity-clouds
@@ -40,7 +40,7 @@ services:
 #      - --heatmap
 #      - velocities
 #      - --toomre-diagram
-      - --ugriz-color-color-diagram
+#      - --ugriz-color-color-diagram
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 

@@ -178,11 +178,12 @@ C     the sequence of RNs to repeat itself(init:805577 133547):
       open(unit=772,file='input_data/seeds_line.in')
       read(unit=772,fmt=*) iseed1, iseed2
       close(unit=772)
-      iseed1 = iseed1 - 1
-      iseed2 = iseed2 + 1
-      open(unit=772,file='input_data/seeds_line.in',status='replace')
-      write(unit=772,fmt=100) iseed1,iseed2
-      close(unit=772)
+C       TODO: add if 
+C       iseed1 = iseed1 - 1
+C       iseed2 = iseed2 + 1
+C       open(unit=772,file='input_data/seeds_line.in',status='replace')
+C       write(unit=772,fmt=100) iseed1,iseed2
+C       close(unit=772)
 C     finished rewriting seeds here
 100   format(I6,2x,I6)  
       write(6,*) 'iseed1=',iseed1
@@ -458,11 +459,11 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       double precision :: ros
       real cone_height_latitude
 C       TODO: uncomment when ubvri diagrams plotted
-C       real :: ugriz_ug(numberOfStars),
-C      &                    ugriz_gr(numberOfStars),
-C      &                    ugriz_ri(numberOfStars),
-C      &                    ugriz_iz(numberOfStars),
-C      &                    ugriz_g_apparent(numberOfStars)
+      real :: ugriz_ug(numberOfStars),
+     &                    ugriz_gr(numberOfStars),
+     &                    ugriz_ri(numberOfStars),
+     &                    ugriz_iz(numberOfStars),
+     &                    ugriz_g_apparent(numberOfStars)
       logical :: with_overlapping_checking = .true.
       integer processed_cones_count, overlappings, stars_counter,
      & eliminations_counter
@@ -471,8 +472,8 @@ C      &                    ugriz_g_apparent(numberOfStars)
       logical longitude_overlapping, latitude_overlapping,
      &  star_in_intersection
       real :: UB(numberOfStars), BV(numberOfStars), 
-     &                    VRR(numberOfStars), RI(numberOfStars),
-     &                    ugriz_g_apparent(numberOfStars)
+     &                    VRR(numberOfStars), RI(numberOfStars)
+C      &                    ugriz_g_apparent(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -483,12 +484,13 @@ C      &                    ugriz_g_apparent(numberOfStars)
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
 C       TODO: uncomment when ubvri diagrams plotted
-C       common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
-C      &               ugriz_g_apparent
+      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
+     &               ugriz_g_apparent
       common /indexdb/ typeOfWD
       common /johnson/ V
       common /vel/ uu,vv,ww
-      common /ubvri/ UB, BV, VRR, RI, ugriz_g_apparent
+      common /ubvri/ UB, BV, VRR, RI
+C      &, ugriz_g_apparent
       pi = 4.0 * atan(1.0)
       DELTA_LATITUDE = 2.64 * pi / 180.0
       overlappings = 0
@@ -510,6 +512,7 @@ C      &               ugriz_g_apparent
      &                  'galactic_latitude ',
      &                  'galactic_longitude ',
      &                  'ugriz_g_apparent ',
+     &                  'ugriz_ug ',    
      &                  'ugriz_gr ',    
      &                  'ugriz_ri ',
      &                  'ugriz_iz ',
@@ -532,9 +535,10 @@ C      &               ugriz_g_apparent
      &                      lgac(i),
      &                      ugriz_g_apparent(i),
 C                           TODO: uncomment
-C      &                      ugriz_gr(i),
-C      &                      ugriz_ri(i),
-C      &                      ugriz_iz(i),
+     &                      ugriz_ug(i),
+     &                      ugriz_gr(i),
+     &                      ugriz_ri(i),
+     &                      ugriz_iz(i),
      &                      V(i),
      &                      uu(i),
      &                      vv(i),
@@ -732,7 +736,7 @@ C      &                                              ugriz_iz(i),
      &                                              disk_belonging(i),
      &                                              typeOfWD(i)
 C                                            TODO: delete this after..
-     &                                       ,UB(i),BV(i),VRR(i),RI(i)
+C      &                                       ,UB(i),BV(i),VRR(i),RI(i)
             else
                 eliminations_counter = eliminations_counter + 1
             end if
