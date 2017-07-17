@@ -6,7 +6,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
 from sqlalchemy.sql.sqltypes import (Integer,
                                      Float,
-                                     String, DateTime)
+                                     String,
+                                     DateTime)
 
 from .base import Base
 

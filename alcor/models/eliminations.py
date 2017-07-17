@@ -12,7 +12,8 @@ from .base import Base
 class StarsCounter(Base):
     __tablename__ = 'stars_eliminations_counters'
 
-    id = Column(Integer(), primary_key=True)
+    id = Column(Integer(),
+                primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
     raw = Column(Integer(),

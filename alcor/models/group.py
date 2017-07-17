@@ -19,5 +19,6 @@ class Group(Base):
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
-    def __init__(self, id: uuid.UUID):
+    def __init__(self,
+                 id: uuid.UUID):
         self.id = id

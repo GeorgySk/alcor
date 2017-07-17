@@ -56,13 +56,18 @@ class Bin(Base):
 class LepineCaseUBin(Base):
     __tablename__ = 'lepine_case_u_velocities_vs_magnitudes_bins'
 
-    id = Column(Integer(), primary_key=True)
+    id = Column(Integer(),
+                primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    avg_magnitude = Column(Float(asdecimal=True), nullable=False)
-    avg_velocity_u = Column(Float(asdecimal=True), nullable=False)
-    velocity_u_std = Column(Float(asdecimal=True), nullable=False)
-    updated_timestamp = Column(DateTime(), server_default=func.now())
+    avg_magnitude = Column(Float(asdecimal=True),
+                           nullable=False)
+    avg_velocity_u = Column(Float(asdecimal=True),
+                            nullable=False)
+    velocity_u_std = Column(Float(asdecimal=True),
+                            nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
@@ -78,12 +83,18 @@ class LepineCaseUBin(Base):
 class LepineCaseVBin(Base):
     __tablename__ = 'lepine_case_v_velocities_vs_magnitudes_bins'
 
-    id = Column(Integer(), primary_key=True)
-    group_id = Column(UUID(as_uuid=True), nullable=False)
-    avg_magnitude = Column(Float(asdecimal=True), nullable=False)
-    avg_velocity_v = Column(Float(asdecimal=True), nullable=False)
-    velocity_v_std = Column(Float(asdecimal=True), nullable=False)
-    updated_timestamp = Column(DateTime(), server_default=func.now())
+    id = Column(Integer(),
+                primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    avg_magnitude = Column(Float(asdecimal=True),
+                           nullable=False)
+    avg_velocity_v = Column(Float(asdecimal=True),
+                            nullable=False)
+    velocity_v_std = Column(Float(asdecimal=True),
+                            nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
@@ -99,12 +110,18 @@ class LepineCaseVBin(Base):
 class LepineCaseWBin(Base):
     __tablename__ = 'lepine_case_w_velocities_vs_magnitudes_bins'
 
-    id = Column(Integer(), primary_key=True)
-    group_id = Column(UUID(as_uuid=True), nullable=False)
-    avg_magnitude = Column(Float(asdecimal=True), nullable=False)
-    avg_velocity_w = Column(Float(asdecimal=True), nullable=False)
-    velocity_w_std = Column(Float(asdecimal=True), nullable=False)
-    updated_timestamp = Column(DateTime(), server_default=func.now())
+    id = Column(Integer(),
+                primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    avg_magnitude = Column(Float(asdecimal=True),
+                           nullable=False)
+    avg_velocity_w = Column(Float(asdecimal=True),
+                            nullable=False)
+    velocity_w_std = Column(Float(asdecimal=True),
+                            nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,

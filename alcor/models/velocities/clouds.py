@@ -63,7 +63,8 @@ class LepineCaseUVCloud(Base):
 class LepineCaseUWCloud(Base):
     __tablename__ = 'lepine_case_uw_velocities_clouds'
 
-    id = Column(Integer(), primary_key=True)
+    id = Column(Integer(),
+                primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
     velocity_u = Column(Float(asdecimal=True),
@@ -85,7 +86,8 @@ class LepineCaseUWCloud(Base):
 class LepineCaseVWCloud(Base):
     __tablename__ = 'lepine_case_vw_velocities_clouds'
 
-    id = Column(Integer(), primary_key=True)
+    id = Column(Integer(),
+                primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
     velocity_v = Column(Float(asdecimal=True),

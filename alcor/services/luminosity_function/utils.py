@@ -4,7 +4,8 @@ from math import (ceil,
 from typing import (Iterable,
                     List)
 
-from alcor.models import (Group, Star)
+from alcor.models import (Group,
+                          Star)
 from alcor.models.luminosity_function import Point
 from alcor.types import StarsBinsType
 
