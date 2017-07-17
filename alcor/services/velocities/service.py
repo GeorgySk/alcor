@@ -5,7 +5,7 @@ from sqlalchemy.orm.session import Session
 from alcor.models import (Group,
                           Star)
 from alcor.models.velocities import Cloud
-from .utils import generate_clouds
+from .utils import star_cloud
 
 
 def process_stars_group(*,
@@ -15,7 +15,7 @@ def process_stars_group(*,
                         session: Session
                         ) -> None:
     if w_lepine_criterion:
-        clouds = generate_clouds(stars)
+        clouds = map(star_cloud, stars)
     else:
         clouds = (Cloud(group_id=group.id,
                         velocity_u=star.velocity_u,
