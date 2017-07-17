@@ -352,7 +352,7 @@ C     ugriz-color system and V-band from Johnson system
       double precision gi(numberOfStars),ur(numberOfStars),
      &                 rz(numberOfStars)
       double precision massInBin(70)
-      double precision typeOfWD(numberOfStars)
+      integer typeOfWD(numberOfStars)
 C     values of LF in each bin. o-observational
       double precision xfl(19),xflo(19),xflcut(3),xflocut(3)
       double precision xflhot(11),xflohot(11)
