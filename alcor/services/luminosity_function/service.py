@@ -4,7 +4,6 @@ from sqlalchemy.orm.session import Session
 
 from alcor.models import (Group,
                           Star)
-from alcor.models.luminosity_function import Point
 from .utils import (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME,
                     OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT,
                     generate_stars_bins,
@@ -27,7 +26,6 @@ def process_stars_group(*,
                             / OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT)
     graph_points = points(stars_bins=stars_bins,
                           group=group,
-                          normalization_factor=normalization_factor,
-                          cls=Point)
+                          normalization_factor=normalization_factor)
     session.add_all(graph_points)
     session.commit()

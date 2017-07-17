@@ -37,8 +37,7 @@ def get_stars_bin_index(star: Star) -> int:
 def points(*,
            stars_bins: StarsBinsType,
            group: Group,
-           normalization_factor: float,
-           cls) -> Iterable[Point]:
+           normalization_factor: float) -> Iterable[Point]:
     non_empty_bins = filter(None, stars_bins)
     for stars_bin_index, stars_bin in enumerate(non_empty_bins):
         stars_count = len(stars_bin)
@@ -49,11 +48,11 @@ def points(*,
             normalization_factor=normalization_factor)
         upper_error_bar = get_upper_error_bar(stars_count)
         lower_error_bar = get_lower_error_bar(stars_count)
-        yield cls(group_id=group.id,
-                  avg_bin_magnitude=avg_bin_magnitude,
-                  stars_count_logarithm=stars_count_logarithm,
-                  upper_error_bar=upper_error_bar,
-                  lower_error_bar=lower_error_bar)
+        yield Point(group_id=group.id,
+                    avg_bin_magnitude=avg_bin_magnitude,
+                    stars_count_logarithm=stars_count_logarithm,
+                    upper_error_bar=upper_error_bar,
+                    lower_error_bar=lower_error_bar)
 
 
 def get_stars_count_logarithm(stars_count: int,
