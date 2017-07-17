@@ -24,14 +24,7 @@ services:
       - --w-velocities-vs-magnitude
       - --w-lepine-criterion
     environment:
-      - CASSANDRA_RPC_ADDRESS=cassandra
-      - CASSANDRA_RPC_PORT=9042
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
-
-  cassandra:
-    image: cassandra:latest
-    volumes:
-      - cassandra-data:/var/lib/cassandra
 
   postgres:
     image: postgres:latest
