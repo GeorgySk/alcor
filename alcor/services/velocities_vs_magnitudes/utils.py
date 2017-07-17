@@ -110,9 +110,9 @@ def generate_w_bins(*,
                              velocity_w_std=velocity_w_std)
 
 
-def generate_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
-                                                    StarsBinsType,
-                                                    StarsBinsType]:
+def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
+                                                  StarsBinsType,
+                                                  StarsBinsType]:
     u_stars_bins = [[] for _ in range(BINS_COUNT)]
     v_stars_bins = [[] for _ in range(BINS_COUNT)]
     w_stars_bins = [[] for _ in range(BINS_COUNT)]
@@ -134,12 +134,6 @@ def generate_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
             v_stars_bins[index].append(star)
 
     return u_stars_bins, v_stars_bins, w_stars_bins
-
-
-def get_stars_bin_index(star: Star) -> int:
-    return int(ceil((float(star.bolometric_magnitude)
-                     - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE))
 
 
 def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
@@ -182,3 +176,9 @@ def generate_bins(*,
                   velocity_u_std=velocity_u_std,
                   velocity_v_std=velocity_v_std,
                   velocity_w_std=velocity_w_std)
+
+
+def get_stars_bin_index(star: Star) -> int:
+    return int(ceil((float(star.bolometric_magnitude)
+                     - MIN_BOLOMETRIC_MAGNITUDE)
+                    / BIN_SIZE))

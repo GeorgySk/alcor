@@ -7,7 +7,7 @@ from alcor.models import (Group,
                           Star)
 from alcor.models.velocities_vs_magnitudes import Cloud
 from .utils import (generate_clouds,
-                    generate_stars_bins,
+                    lepine_stars_bins,
                     generate_u_bins,
                     generate_v_bins,
                     generate_w_bins,
@@ -23,7 +23,7 @@ def process_stars_group(*,
     if w_lepine_criterion:
         clouds = generate_clouds(stars=stars,
                                  group=group)
-        u_stars_bins, v_stars_bins, w_stars_bins = generate_stars_bins(stars)
+        u_stars_bins, v_stars_bins, w_stars_bins = lepine_stars_bins(stars)
         u_bins = generate_u_bins(stars_bins=u_stars_bins,
                                  group=group)
         v_bins = generate_v_bins(stars_bins=v_stars_bins,
