@@ -19,18 +19,29 @@ services:
       - --filtration-method
       - restricted
       - --nullify-radial-velocity
-      - --luminosity-function
-      - --velocities-clouds
-      - --velocities-vs-magnitude
-#      - --lepine-criterion
+      - --w-luminosity-function
+      - --w-velocities-clouds
+      - --w-velocities-vs-magnitude
+      - --w-lepine-criterion
     environment:
       - CASSANDRA_RPC_ADDRESS=cassandra
       - CASSANDRA_RPC_PORT=9042
+      - POSTGRES_URI=postgresql://username:password@postgres/alcor
 
   cassandra:
     image: cassandra:latest
     volumes:
       - cassandra-data:/var/lib/cassandra
 
+  postgres:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=alcor
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+
 volumes:
   cassandra-data:
+  postgres_data:

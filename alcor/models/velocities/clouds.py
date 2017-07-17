@@ -1,52 +1,104 @@
 import uuid
-from datetime import datetime
+from decimal import Decimal
 
-from cassandra.cqlengine.columns import (UUID,
-                                         Decimal,
-                                         DateTime)
-from cassandra.cqlengine.models import Model
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.schema import Column
+from sqlalchemy.sql.functions import func
+from sqlalchemy.sql.sqltypes import (Integer,
+                                     Float,
+                                     DateTime)
 
-
-class Cloud(Model):
-    __table_name__ = 'velocities_clouds'
-
-    id = UUID(primary_key=True,
-              default=uuid.uuid4)
-    group_id = UUID(required=True)
-    velocity_u = Decimal(required=True)
-    velocity_v = Decimal(required=True)
-    velocity_w = Decimal(required=True)
-    updated_timestamp = DateTime(default=datetime.now)
+from alcor.models.base import Base
 
 
-class LepineCaseUVCloud(Model):
-    __table_name__ = 'lepine_case_uv_velocities_clouds'
+class Cloud(Base):
+    __tablename__ = 'velocities_clouds'
 
-    id = UUID(primary_key=True,
-              default=uuid.uuid4)
-    group_id = UUID(required=True)
-    velocity_u = Decimal(required=True)
-    velocity_v = Decimal(required=True)
-    updated_timestamp = DateTime(default=datetime.now)
+    id = Column(Integer(),
+                primary_key=True)
+    group_id = Column(UUID(as_uuid=True))
+    velocity_u = Column(Float(asdecimal=True),
+                        nullable=False)
+    velocity_v = Column(Float(asdecimal=True),
+                        nullable=False)
+    velocity_w = Column(Float(asdecimal=True),
+                        nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
+
+    def __init__(self,
+                 group_id: uuid.UUID,
+                 velocity_u: Decimal,
+                 velocity_v: Decimal,
+                 velocity_w: Decimal):
+        self.group_id = group_id
+        self.velocity_u = velocity_u
+        self.velocity_v = velocity_v
+        self.velocity_w = velocity_w
 
 
-class LepineCaseUWCloud(Model):
-    __table_name__ = 'lepine_case_uw_velocities_clouds'
+class LepineCaseUVCloud(Base):
+    __tablename__ = 'lepine_case_uv_velocities_clouds'
 
-    id = UUID(primary_key=True,
-              default=uuid.uuid4)
-    group_id = UUID(required=True)
-    velocity_u = Decimal(required=True)
-    velocity_w = Decimal(required=True)
-    updated_timestamp = DateTime(default=datetime.now)
+    id = Column(Integer(),
+                primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    velocity_u = Column(Float(asdecimal=True),
+                        nullable=False)
+    velocity_v = Column(Float(asdecimal=True),
+                        nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
+
+    def __init__(self,
+                 group_id: uuid.UUID,
+                 velocity_u: Decimal,
+                 velocity_v: Decimal):
+        self.group_id = group_id
+        self.velocity_u = velocity_u
+        self.velocity_v = velocity_v
 
 
-class LepineCaseVWCloud(Model):
-    __table_name__ = 'lepine_case_vw_velocities_clouds'
+class LepineCaseUWCloud(Base):
+    __tablename__ = 'lepine_case_uw_velocities_clouds'
 
-    id = UUID(primary_key=True,
-              default=uuid.uuid4)
-    group_id = UUID(required=True)
-    velocity_v = Decimal(required=True)
-    velocity_w = Decimal(required=True)
-    updated_timestamp = DateTime(default=datetime.now)
+    id = Column(Integer(), primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    velocity_u = Column(Float(asdecimal=True),
+                        nullable=False)
+    velocity_w = Column(Float(asdecimal=True),
+                        nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
+
+    def __init__(self,
+                 group_id: uuid.UUID,
+                 velocity_u: Decimal,
+                 velocity_w: Decimal):
+        self.group_id = group_id
+        self.velocity_u = velocity_u
+        self.velocity_w = velocity_w
+
+
+class LepineCaseVWCloud(Base):
+    __tablename__ = 'lepine_case_vw_velocities_clouds'
+
+    id = Column(Integer(), primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    velocity_v = Column(Float(asdecimal=True),
+                        nullable=False)
+    velocity_w = Column(Float(asdecimal=True),
+                        nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
+
+    def __init__(self,
+                 group_id: uuid.UUID,
+                 velocity_v: Decimal,
+                 velocity_w: Decimal):
+        self.group_id = group_id
+        self.velocity_v = velocity_v
+        self.velocity_w = velocity_w

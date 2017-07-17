@@ -4,7 +4,7 @@ from math import log10
 
 from cassandra.deserializers import Decimal
 
-from alcor.models import Star
+from alcor.cassandra_models import CStar
 
 MIN_PARALLAX = 0.025
 MIN_DECLINATION = 0.
@@ -12,7 +12,7 @@ MAX_VELOCITY = 500.
 MIN_PROPER_MOTION = 0.04
 
 
-def check_elimination(star: Star,
+def check_elimination(star: CStar,
                       # we are using `dict`s mutability,
                       # so passed as argument
                       # original object will have all changes

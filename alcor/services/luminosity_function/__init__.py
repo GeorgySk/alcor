@@ -1,1 +1,1 @@
-from .service import process_stars_group_luminosity_function
+from .service import process_stars_group

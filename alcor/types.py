@@ -9,10 +9,10 @@ from typing import (Union,
 
 from cassandra.query import Statement
 
-from alcor.models import Star
+from alcor.cassandra_models import CStar
 
 NumericType = Union[int, float]
-StarsBinsType = List[List[Star]]
+StarsBinsType = List[List[CStar]]
 RowType = Tuple[Number, ...]
 ColumnValueType = Union[int, bool,
                         float, str,

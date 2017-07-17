@@ -9,8 +9,10 @@ from cassandra.query import SimpleStatement
 from alcor.types import (CallbackType,
                          StatementType,
                          RecordType,
-                         ColumnValueType, StatementParametersType)
-from .callbacks import add_callback, empty_callback
+                         ColumnValueType,
+                         StatementParametersType)
+from .callbacks import (add_callback,
+                        empty_callback)
 
 
 def execute_base_statement(*,
