@@ -1,7 +1,7 @@
 C***********************************************************************
 C           FUNCTION RAND
 C***********************************************************************
-        FUNCTION RAN(IDUMMY)
+      FUNCTION RAN(IDUMMY)
 C
 C     THIS IS AN ADAPTED VERSION OF SUBROUTINE RANECU WRITTEN BY
 C     F. JAMES (COMPUT. PHYS. COMMUN. 60 (1990) 329-344, WHICH HAS

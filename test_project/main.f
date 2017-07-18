@@ -458,7 +458,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real latitude, longitude,zzx,cone_height_longitude
       double precision :: ros
       real cone_height_latitude
-C       TODO: uncomment when ubvri diagrams plotted
+C       TODO: no need to keep these
       real :: ugriz_ug(numberOfStars),
      &                    ugriz_gr(numberOfStars),
      &                    ugriz_ri(numberOfStars),
@@ -483,7 +483,7 @@ C      &                    ugriz_g_apparent(numberOfStars)
       common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
-C       TODO: uncomment when ubvri diagrams plotted
+C       TODO: no need to keep these
       common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
      &               ugriz_g_apparent
       common /indexdb/ typeOfWD
@@ -534,7 +534,7 @@ C      &, ugriz_g_apparent
      &                      bgac(i),
      &                      lgac(i),
      &                      ugriz_g_apparent(i),
-C                           TODO: uncomment
+C                           TODO: better save ubvri, ugriz is derivative
      &                      ugriz_ug(i),
      &                      ugriz_gr(i),
      &                      ugriz_ri(i),

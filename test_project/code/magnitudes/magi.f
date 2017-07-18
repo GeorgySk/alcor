@@ -43,7 +43,7 @@ C     ---   Dimensions  ---
       integer typeOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
 
-C       TODO: uncomment this after UBVRI diag-s plotted
+C     TODO: no need to keep these
       real :: ugriz_ug(numberOfStars),
      &                    ugriz_gr(numberOfStars),
      &                    ugriz_ri(numberOfStars),
@@ -61,7 +61,7 @@ C     ---   Commons   ---
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /paral/ rgac
-C       TODO: uncomment this after UBVRI diag-s plotted
+C     TODO: no need to keep these
       common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
      &               ugriz_g_apparent
       common /johnson/ v
@@ -118,8 +118,8 @@ C         ---  END IF CO/ONe ---
           luminosityOfWD(i)=-lum
           effTempOfWD(i)=teff            
           V(i)=c3
-C         TODO: delete indexes after UBVRI diag-s are plotted
-C         TODO: rename VRR to VR also after diag-s
+C         TODO: no need to keep indexes
+C         TODO: rename VRR to VR
           UB(i)=c1-c2
           BV(i)=c2-c3
           VRR(i)=c3-c4
@@ -127,11 +127,11 @@ C         TODO: rename VRR to VR also after diag-s
           call chanco(V(i),UB(i),BV(i),VRR(i),RI(i),xg,xug,xgr,xri,xiz,
      &                xgi)
           g(i) = xg
-C           TODO: uncomment this after UBVRI color diagrams are plotted
-          ugriz_ug(i) = xug
-          ugriz_gr(i) = xgr
-          ugriz_ri(i) = xri
-          ugriz_iz(i) = xiz
+C         TODO: we don't need to keep them; ubvri is enough
+          ugriz_ug(i) = xug * (1.0 + 0.05 * gasdev(iseed))
+          ugriz_gr(i) = xgr * (1.0 + 0.05 * gasdev(iseed))
+          ugriz_ri(i) = xri * (1.0 + 0.05 * gasdev(iseed))
+          ugriz_iz(i) = xiz * (1.0 + 0.05 * gasdev(iseed))
 C         ---  Making g and V apparent magnitude ---
           ugriz_g_apparent(i) = g(i) - 5.0 + 5.0 * (log10(rgac(i)) 
      &                                              + 3.0)
