@@ -37,7 +37,7 @@ C     with its height direction set by longitude and latitude
      &                                   FI = PI / 180.0,
      &                                   DELTA_LATITUDE = 2.64 * FI,
      &                                  NORMALIZATION_CONE_HEIGHT = 0.2,
-     &                                   CONE_HEIGHT = 5.0,
+     &                                   CONE_HEIGHT = 2.0,
      &                                THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                         THIN_DISK_STARS_COUNT_FRACTION = 0.92,
      &                         THICK_DISK_STARS_COUNT_FRACTION = 1.0 
