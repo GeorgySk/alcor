@@ -2,7 +2,8 @@ import uuid
 from datetime import datetime
 from numbers import Number
 from typing import (Union,
-                    List)
+                    List,
+                    Tuple)
 
 from alcor.models import Star
 
@@ -16,9 +17,3 @@ ColumnValueType = Union[int,
                         datetime,
                         uuid.uuid4,
                         None]
-RecordType = Dict[str, ColumnValueType]
-# callback argument will be `None` for "insert" function
-ResponseType = Optional[List[RecordType]]
-CallbackType = Callable[[ResponseType], None]
-StatementType = Union[str, Statement]
-StatementParametersType = Iterable[ColumnValueType]

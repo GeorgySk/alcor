@@ -24,7 +24,6 @@ from alcor.models import (Group,
                           simulation,
                           velocities,
                           velocities_vs_magnitudes)
-from alcor.services.data_access import run_db_managing
 from alcor.services.processing import run_processing
 from alcor.services.plotting import draw_plots
 from alcor.services.simulations import run_simulations
@@ -64,31 +63,6 @@ def main(ctx: click.Context) -> None:
 
 
 @main.command()
-@click.option('--delete-processed-data',
-              is_flag=True,
-              help='Cleans all records with data about processed groups and '
-                   'stars.')
-@click.pass_context
-def manage_db(ctx: click.Context,
-              delete_processed_data: bool) -> None:
-    cluster_settings = ctx.obj
-    contact_points = cluster_settings['contact_points']
-    port = cluster_settings['port']
-
-    keyspace_name = PROJECT_NAME
-
-    check_connection(contact_points=contact_points,
-                     port=port)
-    with Cluster(contact_points=contact_points,
-                 port=port) as cluster:
-        session = cluster.connect()
-        init_db(keyspace_name=keyspace_name,
-                session=session)
-        run_db_managing(delete_processed_data,
-                        session=session)
-
-
-@main.command()
 @click.option('--settings-path', '-p',
               default='settings.yml',
               type=click.Path(),
@@ -122,6 +96,7 @@ def simulate(ctx: click.Context,
 
         settings = load_settings(settings_path)
         os.chdir(project_dir)
+
         run_simulations(settings=settings,
                         session=session)
 

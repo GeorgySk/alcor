@@ -5,7 +5,7 @@ from . import (luminosity_function,
                toomre_diagram,
                ugriz_diagrams)
 
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 
 
 def draw_plots(with_luminosity_function: bool,

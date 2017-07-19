@@ -1,4 +1,4 @@
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -11,7 +11,6 @@ from alcor.models.velocities.clouds import (Cloud,
                                             LepineCaseUVCloud,
                                             LepineCaseUWCloud,
                                             LepineCaseVWCloud)
-from alcor.services.data_access.reading import fetch
 
 
 FILENAME = 'velocity_clouds.ps'

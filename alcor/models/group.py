@@ -14,7 +14,7 @@ class Group(Base):
     id = Column(UUID(as_uuid=True),
                 primary_key=True)
     original_unprocessed_group_id = Column(UUID(as_uuid=True),
-                                           default=False)
+                                           default=None)
     processed = Column(Boolean(),
                        default=False)
     updated_timestamp = Column(DateTime(),

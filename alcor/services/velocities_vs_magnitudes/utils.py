@@ -14,7 +14,8 @@ from alcor.models.velocities_vs_magnitudes import (Bin,
                                                    LepineCaseUCloud,
                                                    LepineCaseVCloud,
                                                    LepineCaseWCloud)
-from alcor.types import StarsBinsType
+from alcor.types import (StarsBinsType,
+                         RowType)
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.0
 MAX_BOLOMETRIC_MAGNITUDE = 21.0

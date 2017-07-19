@@ -1,7 +1,7 @@
 from math import (log10,
                   sqrt)
 
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from alcor.models.luminosity_function import Point
-from alcor.services.data_access.reading import fetch
 
 
 FILENAME = 'luminosity_function.ps'
@@ -111,10 +110,11 @@ def plot(*,
     plt.savefig(FILENAME)
 
 
-def fetch_all_graph_points(*,
-                           session: Session):
-    query = (Point.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [Point(**record)
-            for record in records]
+# TODO: implement using postgres
+# def fetch_all_graph_points(*,
+#                            session: Session):
+#     query = (Point.objects.all().limit(None))
+#     records = fetch(query=query,
+#                     session=session)
+#     return [Point(**record)
+#             for record in records]

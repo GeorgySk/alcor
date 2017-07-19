@@ -11,9 +11,6 @@ services:
 #      - "dockerhost:$DOCKERHOST"  # for debugging
        - "dockerhost:172.17.0.1"  # for debugging
     command:
-      # Manage database:
-#      - manage_db
-#      - --delete-processed-data
       # Generating stars:
       - simulate
       - --project-dir
@@ -23,13 +20,13 @@ services:
 #      - --last=2
 #      TODO: implement this:
 #      - --id_groups='fc70b148-ab3f-441c-b66d-8430f6d9ce21'
-      - --filtration-method
-      - restricted
-      - --nullify-radial-velocity
-      - --w-luminosity-function
-      - --w-velocities-clouds
-      - --w-velocities-vs-magnitude
-      - --w-lepine-criterion
+#      - --filtration-method
+#      - restricted
+#      - --nullify-radial-velocity
+#      - --w-luminosity-function
+#      - --w-velocities-clouds
+#      - --w-velocities-vs-magnitude
+#      - --w-lepine-criterion
 #      - --delete-overlapping-cone-stars
       # Plotting
 #      - plot

@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -11,7 +11,6 @@ from matplotlib import cm
 import numpy as np
 
 from alcor.models.star import Star
-from alcor.services.data_access.reading import fetch
 
 
 logger = logging.getLogger(__name__)
@@ -81,6 +80,7 @@ def plot(*,
                   filename=VW_FILENAME)
 
 
+# TODO: implement with postgres
 def fetch_all_stars(*,
                     session: Session):
     query = (Star.objects.all().limit(None))

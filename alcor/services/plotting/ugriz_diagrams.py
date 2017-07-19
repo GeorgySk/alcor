@@ -1,14 +1,11 @@
 import logging
 
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
-from alcor.services.data_access.reading import fetch_unprocessed_groups
-from alcor.services.processing.service import fetch_stars
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +27,7 @@ POINT_SIZE = 0.5
 
 
 def plot(session: Session) -> None:
-    # TODO: Implement other options
+    # TODO: Resolve the problem with absent function
     unprocessed_groups = fetch_unprocessed_groups(session=session)
     logger.debug(f'Number of unprocessed groups: {len(unprocessed_groups)}')
 

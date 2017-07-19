@@ -68,16 +68,16 @@ class Star(Base):
                          nullable=False)
     galactic_distance = Column(Float(asdecimal=True),
                                nullable=False)
-    galactic_coordinate_b = Column(Float(asdecimal=True),
-                                   nullable=False)
-    galactic_coordinate_l = Column(Float(asdecimal=True),
-                                   nullable=False)
+    galactic_latitude = Column(Float(asdecimal=True),
+                               nullable=False)
+    galactic_longitude = Column(Float(asdecimal=True),
+                                nullable=False)
     ugriz_g_apparent = Column(Float(asdecimal=True),
                               nullable=False)
     ugriz_ug = Column(Float(asdecimal=True),
                       nullable=False)
     ugriz_gr = Column(Float(asdecimal=True),
-                           nullable=False)
+                      nullable=False)
     ugriz_ri = Column(Float(asdecimal=True),
                       nullable=False)
     ugriz_iz = Column(Float(asdecimal=True),
@@ -107,8 +107,8 @@ class Star(Base):
                  right_ascension: Decimal,
                  declination: Decimal,
                  galactic_distance: Decimal,
-                 galactic_coordinate_b: Decimal,
-                 galactic_coordinate_l: Decimal,
+                 galactic_latitude: Decimal,
+                 galactic_longitude: Decimal,
                  ugriz_g_apparent: Decimal,
                  ugriz_ug: Decimal,
                  ugriz_gr: Decimal,
@@ -129,8 +129,8 @@ class Star(Base):
         self.right_ascension = right_ascension
         self.declination = declination
         self.galactic_distance = galactic_distance
-        self.galactic_coordinate_b = galactic_coordinate_b
-        self.galactic_coordinate_l = galactic_coordinate_l
+        self.galactic_latitude = galactic_latitude
+        self.galactic_longitude = galactic_longitude
         self.ugriz_g_apparent = ugriz_g_apparent
         self.ugriz_ug = ugriz_ug
         self.ugriz_gr = ugriz_gr

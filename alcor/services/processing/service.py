@@ -26,10 +26,7 @@ def run_processing(*,
     if unprocessed_groups:
         groups = fetch_unprocessed_groups(session=session)
     for group in groups:
-        stars = fetch_stars(group=group,
-                            session=session)
-        process_stars_group(stars=stars,
-                            group=group,
+        process_stars_group(group=group,
                             filtration_method=filtration_method,
                             nullify_radial_velocity=nullify_radial_velocity,
                             w_luminosity_function=w_luminosity_function,
@@ -40,28 +37,9 @@ def run_processing(*,
                             session=session)
 
 
-def update_group(group: Group,
-                 *,
-                 session: Session) -> None:
-    current_date_time = datetime.now()
-    query = (session.query(Group)
-             .filter(Group.id == group.id))
-    query.update({Group.processed: True,
-                  Group.updated_timestamp: current_date_time})
-
-
 # TODO: move this to reading
 def fetch_unprocessed_groups(*,
                              session: Session) -> List[Group]:
     query = (session.query(Group)
              .filter(Group.processed.is_(False)))
-    return query.all()
-
-
-def fetch_stars(*,
-                group: Group,
-                session: Session
-                ) -> List[Star]:
-    query = (session.query(Star)
-             .filter(Star.group_id == group.id))
     return query.all()

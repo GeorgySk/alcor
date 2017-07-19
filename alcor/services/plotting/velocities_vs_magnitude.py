@@ -1,4 +1,4 @@
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -13,8 +13,6 @@ from alcor.models.velocities_vs_magnitudes.clouds import (Cloud,
                                                           LepineCaseUCloud,
                                                           LepineCaseVCloud,
                                                           LepineCaseWCloud)
-from alcor.services.data_access.reading import fetch
-from alcor.utils import get_columns
 
 FILENAME = 'velocities_vs_magnitude.ps'
 
@@ -306,6 +304,7 @@ def plot_lepine_case(session: Session) -> None:
     plt.savefig(FILENAME)
 
 
+# TODO: implement all this with postgres
 def fetch_all_bins(*,
                    session: Session):
     query = (Bin.objects.all().limit(None))

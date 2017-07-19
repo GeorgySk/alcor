@@ -2,7 +2,7 @@ import logging
 from math import sqrt
 from random import random
 
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -10,7 +10,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from alcor.models.star import Star
-from alcor.services.data_access.reading import fetch
 
 
 logger = logging.getLogger(__name__)
@@ -95,6 +94,7 @@ def plot(*,
     plt.savefig(FILENAME)
 
 
+# TODO: use postgres
 def fetch_all_stars(*,
                     session: Session):
     query = (Star.objects.all().limit(None))

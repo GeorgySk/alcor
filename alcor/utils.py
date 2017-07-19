@@ -1,7 +1,6 @@
 import logging
 from collections import OrderedDict
 from decimal import Decimal
-from itertools import chain
 from typing import (Any,
                     Iterable,
                     Dict,

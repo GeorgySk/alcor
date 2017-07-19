@@ -520,7 +520,8 @@ C      &, ugriz_g_apparent
      &                  'velocity_u ',
      &                  'velocity_v ',
      &                  'velocity_w ',
-     &                  'spectral_type'
+     &                  'spectral_type ',
+     &                  'disk_belonging'
 
           do i = 1, numberOfWDs
               write(421, *) luminosityOfWD(i),
@@ -543,7 +544,8 @@ C                           TODO: better save ubvri, ugriz is derivative
      &                      uu(i),
      &                      vv(i),
      &                      ww(i),
-     &                      typeOfWD(i)
+     &                      typeOfWD(i),
+     &                      disk_belonging(i)
           end do
       else if (geometry == 'cone') then
 
