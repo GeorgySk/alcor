@@ -6,12 +6,10 @@ from typing import (Any,
                     Iterable,
                     Dict)
 
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 
-from alcor.models import Group, Star
+from alcor.models import Group
 from alcor.models.simulation import Parameter
-from alcor.services.data_access import (insert,
-                                        model_insert_statement)
 from alcor.services.parameters import generate_parameters_values
 from alcor.services.restrictions import (OUTPUT_FILE_EXTENSION,
                                          MAX_OUTPUT_FILE_NAME_LENGTH)
@@ -46,20 +44,10 @@ def run_simulations(*,
             stars = list(parse_stars(output_file,
                                      group=group))
 
-        insert_groups_statement = model_insert_statement(Group)
-        insert(instances=[group],
-               statement=insert_groups_statement,
-               session=session)
-
-        insert_parameters_statement = model_insert_statement(Parameter)
-        insert(instances=parameters,
-               statement=insert_parameters_statement,
-               session=session)
-
-        insert_stars_statement = model_insert_statement(Star)
-        insert(instances=stars,
-               statement=insert_stars_statement,
-               session=session)
+        session.add(group)
+        session.add_all(parameters)
+        session.add_all(stars)
+        session.commit()
 
 
 def generate_parameters(*,

@@ -4,17 +4,14 @@ from functools import partial
 from itertools import filterfalse
 from typing import List
 
-from cassandra.cluster import Session
+from sqlalchemy.orm.session import Session
 
 from alcor.models import (Group,
                           Star)
 from alcor.models.eliminations import StarsCounter
-from alcor.services.data_access import (insert,
-                                        model_insert_statement)
-from alcor.services.luminosity_function import process_stars_group_luminosity_function
-from alcor.services.velocities import process_stars_group_velocities_clouds
-from alcor.services.velocities_vs_magnitudes import (
-    process_stars_group_velocities_vs_magnitudes)
+from alcor.services import (luminosity_function,
+                            velocities,
+                            velocities_vs_magnitudes)
 from .sampling import check_elimination
 
 logging.basicConfig(format='%(filename)s %(funcName)s '
@@ -28,10 +25,10 @@ def process_stars_group(*,
                         group: Group,
                         filtration_method: str,
                         nullify_radial_velocity: bool,
-                        luminosity_function: bool,
-                        velocities_clouds: bool,
-                        velocities_vs_magnitude: bool,
-                        lepine_criterion: bool,
+                        w_luminosity_function: bool,
+                        w_velocities_clouds: bool,
+                        w_velocities_vs_magnitude: bool,
+                        w_lepine_criterion: bool,
                         session: Session) -> None:
     stars_count = len(stars)
     logger.info('Starting processing stars, '
@@ -54,31 +51,29 @@ def process_stars_group(*,
         by_proper_motion=eliminations_counter['proper_motion'],
         by_reduced_proper_motion=eliminations_counter['reduced_proper_motion'],
         by_apparent_magnitude=eliminations_counter['apparent_magnitude'])
-    statement = model_insert_statement(StarsCounter)
-    insert(instances=[counter],
-           statement=statement,
-           session=session)
+
+    session.add(counter)
 
     if nullify_radial_velocity:
         for star in stars:
             star.set_radial_velocity_to_zero()
 
-    if luminosity_function:
-        process_stars_group_luminosity_function(
+    if w_luminosity_function:
+        luminosity_function.process_stars_group(
             stars=stars,
             group=group,
             session=session)
 
-    if velocities_clouds:
-        process_stars_group_velocities_clouds(
+    if w_velocities_clouds:
+        velocities.process_stars_group(
             stars=stars,
             group=group,
-            lepine_criterion=lepine_criterion,
+            w_lepine_criterion=w_lepine_criterion,
             session=session)
 
-    if velocities_vs_magnitude:
-        process_stars_group_velocities_vs_magnitudes(
+    if w_velocities_vs_magnitude:
+        velocities_vs_magnitudes.process_stars_group(
             stars=stars,
             group=group,
-            lepine_criterion=lepine_criterion,
+            w_lepine_criterion=w_lepine_criterion,
             session=session)

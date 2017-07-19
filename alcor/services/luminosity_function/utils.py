@@ -1,8 +1,8 @@
 from math import (ceil,
                   log10,
                   sqrt)
-from typing import (List,
-                    Iterable)
+from typing import (Iterable,
+                    List)
 
 from alcor.models import (Group,
                           Star)
@@ -35,10 +35,10 @@ def get_stars_bin_index(star: Star) -> int:
 
 
 def points(*,
-           bins: StarsBinsType,
+           stars_bins: StarsBinsType,
            group: Group,
            normalization_factor: float) -> Iterable[Point]:
-    non_empty_bins = filter(None, bins)
+    non_empty_bins = filter(None, stars_bins)
     for stars_bin_index, stars_bin in enumerate(non_empty_bins):
         stars_count = len(stars_bin)
         avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE

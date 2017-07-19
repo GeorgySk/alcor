@@ -1,8 +1,7 @@
 from collections import Counter
+from decimal import Decimal
 from fractions import Fraction
 from math import log10
-
-from cassandra.deserializers import Decimal
 
 from alcor.models import Star
 

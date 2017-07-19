@@ -1,6 +1,5 @@
-import decimal
 import uuid
-from datetime import datetime
+from decimal import Decimal
 from math import (cos,
                   sin,
                   pi,
@@ -8,11 +7,15 @@ from math import (cos,
                   atan)
 from typing import Tuple
 
-from cassandra.cqlengine.columns import (UUID,
-                                         Decimal,
-                                         DateTime,
-                                         Integer)
-from cassandra.cqlengine.models import Model
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.schema import Column
+from sqlalchemy.sql.functions import func
+from sqlalchemy.sql.sqltypes import (BigInteger,
+                                     Integer,
+                                     Float,
+                                     DateTime)
+
+from .base import Base
 
 ASTRONOMICAL_UNIT = 4.74
 DEC_GPOLE = 27.128336 * pi / 180.
@@ -39,37 +42,96 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'spectral_type']
 
 
-class Star(Model):
-    __table_name__ = 'stars'
+class Star(Base):
+    __tablename__ = 'stars'
 
-    id = UUID(primary_key=True,
-              default=uuid.uuid4)
-    group_id = UUID(required=True,
-                    index=True)
-    luminosity = Decimal(required=True)
-    proper_motion = Decimal(required=True)
-    proper_motion_component_b = Decimal(required=True)
-    proper_motion_component_l = Decimal(required=True)
-    proper_motion_component_vr = Decimal(required=True)
-    right_ascension = Decimal(required=True)
-    declination = Decimal(required=True)
-    galactocentric_distance = Decimal(required=True)
-    galactocentric_coordinate_b = Decimal(required=True)
-    galactocentric_coordinate_l = Decimal(required=True)
-    go_photometry = Decimal(required=True)
-    gr_photometry = Decimal(required=True)
-    rz_photometry = Decimal(required=True)
-    v_photometry = Decimal(required=True)
-    velocity_u = Decimal(required=True)
-    velocity_v = Decimal(required=True)
-    velocity_w = Decimal(required=True)
-    spectral_type = Integer(required=True)
-    updated_timestamp = DateTime(default=datetime.now)
+    id = Column(BigInteger(),
+                primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    luminosity = Column(Float(asdecimal=True),
+                        nullable=False)
+    proper_motion = Column(Float(asdecimal=True),
+                           nullable=False)
+    proper_motion_component_b = Column(Float(asdecimal=True),
+                                       nullable=False)
+    proper_motion_component_l = Column(Float(asdecimal=True),
+                                       nullable=False)
+    proper_motion_component_vr = Column(Float(asdecimal=True),
+                                        nullable=False)
+    right_ascension = Column(Float(asdecimal=True),
+                             nullable=False)
+    declination = Column(Float(asdecimal=True),
+                         nullable=False)
+    galactocentric_distance = Column(Float(asdecimal=True),
+                                     nullable=False)
+    galactocentric_coordinate_b = Column(Float(asdecimal=True),
+                                         nullable=False)
+    galactocentric_coordinate_l = Column(Float(asdecimal=True),
+                                         nullable=False)
+    go_photometry = Column(Float(asdecimal=True),
+                           nullable=False)
+    gr_photometry = Column(Float(asdecimal=True),
+                           nullable=False)
+    rz_photometry = Column(Float(asdecimal=True),
+                           nullable=False)
+    v_photometry = Column(Float(asdecimal=True),
+                          nullable=False)
+    velocity_u = Column(Float(asdecimal=True),
+                        nullable=False)
+    velocity_v = Column(Float(asdecimal=True),
+                        nullable=False)
+    velocity_w = Column(Float(asdecimal=True),
+                        nullable=False)
+    spectral_type = Column(Integer(),
+                           nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
+
+    def __init__(self,
+                 group_id: uuid.UUID,
+                 luminosity: Decimal,
+                 proper_motion: Decimal,
+                 proper_motion_component_b: Decimal,
+                 proper_motion_component_l: Decimal,
+                 proper_motion_component_vr: Decimal,
+                 right_ascension: Decimal,
+                 declination: Decimal,
+                 galactocentric_distance: Decimal,
+                 galactocentric_coordinate_b: Decimal,
+                 galactocentric_coordinate_l: Decimal,
+                 go_photometry: Decimal,
+                 gr_photometry: Decimal,
+                 rz_photometry: Decimal,
+                 v_photometry: Decimal,
+                 velocity_u: Decimal,
+                 velocity_v: Decimal,
+                 velocity_w: Decimal,
+                 spectral_type: int):
+        self.group_id = group_id
+        self.luminosity = luminosity
+        self.proper_motion = proper_motion
+        self.proper_motion_component_b = proper_motion_component_b
+        self.proper_motion_component_l = proper_motion_component_l
+        self.proper_motion_component_vr = proper_motion_component_vr
+        self.right_ascension = right_ascension
+        self.declination = declination
+        self.galactocentric_distance = galactocentric_distance
+        self.galactocentric_coordinate_b = galactocentric_coordinate_b
+        self.galactocentric_coordinate_l = galactocentric_coordinate_l
+        self.go_photometry = go_photometry
+        self.gr_photometry = gr_photometry
+        self.rz_photometry = rz_photometry
+        self.v_photometry = v_photometry
+        self.velocity_u = velocity_u
+        self.velocity_v = velocity_v
+        self.velocity_w = velocity_w
+        self.spectral_type = spectral_type
 
     @property
     def bolometric_magnitude(self) -> float:
         # TODO: find out the meaning of the following constants
-        return decimal.Decimal(2.5) * self.luminosity + decimal.Decimal(4.75)
+        return Decimal(2.5) * self.luminosity + Decimal(4.75)
 
     @property
     def coordinate_x(self) -> float:

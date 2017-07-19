@@ -42,7 +42,7 @@ C     ---   Dimensions  ---
       double precision gi(numberOfStars),ur(numberOfStars),
      &                 rz(numberOfStars)
       double precision coolingTime(numberOfStars)
-      double precision typeOfWD(numberOfStars)
+      integer typeOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 

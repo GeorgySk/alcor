@@ -1,20 +1,35 @@
 import uuid
-from datetime import datetime
 
-from cassandra.cqlengine.columns import (UUID,
-                                         Text,
-                                         Decimal,
-                                         DateTime)
-from cassandra.cqlengine.models import Model
+from decimal import Decimal
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.schema import Column
+from sqlalchemy.sql.sqltypes import (Integer,
+                                     Float,
+                                     String,
+                                     DateTime)
+
+from .base import Base
 
 
-class Parameter(Model):
-    __table_name__ = 'simulations_parameters'
+class Parameter(Base):
+    __tablename__ = 'simulations_parameters'
 
-    id = UUID(primary_key=True,
-              default=uuid.uuid4)
-    group_id = UUID(required=True,
-                    index=True)
-    name = Text(required=True)
-    value = Decimal(required=True)
-    created_timestamp = DateTime(default=datetime.now)
+    id = Column(Integer(),
+                primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    name = Column(String(),
+                  nullable=False)
+    value = Column(Float(asdecimal=True),
+                   nullable=False)
+    created_timestamp = Column(DateTime(),
+                               server_default=func.now())
+
+    def __init__(self,
+                 group_id: uuid.UUID,
+                 name: str,
+                 value: Decimal):
+        self.group_id = group_id
+        self.name = name
+        self.value = value

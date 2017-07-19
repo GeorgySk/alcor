@@ -1,23 +1,52 @@
 import uuid
-from datetime import datetime
 
-from cassandra.cqlengine.columns import (UUID,
-                                         Integer,
-                                         DateTime)
-from cassandra.cqlengine.models import Model
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.schema import Column
+from sqlalchemy.sql.functions import func
+from sqlalchemy.sql.sqltypes import (Integer,
+                                     DateTime)
+
+from .base import Base
 
 
-class StarsCounter(Model):
-    __table_name__ = 'stars_eliminations_counters'
+class StarsCounter(Base):
+    __tablename__ = 'stars_eliminations_counters'
 
-    id = UUID(primary_key=True,
-              default=uuid.uuid4)
-    group_id = UUID(required=True)
-    raw = Integer(required=True)
-    by_parallax = Integer(required=True)
-    by_declination = Integer(required=True)
-    by_velocity = Integer(required=True)
-    by_proper_motion = Integer(required=True)
-    by_reduced_proper_motion = Integer(required=True)
-    by_apparent_magnitude = Integer(required=True)
-    updated_timestamp = DateTime(default=datetime.now)
+    id = Column(Integer(),
+                primary_key=True)
+    group_id = Column(UUID(as_uuid=True),
+                      nullable=False)
+    raw = Column(Integer(),
+                 nullable=False)
+    by_parallax = Column(Integer(),
+                         nullable=False)
+    by_declination = Column(Integer(),
+                            nullable=False)
+    by_velocity = Column(Integer(),
+                         nullable=False)
+    by_proper_motion = Column(Integer(),
+                              nullable=False)
+    by_reduced_proper_motion = Column(Integer(),
+                                      nullable=False)
+    by_apparent_magnitude = Column(Integer(),
+                                   nullable=False)
+    updated_timestamp = Column(DateTime(),
+                               server_default=func.now())
+
+    def __init__(self,
+                 group_id: uuid.UUID,
+                 raw: int,
+                 by_parallax: int,
+                 by_declination: int,
+                 by_velocity: int,
+                 by_proper_motion: int,
+                 by_reduced_proper_motion: int,
+                 by_apparent_magnitude: int):
+        self.group_id = group_id
+        self.raw = raw
+        self.by_parallax = by_parallax
+        self.by_declination = by_declination
+        self.by_velocity = by_velocity
+        self.by_proper_motion = by_proper_motion
+        self.by_reduced_proper_motion = by_reduced_proper_motion
+        self.by_apparent_magnitude = by_apparent_magnitude

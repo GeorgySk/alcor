@@ -1,1 +1,1 @@
-from .service import process_stars_group_velocities_clouds
+from .service import process_stars_group

@@ -15,7 +15,6 @@ setup(name=PROJECT_NAME,
       download_url='https://github.com/lycantropos/alcor/archive/master.tar.gz',
       keywords=['astronomy'],
       install_requires=[
-          'cassandra-driver>=3.9.0',  # working with Cassandra
+          'psycopg2>=2.7.1',
           'PyYAML>=3.12.0',  # settings loading
-          'astropy>=1.3.2'
       ])
