@@ -46,6 +46,7 @@ def process_stars_group(*,
 
     stars = fetch_stars(group=group,
                         session=session)
+    stars_count = len(stars)
 
     eliminations_counter = Counter()
     apply_elimination_criteria = partial(
@@ -59,7 +60,7 @@ def process_stars_group(*,
     # TODO: shouldn't it be in the models?
     counter = StarsCounter(
         group_id=group.id,
-        raw=len(stars),
+        raw=stars_count,
         by_parallax=eliminations_counter['parallax'],
         by_declination=eliminations_counter['declination'],
         by_velocity=eliminations_counter['velocity'],

@@ -22,6 +22,8 @@ DEC_GPOLE = 27.128336 * pi / 180.
 RA_GPOLE = 192.859508 * pi / 180.
 AUX_ANGLE = 122.932 * pi / 180.
 
+# Description of ugriz color scheme:
+# https://en.wikipedia.org/wiki/Photometric_system
 STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion',
                          'proper_motion_component_b',

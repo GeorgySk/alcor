@@ -30,11 +30,14 @@ def generate_clouds(stars: List[Star],
                     group: Group) -> Tuple[List[LepineCaseUCloud],
                                            List[LepineCaseVCloud],
                                            List[LepineCaseWCloud]]:
+    u_clouds = []
+    v_clouds = []
+    w_clouds = []
     for star in stars:
-        highest_coordinate = max(abs(star.coordinate_x),
-                                 abs(star.coordinate_y),
-                                 abs(star.coordinate_z))
-        if abs(star.coordinate_x) == highest_coordinate:
+        max_coordinates_modulus = max(abs(star.coordinate_x),
+                                      abs(star.coordinate_y),
+                                      abs(star.coordinate_z))
+        if abs(star.coordinate_x) == max_coordinates_modulus:
             v_clouds.append(
                 LepineCaseVCloud(group_id=group.id,
                                  velocity_v=star.velocity_v,
@@ -43,7 +46,7 @@ def generate_clouds(stars: List[Star],
                 LepineCaseWCloud(group_id=group.id,
                                  velocity_w=star.velocity_w,
                                  bolometric_magnitude=star.bolometric_magnitude))
-        elif abs(star.coordinate_y) == highest_coordinate:
+        elif abs(star.coordinate_y) == max_coordinates_modulus:
             u_clouds.append(
                 LepineCaseUCloud(group_id=group.id,
                                  velocity_u=star.velocity_u,
