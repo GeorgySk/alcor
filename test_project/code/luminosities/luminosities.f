@@ -130,14 +130,9 @@ C     ---   Making the transfer   ---
           starBirthTime(k)=ztborn(i)
           tms(k)=ztms(i)
           disk_belonging(k)=disk_belonging(i)
-C           write (81,81) massOfWD(k),metallicityOfWD(k),starBirthTime(k),
-C      &                  tms(k),coolingTime(k)
         endif
  3    continue
 
- 81   format (5(f7.4,2x))
-
-C     ---   Writing data   ---
       write(6,*) '      Total number of WDs=',numberOfWDs
       write(6,*) '      WDs of ONe=',ntwdone
 
@@ -288,13 +283,13 @@ C=======================================================================
       real mass,massOfWD
       
       if(mass.lt.2.7)then
-        massOfWD=0.096d0*mass+0.429d0
+        massOfWD=0.096*mass+0.429
       elseif((mass.ge.2.7).and.(mass.le.6.0))then
 C       Small correction for continuity
-        massOfWD=0.137d0*mass+0.3183d0
+        massOfWD=0.137*mass+0.3183
       else
 C       Slope of Iben + continuity in Mi=6Mo
-        massOfWD=0.1057d0*mass+0.5061d0
+        massOfWD=0.1057*mass+0.5061
       end if
 
       return

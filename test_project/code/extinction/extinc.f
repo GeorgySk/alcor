@@ -107,61 +107,61 @@ C----------------------------------------------------------------------
       IF (B .NE. 0.) IFLG=1
       BETA0=.114
       IF ((L .GE. 10.) .AND. (L .LT. 60.)) THEN
-	BETA=.045
-	GOTO 660
+      BETA=.045
+      GOTO 660
       ENDIF
       IF ((L .GE. 60.) .AND. (L .LT. 100.)) THEN
-	BETA=.040
-	GOTO 661
+      BETA=.040
+      GOTO 661
       ENDIF
       IF ((L .GE. 100.) .AND. (L .LT. 130.)) THEN
-	BETA=.055
-	GOTO 662
+      BETA=.055
+      GOTO 662
       ENDIF
       IF ((L .GE. 130.) .AND. (L .LT. 160.)) THEN
-	BETA=.170
-	GOTO 663
+      BETA=.170
+      GOTO 663
       ENDIF
       IF ((L .GE. 160.) .AND. (L .LT. 190.)) THEN
-	BETA=.105
-	GOTO 664
+      BETA=.105
+      GOTO 664
       ENDIF
       IF ((L .GE. 190.) .AND. (L .LT. 220.)) THEN
-	BETA=.070
-	GOTO 665
+      BETA=.070
+      GOTO 665
       ENDIF
       IF ((L .GE. 220.) .AND. (L .LT. 250.)) THEN
-	BETA=.065
-	GOTO 666
+      BETA=.065
+      GOTO 666
       ENDIF
       IF ((L .GE. 250.) .AND. (L .LT. 280.)) THEN
-	BETA=.080
-	GOTO 667
+      BETA=.080
+      GOTO 667
       ENDIF
       IF ((L .GE. 280.) .AND. (L .LT. 310.)) THEN
-	BETA=.040
-	GOTO 668
+      BETA=.040
+      GOTO 668
       ENDIF
       IF ((L .GE. 310.) .AND. (L .LT. 340.)) THEN
-	BETA=.060
-	GOTO 669
+      BETA=.060
+      GOTO 669
       ENDIF
       IF ((L .GE. 340.) .AND. (L .LT. 360.)) THEN
-	BETA=.100
-	GOTO 670
+      BETA=.100
+      GOTO 670
       ENDIF
       IF ((L .GE. 0.) .AND. (L .LT. 10.)) THEN
-	BETA=.100
-	GOTO 659
+      BETA=.100
+      GOTO 659
       ENDIF
  659   IF ((L .GE. 0.0) .AND.  (L .LT. 4.0)) THEN
-	  IF ((D .GE. 0.0) .AND. (D .LT. 0.5)) THEN
-	    EY = 0.0
-	    GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.5) .AND. (D .LT. 0.8)) THEN
+        IF ((D .GE. 0.0) .AND. (D .LT. 0.5)) THEN
+          EY = 0.0
+          GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.5) .AND. (D .LT. 0.8)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.0 + 2.7*(D-0.5)	
+          EY = 0.0 + 2.7*(D-0.5)      
            ELSE
             EY=EYFCN(2.7,0.5,D,B,BETA)
            ENDIF    
@@ -170,7 +170,7 @@ C----------------------------------------------------------------------
           IF ((D .GE. 0.8) .AND.(D .LT. 4.2)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.81
-	   ELSE
+         ELSE
             EY=EYFCN(2.7,0.5,0.8,B,BETA0)
            ENDIF
           GOTO 1000
@@ -182,2897 +182,2897 @@ C----------------------------------------------------------------------
             EY=EYFCN(2.7,0.5,0.8,B,BETA0)+EYFCN(A0R,4.2,D,B,BETA0)
            ENDIF
           GOTO 1000
-	  ENDIF
+        ENDIF
        ENDIF
        IF ((L .GE. 4.0) .AND. (L .LT. 7.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
-	    EY = 0.0
-	    GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.1) .AND. (D .LT. 0.5)) THEN
+          EY = 0.0
+          GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.1) .AND. (D .LT. 0.5)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.0 + 0.75*(D-0.1)
+          EY = 0.0 + 0.75*(D-0.1)
            ELSE
             EY=EYFCN(0.75,0.1,D,B,BETA)
            ENDIF  
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.5) .AND. (D .LT. 1.2)) THEN
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.5) .AND. (D .LT. 1.2)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.3
-	   ELSE
+          EY = 0.3
+         ELSE
             EY=EYFCN(0.75,0.1,0.5,B,BETA)
            ENDIF  
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.2) .AND. (D .LT. 1.8)) THEN
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.2) .AND. (D .LT. 1.8)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.3 + 1.38*(D-1.2)
+          EY = 0.3 + 1.38*(D-1.2)
            ELSE
             EY=EYFCN(0.75,0.1,0.5,B,BETA)+EYFCN(1.38,1.2,D,B,BETA0)
            ENDIF
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.8)) THEN
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.8)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.128 + A0R*(D-1.8)
+          EY = 1.128 + A0R*(D-1.8)
            ELSE
             EY=EYFCN(0.75,0.1,0.5,B,BETA)+EYFCN(1.38,1.2,1.8,B,BETA0)
      &         +EYFCN(A0R,1.8,D,B,BETA0)
            ENDIF
-	  GOTO 1000
-	  ENDIF
+        GOTO 1000
+        ENDIF
        ENDIF
        IF ((L .GE. 7.0) .AND. (L. LT. 10.0)) THEN
-	  IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
-	    EY = 0.0
-	    GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.2) .AND. (D .LT. 0.5)) THEN
+        IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
+          EY = 0.0
+          GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.2) .AND. (D .LT. 0.5)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.0 + 1.17*(D-0.2)
- 	   ELSE
+          EY = 0.0 + 1.17*(D-0.2)
+          ELSE
             EY=EYFCN(1.17,0.2,D,B,BETA)
            ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.5) .AND. (D .LT. 4.0)) THEN
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.5) .AND. (D .LT. 4.0)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.351
-	   ELSE
-	    EY=EYFCN(1.17,0.2,0.5,B,BETA)
+          EY = 0.351
+         ELSE
+          EY=EYFCN(1.17,0.2,0.5,B,BETA)
            ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.351 + A0R*(D-4.0)
-    	   ELSE
-	    EY=EYFCN(1.17,0.2,0.5,B,BETA)+EYFCN(A0R,4.0,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
-	  ENDIF
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 4.0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.351 + A0R*(D-4.0)
+             ELSE
+          EY=EYFCN(1.17,0.2,0.5,B,BETA)+EYFCN(A0R,4.0,D,B,BETA0)
+         ENDIF
+        GOTO 1000
+        ENDIF
        ENDIF
  660   IF ((L .GE. 10.0) .AND. (L .LT. 12.0)) THEN
-	  IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
-	    EY = 0.0
-	    GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.1) .AND. (D .LT. 0.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.0 + 1.43*(D-0.1)
-	   ELSE
-	    EY=EYFCN(1.43,0.1,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.45) .AND. (D .LT. 1.9)) THEN
+        IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
+          EY = 0.0
+          GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.1) .AND. (D .LT. 0.45)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.0 + 1.43*(D-0.1)
+         ELSE
+          EY=EYFCN(1.43,0.1,D,B,BETA)
+         ENDIF       
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.45) .AND. (D .LT. 1.9)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5005
-	   ELSE
-	    EY=EYFCN(1.43,0.1,0.45,B,BETA)
-	   ENDIF       
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.9) .AND. (D .LT. 2.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5005 + 1.2488*(D-1.9)
-	   ELSE
-	    EY=EYFCN(1.43,0.1,0.45,B,BETA)+EYFCN(1.2488,1.9,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 2.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.00002 + A0R*(D-2.3)
-	   ELSE
-	    EY=EYFCN(1.43,0.1,0.45,B,BETA)+EYFCN(1.2488,1.9,2.3,B,BETA0)
+          EY = 0.5005
+         ELSE
+          EY=EYFCN(1.43,0.1,0.45,B,BETA)
+         ENDIF       
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.9) .AND. (D .LT. 2.3)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.5005 + 1.2488*(D-1.9)
+         ELSE
+          EY=EYFCN(1.43,0.1,0.45,B,BETA)+EYFCN(1.2488,1.9,D,B,BETA0)
+         ENDIF 
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 2.3)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.00002 + A0R*(D-2.3)
+         ELSE
+          EY=EYFCN(1.43,0.1,0.45,B,BETA)+EYFCN(1.2488,1.9,2.3,B,BETA0)
      &         +EYFCN(A0R,2.3,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
-	  ENDIF
+         ENDIF
+        GOTO 1000
+        ENDIF
        ENDIF
        IF ((L .GE. 12.0) .AND. (L .LT. 14.0)) THEN
-	  IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN	
-	    EY = 0.0
-	    GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.25) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.0 + 2.*(D-0.25)
-	   ELSE
-	    EY=EYFCN(2.,0.25,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.5) .AND. (D .LT. 1.9)) THEN
+        IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN      
+          EY = 0.0
+          GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.25) .AND. (D .LT. 0.5)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.0 + 2.*(D-0.25)
+         ELSE
+          EY=EYFCN(2.,0.25,D,B,BETA)
+         ENDIF    
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.5) .AND. (D .LT. 1.9)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5
-	   ELSE
-	    EY=EYFCN(2.,0.25,0.5,B,BETA)
-	   ENDIF    
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.9) .AND. (D .LT. 2.35)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5 + 1.11*(D-1.9)
-	   ELSE
-	    EY=EYFCN(2.,0.25,0.5,B,BETA)+EYFCN(1.11,1.9,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+          EY = 0.5
+         ELSE
+          EY=EYFCN(2.,0.25,0.5,B,BETA)
+         ENDIF    
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.9) .AND. (D .LT. 2.35)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.5 + 1.11*(D-1.9)
+         ELSE
+          EY=EYFCN(2.,0.25,0.5,B,BETA)+EYFCN(1.11,1.9,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.35)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9995 + A0R*(D-2.35)
-	   ELSE
-	    EY=EYFCN(2.,0.25,0.5,B,BETA)+EYFCN(1.11,1.9,2.35,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9995 + A0R*(D-2.35)
+         ELSE
+          EY=EYFCN(2.,0.25,0.5,B,BETA)+EYFCN(1.11,1.9,2.35,B,BETA0)
      &        +EYFCN(A0R,2.35,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
-	  ENDIF
+         ENDIF
+        GOTO 1000
+        ENDIF
        ENDIF
        IF ((L .GE. 14.0) .AND. (L .LT. 16.0)) THEN
-	  IF ((D .GE. 0.0) .AND. (D .LT. 0.6)) THEN
-	    EY = 0.0
-	    GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.6) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.0 + 1.5*(D-0.6)
-	   ELSE
-	    EY=EYFCN(1.5,0.6,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.0) .AND. (D .LT. 2.5)) THEN
+        IF ((D .GE. 0.0) .AND. (D .LT. 0.6)) THEN
+          EY = 0.0
+          GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.6) .AND. (D .LT. 1.0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.0 + 1.5*(D-0.6)
+         ELSE
+          EY=EYFCN(1.5,0.6,D,B,BETA)
+         ENDIF 
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.0) .AND. (D .LT. 2.5)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.6
-	   ELSE
-	    EY=EYFCN(1.5,0.6,1.,B,BETA)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 2.5) .AND. (D .LT. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.6 + 1.2*(D-2.5)
-  	   ELSE
-	    EY=EYFCN(1.5,0.6,1.0,B,BETA)+EYFCN(1.2,2.5,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.2 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(1.5,0.6,1.0,B,BETA)+EYFCN(1.2,2.5,3.,B,BETA0)
+          EY = 0.6
+         ELSE
+          EY=EYFCN(1.5,0.6,1.,B,BETA)
+         ENDIF 
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 2.5) .AND. (D .LT. 3.0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.6 + 1.2*(D-2.5)
+           ELSE
+          EY=EYFCN(1.5,0.6,1.0,B,BETA)+EYFCN(1.2,2.5,D,B,BETA0)
+         ENDIF
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 3.0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.2 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(1.5,0.6,1.0,B,BETA)+EYFCN(1.2,2.5,3.,B,BETA0)
      &        +EYFCN(A0R,3.0,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
-      	  ENDIF
+         ENDIF
+        GOTO 1000
+              ENDIF
        ENDIF
        IF ((L .GE. 16.0) .AND. (L .LT. 17.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.1) .AND. (D .LT. 0.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.67*(D-0.1)
-	   ELSE
-	    EY=EYFCN(1.67,0.1,D,B,BETA)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.67,0.1,D,B,BETA)
+         ENDIF        
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.5)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY=0.2505
-	   ELSE
-	    EY=EYFCN(1.67,0.1,0.25,B,BETA)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.67,0.1,0.25,B,BETA)
+         ENDIF        
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 0.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.2505 + 1.874*(D-0.5)
-	   ELSE
-	    EY=EYFCN(1.67,0.1,0.25,B,BETA)+EYFCN(1.874,0.5,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.67,0.1,0.25,B,BETA)+EYFCN(1.874,0.5,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF                
-	  IF ((D .GE. 0.9) .AND. (D .LT. 2.5)) THEN
+        IF ((D .GE. 0.9) .AND. (D .LT. 2.5)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.0001
-	   ELSE
-	    EY=EYFCN(1.67,0.1,0.25,B,BETA)+EYFCN(1.874,0.5,0.9,B,BETA)
-	   ENDIF      
-	  GOTO 1000
-	  ENDIF
+          EY = 1.0001
+         ELSE
+          EY=EYFCN(1.67,0.1,0.25,B,BETA)+EYFCN(1.874,0.5,0.9,B,BETA)
+         ENDIF      
+        GOTO 1000
+        ENDIF
           IF ((D .GE. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.0001 + A0R*(D-2.5)
-	   ELSE
-	    EY=EYFCN(1.67,0.1,0.25,B,BETA)+EYFCN(1.874,0.5,0.9,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.0001 + A0R*(D-2.5)
+         ELSE
+          EY=EYFCN(1.67,0.1,0.25,B,BETA)+EYFCN(1.874,0.5,0.9,B,BETA)
      &        +EYFCN(A0R,2.5,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 17.0) .AND. (L .LT. 18.5)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 2.*D 
-	   ELSE
-	    EY=EYFCN(2.,0.,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.75)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.4
-	   ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.,0.2,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.75) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4 + 2.8*(D-0.75)
-	   ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF        
           IF ((D .GE. 1.0) .AND. (D .LT. 3.1)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 1.1
-	   ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.1 + A0R*(D-3.1)
-	   ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.1 + A0R*(D-3.1)
+         ELSE
+          EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
      &        +EYFCN(A0R,3.1,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 18.5) .AND. (L .LT. 20.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 2.*D
-	   ELSE
-	    EY=EYFCN(2.,0.,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF               
           IF ((D .GE. 0.2) .AND. (D .LT. 0.75)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.4
-	   ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.,0.2,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.75) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4 + 2.8*(D-0.75)
            ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+          EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF  
           IF ((D .GE. 1.0) .AND. (D .LT. 3.0)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 1.1
-	   ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.1 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.1 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(2.,0.,0.2,B,BETA)+EYFCN(2.8,0.75,1.,B,BETA)
      &        +EYFCN(A0R,3.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 20.0) .AND. (L .LT. 24.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 1.5*D
-	   ELSE
-	    EY=EYFCN(1.5,0.,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.35)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3 + 0.67*(D-0.2)
-	   ELSE
-	    EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.35) .AND. (D .LT. 0.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4005 + 1.599*(D-0.35)
-	   ELSE
-	    EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,0.35,B,BETA)
+         ELSE
+          EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,0.35,B,BETA)
      &        +EYFCN(1.599,0.35,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF                   
           IF ((D .GE. 0.85) .AND. (D .LT. 2.75)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 1.2
-	   ELSE
-	    EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,0.35,B,BETA)
+         ELSE
+          EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,0.35,B,BETA)
      &        +EYFCN(1.599,0.35,0.85,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.2 + A0R*(D-2.75)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.2 + A0R*(D-2.75)
            ELSE
-	    EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,0.35,B,BETA)
+          EY=EYFCN(1.5,0.,0.2,B,BETA)+EYFCN(0.67,0.2,0.35,B,BETA)
      &        +EYFCN(1.599,0.35,0.85,B,BETA)+EYFCN(A0R,2.75,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 24.0) .AND. (L .LT. 30.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.6*(D-0.2)
-	   ELSE
-	    EY=EYFCN(1.6,0.2,D,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.6,0.2,D,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF    
           IF ((D .GE. 0.45) .AND. (D .LT. 1.6)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.4
-	   ELSE
-	    EY=EYFCN(1.6,0.2,0.45,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.6,0.2,0.45,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.6) .AND. (D .LT. 2.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4 + 1.25*(D-1.6)
-	   ELSE
-	    EY=EYFCN(1.6,0.2,0.45,B,BETA)+EYFCN(1.25,1.6,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.6,0.2,0.45,B,BETA)+EYFCN(1.25,1.6,D,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 2.0) .AND. (D .LT. 4.0)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.9
-	   ELSE
-	    EY=EYFCN(1.6,0.2,0.45,B,BETA)+EYFCN(1.25,1.6,2.,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.6,0.2,0.45,B,BETA)+EYFCN(1.25,1.6,2.,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.0)) THEN        
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9 + A0R*(D-4.0)
-	   ELSE
-	    EY=EYFCN(1.6,0.2,0.45,B,BETA)+EYFCN(1.25,1.6,2.,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9 + A0R*(D-4.0)
+         ELSE
+          EY=EYFCN(1.6,0.2,0.45,B,BETA)+EYFCN(1.25,1.6,2.,B,BETA0)
      &        +EYFCN(A0R,4.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 30.0) .AND. (L .LT. 40.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.15)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.15) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 2.*(D-0.15)
-	   ELSE
-	    EY=EYFCN(2.,0.15,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.15,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF             
           IF ((D .GE. 0.6) .AND. (D .LT. 2.8)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.9
-	   ELSE
-	    EY=EYFCN(2.,0.15,0.6,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.15,0.6,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9 + A0R*(D-2.8)
-	   ELSE
-	    EY=EYFCN(2.,0.15,0.6,B,BETA)+EYFCN(A0R,2.8,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9 + A0R*(D-2.8)
+         ELSE
+          EY=EYFCN(2.,0.15,0.6,B,BETA)+EYFCN(A0R,2.8,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 40.0) .AND. (L .LT. 50.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + D
-	   ELSE
-	    EY=EYFCN(1.,0.,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 0.1) .AND. (D .LT. 0.25)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.1
-	   ELSE
-	    EY=EYFCN(1.,0.,0.1,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.,0.1,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 1.4*(D-0.25)
-	   ELSE
-	    EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.45 + 0.11*(D-0.5)
-	   ELSE
-	    EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
+         ELSE
+          EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
      &        +EYFCN(0.11,0.5,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.95) .AND. (D .LT. 1.3)) THEN  
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4995 + 0.86*(D-0.95)
-	   ELSE
-	    EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
+         ELSE
+          EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
      &        +EYFCN(0.11,0.5,0.95,B,BETA)+EYFCN(0.86,0.95,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF                                               
-	  IF ((D .GE. 1.3) .AND. (D .LT. 3.0)) THEN
+        IF ((D .GE. 1.3) .AND. (D .LT. 3.0)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.8005
-	   ELSE
-	    EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
+          EY = 0.8005
+         ELSE
+          EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
      &        +EYFCN(0.11,0.5,0.95,B,BETA)+EYFCN(0.86,0.95,1.3,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.8005 + A0R*(D-3.0)
-    	   ELSE
-	    EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.8005 + A0R*(D-3.0)
+             ELSE
+          EY=EYFCN(1.,0.,0.1,B,BETA)+EYFCN(1.4,0.25,0.5,B,BETA)
      &        +EYFCN(0.11,0.5,0.95,B,BETA)+EYFCN(0.86,0.95,1.3,B,BETA0)
      &        +EYFCN(A0R,3.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 50.0) .AND. (L .LT. 60.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 3.*(D-0.25)
-	   ELSE
-	    EY=EYFCN(3.,0.25,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(3.,0.25,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.4) .AND. (D .LT. 0.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.45 + 0.11*(D-0.4)
-	   ELSE
-	    EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
-	  IF ((D .GE. 0.85) .AND. (D .LT. 1.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.4995 + 1.202*(D-0.85)
-	   ELSE
-	    EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,0.85,B,BETA)
+        IF ((D .GE. 0.85) .AND. (D .LT. 1.1)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.4995 + 1.202*(D-0.85)
+         ELSE
+          EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,0.85,B,BETA)
      &         +EYFCN(1.202,0.85,D,B,BETA0)
-	   ENDIF  
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.1) .AND. (D .LT. 2.9)) THEN
+         ENDIF  
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.1) .AND. (D .LT. 2.9)) THEN
            IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.8
-	   ELSE
-	    EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,0.85,B,BETA)
+          EY = 0.8
+         ELSE
+          EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,0.85,B,BETA)
      &         +EYFCN(1.202,0.85,1.1,B,BETA0)
-	   ENDIF  
-	  GOTO 1000
-	  ENDIF
+         ENDIF  
+        GOTO 1000
+        ENDIF
           IF ((D .GE. 2.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.8 + A0R*(D-2.9)
-	   ELSE
-	    EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,0.85,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.8 + A0R*(D-2.9)
+         ELSE
+          EY=EYFCN(3.,0.25,0.4,B,BETA)+EYFCN(0.11,0.4,0.85,B,BETA)
      &         +EYFCN(1.202,0.85,1.1,B,BETA0)+EYFCN(A0R,2.9,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
  661   IF ((L .GE. 60.0) .AND. (L .LT. 62.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-            EY = 0.33*D
-	   ELSE
-	    EY=EYFCN(0.33,0.,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+             IF ((IFLG .EQ. 0)) THEN
+                EY = 0.33*D
+             ELSE
+                EY=EYFCN(0.33,0.,D,B,BETA)
+             ENDIF 
+             GOTO 1000
           ENDIF
           IF ((D .GE. 0.3) .AND. (D .LT. 0.7)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-            EY = 0.099 + 2.2525*(D-0.3)
-	   ELSE
-	    EY=EYFCN(0.33,0.,0.3,B,BETA)+EYFCN(2.2525,0.3,D,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+             IF ((IFLG .EQ. 0)) THEN
+                EY = 0.099 + 2.2525*(D-0.3)
+             ELSE
+                EY=EYFCN(0.33,0.,0.3,B,BETA)+EYFCN(2.2525,0.3,D,B,BETA)
+             ENDIF   
+             GOTO 1000
           ENDIF              
           IF ((D .GE. 0.7) .AND. (D .LT. 2.1)) THEN
-           IF ((IFLG .EQ. 0)) THEN
-            EY = 1.0
-	   ELSE
-	    EY=EYFCN(0.33,0.,0.3,B,BETA)+EYFCN(2.2525,0.3,0.7,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+              IF ((IFLG .EQ. 0)) THEN
+                 EY = 1.0
+              ELSE
+               EY=EYFCN(0.33,0.,0.3,B,BETA)+EYFCN(2.2525,0.3,0.7,B,BETA)
+              ENDIF   
+              GOTO 1000
           ENDIF
           IF ((D .GE. 2.1)) THEN    
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.0 + A0R*(D-2.1)
-	   ELSE
-	    EY=EYFCN(0.33,0.,0.3,B,BETA)+EYFCN(2.2525,0.3,0.7,B,BETA)
-     &        +EYFCN(A0R,2.1,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+             IF ((IFLG .EQ. 0)) THEN
+                EY = 1.0 + A0R*(D-2.1)
+             ELSE
+               EY=EYFCN(0.33,0.,0.3,B,BETA)+EYFCN(2.2525,0.3,0.7,B,BETA)
+     &            +EYFCN(A0R,2.1,D,B,BETA0)
+             ENDIF
+             GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 62.0) .AND. (L .LT. 63.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.3)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.3) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.05*(D-0.3)
-	   ELSE
-	    EY=EYFCN(1.05,0.3,D,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.05,0.3,D,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF                   
           IF ((D .GE. 1.25) .AND. (D .LT. 3.0)) THEN
            IF ((IFLG .EQ. 0)) THEN
             EY = 0.9975
-	   ELSE
-	    EY=EYFCN(1.05,0.3,1.25,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.05,0.3,1.25,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9975 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(1.05,0.3,1.25,B,BETA)+EYFCN(A0R,3.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9975 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(1.05,0.3,1.25,B,BETA)+EYFCN(A0R,3.,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 63.0) .AND. (L .LT. 70.0)) THEN
-	  IF ((D .GE. 0.0) .AND. (D .LT. 0.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.38*D
-	   ELSE
-	    EY=EYFCN(0.38,0.,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.4) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.152 + 1.49*(D-0.4)
-	   ELSE
-	    EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 0.6) .AND. (D .LT. 1.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.45 + 0.22*(D-0.6)
-	   ELSE
-	    EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,0.6,B,BETA)
+        IF ((D .GE. 0.0) .AND. (D .LT. 0.4)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.38*D
+         ELSE
+          EY=EYFCN(0.38,0.,D,B,BETA)
+         ENDIF
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.4) .AND. (D .LT. 0.6)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.152 + 1.49*(D-0.4)
+         ELSE
+          EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,D,B,BETA)
+         ENDIF 
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 0.6) .AND. (D .LT. 1.5)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.45 + 0.22*(D-0.6)
+         ELSE
+          EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,0.6,B,BETA)
      &        +EYFCN(0.22,0.6,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.5) .AND. (D .LT. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.648 + 0.102*(D-1.5)
-	   ELSE
-	    EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,0.6,B,BETA)
+         ENDIF 
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.5) .AND. (D .LT. 2.5)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.648 + 0.102*(D-1.5)
+         ELSE
+          EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,0.6,B,BETA)
      &        +EYFCN(0.22,0.6,1.5,B,BETA)+EYFCN(0.102,1.5,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.75 + A0R*(D-2.5)
-	   ELSE
-	    EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,0.6,B,BETA)
+         ENDIF 
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 2.5)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.75 + A0R*(D-2.5)
+         ELSE
+          EY=EYFCN(0.38,0.,0.4,B,BETA)+EYFCN(1.49,0.4,0.6,B,BETA)
      &        +EYFCN(0.22,0.6,1.5,B,BETA)+EYFCN(0.102,1.5,2.5,B,BETA0)
      &        +EYFCN(A0R,2.5,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
-	  ENDIF
+         ENDIF
+        GOTO 1000
+        ENDIF
        ENDIF
        IF ((L .GE. 70.0) .AND. (L .LT. 72.0) .AND. (B .GE. -0.3)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.17*D
-	   ELSE
-	    EY=EYFCN(0.17,0.,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.17,0.,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.6) .AND. (D .LT. 0.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.102 + 0.66*(D-0.6)
-	   ELSE
-	    EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(0.66,0.6,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(0.66,0.6,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.9) .AND. (D .LT. 2.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3 + 1.5*(D-0.9)
-	   ELSE
-	    EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(0.66,0.6,0.9,B,BETA)
+         ELSE
+          EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(0.66,0.6,0.9,B,BETA)
      &        +EYFCN(1.5,0.9,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.95 + A0R*(D-2.0)
-	   ELSE
-	    EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(0.66,0.6,0.9,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.95 + A0R*(D-2.0)
+         ELSE
+          EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(0.66,0.6,0.9,B,BETA)
      &        +EYFCN(1.5,0.9,2.,B,BETA)+EYFCN(A0R,2.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 70.0) .AND. (L .LT. 74.0) .AND. (B .LT. -0.3)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.6)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.6) .AND. (D .LT. 1.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 3.2*(D-0.6)
-	   ELSE
-	    EY=EYFCN(3.2,0.6,D,B,BETA)
+         ELSE
+          EY=EYFCN(3.2,0.6,D,B,BETA)
            ENDIF
-	  GOTO 1000
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.6 + A0R*(D-1.1)
-	   ELSE
-	    EY=EYFCN(3.2,0.6,1.1,B,BETA)+EYFCN(A0R,1.1,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.6 + A0R*(D-1.1)
+         ELSE
+          EY=EYFCN(3.2,0.6,1.1,B,BETA)+EYFCN(A0R,1.1,D,B,BETA0)
+         ENDIF 
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 72.0) .AND. (L .LT. 74.0) .AND. (B .GE. -0.3)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.25*D
-	   ELSE
-	    EY=EYFCN(0.25,0.,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.25,0.,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.6) .AND. (D .LT. 0.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15 + 0.83*(D-0.6)
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF              
-	  IF ((D .GE. 0.9) .AND. (D .LT. 1.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.399
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,0.9,B,BETA)
-	   ENDIF      
-	  GOTO 1000
-	  ENDIF
-	  IF ((D .GE. 1.9) .AND. (D .LT. 2.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.399 + 2.005*(D-1.9)
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,0.9,B,BETA)
+        IF ((D .GE. 0.9) .AND. (D .LT. 1.9)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.399
+         ELSE
+          EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,0.9,B,BETA)
+         ENDIF      
+        GOTO 1000
+        ENDIF
+        IF ((D .GE. 1.9) .AND. (D .LT. 2.1)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.399 + 2.005*(D-1.9)
+         ELSE
+          EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,0.9,B,BETA)
      &        +EYFCN(2.005,1.9,D,B,BETA0)
-	   ENDIF               
-	  GOTO 1000
+         ENDIF               
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.8 + A0R*(D-2.1)
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,0.9,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.8 + A0R*(D-2.1)
+         ELSE
+          EY=EYFCN(0.25,0.,0.6,B,BETA)+EYFCN(0.83,0.6,0.9,B,BETA)
      &        +EYFCN(2.005,1.9,2.1,B,BETA0)+EYFCN(A0R,2.1,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 74.0) .AND. (L .LT. 75.5)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.33*D
-	   ELSE
-	    EY=EYFCN(0.33,0.,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.33,0.,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF   
           IF ((D .GE. 0.45) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1485
-	   ELSE
-	    EY=EYFCN(0.33,0.,0.45,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.33,0.,0.45,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.0) .AND. (D .LT. 1.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1485 + 1.548*(D-1.0)
-	   ELSE
-	    EY=EYFCN(0.33,0.,0.45,B,BETA)+EYFCN(1.548,1.,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.33,0.,0.45,B,BETA)+EYFCN(1.548,1.,D,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF                                             
           IF ((D .GE. 1.55) .AND. (D .LT. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.9999
-	   ELSE
-	    EY=EYFCN(0.33,0.,0.45,B,BETA)+EYFCN(1.548,1.,1.55,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.33,0.,0.45,B,BETA)+EYFCN(1.548,1.,1.55,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9999 + A0R*(D-4.0)
-	   ELSE
-	    EY=EYFCN(0.33,0.,0.45,B,BETA)+EYFCN(1.548,1.,1.55,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9999 + A0R*(D-4.0)
+         ELSE
+          EY=EYFCN(0.33,0.,0.45,B,BETA)+EYFCN(1.548,1.,1.55,B,BETA0)
      &        +EYFCN(A0R,4.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 75.5) .AND. (L .LT. 77.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4*D
-	   ELSE
-	    EY=EYFCN(0.4,0.,D,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.4,0.,D,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 0.25) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1
-	   ELSE
-	    EY=EYFCN(0.4,0.,0.25,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.4,0.,0.25,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.6) .AND. (D .LT. 1.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 1.08*(D-0.6)
-	   ELSE
-	    EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.08,0.6,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.08,0.6,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.396 + A0R*(D-1.8)
-	   ELSE
-	    EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.08,0.6,1.8,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.396 + A0R*(D-1.8)
+         ELSE
+          EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.08,0.6,1.8,B,BETA)
      &        +EYFCN(A0R,1.8,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
+         ENDIF 
+        GOTO 1000
           ENDIF          
        ENDIF
        IF ((L .GE. 77.0) .AND. (L .LT. 80.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 1.15)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.67*(D-0.25)
-	   ELSE
-	    EY=EYFCN(1.67,0.25,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.67,0.25,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.15)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.503 + A0R*(D-1.15)
-	   ELSE
-	    EY=EYFCN(1.67,0.25,1.15,B,BETA)+EYFCN(A0R,1.15,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.503 + A0R*(D-1.15)
+         ELSE
+          EY=EYFCN(1.67,0.25,1.15,B,BETA)+EYFCN(A0R,1.15,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 80.0) .AND. (L .LT. 84.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.15)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.15) .AND. (D .LT. 0.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 3.57*(D-0.15)
-	   ELSE
-	    EY=EYFCN(3.57,0.15,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(3.57,0.15,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 2.499 + A0R*(D-0.85)
-	   ELSE
-	    EY=EYFCN(3.57,0.15,0.85,B,BETA)+EYFCN(A0R,0.85,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 2.499 + A0R*(D-0.85)
+         ELSE
+          EY=EYFCN(3.57,0.15,0.85,B,BETA)+EYFCN(A0R,0.85,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 84.0) .AND. (L .LT. 87.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.7)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 1.4*(D-0.2)
-	   ELSE
-	    EY=EYFCN(1.4,0.2,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.4,0.2,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF 
           IF ((D .GE. 0.7) .AND. (D .LT. 2.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.7
-	   ELSE
-	    EY=EYFCN(1.4,0.2,0.7,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.4,0.2,0.7,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.7 + A0R*(D-2.65)
-	   ELSE
-	    EY=EYFCN(1.4,0.2,0.7,B,BETA)+EYFCN(A0R,2.65,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.7 + A0R*(D-2.65)
+         ELSE
+          EY=EYFCN(1.4,0.2,0.7,B,BETA)+EYFCN(A0R,2.65,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 87.0) .AND. (L .LT. 90.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.25)
-	   ELSE
-	    EY=EYFCN(1.,0.25,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,D,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 0.4) .AND. (D .LT. 0.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.4,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,0.4,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.8) .AND. (D .LT. 2.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15 + 0.42*(D-0.8)
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.4,B,BETA)+EYFCN(0.42,0.8,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,0.4,B,BETA)+EYFCN(0.42,0.8,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                                           
           IF ((D .GE. 2.0) .AND. (D .LT. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.654
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.4,B,BETA)+EYFCN(0.42,0.8,2.,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,0.4,B,BETA)+EYFCN(0.42,0.8,2.,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.654 + A0R*(D-3.5)
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.4,B,BETA)+EYFCN(0.42,0.8,2.,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.654 + A0R*(D-3.5)
+         ELSE
+          EY=EYFCN(1.,0.25,0.4,B,BETA)+EYFCN(0.42,0.8,2.,B,BETA0)
      &        +EYFCN(A0R,3.5,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 90.0) .AND. (L .LT. 97.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.45*(D-0.25)
-	   ELSE
-	    EY=EYFCN(1.45,0.25,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.45,0.25,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF                   
           IF ((D .GE. 0.8) .AND. (D .LT. 2.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.7975
-	   ELSE
-	    EY=EYFCN(1.45,0.25,0.8,B,BETA)
-	   ENDIF          
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.45,0.25,0.8,B,BETA)
+         ENDIF          
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.6)) THEN
-   	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.7975 + A0R*(D-2.6)
-	   ELSE
-	    EY=EYFCN(1.45,0.25,0.8,B,BETA)+EYFCN(A0R,2.6,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+            IF ((IFLG .EQ. 0)) THEN
+          EY = 0.7975 + A0R*(D-2.6)
+         ELSE
+          EY=EYFCN(1.45,0.25,0.8,B,BETA)+EYFCN(A0R,2.6,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 97.0) .AND. (L .LT. 100.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.25)
-	   ELSE
-	    EY=EYFCN(1.,0.25,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF                  
           IF ((D .GE. 0.95) .AND. (D .LT. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.7
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.95,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,0.95,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.7 + A0R*(D-2.5)
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.95,B,BETA)+EYFCN(A0R,2.5,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.7 + A0R*(D-2.5)
+         ELSE
+          EY=EYFCN(1.,0.25,0.95,B,BETA)+EYFCN(A0R,2.5,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
  662   IF ((L .GE. 100.0) .AND. (L .LT. 103.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.33*(D-0.2)
-	   ELSE
-	    EY=EYFCN(1.33,0.2,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.2,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 0.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.399 + 1.02*(D-0.5)
-	   ELSE
-	    EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.55) .AND. (D .LT. 1.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.45 + 0.6*(D-0.55)
-	   ELSE
-	    EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,0.55,B,BETA)
+         ELSE
+          EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,0.55,B,BETA)
      &        +EYFCN(0.6,0.55,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF                  
-	  IF ((D .GE. 1.3) .AND. (D. LT. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9
-	   ELSE
-	    EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,0.55,B,BETA)
+        IF ((D .GE. 1.3) .AND. (D. LT. 4.0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9
+         ELSE
+          EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,0.55,B,BETA)
      &        +EYFCN(0.6,0.55,1.3,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9 + A0R*(D-4.0)
-	   ELSE
-	    EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,0.55,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9 + A0R*(D-4.0)
+         ELSE
+          EY=EYFCN(1.33,0.2,0.5,B,BETA)+EYFCN(1.02,0.5,0.55,B,BETA)
      &        +EYFCN(0.6,0.55,1.3,B,BETA0)+EYFCN(A0R,4.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 103.0) .AND. (L .LT. 107.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.15)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.15) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 2.15*(D-0.15)
-	   ELSE
-	    EY=EYFCN(2.15,0.15,D,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.15,0.15,D,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF      
           IF ((D .GE. 0.5) .AND. (D .LT. 4.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.7525
-	   ELSE
-	    EY=EYFCN(2.15,0.15,0.5,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.15,0.15,0.5,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.7525 + A0R*(D-4.4)
-	   ELSE
-	    EY=EYFCN(2.15,0.15,0.5,B,BETA)+EYFCN(A0R,4.4,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.7525 + A0R*(D-4.4)
+         ELSE
+          EY=EYFCN(2.15,0.15,0.5,B,BETA)+EYFCN(A0R,4.4,D,B,BETA0)
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 107.0) .AND. (L .LT. 110.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5*D
-	   ELSE
-	    EY=EYFCN(0.5,0.,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.25 + 1.33*(D-0.5)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.33,0.5,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.33,0.5,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                                            
           IF ((D .GE. 0.95) .AND. (D .LT. 3.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.8485
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.33,0.5,0.95,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.33,0.5,0.95,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.8485 + A0R*(D-3.6)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.33,0.5,0.95,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.8485 + A0R*(D-3.6)
+         ELSE
+          EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.33,0.5,0.95,B,BETA0)
      &        +EYFCN(A0R,3.6,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 110.0) .AND. (L .LT. 113.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5*D
-	   ELSE
-	    EY=EYFCN(0.5,0.,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.25 + 1.7*(D-0.5)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.7,0.5,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.7,0.5,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF       
-	  IF ((D .GE. 1.0) .AND. (D .LT. 3.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.1 
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.7,0.5,1.,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
+        IF ((D .GE. 1.0) .AND. (D .LT. 3.3)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.1 
+         ELSE
+          EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.7,0.5,1.,B,BETA0)
+         ENDIF 
+        GOTO 1000
+        ENDIF
           IF ((D .GE. 3.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.1 + A0R*(D-3.3)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.7,0.5,1.,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.1 + A0R*(D-3.3)
+         ELSE
+          EY=EYFCN(0.5,0.,0.5,B,BETA)+EYFCN(1.7,0.5,1.,B,BETA0)
      &        +EYFCN(A0R,3.3,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 113.0) .AND. (L .LT. 117.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.15)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.33*D
-	   ELSE
-	    EY=EYFCN(1.33,0.,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.,D,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 0.15) .AND. (D .LT. 0.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1995
-	   ELSE
-	    EY=EYFCN(1.33,0.,0.15,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.,0.15,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.65) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1995 + 1.287*(D-0.65)
-	   ELSE                
-	    EY=EYFCN(1.33,0.,0.15,B,BETA)+EYFCN(1.287,0.65,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE                
+          EY=EYFCN(1.33,0.,0.15,B,BETA)+EYFCN(1.287,0.65,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 1.0) .AND. (D .LT. 3.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.64995
-	   ELSE
-	    EY=EYFCN(1.33,0.,0.15,B,BETA)+EYFCN(1.287,0.65,1.,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.,0.15,B,BETA)+EYFCN(1.287,0.65,1.,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.64995 + A0R*(D-3.9)
-	   ELSE
-	    EY=EYFCN(1.33,0.,0.15,B,BETA)+EYFCN(1.287,0.65,1.,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.64995 + A0R*(D-3.9)
+         ELSE
+          EY=EYFCN(1.33,0.,0.15,B,BETA)+EYFCN(1.287,0.65,1.,B,BETA)
      &        +EYFCN(A0R,3.9,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 117.0) .AND. (L .LT. 120.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.63*D
-	   ELSE
-	    EY=EYFCN(0.63,0.,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.63,0.,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                  
           IF ((D .GE. 0.95) .AND. (D .LT. 3.7)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5985
-	   ELSE
-	    EY=EYFCN(0.63,0.,0.95,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.63,0.,0.95,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.7)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5985 + A0R*(D-3.7)
-    	   ELSE
-	    EY=EYFCN(0.63,0.,0.95,B,BETA)+EYFCN(A0R,3.7,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.5985 + A0R*(D-3.7)
+             ELSE
+          EY=EYFCN(0.63,0.,0.95,B,BETA)+EYFCN(A0R,3.7,D,B,BETA0)
+         ENDIF 
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 120.0) .AND. (L .LT. 122.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.1) .AND. (D .LT. 0.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.25*(D-0.1)
-	   ELSE
-	    EY=EYFCN(1.25,0.1,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.25,0.1,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF   
           IF ((D .GE. 0.3) .AND. (D .LT. 0.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.25
-	   ELSE
-	    EY=EYFCN(1.25,0.1,0.3,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.25,0.1,0.3,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.75) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.25 + 1.5*(D-0.75)
-	   ELSE
-	    EY=EYFCN(1.25,0.1,0.3,B,BETA)+EYFCN(1.5,0.75,D,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.25,0.1,0.3,B,BETA)+EYFCN(1.5,0.75,D,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.25) .AND. (D .LT. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 1.0
-	   ELSE
-	    EY=EYFCN(1.25,0.1,0.3,B,BETA)+EYFCN(1.5,0.75,1.25,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.25,0.1,0.3,B,BETA)+EYFCN(1.5,0.75,1.25,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.0 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(1.25,0.1,0.3,B,BETA)+EYFCN(1.5,0.75,1.25,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.0 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(1.25,0.1,0.3,B,BETA)+EYFCN(1.5,0.75,1.25,B,BETA)
      &        +EYFCN(A0R,3.,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 122.0) .AND. (L .LT. 124.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.22*D
-	   ELSE
-	    EY=EYFCN(0.22,0.,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.22,0.,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.45) .AND. (D .LT. 1.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.099 + 0.9424*(D-0.45)
-	   ELSE
-	    EY=EYFCN(0.22,0.,0.45,B,BETA)+EYFCN(0.9424,0.45,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.22,0.,0.45,B,BETA)+EYFCN(0.9424,0.45,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF                                              
           IF ((D .GE. 1.3) .AND. (D .LT. 4.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.90004
-	   ELSE
-	    EY=EYFCN(0.22,0.,0.45,B,BETA)+EYFCN(0.9424,0.45,1.3,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.22,0.,0.45,B,BETA)+EYFCN(0.9424,0.45,1.3,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.90004 + A0R*(D-4.1)
-	   ELSE
-	    EY=EYFCN(0.22,0.,0.45,B,BETA)+EYFCN(0.9424,0.45,1.3,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.90004 + A0R*(D-4.1)
+         ELSE
+          EY=EYFCN(0.22,0.,0.45,B,BETA)+EYFCN(0.9424,0.45,1.3,B,BETA)
      &        +EYFCN(A0R,4.1,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 124.0) .AND. (L .LT. 127.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.36*D
-	   ELSE
-	    EY=EYFCN(0.36,0.,D,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.36,0.,D,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.55) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.198 + 1.56*(D-0.55)
-	   ELSE
-	    EY=EYFCN(0.36,0.,0.55,B,BETA)+EYFCN(1.56,0.55,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.36,0.,0.55,B,BETA)+EYFCN(1.56,0.55,D,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF   
           IF ((D .GE. 1.0) .AND. (D .LT. 3.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.9
-	   ELSE
-	    EY=EYFCN(0.36,0.,0.55,B,BETA)+EYFCN(1.56,0.55,1.,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.36,0.,0.55,B,BETA)+EYFCN(1.56,0.55,1.,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9 + A0R*(D-3.65)
-	   ELSE
-	    EY=EYFCN(0.36,0.,0.55,B,BETA)+EYFCN(1.56,0.55,1.,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9 + A0R*(D-3.65)
+         ELSE
+          EY=EYFCN(0.36,0.,0.55,B,BETA)+EYFCN(1.56,0.55,1.,B,BETA)
      &        +EYFCN(A0R,3.65,D,B,BETA0)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 127.0) .AND. (L .LT. 130.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.17*D
-	   ELSE
-	    EY=EYFCN(0.17,0.,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.17,0.,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.6) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN      
+         IF ((IFLG .EQ. 0)) THEN      
             EY = 0.102 + 1.37*(D-0.6)
-	   ELSE
-	    EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(1.37,0.6,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(1.37,0.6,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF      
           IF ((D .GE. 1.0) .AND. (D .LT. 4.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.65
-	   ELSE
-	    EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(1.37,0.6,1.,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(1.37,0.6,1.,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.65 + A0R*(D-4.45)
-	   ELSE
-	    EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(1.37,0.6,1.,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.65 + A0R*(D-4.45)
+         ELSE
+          EY=EYFCN(0.17,0.,0.6,B,BETA)+EYFCN(1.37,0.6,1.,B,BETA)
      &        +EYFCN(A0R,4.45,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
  663   IF ((L .GE. 130.0) .AND. (L .LT. 132.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.2*D
-	   ELSE
-	    EY=EYFCN(0.2,0.,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.2,0.,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 1.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 1.07*(D-0.5)
-	   ELSE
-	    EY=EYFCN(0.2,0.,0.5,B,BETA)+EYFCN(1.07,0.5,D,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.2,0.,0.5,B,BETA)+EYFCN(1.07,0.5,D,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 1.2) .AND. (D .LT. 4.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.849
-	   ELSE
-	    EY=EYFCN(0.2,0.,0.5,B,BETA)+EYFCN(1.07,0.5,1.2,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.2,0.,0.5,B,BETA)+EYFCN(1.07,0.5,1.2,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.849 + A0R*(D-4.25)
-	   ELSE
-	    EY=EYFCN(0.2,0.,0.5,B,BETA)+EYFCN(1.07,0.5,1.2,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.849 + A0R*(D-4.25)
+         ELSE
+          EY=EYFCN(0.2,0.,0.5,B,BETA)+EYFCN(1.07,0.5,1.2,B,BETA)
      &        +EYFCN(A0R,4.25,D,B,BETA0)
-	   ENDIF
-	  GOTO 1000
+         ENDIF
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 132.0) .AND. (L .LT. 134.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 2.5*(D-0.2)
-	   ELSE
-	    EY=EYFCN(2.5,0.2,D,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.5,0.2,D,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.4) .AND. (D .LT. 1.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5 + 0.81*(D-0.4)
-	   ELSE
-	    EY=EYFCN(2.5,0.2,0.4,B,BETA)+EYFCN(0.81,0.4,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.5,0.2,0.4,B,BETA)+EYFCN(0.81,0.4,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF     
-	  IF ((D .GE. 1.2) .AND. (D .LT. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.148
-	   ELSE
-	    EY=EYFCN(2.5,0.2,0.4,B,BETA)+EYFCN(0.81,0.4,1.2,B,BETA)
-	   ENDIF   
-	  GOTO 1000
-	  ENDIF              
-          IF ((D .GE. 2.5)) THEN	
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.148 + A0R*(D-2.5)
-	   ELSE
-	    EY=EYFCN(2.5,0.2,0.4,B,BETA)+EYFCN(0.81,0.4,1.2,B,BETA)
+        IF ((D .GE. 1.2) .AND. (D .LT. 2.5)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.148
+         ELSE
+          EY=EYFCN(2.5,0.2,0.4,B,BETA)+EYFCN(0.81,0.4,1.2,B,BETA)
+         ENDIF   
+        GOTO 1000
+        ENDIF              
+          IF ((D .GE. 2.5)) THEN      
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.148 + A0R*(D-2.5)
+         ELSE
+          EY=EYFCN(2.5,0.2,0.4,B,BETA)+EYFCN(0.81,0.4,1.2,B,BETA)
      &        +EYFCN(A0R,2.5,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 134.0) .AND. (L .LT. 137.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.1) .AND. (D .LT. 0.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.5*(D-0.1)
-	   ELSE
-	    EY=EYFCN(1.5,0.1,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.1,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.3) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3 + 0.86*(D-0.3)
-	   ELSE
-	    EY=EYFCN(1.5,0.1,0.3,B,BETA)+EYFCN(0.86,0.3,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.1,0.3,B,BETA)+EYFCN(0.86,0.3,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF           
           IF ((D .GE. 1.0) .AND. (D .LT. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.902
-	   ELSE
-	    EY=EYFCN(1.5,0.1,0.3,B,BETA)+EYFCN(0.86,0.3,1.,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.1,0.3,B,BETA)+EYFCN(0.86,0.3,1.,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.902 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(1.5,0.1,0.3,B,BETA)+EYFCN(0.86,0.3,1.,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.902 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(1.5,0.1,0.3,B,BETA)+EYFCN(0.86,0.3,1.,B,BETA)
      &        +EYFCN(A0R,3.,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ENDIF       
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 137.0) .AND. (L .LT. 140.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.2)
-	   ELSE
-	    EY=EYFCN(1.,0.2,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.2,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.55) .AND. (D .LT. 0.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35 + 1.71*(D-0.55)
-	   ELSE
-	    EY=EYFCN(1.,0.2,0.55,B,BETA)+EYFCN(1.71,0.55,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.2,0.55,B,BETA)+EYFCN(1.71,0.55,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF              
-	  IF ((D .GE. 0.9) .AND. (D .LT. 3.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9485
-	   ELSE
-	    EY=EYFCN(1.,0.2,0.55,B,BETA)+EYFCN(1.71,0.55,0.9,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+        IF ((D .GE. 0.9) .AND. (D .LT. 3.2)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9485
+         ELSE
+          EY=EYFCN(1.,0.2,0.55,B,BETA)+EYFCN(1.71,0.55,0.9,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9485 + A0R*(D-3.2)
-	   ELSE
-	    EY=EYFCN(1.,0.2,0.55,B,BETA)+EYFCN(1.71,0.55,0.9,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9485 + A0R*(D-3.2)
+         ELSE
+          EY=EYFCN(1.,0.2,0.55,B,BETA)+EYFCN(1.71,0.55,0.9,B,BETA)
      &        +EYFCN(A0R,3.2,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF             
        IF ((L .GE. 140.0) .AND. (L .LT. 150.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5*D 
-	   ELSE
-	    EY=EYFCN(0.5,0.,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 0.7)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 3.5*(D-0.5)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 0.7) .AND. (D .LT. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.8
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,0.7,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,0.7,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.5) .AND. (D .LT. 3.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.8 + 0.5*(D-2.5)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,0.7,B,BETA)
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,0.7,B,BETA)
      &        +EYFCN(0.5,2.5,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.2 + A0R*(D-3.3)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,0.7,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.2 + A0R*(D-3.3)
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(3.5,0.5,0.7,B,BETA)
      &        +EYFCN(0.5,2.5,3.3,B,BETA)+EYFCN(A0R,3.3,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ENDIF 
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 150.0) .AND. (L .LT. 160.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5*D
-	   ELSE
-	    EY=EYFCN(0.5,0.,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,D,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.35)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 0.33*(D-0.2)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,D,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.35) .AND. (D .LT. 0.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1495 + 0.3763*(D-0.35)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
      &        +EYFCN(0.3763,0.35,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.75) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3002 + 1.749*(D-0.75)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
      &        +EYFCN(0.3763,0.35,0.75,B,BETA)
      &        +EYFCN(1.749,0.75,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.95) .AND. (D .LT. 1.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.65 + 0.4*(D-0.95)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
      &        +EYFCN(0.3763,0.35,0.75,B,BETA)
      &        +EYFCN(1.749,0.75,0.95,B,BETA)
      &        +EYFCN(0.4,0.95,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF                   
           IF ((D .GE. 1.45) .AND. (D .LT. 2.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.85
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
      &        +EYFCN(0.3763,0.35,0.75,B,BETA)
      &        +EYFCN(1.749,0.75,0.95,B,BETA)
      &        +EYFCN(0.4,0.95,1.45,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.85 + A0R*(D-2.85)
-	   ELSE
-	    EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.85 + A0R*(D-2.85)
+         ELSE
+          EY=EYFCN(0.5,0.,0.2,B,BETA)+EYFCN(0.33,0.2,0.35,B,BETA)
      &        +EYFCN(0.3763,0.35,0.75,B,BETA)
      &        +EYFCN(1.749,0.75,0.95,B,BETA)
      &        +EYFCN(0.4,0.95,1.45,B,BETA)+EYFCN(A0R,2.85,D,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ENDIF 
+        GOTO 1000
           ENDIF
        ENDIF
  664   IF ((L .GE. 160.0) .AND. (L .LT. 170.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.6)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.6) .AND. (D .LT. 0.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.33*(D-0.6)
-	   ELSE
-	    EY=EYFCN(1.33,0.6,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.6,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                  
           IF ((D .GE. 0.9) .AND. (D .LT. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.399
-	   ELSE
-	    EY=EYFCN(1.33,0.6,0.9,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.6,0.9,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.5) .AND. (D .LT. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.399 + 0.802*(D-2.5)
-	   ELSE
-	    EY=EYFCN(1.33,0.6,0.9,B,BETA)+EYFCN(0.802,2.5,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.33,0.6,0.9,B,BETA)+EYFCN(0.802,2.5,D,B,BETA0)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.8 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(1.33,0.6,0.9,B,BETA)+EYFCN(0.802,2.5,3.,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.8 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(1.33,0.6,0.9,B,BETA)+EYFCN(0.802,2.5,3.,B,BETA0)
      &        +EYFCN(A0R,3.,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ENDIF       
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 170.0) .AND. (L .LT. 174.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.1) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.1)
-	   ELSE
-	    EY=EYFCN(1.,0.1,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.1,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF                
           IF ((D .GE. 0.5) .AND. (D .LT. 1.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4
-	   ELSE
-	    EY=EYFCN(1.,0.1,0.5,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.1,0.5,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.5) .AND. (D .LT. 1.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4 + 0.43*(D-1.5)
-	   ELSE
-	    EY=EYFCN(1.,0.1,0.5,B,BETA)+EYFCN(0.43,1.5,D,B,BETA0)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.1,0.5,B,BETA)+EYFCN(0.43,1.5,D,B,BETA0)
+         ENDIF        
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 1.85) .AND. (D .LT. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5505
-	   ELSE
-	    EY=EYFCN(1.,0.1,0.5,B,BETA)+EYFCN(0.43,1.5,1.85,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.1,0.5,B,BETA)+EYFCN(0.43,1.5,1.85,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5505 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(1.,0.1,0.5,B,BETA)+EYFCN(0.43,1.5,1.85,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.5505 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(1.,0.1,0.5,B,BETA)+EYFCN(0.43,1.5,1.85,B,BETA0)
      &        +EYFCN(A0R,3.,D,B,BETA0)
-	   ENDIF        
-	  GOTO 1000
+         ENDIF        
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 174.0) .AND. (L .LT. 184.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.6*D
-	   ELSE
-	    EY=EYFCN(0.6,0.,D,B,BETA)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.6,0.,D,B,BETA)
+         ENDIF        
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 0.5) .AND. (D .LT. 1.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3 
-	   ELSE
-	    EY=EYFCN(0.6,0.,0.5,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.6,0.,0.5,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.95) .AND. (D .LT. 2.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3 + (D-1.95)
-	   ELSE
-	    EY=EYFCN(0.6,0.,0.5,B,BETA)+EYFCN(1.,1.95,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.6,0.,0.5,B,BETA)+EYFCN(1.,1.95,D,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.95 + A0R*(D-2.6)
-	   ELSE
-	    EY=EYFCN(0.6,0.,0.5,B,BETA)+EYFCN(1.,1.95,2.6,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.95 + A0R*(D-2.6)
+         ELSE
+          EY=EYFCN(0.6,0.,0.5,B,BETA)+EYFCN(1.,1.95,2.6,B,BETA0)
      &        +EYFCN(A0R,2.6,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
+         ENDIF 
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 184.0) .AND. (L .LT. 190.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.05)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.05) .AND. (D .LT. 0.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5*(D-0.05)
-	   ELSE
-	    EY=EYFCN(0.5,0.05,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.05,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF                   
           IF ((D .GE. 0.25) .AND. (D .LT. 0.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1
-	   ELSE
-	    EY=EYFCN(0.5,0.05,0.25,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.05,0.25,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.8) .AND. (D .LT. 1.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 1.7*(D-0.8)
-	   ELSE
-	    EY=EYFCN(0.5,0.05,0.25,B,BETA)+EYFCN(1.7,0.8,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.05,0.25,B,BETA)+EYFCN(1.7,0.8,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF              
-	  IF ((D .GE. 1.3) .AND. (D .LT. 3.35)) THEN 
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.95
-	   ELSE
-	    EY=EYFCN(0.5,0.05,0.25,B,BETA)+EYFCN(1.7,0.8,1.3,B,BETA)
-	   ENDIF   
-	  GOTO 1000
-	  ENDIF
+        IF ((D .GE. 1.3) .AND. (D .LT. 3.35)) THEN 
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.95
+         ELSE
+          EY=EYFCN(0.5,0.05,0.25,B,BETA)+EYFCN(1.7,0.8,1.3,B,BETA)
+         ENDIF   
+        GOTO 1000
+        ENDIF
           IF ((D .GE. 3.35)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.95 + A0R*(D-3.35)
-	   ELSE
-	    EY=EYFCN(0.5,0.05,0.25,B,BETA)+EYFCN(1.7,0.8,1.3,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.95 + A0R*(D-3.35)
+         ELSE
+          EY=EYFCN(0.5,0.05,0.25,B,BETA)+EYFCN(1.7,0.8,1.3,B,BETA)
      &        +EYFCN(A0R,3.35,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF
  665   IF ((L .GE. 190.0) .AND. (L .LT. 200.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.1) .AND. (D .LT. 0.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5*(D-0.1)
-	   ELSE
-	    EY=EYFCN(0.5,0.1,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.3) .AND. (D .LT. 0.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.3,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,0.3,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.65) .AND. (D .LT. 1.05)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 0.88*(D-0.65)
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.05) .AND. (D .LT. 1.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.452
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.8) .AND. (D .LT. 2.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.452 + 0.44*(D-1.8)
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
+         ELSE
+          EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
      &        +EYFCN(0.44,1.8,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ENDIF   
+        GOTO 1000
           ENDIF              
-	  IF ((D .GE. 2.25) .AND. (D .LT. 4.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.65
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
+        IF ((D .GE. 2.25) .AND. (D .LT. 4.4)) THEN
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.65
+         ELSE
+          EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
      &        +EYFCN(0.44,1.8,2.25,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
-	  ENDIF
+         ENDIF 
+        GOTO 1000
+        ENDIF
           IF ((D .GE. 4.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.65 + A0R*(D-4.4)
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.65 + A0R*(D-4.4)
+         ELSE
+          EY=EYFCN(0.5,0.1,0.3,B,BETA)+EYFCN(0.88,0.65,1.05,B,BETA)
      &        +EYFCN(0.44,1.8,2.25,B,BETA0)+EYFCN(A0R,4.4,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
+         ENDIF 
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 200.0) .AND. (L .LT. 205.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.25*D
-	   ELSE
-	    EY=EYFCN(0.25,0.,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.25,0.,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF     
           IF ((D .GE. 0.2) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.05
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.2,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.25,0.,0.2,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.6) .AND. (D .LT. 0.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.05 + 0.4*(D-0.6)
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 0.85) .AND. (D .LT. 1.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.75) .AND. (D .LT. 2.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15 + (D-1.75)
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
+         ELSE
+          EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
      &        +EYFCN(1.,1.75,D,B,BETA0)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF                
           IF ((D .GE. 2.0) .AND. (D .LT. 3.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
+         ELSE
+          EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
      &        +EYFCN(1.,1.75,2.,B,BETA0)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.4 + A0R*(D-3.65)
-	   ELSE
-	    EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.4 + A0R*(D-3.65)
+         ELSE
+          EY=EYFCN(0.25,0.,0.2,B,BETA)+EYFCN(0.4,0.6,0.85,B,BETA)
      &        +EYFCN(1.,1.75,2.,B,BETA0)+EYFCN(A0R,3.65,D,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
+         ENDIF 
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 205.0) .AND. (L .LT. 210.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.15*D
-	   ELSE
-	    EY=EYFCN(0.15,0.,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.15,0.,D,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.65) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0975 + 1.1708*(D-0.65)
-	   ELSE
-	    EY=EYFCN(0.15,0.,0.65,B,BETA)+EYFCN(1.1708,0.65,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.15,0.,0.65,B,BETA)+EYFCN(1.1708,0.65,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.79998 + A0R*(D-1.25)
-	   ELSE
-	    EY=EYFCN(0.15,0.,0.65,B,BETA)+EYFCN(1.1708,0.65,1.25,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.79998 + A0R*(D-1.25)
+         ELSE
+          EY=EYFCN(0.15,0.,0.65,B,BETA)+EYFCN(1.1708,0.65,1.25,B,BETA)
      &        +EYFCN(A0R,1.25,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ENDIF       
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 210.0) .AND. (L .LT. 220.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.9)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.9) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.9)
-	   ELSE
-	    EY=EYFCN(1.,0.9,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.9,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 1.25) .AND. (D .LT. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35
-	   ELSE
-	    EY=EYFCN(1.,0.9,1.25,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.9,1.25,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0) .AND. (D .LT. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35 + 0.8*(D-3.)
-	   ELSE
-	    EY=EYFCN(1.,0.9,1.25,B,BETA)+EYFCN(0.8,3.,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.9,1.25,B,BETA)+EYFCN(0.8,3.,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.75 + A0R*(D-3.5)
-	   ELSE
-	    EY=EYFCN(1.,0.9,1.25,B,BETA)+EYFCN(0.8,3.,3.5,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.75 + A0R*(D-3.5)
+         ELSE
+          EY=EYFCN(1.,0.9,1.25,B,BETA)+EYFCN(0.8,3.,3.5,B,BETA0)
      &        +EYFCN(A0R,3.5,D,B,BETA0)
-	   ENDIF    
-	  GOTO 1000
+         ENDIF    
+        GOTO 1000
           ENDIF
        ENDIF
  666   IF ((L .GE. 220.0) .AND. (L .LT. 230.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.3)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.3) .AND. (D .LT. 0.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.3)
-	   ELSE
-	    EY=EYFCN(1.,0.3,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.3,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF              
           IF ((D .GE. 0.65) .AND. (D .LT. 1.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35
-	   ELSE
-	    EY=EYFCN(1.,0.3,0.65,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.3,0.65,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.75) .AND. (D .LT. 2.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35 + 0.43*(D-1.75)
- 	   ELSE
-	    EY=EYFCN(1.,0.3,0.65,B,BETA)+EYFCN(0.43,1.75,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+          ELSE
+          EY=EYFCN(1.,0.3,0.65,B,BETA)+EYFCN(0.43,1.75,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF         
           IF ((D .GE. 2.1) .AND. (D .LT. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-            EY = 0.5005	
-	   ELSE
-	    EY=EYFCN(1.,0.3,0.65,B,BETA)+EYFCN(0.43,1.75,2.1,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+            EY = 0.5005      
+         ELSE
+          EY=EYFCN(1.,0.3,0.65,B,BETA)+EYFCN(0.43,1.75,2.1,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5005 + A0R*(D-2.5)
-	   ELSE
-	    EY=EYFCN(1.,0.3,0.65,B,BETA)+EYFCN(0.43,1.75,2.1,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.5005 + A0R*(D-2.5)
+         ELSE
+          EY=EYFCN(1.,0.3,0.65,B,BETA)+EYFCN(0.43,1.75,2.1,B,BETA0)
      &        +EYFCN(A0R,2.5,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ENDIF   
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 230.0) .AND. (L .LT. 240.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 1.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1*D
-	   ELSE
-	    EY=EYFCN(0.1,0.,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.1,0.,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.15 + A0R*(D-1.5)
-	   ELSE
-	    EY=EYFCN(0.1,0.,1.5,B,BETA)+EYFCN(A0R,1.5,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.15 + A0R*(D-1.5)
+         ELSE
+          EY=EYFCN(0.1,0.,1.5,B,BETA)+EYFCN(A0R,1.5,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 240.0) .AND. (L .LT. 250.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.1) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.5*(D-0.1)
-	   ELSE
-	    EY=EYFCN(0.5,0.1,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.5) .AND. (D .LT. 3.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.2
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.5,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,0.5,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.4) .AND. (D .LT. 4.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.2 + 0.27*(D-3.4)
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.5,B,BETA)+EYFCN(0.27,3.4,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,0.5,B,BETA)+EYFCN(0.27,3.4,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF  
           IF ((D .GE. 4.5) .AND. (D .LT. 9.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.497
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.5,B,BETA)+EYFCN(0.27,3.4,4.5,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.1,0.5,B,BETA)+EYFCN(0.27,3.4,4.5,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 9.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.497 + A0R*(D-9.0)
-	   ELSE
-	    EY=EYFCN(0.5,0.1,0.5,B,BETA)+EYFCN(0.27,3.4,4.5,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.497 + A0R*(D-9.0)
+         ELSE
+          EY=EYFCN(0.5,0.1,0.5,B,BETA)+EYFCN(0.27,3.4,4.5,B,BETA0)
      &        +EYFCN(A0R,9.,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF
        ENDIF
  667   IF ((L .GE. 250.0) .AND. (L .LT. 257.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.4)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.4) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 1.25*(D-0.4)
-	   ELSE
-	    EY=EYFCN(1.25,0.4,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.25,0.4,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                  
           IF ((D .GE. 0.6) .AND. (D .LT. 2.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.25
-	   ELSE
-	    EY=EYFCN(1.25,0.4,0.6,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.25,0.4,0.6,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.0) .AND. (D .LT. 2.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.25 + 0.47*(D-2.)
-	   ELSE
-	    EY=EYFCN(1.25,0.4,0.6,B,BETA)+EYFCN(0.47,2.,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.25,0.4,0.6,B,BETA)+EYFCN(0.47,2.,D,B,BETA0)
+         ENDIF       
+        GOTO 1000
           ENDIF                                             
           IF ((D .GE. 2.75) .AND. (D .LT. 4.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-            EY = 0.6025	
-	   ELSE
-	    EY=EYFCN(1.25,0.4,0.6,B,BETA)+EYFCN(0.47,2.,2.75,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+            EY = 0.6025      
+         ELSE
+          EY=EYFCN(1.25,0.4,0.6,B,BETA)+EYFCN(0.47,2.,2.75,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.6025 + A0R*(D-4.25)
-	   ELSE
-	    EY=EYFCN(1.25,0.4,0.6,B,BETA)+EYFCN(0.47,2.,2.75,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.6025 + A0R*(D-4.25)
+         ELSE
+          EY=EYFCN(1.25,0.4,0.6,B,BETA)+EYFCN(0.47,2.,2.75,B,BETA0)
      &        +EYFCN(A0R,4.25,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ENDIF       
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 257.0) .AND. (L .LT. 264.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.65)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.65) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.86*(D-0.65)
-	   ELSE
-	    EY=EYFCN(1.86,0.65,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.86,0.65,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF                
           IF ((D .GE. 1.0) .AND. (D .LT. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.651
-	   ELSE
-	    EY=EYFCN(1.86,0.65,1.,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.86,0.65,1.,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.651 + A0R*(D-3.0)
-	   ELSE
-	    EY=EYFCN(1.86,0.65,1.,B,BETA)+EYFCN(A0R,3.,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.651 + A0R*(D-3.0)
+         ELSE
+          EY=EYFCN(1.86,0.65,1.,B,BETA)+EYFCN(A0R,3.,D,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 264.0) .AND. (L .LT. 267.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.9)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.9) .AND. (D .LT. 1.35)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 2.*(D-0.9)
-	   ELSE
-	    EY=EYFCN(2.,0.9,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.9,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 1.35) .AND. (D .LT. 3.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.9
-	   ELSE
-	    EY=EYFCN(2.,0.9,1.35,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,0.9,1.35,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.9 + A0R*(D-3.1)
-	   ELSE
-	    EY=EYFCN(2.,0.9,1.35,B,BETA)+EYFCN(A0R,3.1,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.9 + A0R*(D-3.1)
+         ELSE
+          EY=EYFCN(2.,0.9,1.35,B,BETA)+EYFCN(A0R,3.1,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 267.0) .AND. (L .LT. 270.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.105*D
-	   ELSE
-	    EY=EYFCN(0.105,0.,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.105,0.,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.95) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.09975 + 2.67*(D-0.95)
-	   ELSE
-	    EY=EYFCN(0.105,0.,0.95,B,BETA)+EYFCN(2.67,0.95,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.105,0.,0.95,B,BETA)+EYFCN(2.67,0.95,D,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF          
           IF ((D .GE. 1.25) .AND. (D .LT. 3.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.90075
-	   ELSE
-	    EY=EYFCN(0.105,0.,0.95,B,BETA)+EYFCN(2.67,0.95,1.25,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.105,0.,0.95,B,BETA)+EYFCN(2.67,0.95,1.25,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.2)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.90075 + A0R*(D-3.2)
-	   ELSE
-	    EY=EYFCN(0.105,0.,0.95,B,BETA)+EYFCN(2.67,0.95,1.25,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.90075 + A0R*(D-3.2)
+         ELSE
+          EY=EYFCN(0.105,0.,0.95,B,BETA)+EYFCN(2.67,0.95,1.25,B,BETA)
      &        +EYFCN(A0R,3.2,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ENDIF   
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 270.0) .AND. (L .LT. 280.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 1.0)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 1.0) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 2.*(D-1.)
-	   ELSE
-	    EY=EYFCN(2.,1.,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,1.,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF                
           IF ((D .GE. 1.25) .AND. (D .LT. 3.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5
-	   ELSE
-	    EY=EYFCN(2.,1.,1.25,B,BETA)
-	   ENDIF
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.,1.,1.25,B,BETA)
+         ENDIF
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.5 + A0R*(D-3.9)
-	   ELSE
-	    EY=EYFCN(2.,1.,1.25,B,BETA)+EYFCN(A0R,3.9,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.5 + A0R*(D-3.9)
+         ELSE
+          EY=EYFCN(2.,1.,1.25,B,BETA)+EYFCN(A0R,3.9,D,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF
  668   IF ((L .GE. 280.0) .AND. (L .LT. 290.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.45)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.45) .AND. (D .LT. 0.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5*(D-0.45)
-	   ELSE
-	    EY=EYFCN(0.5,0.45,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.45,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF                   
           IF ((D .GE. 0.65) .AND. (D .LT. 1.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 
-	   ELSE
-	    EY=EYFCN(0.5,0.45,0.65,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.45,0.65,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.3) .AND. (D .LT. 1.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + 1.5*(D-1.3)
-	   ELSE
-	    EY=EYFCN(0.5,0.45,0.65,B,BETA)+EYFCN(1.5,1.3,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.45,0.65,B,BETA)+EYFCN(1.5,1.3,D,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.5) .AND. (D .LT. 2.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4
-	   ELSE
-	    EY=EYFCN(0.5,0.45,0.65,B,BETA)+EYFCN(1.5,1.3,1.5,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.5,0.45,0.65,B,BETA)+EYFCN(1.5,1.3,1.5,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.4 + A0R*(D-2.65)
-	   ELSE
-	    EY=EYFCN(0.5,0.45,0.65,B,BETA)+EYFCN(1.5,1.3,1.5,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.4 + A0R*(D-2.65)
+         ELSE
+          EY=EYFCN(0.5,0.45,0.65,B,BETA)+EYFCN(1.5,1.3,1.5,B,BETA0)
      &        +EYFCN(A0R,2.65,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 290.0) .AND. (L .LT. 291.5)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.55)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.55) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.11*(D-0.55)
            ELSE
-	    EY=EYFCN(1.11,0.55,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+          EY=EYFCN(1.11,0.55,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.0) .AND. (D .LT. 2.9)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4995 
-	   ELSE
-	    EY=EYFCN(1.11,0.55,1.,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.11,0.55,1.,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.9) .AND. (D .LT. 3.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4995 + 1.1546*(D-2.9)
-	   ELSE
-	    EY=EYFCN(1.11,0.55,1.,B,BETA)+EYFCN(1.1546,2.9,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.11,0.55,1.,B,BETA)+EYFCN(1.1546,2.9,D,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.24999 + A0R*(D-3.55)
-	   ELSE
-	    EY=EYFCN(1.11,0.55,1.,B,BETA)+EYFCN(1.1546,2.9,3.55,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.24999 + A0R*(D-3.55)
+         ELSE
+          EY=EYFCN(1.11,0.55,1.,B,BETA)+EYFCN(1.1546,2.9,3.55,B,BETA0)
      &        +EYFCN(A0R,3.55,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 291.5) .AND. (L .LT. 293.5)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.4*D
-	   ELSE
-	    EY=EYFCN(0.4,0.,D,B,BETA)
-	   ENDIF         
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.4,0.,D,B,BETA)
+         ENDIF         
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 0.25) .AND. (D .LT. 0.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1
-	   ELSE
-	    EY=EYFCN(0.4,0.,0.25,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.4,0.,0.25,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.8) .AND. (D .LT. 1.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1 + (D-0.8)
-	   ELSE
-	    EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.,0.8,D,B,BETA)
-	   ENDIF         
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.,0.8,D,B,BETA)
+         ENDIF         
+        GOTO 1000
           ENDIF                                          
           IF ((D .GE. 1.1) .AND. (D .LT. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-            EY = 0.4	
-	   ELSE
-	    EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.,0.8,1.1,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+            EY = 0.4      
+         ELSE
+          EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.,0.8,1.1,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.4 + A0R*(D-4.0)
-	   ELSE
-	    EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.,0.8,1.1,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.4 + A0R*(D-4.0)
+         ELSE
+          EY=EYFCN(0.4,0.,0.25,B,BETA)+EYFCN(1.,0.8,1.1,B,BETA)
      &        +EYFCN(A0R,4.0,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ENDIF   
+        GOTO 1000
           ENDIF               
        ENDIF
        IF ((L .GE. 293.5) .AND. (L .LT. 300.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.25)
-	   ELSE
-	    EY=EYFCN(1.,0.25,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 0.6) .AND. (D .LT. 4.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35 
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.6,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.25,0.6,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.35 + A0R*(D-4.5)
-	   ELSE
-	    EY=EYFCN(1.,0.25,0.6,B,BETA)+EYFCN(A0R,4.5,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.35 + A0R*(D-4.5)
+         ELSE
+          EY=EYFCN(1.,0.25,0.6,B,BETA)+EYFCN(A0R,4.5,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 300.0) .AND. (L .LT. 310.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.15)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.15) .AND. (D .LT. 0.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 1.57*(D-0.15)
-	   ELSE
-	    EY=EYFCN(1.57,0.15,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.57,0.15,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF                   
           IF ((D .GE. 0.5) .AND. (D .LT. 1.6)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5495
-	   ELSE
-	    EY=EYFCN(1.57,0.15,0.5,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.57,0.15,0.5,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.6) .AND. (D .LT. 1.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5495 + 0.8586*(D-1.6)
-	   ELSE
-	    EY=EYFCN(1.57,0.15,0.5,B,BETA)+EYFCN(0.8586,1.6,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.57,0.15,0.5,B,BETA)+EYFCN(0.8586,1.6,D,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.85001 + A0R*(D-1.95)
-	   ELSE
-	    EY=EYFCN(1.57,0.15,0.5,B,BETA)+EYFCN(0.8586,1.6,1.95,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.85001 + A0R*(D-1.95)
+         ELSE
+          EY=EYFCN(1.57,0.15,0.5,B,BETA)+EYFCN(0.8586,1.6,1.95,B,BETA0)
      &        +EYFCN(A0R,1.95,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF
  669   IF ((L .GE. 310.0) .AND. (L .LT. 320.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.15)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.15) .AND. (D .LT. 0.4)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.8*(D-0.15)
-	   ELSE
-	    EY=EYFCN(0.8,0.15,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.8,0.15,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF                  
           IF ((D .GE. 0.4) .AND. (D .LT. 0.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.2
-	   ELSE
-	    EY=EYFCN(0.8,0.15,0.4,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.8,0.15,0.4,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.75) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.2 + 0.8*(D-0.75)
-	   ELSE
-	    EY=EYFCN(0.8,0.15,0.4,B,BETA)+EYFCN(0.8,0.75,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.8,0.15,0.4,B,BETA)+EYFCN(0.8,0.75,D,B,BETA0)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.4 + A0R*(D-1.0)
-	   ELSE
-	    EY=EYFCN(0.8,0.15,0.4,B,BETA)+EYFCN(0.8,0.75,1.,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.4 + A0R*(D-1.0)
+         ELSE
+          EY=EYFCN(0.8,0.15,0.4,B,BETA)+EYFCN(0.8,0.75,1.,B,BETA0)
      &        +EYFCN(A0R,1.,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         ENDIF   
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 320.0) .AND. (L .LT. 330.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.2)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.2) .AND. (D .LT. 0.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.55*(D-0.2)
-	   ELSE
-	    EY=EYFCN(0.55,0.2,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.55,0.2,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF                  
           IF ((D .GE. 0.75) .AND. (D .LT. 3.1)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3025
-	   ELSE
-	    EY=EYFCN(0.55,0.2,0.75,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.55,0.2,0.75,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.1) .AND. (D .LT. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.3025 + 1.13*(D-3.1)
-	   ELSE
-	    EY=EYFCN(0.55,0.2,0.75,B,BETA)+EYFCN(1.13,3.1,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.55,0.2,0.75,B,BETA)+EYFCN(1.13,3.1,D,B,BETA0)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.7545 + A0R*(D-3.5)
-	   ELSE
-	    EY=EYFCN(0.55,0.2,0.75,B,BETA)+EYFCN(1.13,3.1,3.5,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.7545 + A0R*(D-3.5)
+         ELSE
+          EY=EYFCN(0.55,0.2,0.75,B,BETA)+EYFCN(1.13,3.1,3.5,B,BETA0)
      &        +EYFCN(A0R,3.5,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 330.0) .AND. (L .LT. 333.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.7)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.7) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 3.33*(D-0.7)
-	   ELSE
-	    EY=EYFCN(3.33,0.7,D,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(3.33,0.7,D,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF  
           IF ((D .GE. 1.0) .AND. (D .LT. 4.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.999
-	   ELSE
-	    EY=EYFCN(3.33,0.7,1.0,B,BETA)
-	   ENDIF   
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(3.33,0.7,1.0,B,BETA)
+         ENDIF   
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.999 + A0R*(D-4.3)
-     	   ELSE
-	    EY=EYFCN(3.33,0.7,1.0,B,BETA)+EYFCN(A0R,4.3,D,B,BETA0)
-	   ENDIF   
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.999 + A0R*(D-4.3)
+              ELSE
+          EY=EYFCN(3.33,0.7,1.0,B,BETA)+EYFCN(A0R,4.3,D,B,BETA0)
+         ENDIF   
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 333.0) .AND. (L .LT. 337.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.15)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.15) .AND. (D .LT. 0.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.5*(D-0.15)
-	   ELSE
-	    EY=EYFCN(1.5,0.15,D,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.15,D,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF  
           IF ((D .GE. 0.25) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15
-	   ELSE
-	    EY=EYFCN(1.5,0.15,0.25,B,BETA)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.15,0.25,B,BETA)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.95) .AND. (D .LT. 1.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15 + 1.86*(D-0.95)
-	   ELSE
-	    EY=EYFCN(1.5,0.15,0.25,B,BETA)+EYFCN(1.86,0.95,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.15,0.25,B,BETA)+EYFCN(1.86,0.95,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF          
           IF ((D .GE. 1.3) .AND. (D .LT. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.801 
-	   ELSE
-	    EY=EYFCN(1.5,0.15,0.25,B,BETA)+EYFCN(1.86,0.95,1.3,B,BETA0)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.5,0.15,0.25,B,BETA)+EYFCN(1.86,0.95,1.3,B,BETA0)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.801 + A0R*(D-3.5)
-	   ELSE
-	    EY=EYFCN(1.5,0.15,0.25,B,BETA)+EYFCN(1.86,0.95,1.3,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.801 + A0R*(D-3.5)
+         ELSE
+          EY=EYFCN(1.5,0.15,0.25,B,BETA)+EYFCN(1.86,0.95,1.3,B,BETA0)
      &        +EYFCN(A0R,3.5,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 337.0) .AND. (L .LT. 338.5)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.8)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.8) .AND. (D .LT. 1.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 2.75*(D-0.8)
-	   ELSE
-	    EY=EYFCN(2.75,0.8,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.75,0.8,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF        
           IF ((D .GE. 1.0) .AND. (D .LT. 2.05)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.55
-	   ELSE
-	    EY=EYFCN(2.75,0.8,1.,B,BETA)
-	   ENDIF    
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.75,0.8,1.,B,BETA)
+         ENDIF    
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.05) .AND. (D .LT. 2.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.55 + 0.33*(D-2.05)
-	   ELSE
-	    EY=EYFCN(2.75,0.8,1.,B,BETA)+EYFCN(0.33,2.05,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.75,0.8,1.,B,BETA)+EYFCN(0.33,2.05,D,B,BETA0)
+         ENDIF       
+        GOTO 1000
           ENDIF  
           IF ((D .GE. 2.5) .AND. (D .LT. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.6985
-	   ELSE
-	    EY=EYFCN(2.75,0.8,1.,B,BETA)+EYFCN(0.33,2.05,2.5,B,BETA0)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.75,0.8,1.,B,BETA)+EYFCN(0.33,2.05,2.5,B,BETA0)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 4.0)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.6985 + A0R*(D-4.0)
-	   ELSE
-	    EY=EYFCN(2.75,0.8,1.,B,BETA)+EYFCN(0.33,2.05,2.5,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.6985 + A0R*(D-4.0)
+         ELSE
+          EY=EYFCN(2.75,0.8,1.,B,BETA)+EYFCN(0.33,2.05,2.5,B,BETA0)
      &        +EYFCN(A0R,4.0,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF     
        IF ((L .GE. 338.5) .AND. (L .LT. 340.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.1)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.1) .AND. (D .LT. 0.3)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 2.5*(D-0.1)
-	   ELSE
-	    EY=EYFCN(2.5,0.1,D,B,BETA)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.5,0.1,D,B,BETA)
+         ENDIF        
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 0.3) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5
-	   ELSE
-	    EY=EYFCN(2.5,0.1,0.3,B,BETA)
-	   ENDIF  
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.5,0.1,0.3,B,BETA)
+         ENDIF  
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.25) .AND. (D .LT. 1.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.5 + 0.7*(D-1.25)
-	   ELSE
-	    EY=EYFCN(2.5,0.1,0.3,B,BETA)+EYFCN(0.7,1.25,D,B,BETA0)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.5,0.1,0.3,B,BETA)+EYFCN(0.7,1.25,D,B,BETA0)
+         ENDIF        
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.75) .AND. (D .LT. 2.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.85
-	   ELSE
-	    EY=EYFCN(2.5,0.1,0.3,B,BETA)+EYFCN(0.7,1.25,1.75,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(2.5,0.1,0.3,B,BETA)+EYFCN(0.7,1.25,1.75,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 2.85)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.85 + A0R*(D-2.85)
-	   ELSE
-	    EY=EYFCN(2.5,0.1,0.3,B,BETA)+EYFCN(0.7,1.25,1.75,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.85 + A0R*(D-2.85)
+         ELSE
+          EY=EYFCN(2.5,0.1,0.3,B,BETA)+EYFCN(0.7,1.25,1.75,B,BETA0)
      &        +EYFCN(A0R,2.85,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         ENDIF       
+        GOTO 1000
           ENDIF
        ENDIF
  670   IF ((L .GE. 340.0) .AND. (L .LT. 343.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.35)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.29*D
-	   ELSE
-	    EY=EYFCN(0.29,0.,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.29,0.,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.35) .AND. (D .LT. 0.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.1015 + 3.28*(D-0.35)
-	   ELSE
-	    EY=EYFCN(0.29,0.,0.35,B,BETA)+EYFCN(3.28,0.35,D,B,BETA)
-	   ENDIF      
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.29,0.,0.35,B,BETA)+EYFCN(3.28,0.35,D,B,BETA)
+         ENDIF      
+        GOTO 1000
           ENDIF
           IF ((D .GE. 0.65)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.0855 + A0R*(D-0.65)
-	   ELSE
-	    EY=EYFCN(0.29,0.,0.35,B,BETA)+EYFCN(3.28,0.35,0.65,B,BETA)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.0855 + A0R*(D-0.65)
+         ELSE
+          EY=EYFCN(0.29,0.,0.35,B,BETA)+EYFCN(3.28,0.35,0.65,B,BETA)
      &        +EYFCN(A0R,0.65,D,B,BETA0)
-	   ENDIF      
-	  GOTO 1000
+         ENDIF      
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 343.0) .AND. (L .LT. 350.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.3)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.3) .AND. (D .LT. 0.95)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + (D-0.3)
-	   ELSE
-	    EY=EYFCN(1.,0.3,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.3,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF                 
           IF ((D .GE. 0.95) .AND. (D .LT. 1.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.65
-	   ELSE
-	    EY=EYFCN(1.,0.3,0.95,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.,0.3,0.95,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.8)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 0.65 + A0R*(D-1.8)
-	   ELSE
-	    EY=EYFCN(1.,0.3,0.95,B,BETA)+EYFCN(A0R,1.8,D,B,BETA0)
-	   ENDIF       
-	  GOTO 1000
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 0.65 + A0R*(D-1.8)
+         ELSE
+          EY=EYFCN(1.,0.3,0.95,B,BETA)+EYFCN(A0R,1.8,D,B,BETA0)
+         ENDIF       
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 350.0) .AND. (L .LT. 357.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 0.25)) THEN
             EY = 0.0
-	    GOTO 1000
+          GOTO 1000
           ENDIF
           IF ((D .GE. 0.25) .AND. (D .LT. 0.45)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 1.75*(D-0.25)
-	   ELSE
-	    EY=EYFCN(1.75,0.25,D,B,BETA)
-	   ENDIF       
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.75,0.25,D,B,BETA)
+         ENDIF       
+        GOTO 1000
           ENDIF                    
           IF ((D .GE. 0.45) .AND. (D .LT. 1.15)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35
-	   ELSE
-	    EY=EYFCN(1.75,0.25,0.45,B,BETA)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.75,0.25,0.45,B,BETA)
+         ENDIF     
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.15) .AND. (D .LT. 1.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.35 + 2.63*(D-1.15)
-	   ELSE
-	    EY=EYFCN(1.75,0.25,0.45,B,BETA)+EYFCN(2.63,1.15,D,B,BETA0)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(1.75,0.25,0.45,B,BETA)+EYFCN(2.63,1.15,D,B,BETA0)
+         ENDIF        
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.55)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.402 + A0R*(D-1.55)
-	   ELSE
-	    EY=EYFCN(1.75,0.25,0.45,B,BETA)+EYFCN(2.63,1.15,1.55,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.402 + A0R*(D-1.55)
+         ELSE
+          EY=EYFCN(1.75,0.25,0.45,B,BETA)+EYFCN(2.63,1.15,1.55,B,BETA0)
      &        +EYFCN(A0R,1.55,D,B,BETA0)
-	   ENDIF        
-	  GOTO 1000
+         ENDIF        
+        GOTO 1000
           ENDIF
        ENDIF
        IF ((L .GE. 357.0) .AND. (L .LT. 360.0)) THEN
           IF ((D .GE. 0.0) .AND. (D .LT. 1.25)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.0 + 0.12*D
-	   ELSE
-	    EY=EYFCN(0.12,0.,D,B,BETA)
-	   ENDIF        
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.12,0.,D,B,BETA)
+         ENDIF        
+        GOTO 1000
           ENDIF
           IF ((D .GE. 1.25) .AND. (D .LT. 1.75)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 0.15 + 2.*(D-1.25)
-	   ELSE
-	    EY=EYFCN(0.12,0.,1.25,B,BETA)+EYFCN(2.,1.25,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.12,0.,1.25,B,BETA)+EYFCN(2.,1.25,D,B,BETA0)
+         ENDIF     
+        GOTO 1000
           ENDIF      
           IF ((D .GE. 1.75) .AND. (D .LT. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
+         IF ((IFLG .EQ. 0)) THEN
             EY = 1.15
-	   ELSE
-	    EY=EYFCN(0.12,0.,1.25,B,BETA)+EYFCN(2.,1.25,1.75,B,BETA0)
-	   ENDIF 
-	  GOTO 1000
+         ELSE
+          EY=EYFCN(0.12,0.,1.25,B,BETA)+EYFCN(2.,1.25,1.75,B,BETA0)
+         ENDIF 
+        GOTO 1000
           ENDIF
           IF ((D .GE. 3.5)) THEN
-	   IF ((IFLG .EQ. 0)) THEN
-	    EY = 1.15 + A0R*(D-3.5)
-	   ELSE
-	    EY=EYFCN(0.12,0.,1.25,B,BETA)+EYFCN(2.,1.25,1.75,B,BETA0)
+         IF ((IFLG .EQ. 0)) THEN
+          EY = 1.15 + A0R*(D-3.5)
+         ELSE
+          EY=EYFCN(0.12,0.,1.25,B,BETA)+EYFCN(2.,1.25,1.75,B,BETA0)
      &        +EYFCN(A0R,3.5,D,B,BETA0)
-	   ENDIF     
-	  GOTO 1000
+         ENDIF     
+        GOTO 1000
           ENDIF
        ENDIF
 C---------------------------------------------------------------------------
@@ -3106,7 +3106,7 @@ C---------------------------------------------------------------------------
       ELSE
          E0=1.
       ENDIF
-      E=EXP(-D*ABS(TAN(B*3.141592/180.))/BETA)
+      E = EXP(-D * ABS(TAN(B * 3.141592 / 180.)) / BETA)
       EYFCN=BETA*S*(E0-E)/ABS(SIN(B*3.141592/180.))
       RETURN
       END
@@ -14152,7 +14152,7 @@ C-----------------------------------------------------------------------
       IF (ABS(B) .EQ. 90.) L=115.
       IF ((L .GE. 65.) .AND. (L .LE. 165.) 
      &   .AND. (ABS(B) .GT. 10.)) THEN
-	 IF ((D .LE. 1.5)) THEN
+       IF ((D .LE. 1.5)) THEN
             ABSZ=D*ABS(SIN(B*3.141592/180.))
             AVA=B0*SIN((L-PHI)*3.141592/180.)+A0
             AVB=1.-EXP(-(ABSZ/BETA))
@@ -14160,14 +14160,14 @@ C-----------------------------------------------------------------------
             AV=AVA*AVB*AVC
             SAV=0.41
          ELSE
-	    ABSZ=1.5*ABS(SIN(B*3.141592/180.))
-	    AVA=B0*SIN((L-PHI)*3.141592/180.)+A0
-	    AVB=1.-EXP(-(ABSZ/BETA))
-	    AVC=BETA/(ABS(SIN(B*3.141592/180.)))
+          ABSZ=1.5*ABS(SIN(B*3.141592/180.))
+          AVA=B0*SIN((L-PHI)*3.141592/180.)+A0
+          AVB=1.-EXP(-(ABSZ/BETA))
+          AVC=BETA/(ABS(SIN(B*3.141592/180.)))
             AVFAR=BERDFCN(1.09,1.5,D,B,BETA)
             AV=AVA*AVB*AVC+AVFAR
-	    SAV=SQRT(0.1681+AVFAR*AVFAR*(D-1.5)*(D-1.5)/9.)
-	 ENDIF
+          SAV=SQRT(0.1681+AVFAR*AVFAR*(D-1.5)*(D-1.5)/9.)
+       ENDIF
       ENDIF
       RETURN
       END
@@ -14209,73 +14209,73 @@ C-----------------------------------------------------------------------
             ALPHA=2.22534
             BETA=-6.00212
             R=.052
-	    SAV4=13.
+          SAV4=13.
          ENDIF
          IF ((L .GE. 29.) .AND. (L .LT. 57.)) THEN
             ALPHA=3.35436
             BETA=-14.74567
             R=.035
-	    SAV4=40.
+          SAV4=40.
          ENDIF
          IF ((L .GE. 57.) .AND. (L .LT. 85.)) THEN
             ALPHA=2.77637
             BETA=-9.62706
             R=.042
-	    SAV4=15.
+          SAV4=15.
          ENDIF
          IF ((L .GE. 85.0) .AND. (L .LT. 110.0)) THEN
            ALPHA=4.44190
            BETA=-19.92097
            R=0.025
- 	   SAV4=36.
+          SAV4=36.
          ENDIF
          IF ((L .GE. 110.0) .AND. (L .LT. 150.0)) THEN
            ALPHA=4.46685
            BETA=-26.07305
            R=0.026
-	   SAV4=28.
+         SAV4=28.
          ENDIF
          IF ((L .GE. 150.0) .AND. (L .LT. 180.0)) THEN
            ALPHA=7.63699
            BETA=-46.10856
            R=0.014
-	   SAV4=38.
+         SAV4=38.
          ENDIF
          IF ((L .GE. 180.0) .AND. (L .LT. 210.0)) THEN
            ALPHA=2.43412
            BETA=-8.69913
            R=0.050
-	   SAV4=36.
+         SAV4=36.
          ENDIF
          IF ((L .GE. 210.0) .AND. (L .LT. 240.0)) THEN
            ALPHA=3.34481
            BETA=-13.93228
            R=0.035
-	   SAV4=38.
+         SAV4=38.
          ENDIF
          IF ((L .GE. 240.0) .AND. (L .LT. 270.0)) THEN
            ALPHA=1.40733
            BETA=-3.43418
            R=0.091
-	   SAV4=30.
+         SAV4=30.
          ENDIF
          IF ((L .GE. 270.0) .AND. (L .LT. 300.0)) THEN
            ALPHA=1.64466
            BETA=-3.97380
            R=0.074
-	   SAV4=28.
+         SAV4=28.
          ENDIF
          IF ((L .GE. 300.0) .AND. (L .LT. 330.0)) THEN
            ALPHA=2.12696
            BETA=-6.05682
            R=0.056
-	   SAV4=14.
+         SAV4=14.
          ENDIF
          IF ((L .GE. 330.0) .AND. (L .LT. 360.0)) THEN
            ALPHA=2.34636
            BETA=-8.17784
            R=0.052
-	   SAV4=16.
+         SAV4=16.
          ENDIF
       ENDIF
       IF ((B .GE. -60.) .AND. (B .LT. -45.)) THEN
@@ -14283,7 +14283,7 @@ C-----------------------------------------------------------------------
           ALPHA=2.77060
           BETA=-9.52310
           R=0.145
-	  SAV4=16.
+        SAV4=16.
         ENDIF
         IF ((L .GE.30.0) .AND. (L .LT. 60.0)) THEN
           ALPHA=1.96533
@@ -14295,7 +14295,7 @@ C-----------------------------------------------------------------------
           ALPHA=1.93622
           BETA=-13.31757
           R=0.073
-	  SAV4=26.
+        SAV4=26.
         ENDIF
         IF ((L .GE. 110.0) .AND. (L .LT. 180.0)) THEN
           ALPHA=1.05414
@@ -14307,13 +14307,13 @@ C-----------------------------------------------------------------------
           ALPHA=1.39990
           BETA=-1.35325
           R=0.252
-	  SAV4=10.
+        SAV4=10.
         ENDIF
         IF ((L .GE. 210.0) .AND. (L .LT. 240.0)) THEN
           ALPHA=2.73481
           BETA=-11.70266
           R=0.117
-	  SAV4=8.
+        SAV4=8.
         ENDIF
         IF ((L .GE. 240.0) .AND. (L .LT. 270.0)) THEN
           ALPHA=2.99784
@@ -14325,19 +14325,19 @@ C-----------------------------------------------------------------------
           ALPHA=3.23802
           BETA=-11.63810
           R=0.139
-	  SAV4=7.
+        SAV4=7.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 330.0)) THEN
           ALPHA=1.72679
           BETA=-6.05085
           R=0.143
-	  SAV4=7.
+        SAV4=7.
         ENDIF
         IF ((L .GE. 330.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=1.88890
           BETA=-5.51861
           R=0.171
-	  SAV4=14.
+        SAV4=14.
         ENDIF
       ENDIF
       IF ((B .GE. -45.) .AND. (B .LT. -30.)) THEN
@@ -14345,67 +14345,67 @@ C-----------------------------------------------------------------------
           ALPHA=1.98973
           BETA=-4.86206
           R=0.205
-	  SAV4=6.
+        SAV4=6.
         ENDIF
         IF ((L .GE. 30.0) .AND. (L .LT. 60.0)) THEN
           ALPHA=1.49901
           BETA=-3.75837
           R=0.199
-	  SAV4=16.
+        SAV4=16.
         ENDIF
         IF ((L .GE. 60.0) .AND. (L .LT. 90.0)) THEN
           ALPHA=0.90091
           BETA=-1.30459
           R=0.329
-	  SAV4=73.
+        SAV4=73.
         ENDIF
         IF ((L .GE. 90.0) .AND. (L .LT. 120.0)) THEN
           ALPHA=1.94200
           BETA=-6.26833
           R=0.155
-	  SAV4=18.
+        SAV4=18.
         ENDIF
         IF ((L .GE. 120.0) .AND. (L .LT. 160.0)) THEN
           ALPHA=-0.37804
           BETA=10.77372
           R=0.210
-	  SAV4=100.
+        SAV4=100.
         ENDIF
         IF  ((L .GE. 160.0) .AND. (L .LT. 200.0)) THEN
           ALPHA=-0.15710
           BETA=5.03190
           R=0.294
-	  SAV4=24.
+        SAV4=24.
         ENDIF
         IF  ((L .GE. 200.0) .AND. (L .LT. 235.0)) THEN
           ALPHA=3.20162
           BETA=-10.59297
           R=0.151
-	  SAV4=9.
+        SAV4=9.
         ENDIF
         IF ((L .GE. 235.0) .AND. (L .LT. 265.0)) THEN
           ALPHA=1.95079
           BETA=-4.73280
           R=0.206
-	  SAV4=21.
+        SAV4=21.
         ENDIF
         IF ((L .GE. 265.0) .AND. (L .LT. 300.0)) THEN
           ALPHA=1.91200
           BETA=-4.97640
           R=0.192
-	  SAV4=17.
+        SAV4=17.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 330.0)) THEN
           ALPHA=2.50487
           BETA=-8.63106
           R=0.145
-	  SAV4=28.
+        SAV4=28.
         ENDIF
         IF ((L .GE. 330.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=2.44394
           BETA=-9.17612
           R=0.133
-	  SAV4=7.
+        SAV4=7.
         ENDIF
       ENDIF
       IF ((B .GE. -30.) .AND. (B .LT. -15.)) THEN
@@ -14413,103 +14413,103 @@ C-----------------------------------------------------------------------
           ALPHA=2.82440
           BETA=-4.78217
           R=0.295
-	  SAV4=32.
+        SAV4=32.
         ENDIF
         IF ((L .GE. 20.0) .AND. (L .LT. 40.0)) THEN
           ALPHA=3.84362
           BETA=-8.04690
           R=0.239
-	  SAV4=46.
+        SAV4=46.
         ENDIF
         IF ((L .GE. 40.0) .AND. (L .LT. 80.0)) THEN
           ALPHA=0.60365
           BETA=0.07893
           R=0.523
-	  SAV4=22.
+        SAV4=22.
         ENDIF
         IF ((L .GE. 80.0) .AND. (L .LT. 100.0)) THEN
           ALPHA=0.58307
           BETA=-0.21053
           R=0.523
-	  SAV4=53.
+        SAV4=53.
         ENDIF
         IF ((L .GE. 100.0) .AND. (L .LT. 120.0)) THEN
           ALPHA=2.03861
           BETA=-4.40843
           R=0.231
-	  SAV4=60.
+        SAV4=60.
         ENDIF
         IF ((L .GE. 120.0) .AND. (L .LT. 140.0)) THEN
           ALPHA=1.14271
           BETA=-1.35635
           R=0.421
-	  SAV4=34.
+        SAV4=34.
         ENDIF
         IF ((L .GE. 140.0) .AND. (L .LT. 160.0)) THEN
           ALPHA=0.79908
           BETA=1.48074
           R=0.523
-	  SAV4=61.
+        SAV4=61.
         ENDIF
         IF ((L .GE. 160.0) .AND. (L .LT. 180.0)) THEN
           ALPHA=0.94260
           BETA=8.16346
           R=0.441
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF ((L .GE. 180.0) .AND. (L .LT. 200.0)) THEN
           ALPHA=1.66398
           BETA=0.26775
           R=0.523
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF ((L .GE. 200.0) .AND. (L .LT. 220.0)) THEN
           ALPHA=1.08760
           BETA=-1.02443
           R=0.523
-	  SAV4=45.
+        SAV4=45.
         ENDIF
         IF ((L .GE. 220.0) .AND. (L .LT. 240.0)) THEN
           ALPHA=1.20087
           BETA=-2.45407
           R=0.245
-	  SAV4=6.
+        SAV4=6.
         ENDIF
         IF ((L .GE. 240.0) .AND. (L .LT. 260.0)) THEN
           ALPHA=1.13147
           BETA=-1.87916
           R=0.301
-	  SAV4=16.
+        SAV4=16.
         ENDIF
         IF ((L .GE. 260.0) .AND. (L .LT. 280.0)) THEN
           ALPHA=1.97804
           BETA=-2.92838
           R=0.338
-	  SAV4=21.
+        SAV4=21.
         ENDIF
         IF ((L .GE. 280.0) .AND. (L .LT. 300.0)) THEN
           ALPHA=1.40086
           BETA=-1.12403
           R=0.523
-	  SAV4=19.
+        SAV4=19.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 320.0)) THEN
           ALPHA=2.06355
           BETA=-3.68278
           R=0.280
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF ((L .GE. 320.0) .AND. (L .LT. 340.0)) THEN
           ALPHA=1.59260
           BETA=-2.18754
           R=0.364
-	  SAV4=15.
+        SAV4=15.
         ENDIF
         IF ((L .GE. 340.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=1.45589
           BETA=-1.90598
           R=0.382
-	  SAV4=21.
+        SAV4=21.
         ENDIF
       ENDIF
       IF ((B .GE. -15.) .AND. (B .LT. -5.)) THEN
@@ -14517,220 +14517,220 @@ C-----------------------------------------------------------------------
           ALPHA=2.56438
           BETA=-2.31586
           R=0.554
-	  SAV4=37.
+        SAV4=37.
         ENDIF
         IF ((L .GE. 10.0) .AND. (L .LT. 20.0)) THEN
           ALPHA=3.24095
           BETA=-2.78217
           R=0.582
-	  SAV4=38.
+        SAV4=38.
         ENDIF
         IF ((L .GE. 20.0) .AND. (L .LT. 30.0)) THEN
           ALPHA=2.95627
           BETA=-2.57422
           R=0.574
           GAMMA=0.08336
-	  SAV4=41.
+        SAV4=41.
         ENDIF
         IF ((L .GE. 30.0) .AND. (L .LT. 40.0)) THEN
           ALPHA=1.85158
           BETA=-0.67716
           R=1.152
-	  SAV4=4.
+        SAV4=4.
         ENDIF
         IF ((L .GE. 40.0) .AND. (L .LT. 50.0)) THEN
           ALPHA=1.60770
           BETA=0.35279
           R=0.661
-	  SAV4=24.
+        SAV4=24.
         ENDIF
         IF ((L .GE. 50.0) .AND. (L .LT. 60.0)) THEN
           ALPHA=0.69920
           BETA=-0.09146
           R=0.952
           GAMMA=0.12839
-	  SAV4=2.
+        SAV4=2.
         ENDIF
         IF ((L .GE. 60.0) .AND. (L .LT. 80.0)) THEN
           ALPHA=1.36189
           BETA=-1.05290
           R=0.647
           GAMMA=0.16258
-	  SAV4=45.
+        SAV4=45.
         ENDIF
         IF ((L .GE. 80.0) .AND. (L .LT. 90.0)) THEN
           ALPHA=0.33179
           BETA=0.37629
           R=1.152
-	  SAV4=62.
+        SAV4=62.
         ENDIF
         IF ((L .GE. 90.0) .AND. (L .LT. 100.0)) THEN
           ALPHA=1.70303
           BETA=-0.75246
           R=1.132
-	  SAV4=31.
+        SAV4=31.
         ENDIF
         IF ((L .GE. 100.0) .AND. (L .LT. 110.0)) THEN
           ALPHA=1.97414
           BETA=-1.59784
           R=0.618
           GAMMA=0.12847
-	  SAV4=35.
+        SAV4=35.
         ENDIF
         IF ((L .GE. 110.0) .AND. (L .LT. 120.0)) THEN
           ALPHA=1.07407
           BETA=-0.40066
           R=1.152
           GAMMA=0.17698
-	  SAV4=14.
+        SAV4=14.
         ENDIF
         IF ((L .GE. 120.0) .AND. (L .LT. 130.0)) THEN
           ALPHA=1.69495
           BETA=-1.00071
           R=0.847
           GAMMA=0.08567
-	  SAV4=28.
+        SAV4=28.
         ENDIF
         IF ((L .GE. 130.0) .AND. (L .LT. 140.0)) THEN
           ALPHA=1.51449
           BETA=-0.08441
           R=0.897
-	  SAV4=12.
+        SAV4=12.
         ENDIF
         IF ((L .GE. 140.0) .AND. (L .LT. 150.0)) THEN
           ALPHA=1.87894
           BETA=-0.73314
           R=1.152
-	  SAV4=23.
+        SAV4=23.
         ENDIF
         IF ((L .GE. 150.0) .AND. (L .LT. 160.0)) THEN
           ALPHA=1.43670
           BETA=0.67706
           R=0.778
           GAMMA=0.42624
-	  SAV4=3.
+        SAV4=3.
         ENDIF
         IF ((L .GE. 160.0) .AND. (L .LT. 180.0)) THEN
           ALPHA=6.84802
           BETA=-5.06864
           R=0.676
-	  SAV4=50.
+        SAV4=50.
         ENDIF
         IF ((L .GE. 180.0) .AND. (L .LT. 190.0)) THEN
           ALPHA=4.16321
           BETA=-5.80016
           R=0.359
           GAMMA=0.60387
-	  SAV4=51.
+        SAV4=51.
         ENDIF
         IF ((L .GE. 190.0) .AND. (L .LT. 200.0)) THEN
           ALPHA=0.78135
           BETA=-0.27826
           R=1.152
-	  SAV4=4.
+        SAV4=4.
         ENDIF
         IF ((L .GE. 200.0) .AND. (L .LT. 210.0)) THEN
           ALPHA=0.85535
           BETA=0.20848
           R=1.152
-	  SAV4=17.
+        SAV4=17.
         ENDIF
         IF ((L .GE. 210.0) .AND. (L .LT. 220.0)) THEN
           ALPHA=0.52521
           BETA=0.65726
           R=1.152
-	  SAV4=7.
+        SAV4=7.
         ENDIF
         IF ((L .GE. 220.0) .AND. (L .LT. 230.0)) THEN
           ALPHA=0.88376
           BETA=-0.44519
           R=0.993
           GAMMA=0.06013
-	  SAV4=40.
+        SAV4=40.
         ENDIF
         IF ((L .GE. 230.0) .AND. (L .LT. 240.0)) THEN
           ALPHA=0.42228
           BETA=-0.26304
           R=0.803
-	  SAV4=26.
+        SAV4=26.
         ENDIF
         IF ((L .GE. 240.0) .AND. (L .LT. 250.0)) THEN
           ALPHA=0.71318
           BETA=-0.67229
           R=0.530
           GAMMA=0.20994
-	  SAV4=55.
+        SAV4=55.
         ENDIF
         IF ((L .GE. 250.0) .AND. (L .LT. 260.0)) THEN
           ALPHA=0.99606
           BETA=-0.70103
           R=0.710
           GAMMA=0.01323
-	  SAV4=48.
+        SAV4=48.
         ENDIF
         IF ((L .GE. 260.0) .AND. (L .LT. 270.0)) THEN
           ALPHA=0.91519
           BETA=-0.39690
           R=1.152
           GAMMA=0.01961
-	  SAV4=48.
+        SAV4=48.
         ENDIF
         IF ((L .GE. 270.0) .AND. (L .LT. 280.0)) THEN
           ALPHA=0.85791
           BETA=-0.29115
           R=1.152
-	  SAV4=19.
+        SAV4=19.
         ENDIF
         IF ((L .GE. 280.0) .AND. (L .LT. 290.0)) THEN
           ALPHA=1.44226
           BETA=-1.09775
           R=0.657
-	  SAV4=39.
+        SAV4=39.
         ENDIF
         IF ((L .GE. 290.0) .AND. (L .LT. 300.0)) THEN
           ALPHA=2.55486
           BETA=-1.68293
           R=0.759
-	  SAV4=31.
+        SAV4=31.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 310.0)) THEN
           ALPHA=3.18047
           BETA=-2.69796
           R=0.589
-	  SAV4=40.
+        SAV4=40.
         ENDIF
         IF ((L .GE. 310.0) .AND. (L .LT. 320.0)) THEN
           ALPHA=2.11235
           BETA=-1.77506
           R=0.595
-	  SAV4=29.
+        SAV4=29.
         ENDIF
         IF ((L .GE. 320.0) .AND. (L .LT. 330.0)) THEN
           ALPHA=1.75884
           BETA=-1.38574
           R=0.635
-	  SAV4=25.
+        SAV4=25.
         ENDIF
         IF ((L .GE. 330.0) .AND. (L .LT. 340.0)) THEN
           ALPHA=1.97257
           BETA=-1.55545
           R=0.634
           GAMMA=0.00043
-	  SAV4=34.
+        SAV4=34.
         ENDIF
         IF ((L .GE. 340.0) .AND. (L .LT. 350.0)) THEN
           ALPHA=1.41497
           BETA=-1.05722
           R=0.669
           GAMMA=0.03264
-	  SAV4=46.
+        SAV4=46.
         ENDIF
         IF ((L .GE. 350.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=1.17795
           BETA=-0.95012
           R=0.620
           GAMMA=0.03339
-	  SAV4=46.
+        SAV4=46.
         ENDIF          
       ENDIF
       IF ((B .GE. -5.) .AND. (B .LT. 5.)) THEN
@@ -14739,236 +14739,236 @@ C-----------------------------------------------------------------------
           BETA=-1.11097
           R=1.182
           GAMMA=0.00340
-	  SAV4=57.
+        SAV4=57.
         ENDIF
         IF ((L .GE. 10.0) .AND. (L .LT. 20.0)) THEN
           ALPHA=3.14461
           BETA=-1.01140
           R=1.555
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF ((L .GE. 20.0) .AND. (L .LT. 30.0)) THEN
           ALPHA=4.26624
           BETA=-1.61242
           R=1.323
-	  SAV4=34.
+        SAV4=34.
         ENDIF
         IF ((L .GE. 30.0) .AND. (L .LT. 40.0)) THEN
           ALPHA=2.54447
           BETA=-0.12771
           R=1.300
-	  SAV4=30.
+        SAV4=30.
         ENDIF
         IF ((L .GE. 40.0) .AND. (L .LT. 50.0)) THEN
           ALPHA=2.27030
           BETA=-0.68720
           R=1.652
           GAMMA=0.04928
-	  SAV4=52.
+        SAV4=52.
         ENDIF
         IF ((L .GE. 50.0) .AND. (L .LT. 60.0)) THEN
           ALPHA=1.34359
           BETA=-0.05416
           R=2.000
-	  SAV4=32.
+        SAV4=32.
         ENDIF
         IF ((L .GE. 60.0) .AND. (L .LT. 70.0)) THEN
           ALPHA=1.76327
           BETA=-0.26407
           R=2.000
-	  SAV4=37.
+        SAV4=37.
         ENDIF
         IF ((L .GE. 70.0) .AND. (L .LT. 80.0)) THEN
           ALPHA=2.20666
           BETA=-0.41651
           R=2.000
-	  SAV4=36.
+        SAV4=36.
         ENDIF
         IF ((L .GE. 80.0) .AND. (L .LT. 90.0)) THEN
           ALPHA=1.50130
           BETA=-0.09855
           R=1.475
-	  SAV4=45.
+        SAV4=45.
         ENDIF
         IF ((L .GE. 90.0) .AND. (L .LT. 100.0)) THEN
           ALPHA=2.43965
           BETA=-0.82128
           R=1.485
           GAMMA=0.01959
-	  SAV4=36.
+        SAV4=36.
         ENDIF
         IF ((L .GE. 100.0) .AND. (L .LT. 110.0)) THEN
           ALPHA=3.35775
           BETA=-1.16400
           R=0.841
           GAMMA=0.00298
-	  SAV4=35.
+        SAV4=35.
         ENDIF
         IF ((L .GE. 110.0) .AND. (L .LT. 120.0)) THEN
           ALPHA=2.60621
           BETA=-0.68687
           R=1.897
-	  SAV4=36.
+        SAV4=36.
         ENDIF
         IF ((L .GE. 120.0) .AND. (L .LT. 130.0)) THEN
           ALPHA=2.90112
           BETA=-0.97988
           R=1.480
-	  SAV4=32.
+        SAV4=32.
         ENDIF
         IF ((L .GE. 130.0) .AND. (L .LT. 140.0)) THEN
           ALPHA=2.55377
           BETA=-0.71214
           R=1.793
-	  SAV4=38.
+        SAV4=38.
         ENDIF
         IF ((L .GE. 140.0) .AND. (L .LT. 150.0)) THEN
           ALPHA=3.12598
           BETA=-1.21437
           R=1.287
           GAMMA=0.15298
-	  SAV4=23.
+        SAV4=23.
         ENDIF
         IF ((L .GE. 150.0) .AND. (L .LT. 160.0)) THEN
           ALPHA=3.66930
           BETA=-2.29731
           R=0.799
           GAMMA=0.33473
-	  SAV4=40.
+        SAV4=40.
         ENDIF
         IF ((L .GE. 160.0) .AND. (L .LT. 170.0)) THEN
           ALPHA=2.15465
           BETA=-0.70690
           R=1.524
           GAMMA=0.14017
-	  SAV4=37.
+        SAV4=37.
         ENDIF
         IF ((L .GE. 170.0) .AND. (L .LT. 180.0)) THEN
           ALPHA= 1.82465
           BETA=-0.60223
           R=1.515
           GAMMA= 0.20730
-	  SAV4=29.
+        SAV4=29.
         ENDIF
         IF ((L .GE. 180.0) .AND. (L .LT. 190.0)) THEN
           ALPHA=1.76269
           BETA=-0.35945
           R=2.000
           GAMMA=0.08052
-	  SAV4=28.
+        SAV4=28.
         ENDIF
         IF ((L .GE. 190.0) .AND. (L .LT. 200.0)) THEN
           ALPHA=1.06085
           BETA=-0.14211
           R=2.000
-	  SAV4=48.
+        SAV4=48.
         ENDIF
         IF ((L .GE. 200.0) .AND. (L .LT. 210.0)) THEN
           ALPHA=1.21333
           BETA=-0.23225
           R=2.000
-	  SAV4=57.
+        SAV4=57.
         ENDIF
         IF ((L .GE. 210.0) .AND. (L .LT. 220.0)) THEN
           ALPHA=0.58326
           BETA=-0.06097
           R=2.000
           GAMMA=0.36962
-	  SAV4=30.
+        SAV4=30.
         ENDIF
         IF ((L .GE. 220.0) .AND. (L .LT. 230.0)) THEN
           ALPHA=0.74200
           BETA=-0.19293
           R=1.923
           GAMMA=0.07459
-	  SAV4=48.
+        SAV4=48.
         ENDIF
         IF ((L .GE. 230.0) .AND. (L .LT. 240.0)) THEN
           ALPHA=0.67520
           BETA=-0.21041
           R=1.604
           GAMMA=0.16602
-	  SAV4=49.
+        SAV4=49.
         ENDIF
         IF ((L .GE. 240.0) .AND. (L .LT. 250.0)) THEN
           ALPHA=0.62609
           BETA=-0.25312
           R=1.237
           GAMMA=0.14437
-	  SAV4=73.
+        SAV4=73.
         ENDIF
         IF ((L .GE. 250.0) .AND. (L .LT. 260.0)) THEN
           ALPHA=0.61415
           BETA=-0.13788
           R=2.000
           GAMMA=0.26859
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF ((L .GE. 260.0) .AND. (L .LT. 270.0)) THEN
           ALPHA=0.58108
           BETA=0.01195
           R=2.000
           GAMMA=0.07661
-	  SAV4=40.
+        SAV4=40.
         ENDIF
         IF ((L .GE. 270.0) .AND. (L .LT. 280.0)) THEN
           ALPHA=0.68352
           BETA=-0.10743
           R=2.000
           GAMMA=0.00849
-	  SAV4=50.
+        SAV4=50.
         ENDIF
         IF ((L .GE. 280.0) .AND. (L .LT. 290.0)) THEN
           ALPHA=0.61747
           BETA=0.02675
           R=2.000
-	  SAV4=49.
+        SAV4=49.
         ENDIF
         IF ((L .GE. 290.0) .AND. (L .LT. 300.0)) THEN
           ALPHA=1.06827
           BETA=-0.26290
           R=2.000
-	  SAV4=44.
+        SAV4=44.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 310.0)) THEN
           ALPHA=1.53631
           BETA=-0.36833
           R=2.000
           GAMMA=0.02960
-	  SAV4=37.
+        SAV4=37.
         ENDIF
         IF ((L .GE. 310.0) .AND. (L .LT. 320.0)) THEN
           ALPHA=1.94300
           BETA=-0.71445
           R=1.360
           GAMMA=0.15643
-	  SAV4=36.
+        SAV4=36.
         ENDIF
         IF ((L .GE. 320.0) .AND. (L .LT. 330.0)) THEN
           ALPHA=1.22185
           BETA=-0.40185
           R=1.520
           GAMMA=0.07354
-	  SAV4=48.
+        SAV4=48.
         ENDIF
         IF ((L .GE. 330.0) .AND. (L .LT. 340.0)) THEN
           ALPHA=1.79429
           BETA=-0.48657
           R=1.844
-	  SAV4=43.
+        SAV4=43.
         ENDIF
         IF ((L .GE. 340.0) .AND. (L .LT. 350.0)) THEN
           ALPHA=2.29545
           BETA=-0.84096
           R=1.365
-	  SAV4=32.
+        SAV4=32.
         ENDIF
         IF ((L .GE. 350.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=2.07408
           BETA=-0.64745
           R=1.602
           GAMMA=0.12750
-	  SAV4=36.
+        SAV4=36.
         ENDIF
       ENDIF
       IF ((B .GE. 5.) .AND. (B .LT. 15.)) THEN
@@ -14977,196 +14977,196 @@ C-----------------------------------------------------------------------
           BETA=-2.09258
           R=0.703
           GAMMA=0.05490
-	  SAV4=41.
+        SAV4=41.
         ENDIF
         IF ((L .GE. 10.0) .AND. (L .LT. 30.0)) THEN
           ALPHA=3.04627
           BETA=7.71159
           R=0.355
-	  SAV4=45.
+        SAV4=45.
         ENDIF
         IF ((L .GE. 30.0) .AND. (L .LT. 40.0)) THEN
           ALPHA=3.78033
           BETA=-3.91956
           R=0.482
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF  ((L .GE. 40.0) .AND. (L .LT. 50.0)) THEN
           ALPHA=2.18119
           BETA=-2.4050
           R=0.453
-	  SAV4=27.
+        SAV4=27.
         ENDIF
         IF  ((L .GE. 50.0) .AND. (L .LT. 60.0)) THEN
           ALPHA=1.45372
           BETA=-0.49522
           R=1.152
-	  SAV4=31.
+        SAV4=31.
         ENDIF
         IF ((L .GE. 60.0) .AND. (L .LT. 70.0)) THEN
           ALPHA=1.05051
           BETA=-1.01704
           R=0.516
-	  SAV4=2.
+        SAV4=2.
         ENDIF
         IF ((L .GE. 70.0) .AND. (L .LT. 80.0)) THEN
           ALPHA=0.48416
           BETA=-0.27182
           R=0.891
           GAMMA=0.08639
-	  SAV4=94.
+        SAV4=94.
         ENDIF
         IF ((L .GE. 80.0) .AND. (L .LT. 90.0)) THEN
           ALPHA=0.61963
           BETA=0.41697
           R=1.152
           GAMMA=0.47171
-	  SAV4=35.
+        SAV4=35.
         ENDIF
         IF ((L .GE. 90.0) .AND. (L .LT. 100.0)) THEN
           ALPHA=4.40348
           BETA=-2.95611
           R=0.745
-	  SAV4=52.
+        SAV4=52.
         ENDIF
         IF ((L .GE. 100.0) .AND. (L .LT. 120.0)) THEN
           ALPHA=2.50938
           BETA=-0.56541
           R=1.152
-	  SAV4=27.
+        SAV4=27.
         ENDIF
         IF ((L .GE. 120.0) .AND. (L .LT. 130.0)) THEN
           ALPHA=0.44180
           BETA=1.58923
           R=0.949
-	  SAV4=4.
+        SAV4=4.
         ENDIF
         IF ((L .GE. 130.0) .AND. (L .LT. 140.0)) THEN
           ALPHA=3.96084
           BETA=-3.37374
           R=0.587
           GAMMA=0.34109
-	  SAV4=40.
+        SAV4=40.
         ENDIF
         IF ((L .GE. 140.0) .AND. (L .LT. 160.0)) THEN
           ALPHA=2.53335
           BETA=-0.40541
           R=1.152
-	  SAV4=38.
+        SAV4=38.
         ENDIF
         IF ((L .GE. 160.0) .AND. (L .LT. 170.0)) THEN
           ALPHA=2.03760
           BETA=-0.66317
           R=1.152
-	  SAV4=23.
+        SAV4=23.
         ENDIF
         IF ((L .GE. 170.0) .AND. (L .LT. 200.0)) THEN
           ALPHA=1.06946
           BETA=-0.87395
           R=0.612
           GAMMA=0.29230
-	  SAV4=29.
+        SAV4=29.
         ENDIF
         IF ((L .GE. 200.0) .AND. (L .LT. 210.0)) THEN
           ALPHA=0.86348
           BETA=-0.65870
           R=0.655
           GAMMA=0.09089
-	  SAV4=79.
+        SAV4=79.
         ENDIF
         IF ((L .GE. 210.0) .AND. (L .LT. 230.0)) THEN
           ALPHA=0.30117
           BETA=-0.16136
           R=0.933
           GAMMA=0.07495
-	  SAV4=17.
+        SAV4=17.
         ENDIF
         IF ((L .GE. 230.0) .AND. (L .LT. 240.0)) THEN
           ALPHA=0.75171
           BETA=-0.57143
           R=0.658
           GAMMA=0.00534
-	  SAV4=12.
+        SAV4=12.
         ENDIF
         IF ((L .GE. 240.0) .AND. (L .LT. 250.0)) THEN
           ALPHA=1.97427
           BETA=-2.02654
           R=0.487
-	  SAV4=67.
+        SAV4=67.
         ENDIF
         IF ((L .GE. 250.0) .AND. (L .LT. 260.0)) THEN
           ALPHA=1.25208
           BETA=-1.47763
           R=0.424
           GAMMA=0.31600
-	  SAV4=19.
+        SAV4=19.
         ENDIF
         IF ((L .GE. 260.0) .AND. (L .LT. 270.0)) THEN
           ALPHA=0.89448
           BETA=-0.43870
           R=1.019
-	  SAV4=5.
+        SAV4=5.
         ENDIF
         IF ((L .GE. 270.0) .AND. (L .LT. 280.0)) THEN
           ALPHA=0.81141
           BETA=-0.51001
           R=0.795
           GAMMA=0.03505
-	  SAV4=27.
+        SAV4=27.
         ENDIF
         IF ((L .GE. 280.0) .AND. (L .LT. 290.0)) THEN
           ALPHA=0.83781
           BETA=-0.44138
           R=0.949
           GAMMA=0.02820
-	  SAV4=50.
+        SAV4=50.
         ENDIF
         IF ((L .GE. 290.0) .AND. (L .LT. 300.0)) THEN
           ALPHA=1.10600
           BETA=-0.86263
           R=0.641
           GAMMA=0.03402
-	  SAV4=28.
+        SAV4=28.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 310.0)) THEN
           ALPHA=1.37040
           BETA=-1.02779
           R=0.667
           GAMMA=0.05608
-	  SAV4=28.
+        SAV4=28.
         ENDIF
         IF ((L .GE. 310.0) .AND. (L .LT. 320.0)) THEN
           ALPHA=1.77590
           BETA=-1.26951
           R=0.699
           GAMMA=0.06972
-	  SAV4=37.
+        SAV4=37.
         ENDIF
         IF ((L .GE. 320.0) .AND. (L .LT. 330.0)) THEN
           ALPHA=1.20865
           BETA=-0.70679
           R=0.855
           GAMMA=0.02902
-	  SAV4=35.
+        SAV4=35.
         ENDIF
         IF ((L .GE. 330.0) .AND. (L .LT. 340.0)) THEN
           ALPHA=2.28830
           BETA=-1.71890
           R=0.666
           GAMMA=0.22887
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF ((L .GE. 340.0) .AND. (L .LT. 350.0)) THEN
           ALPHA=3.26278
           BETA=-0.94181
           R=1.152
-	  SAV4=38.
+        SAV4=38.
         ENDIF
         IF ((L .GE. 350.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=2.58100
           BETA=-1.69237
           R=0.763
-	  SAV4=53.
+        SAV4=53.
         ENDIF
       ENDIF
       IF ((B .GE. 15.) .AND. (B .LT. 30.)) THEN
@@ -15174,97 +15174,97 @@ C-----------------------------------------------------------------------
           ALPHA=6.23279
           BETA=-10.30384
           R=0.302
-	  SAV4=42.
+        SAV4=42.
         ENDIF
         IF ((L .GE. 20.0) .AND. (L .LT. 40.0)) THEN
           ALPHA=4.47693
           BETA=-7.28366
           R=0.307
-	  SAV4=29.
+        SAV4=29.
         ENDIF
         IF ((L .GE. 40.0) .AND. (L .LT. 60.0)) THEN
           ALPHA=1.22938
           BETA=-1.19030
           R=0.516
-	  SAV4=5.
+        SAV4=5.
         ENDIF
         IF ((L .GE. 60.0) .AND. (L .LT. 80.0)) THEN
           ALPHA=0.84291
           BETA=-1.59338
           R=0.265
-	  SAV4=4.
+        SAV4=4.
         ENDIF
         IF ((L .GE. 80.0) .AND. (L .LT. 100.0)) THEN
           ALPHA=0.23996
           BETA=0.06304
           R=0.523
-	  SAV4=32.
+        SAV4=32.
         ENDIF
         IF ((L .GE. 100.0) .AND. (L .LT. 140.0)) THEN
           ALPHA=0.40062
           BETA=-1.75628
           R=0.114
-	  SAV4=16.
+        SAV4=16.
         ENDIF
         IF ((L .GE. 140.0) .AND. (L .LT. 180.0)) THEN
           ALPHA=0.56898
           BETA=-0.53331
           R=0.523
-	  SAV4=41.
+        SAV4=41.
         ENDIF
         IF ((L .GE. 180.0) .AND. (L .LT. 200.0)) THEN
           ALPHA=-0.95721
           BETA=11.69217
           R=0.240
-	  SAV4=2.
+        SAV4=2.
         ENDIF
         IF ((L .GE. 200.0) .AND. (L .LT. 220.0)) THEN
           ALPHA=-0.19051
           BETA=1.45670
           R=0.376
-	  SAV4=1.
+        SAV4=1.
         ENDIF
         IF ((L .GE. 220.0) .AND. (L .LT. 240.0)) THEN
           ALPHA=2.31305
           BETA=-7.82531
           R=0.148
-	  SAV4=95.
+        SAV4=95.
         ENDIF
         IF ((L .GE. 240.0) .AND. (L .LT. 260.0)) THEN
           ALPHA=1.39169
           BETA=-1.72984
           R=0.402
-	  SAV4=6.
+        SAV4=6.
         ENDIF
         IF ((L .GE. 260.0) .AND. (L .LT. 280.0)) THEN
           ALPHA=1.59418
           BETA=-1.28296
           R=0.523
-	  SAV4=36.
+        SAV4=36.
         ENDIF
         IF ((L .GE. 280.0) .AND. (L .LT. 300.0)) THEN
           ALPHA=1.57082
           BETA=-1.97295
           R=0.398
-	  SAV4=10.
+        SAV4=10.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 320.0)) THEN
           ALPHA=1.95998
           BETA=-3.26159
           R=0.300
-	  SAV4=11.
+        SAV4=11.
         ENDIF
         IF ((L .GE. 320.0) .AND. (L .LT. 340.0)) THEN
           ALPHA=2.59567
           BETA=-4.84133
           R=0.268
-	  SAV4=37.
+        SAV4=37.
         ENDIF
         IF ((L .GE. 340.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=5.30273
           BETA=-7.43033
           R=0.357
-	  SAV4=37.
+        SAV4=37.
         ENDIF
       ENDIF
       IF ((B .GE. 30.) .AND. (B .LT. 45.)) THEN
@@ -15272,73 +15272,73 @@ C-----------------------------------------------------------------------
           ALPHA=2.93960
           BETA=-6.48049
           R=0.227
-	  SAV4=77.
+        SAV4=77.
         ENDIF
         IF ((L .GE. 20.0) .AND. (L .LT. 50.0)) THEN
           ALPHA=1.65864
           BETA=-9.99317
           R=0.083
-	  SAV4=100.
+        SAV4=100.
         ENDIF
         IF ((L .GE. 50.0) .AND. (L .LT. 80.0)) THEN
           ALPHA=1.71831
           BETA=-7.25286
           R=0.118
-	  SAV4=28.
+        SAV4=28.
         ENDIF
         IF ((L .GE. 80.0) .AND. (L .LT. 110.0)) THEN
           ALPHA=1.33617
           BETA=-10.39799
           R=0.064
-	  SAV4=100.
+        SAV4=100.
         ENDIF
         IF ((L .GE. 110.0) .AND. (L .LT. 160.0)) THEN
           ALPHA=-0.31330
           BETA=1.35622
           R=0.329
-	  SAV4=24.
+        SAV4=24.
         ENDIF
         IF ((L .GE. 160.0) .AND. (L .LT. 190.0)) THEN
           ALPHA=1.51984
           BETA=-8.69502
           R=0.087
-	  SAV4=100.
+        SAV4=100.
         ENDIF
         IF ((L .GE. 190.0) .AND. (L .LT. 220.0)) THEN
           ALPHA=-0.50758
           BETA=4.73320
           R=0.250
-	  SAV4=78.
+        SAV4=78.
         ENDIF
         IF ((L .GE. 220.0) .AND. (L .LT. 250.0)) THEN
           ALPHA=1.25864
           BETA=-12.59627
           R=0.050
-	  SAV4=70.
+        SAV4=70.
         ENDIF
         IF ((L .GE. 250.0) .AND. (L .LT. 280.0)) THEN
           ALPHA=1.54243
           BETA=-3.76065
           R=0.205
-	  SAV4=10.
+        SAV4=10.
         ENDIF
         IF ((L .GE. 280.0) .AND. (L .LT. 320.0)) THEN
           ALPHA=2.72258
           BETA=-7.47806
           R=0.182
-	  SAV4=5.
+        SAV4=5.
         ENDIF
         IF ((L .GE. 320.0) .AND. (L .LT. 340.0)) THEN
           ALPHA=2.81545
           BETA=-5.52139
           R=0.255
-	  SAV4=10.
+        SAV4=10.
         ENDIF
         IF ((L .GE. 340.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=2.23818
           BETA=0.81772
           R=0.329
-	  SAV4=19.
+        SAV4=19.
         ENDIF
       ENDIF
       IF ((B .GE. 45.) .AND. (B .LT. 60.)) THEN
@@ -15346,55 +15346,55 @@ C-----------------------------------------------------------------------
           ALPHA=1.38587
           BETA=-9.06536
           R=0.076
-	  SAV4=3.
+        SAV4=3.
         ENDIF
         IF ((L .GE. 60.0) .AND. (L .LT. 90.0)) THEN
           ALPHA=2.28570
           BETA=-9.88812
           R=0.116
-	  SAV4=3.
+        SAV4=3.
         ENDIF
         IF ((L .GE. 90.0) .AND. (L .LT. 110.0)) THEN
           ALPHA=1.36385
           BETA=-8.10127
           R=0.084
-	  SAV4=4.
+        SAV4=4.
         ENDIF
         IF ((L .GE. 110.0) .AND. (L .LT. 170.0)) THEN
           ALPHA=0.05943
           BETA=-1.08126
           R=0.027
-	  SAV4=50.
+        SAV4=50.
         ENDIF
         IF ((L .GE. 170.0) .AND. (L .LT. 200.0)) THEN
           ALPHA=1.40171
           BETA=-3.21783
           R=0.218
-	  SAV4=99.
+        SAV4=99.
         ENDIF
         IF ((L .GE. 200.0) .AND. (L .LT. 230.0)) THEN
           ALPHA=0.14718
           BETA=3.92670
           R=0.252
-	  SAV4=14.
+        SAV4=14.
         ENDIF
         IF ((L .GE. 230.0) .AND. (L .LT. 290.0)) THEN
           ALPHA=0.57124
           BETA=-4.30242
           R=0.066
-	  SAV4=10.
+        SAV4=10.
         ENDIF
         IF ((L .GE. 290.0) .AND. (L .LT. 330.0)) THEN
           ALPHA=3.69891
           BETA=-19.62204
           R=0.094
-	  SAV4=5.
+        SAV4=5.
         ENDIF
         IF ((L .GE. 330.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=1.19568
           BETA=-0.45043
           R=0.252
-	  SAV4=9.
+        SAV4=9.
         ENDIF
       ENDIF
       IF ((B .GE. 60.) .AND. (B .LE. 90.)) THEN
@@ -15402,73 +15402,73 @@ C-----------------------------------------------------------------------
           ALPHA=0.69443
           BETA=-0.27600
           R=0.153
-	  SAV4=100.
+        SAV4=100.
         ENDIF
         IF ((L .GE. 30.0) .AND. (L .LT. 60.0)) THEN
           ALPHA=1.11811
           BETA=0.71179
           R=0.085
-	  SAV4=73.
+        SAV4=73.
         ENDIF
         IF ((L .GE. 60.0) .AND. (L .LT. 90.0)) THEN
           ALPHA=1.10427
           BETA=-2.37654
           R=0.123
-	  SAV4=100.
+        SAV4=100.
         ENDIF
         IF ((L .GE. 90.0) .AND. (L .LT. 120.0)) THEN
           ALPHA=-0.42211
           BETA=5.24037
           R=0.184
-	  SAV4=12.
+        SAV4=12.
         ENDIF
         IF ((L .GE. 120.0) .AND. (L .LT. 150.0)) THEN
           ALPHA=0.87576
           BETA=-4.38033
           R=0.100
-	  SAV4=35.
+        SAV4=35.
         ENDIF
         IF ((L .GE. 150.0) .AND. (L .LT. 180.0)) THEN
           ALPHA=1.27477
           BETA=-4.98307
           R=0.128
-	  SAV4=72.
+        SAV4=72.
         ENDIF
         IF ((L .GE. 180.0) .AND. (L .LT. 210.0)) THEN
           ALPHA=1.19512
           BETA=-6.58464
           R=0.091
-	  SAV4=49.
+        SAV4=49.
         ENDIF
         IF ((L .GE. 210.0) .AND. (L .LT. 240.0)) THEN
           ALPHA=0.97581
           BETA=-4.89869
           R=0.100
-	  SAV4=95.
+        SAV4=95.
         ENDIF
         IF ((L .GE. 240.0) .AND. (L .LT. 270.0)) THEN
           ALPHA=0.54379
           BETA=-0.84403
           R=0.207
-	  SAV4=35.
+        SAV4=35.
         ENDIF
         IF ((L .GE. 270.0) .AND. (L .LT. 300.0)) THEN
           ALPHA=-0.85054
           BETA=13.01249
           R=0.126
-	  SAV4=39.
+        SAV4=39.
         ENDIF
         IF ((L .GE. 300.0) .AND. (L .LT. 330.0)) THEN
           ALPHA=0.74347
           BETA=-1.39825
           R=0.207
-	  SAV4=10.
+        SAV4=10.
         ENDIF
         IF ((L .GE. 330.0) .AND. (L .LT. 360.0)) THEN
           ALPHA=0.77310
           BETA=-4.45005
           R=0.087
-	  SAV4=16.
+        SAV4=16.
         ENDIF
       ENDIF
 C----------------------------------------------------------------------
@@ -15488,21 +15488,21 @@ C----------------------------------------------------------------------
         SAV=SQRT(0.0225+(SAV4/100.*AV)*(SAV4/100.*AV))
       ENDIF
       IF ((D .GT. R) .AND. (D .LE. 2.)) THEN 
-	AV=ALPHA*R+BETA*R*R+GAMMA*(D-R)
-	SAV=SQRT(0.0225+(SAV4/100.*AV)*(SAV4/100.*AV))
+      AV=ALPHA*R+BETA*R*R+GAMMA*(D-R)
+      SAV=SQRT(0.0225+(SAV4/100.*AV)*(SAV4/100.*AV))
       ENDIF
       IF ((D .GT. 2.)) THEN
-	AV= ALPHA*R+BETA*R*R+GAMMA*(2.-R)
-	SAV=SQRT(0.0225+(SAV4/100.*AV)*(SAV4/100.*AV))
-	IF (D*ABS(SIN(B*3.141592/180.)) .LT. 0.1) THEN
+      AV= ALPHA*R+BETA*R*R+GAMMA*(2.-R)
+      SAV=SQRT(0.0225+(SAV4/100.*AV)*(SAV4/100.*AV))
+      IF (D*ABS(SIN(B*3.141592/180.)) .LT. 0.1) THEN
           AV=AV+A0*(D-2.)
-	  SAV=SQRT(SAV*SAV+0.25*(D-2.)*(D-2.))
+        SAV=SQRT(SAV*SAV+0.25*(D-2.)*(D-2.))
         ENDIF
       ENDIF
 C-----------------------------------------------------------------------
 C     Assuming that the paper by Arenou et.al. has a limit of 2kpc.
 C     Beyond 2kpc, used Ao + Parenago. Where ao = 1.5 mag/kpc and  
-C     	sigma ao = 50%.                                            
+C           sigma ao = 50%.                                            
 C-----------------------------------------------------------------------
       RETURN
       END

@@ -124,7 +124,7 @@ C       common /photo/ go,gr,gi,ur,rz
       common /vel/ uu,vv,ww
      
 
-      pi=4.0*atan(1.0d0)
+      pi=4.0*atan(1.0)
       numberOfBins=(mbolmax-mbolmin)/mbolinc
 
 C     make inputs equal 0
@@ -166,7 +166,7 @@ C         ---   Calculating the luminosity function---
 C         --------------------------------------------------------------
           mbol=2.5*luminosityOfWD(i) + 4.75
           do j=1,numberOfBins
-            if (mbol.le.mbolmin+mbolinc*dfloat(j).and.mbol.ge.mbolmin) 
+            if (mbol.le.mbolmin+mbolinc*float(j).and.mbol.ge.mbolmin) 
      &      then
 C             NOTE: useless - use numberOfWDsInBin instead          
               ndfa(j)=ndfa(j)+1
@@ -231,11 +231,11 @@ C         TODO: place all this code for SD in subroutine
 51        continue
           if (numberOfWDsInBin(j) .ne. 1) then
             standardDeviation_u(j)=(sumOfSquareDifferences_u/
-     &                             dfloat(numberOfWDsInBin(j))-1.0)**0.5
+     &                             float(numberOfWDsInBin(j))-1.0)**0.5
             standardDeviation_v(j)=(sumOfSquareDifferences_v/
-     &                             dfloat(numberOfWDsInBin(j))-1.0)**0.5
+     &                             float(numberOfWDsInBin(j))-1.0)**0.5
             standardDeviation_w(j)=(sumOfSquareDifferences_w/
-     &                             dfloat(numberOfWDsInBin(j))-1.0)**0.5
+     &                             float(numberOfWDsInBin(j))-1.0)**0.5
           else
             standardDeviation_u(j)=100.0
             standardDeviation_v(j)=100.0
@@ -250,7 +250,7 @@ C-----------------------------------------------------------------------
 C     NOTE: this loop doesn't make any sense as ndfa cant be less than 0      
       do 6 i=1,numberOfBins
         if (ndfa(i).le.0.0) then
-          ndfa(i)=10.0d-40
+          ndfa(i)=10.0e-40
         endif 
 6     continue
 
@@ -273,7 +273,7 @@ C     ojo factor norma
       do 7 i=1,numberOfBins
 C       ---   Calculating error bars final touches  ---
 C       old definition of binning
-C         x=mbolmin+(mbolinc)*dfloat(i)
+C         x=mbolmin+(mbolinc)*float(i)
 C       new definition of binning -- when changing, go to BINNING WDLF 
 C       and check the values
         x = mbolmin + mbolinc * float(i) - mbolinc / 2.0
@@ -319,7 +319,7 @@ C-----------------------------------------------------------------------
  80   continue
 
       do 8 iii=1,26
-        xxb=dfloat(ntotmass)
+        xxb=float(ntotmass)
         write(162 ,*) xmasi+xmasinc*(dfloat(iii)-0.5),nbinmass(iii)/xxb
  8    continue
 
@@ -334,7 +334,7 @@ C     LF global
         k=i+3
         xfl(i)=ndfa(k)*134041.29
         read (71,*) a1,i2
-        xflo(i)=dfloat(i2)
+        xflo(i)=float(i2)
         write (6,*) i,xfl(i),xflo(i)
   10  continue
        

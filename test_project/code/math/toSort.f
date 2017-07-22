@@ -231,7 +231,7 @@ C***********************************************************************
       implicit real(a-h,o-z)
       integer knstrn
       DIMENSION BINS1(NBINS),BINS2(NBINS)
-      DF=dfloat(NBINS-1-KNSTRN)
+      DF=float(NBINS-1-KNSTRN)
       CHSQ=0.
       DO 11 J=1,NBINS
         IF(BINS1(J).EQ.0..AND.BINS2(J).EQ.0.)THEN

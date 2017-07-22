@@ -7,9 +7,9 @@ unzip -o forts.zip
 
 ffpe_trap_list=$(echo "zero"\
                       "overflow"\
-                      "underflow"\
                       "invalid"\
                  | tr [:space:] ,)
+
 fortran_compiler_options=$(echo "-g"\
                                 "-fbacktrace"\
                                 "-ffpe-trap=${ffpe_trap_list::-1}"\

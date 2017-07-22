@@ -164,11 +164,6 @@ C           call get_command_argument(i, args(i))
      &eeds'
       write(6,*) ' '
 
-C     NOTE: this just repeats inputs
-C       write (157,157) fractionOfDB,galacticDiskAge,parameterIMF,
-C      &                parameterIFMR,timeOfBurst
- 157  format(5(f6.3,2x))
-
 C     ---Reading seeds line from $temporary_files/seeds_line.in
 C ======================================================================
       iseed=-9
@@ -185,12 +180,12 @@ C       open(unit=772,file='input_data/seeds_line.in',status='replace')
 C       write(unit=772,fmt=100) iseed1,iseed2
 C       close(unit=772)
 C     finished rewriting seeds here
-100   format(I6,2x,I6)  
+C 100   format(I6,2x,I6)  
       write(6,*) 'iseed1=',iseed1
       write(6,*) 'iseed2=',iseed2
 C     QUESTION: why do we need this part?      
       do i=1,10
-        randomNumber=dble(ran(iseed))
+        randomNumber=ran(iseed)
         write (6,*) i,randomNumber
       end do  
 
@@ -345,6 +340,10 @@ C***********************************************************************
       include 'code/math/toSort.f'
 
       include 'code/tables_linking.f'
+
+      include 'code/extinction/extinc.f'
+
+      include 'code/colors/errors/errfot.f'
 
       subroutine printForProcessing(output_filename, geometry, iseed,
      &         min_longitude, max_longitude, min_latitude, max_latitude,

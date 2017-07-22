@@ -112,6 +112,11 @@ C          else
           endif
           continue
         endif
+
+        if (lgac(i) > 2.0 * pi) then
+            lgac(i) = lgac(i) - 2.0 * pi
+        end if
+
 C        ---   galactic coordinate bgac ---
         zzx = dabs(coordinate_Zcylindr(i) / ros)
         bgac(i) = datan(zzx)

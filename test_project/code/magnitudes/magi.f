@@ -9,35 +9,22 @@ C     and apparent magnitude of the WDs.
 C     
 C     Created by S.Torres
 C     Introduced metallicity 08/2012 (ER Cojocaru)
-C
-C-----------------------------------------------------------------------
-C     Input parameters:
-C       numberOfStarsInSample
-C-----------------------------------------------------------------------
-C     Output parameters
-C       none
 C=======================================================================
       implicit real (a-h,m,o-z)
 
       integer numberOfStars,iseed,i,numberOfWDs,in
-      
-C     ---   Variables  ---
       real lum,teff,xlog,c1,c2,c3,c4,c5,n1,n2,n3,n4,n5
-C       real UB,BV,VR,RI
       real xg,xug,xgr,xri,xiz,xgi,fractionOfDB
       real mone
 
-C     ---   Parameters  ---
       parameter (numberOfStars=6000000)
       parameter (mone=1.14)
 
-C     ---   Dimensions  ---
       real luminosityOfWD(numberOfStars),
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
       real flagOfWD(numberOfStars)
-      real rgac(numberOfStars)
       real g(numberOfWDs),v(numberOfStars)
       real :: coolingTime(numberOfStars)
       integer typeOfWD(numberOfStars)
@@ -45,18 +32,32 @@ C     ---   Dimensions  ---
 
 C     TODO: no need to keep these
       real :: ugriz_ug(numberOfStars),
-     &                    ugriz_gr(numberOfStars),
-     &                    ugriz_ri(numberOfStars),
-     &                    ugriz_iz(numberOfStars)
-C      &                    ugriz_g_apparent(numberOfStars)
+     &        ugriz_gr(numberOfStars),
+     &        ugriz_ri(numberOfStars),
+     &        ugriz_iz(numberOfStars)
 
       real :: UB(numberOfStars), BV(numberOfStars), 
-     &                    VRR(numberOfStars), RI(numberOfStars),
-     &                    ugriz_g_apparent(numberOfStars)
+     &        VRR(numberOfStars), RI(numberOfStars),
+     &        ugriz_g_apparent(numberOfStars),
+     &        rgac(numberOfStars)
+      double precision :: lgac(numberOfStars),
+     &                    bgac(numberOfStars)
+      real :: AVT,
+     &        SAVT,
+     &        AVC,
+     &        AV(5),
+     &        SAV(5),
+     &        extinction,
+     &        ugriz_u,
+     &        ugriz_g,
+     &        ugriz_r,
+     &        ugriz_i,
+     &        ugriz_z,
+     &        pi
+      integer :: JMAX
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
-C     ---   Commons   ---
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging
@@ -68,7 +69,9 @@ C     TODO: no need to keep these
       common /cool/ coolingTime
       common /indexdb/ typeOfWD
       common /ubvri/ UB, BV, VRR, RI
-C      & , ugriz_g_apparent
+      common /lb/ lgac,bgac
+
+      pi = 4.0 * atan(1.0)
 
       n1=0
       n2=0
@@ -126,12 +129,30 @@ C         TODO: rename VRR to VR
           RI(i)=c4-c5
           call chanco(V(i),UB(i),BV(i),VRR(i),RI(i),xg,xug,xgr,xri,xiz,
      &                xgi)
+          ugriz_u = xug + xg
+          ugriz_g = xg
+          ugriz_r = xg - xgr
+          ugriz_i = xg - xgi
+          ugriz_z = xg - xgi - xiz
           g(i) = xg
-C         TODO: we don't need to keep them; ubvri is enough
-          ugriz_ug(i) = xug * (1.0 + 0.05 * gasdev(iseed))
-          ugriz_gr(i) = xgr * (1.0 + 0.05 * gasdev(iseed))
-          ugriz_ri(i) = xri * (1.0 + 0.05 * gasdev(iseed))
-          ugriz_iz(i) = xiz * (1.0 + 0.05 * gasdev(iseed))
+
+          call extinct(real(lgac(i) * 180.0 / pi),
+     &                 real(bgac(i) * 180.0 / pi),
+     &                 real(rgac(i)),
+     &                 AVT,SAVT,AVC,JMAX,AV,SAV)
+          extinction = AVT + AVC
+
+          ugriz_u = ugriz_u + 1.579 * extinction
+          ugriz_g = ugriz_g + 1.161 * extinction
+          ugriz_r = ugriz_r + 0.843 * extinction
+          ugriz_i = ugriz_i + 0.639 * extinction
+          ugriz_z = ugriz_z + 0.453 * extinction
+
+          ugriz_ug(i) = ugriz_u - ugriz_g
+          ugriz_gr(i) = ugriz_g - ugriz_r
+          ugriz_ri(i) = ugriz_r - ugriz_i
+          ugriz_iz(i) = ugriz_i - ugriz_z
+
 C         ---  Making g and V apparent magnitude ---
           ugriz_g_apparent(i) = g(i) - 5.0 + 5.0 * (log10(rgac(i)) 
      &                                              + 3.0)

@@ -46,17 +46,17 @@ C   ---  ird is the unit of reading archives ---
       ird=121
  
 C   ---  Masses of each archive ---
-      mtabONE(1)=1.06d0
-      mtabONE(2)=1.10d0
-      mtabONE(3)=1.16d0
-      mtabONE(4)=1.20d0
-      mtabONE(5)=1.24d0
-      mtabONE(6)=1.28d0
-      mtabone2(1)=1.06d0
-      mtabone2(2)=1.10d0
-      mtabone2(3)=1.16d0
-      mtabone2(4)=1.20d0
-      mtabone2(5)=1.28d0
+      mtabONE(1)=1.06
+      mtabONE(2)=1.10
+      mtabONE(3)=1.16
+      mtabONE(4)=1.20
+      mtabONE(5)=1.24
+      mtabONE(6)=1.28
+      mtabone2(1)=1.06
+      mtabone2(2)=1.10
+      mtabone2(3)=1.16
+      mtabone2(4)=1.20
+      mtabone2(5)=1.28
 
 C   ---   Reading the files ---
       do  i=1,ncol
@@ -82,7 +82,7 @@ C      ---  Reading the data of log Teff and log g ---
           read(ird,*,end=3) a1,a2,a3,a4,a5,a6
 C         ---  Reconverting radii in cm to radii in solar radius ---
           a3=10.0**a3
-          a3=a3/(6.96d10)
+          a3=a3/(6.96e10)
           a3=log10(a3)
           lgrtabone(i,j)=a3
           lgt2tabone(i,j)=a5 
