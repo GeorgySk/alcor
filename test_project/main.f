@@ -174,13 +174,13 @@ C     the sequence of RNs to repeat itself(init:805577 133547):
       read(unit=772,fmt=*) iseed1, iseed2
       close(unit=772)
 C       TODO: add if 
-C       iseed1 = iseed1 - 1
-C       iseed2 = iseed2 + 1
-C       open(unit=772,file='input_data/seeds_line.in',status='replace')
-C       write(unit=772,fmt=100) iseed1,iseed2
-C       close(unit=772)
-C     finished rewriting seeds here
-C 100   format(I6,2x,I6)  
+      iseed1 = iseed1 - 1
+      iseed2 = iseed2 + 1
+      open(unit=772,file='input_data/seeds_line.in',status='replace')
+      write(unit=772,fmt=100) iseed1,iseed2
+      close(unit=772)
+C    finished rewriting seeds here
+ 100   format(I6,2x,I6)  
       write(6,*) 'iseed1=',iseed1
       write(6,*) 'iseed2=',iseed2
 C     QUESTION: why do we need this part?      
@@ -721,19 +721,19 @@ C           if cone crosses 2pi, move it -2pi
             if (star_in_intersection .eqv. .false.) then
               stars_counter = stars_counter + 1
 C               TODO: uncomment this after ubvri diag-s plotted
-C               write(421,"(11(es17.8e3,x),i1,x,f3.1)") 
-                write(421,"(es17.8e3,x,i1,x,i1,x,4(es17.8e3,x))") 
-C      &                                              uu(i),
-C      &                                              vv(i),
-C      &                                              ww(i),
-C      &                                              rgac(i),
-C      &                                              longitude,
-C      &                                              latitude,
+              write(421,"(11(es17.8e3,x),i1,x,i1)") 
+C                 write(421,"(es17.8e3,x,i1,x,i1,x,4(es17.8e3,x))") 
+     &                                              uu(i),
+     &                                              vv(i),
+     &                                              ww(i),
+     &                                              rgac(i),
+     &                                              longitude,
+     &                                              latitude,
      &                                              ugriz_g_apparent(i),
-C      &                                              ugriz_ug(i),
-C      &                                              ugriz_gr(i),
-C      &                                              ugriz_ri(i),
-C      &                                              ugriz_iz(i),
+     &                                              ugriz_ug(i),
+     &                                              ugriz_gr(i),
+     &                                              ugriz_ri(i),
+     &                                              ugriz_iz(i),
      &                                              disk_belonging(i),
      &                                              typeOfWD(i)
 C                                            TODO: delete this after..

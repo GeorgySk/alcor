@@ -34,44 +34,44 @@ C     with its height direction set by longitude and latitude
      &               disk_belonging(numberOfStars)
 
           real, parameter :: PI = 4.0 * atan(1.0),
-     &                                   FI = PI / 180.0,
-     &                                   DELTA_LATITUDE = 2.64 * FI,
-     &                                  NORMALIZATION_CONE_HEIGHT = 0.2,
-     &                                   CONE_HEIGHT = 2.0,
-     &                                THIN_DISK_DENSITY = 0.095 * 1.0e9,
-     &                         THIN_DISK_STARS_COUNT_FRACTION = 0.92,
-     &                         THICK_DISK_STARS_COUNT_FRACTION = 1.0 
+     &                       FI = PI / 180.0,
+     &                       DELTA_LATITUDE = 2.64 * FI,
+     &                       NORMALIZATION_CONE_HEIGHT = 0.2,
+     &                       CONE_HEIGHT = 5.0,
+     &                       THIN_DISK_DENSITY = 0.095 * 1.0e9,
+     &                       THIN_DISK_STARS_COUNT_FRACTION = 0.92,
+     &                       THICK_DISK_STARS_COUNT_FRACTION = 1.0 
      &                                 - THIN_DISK_STARS_COUNT_FRACTION,
-     &                                  THIN_DISK_SCALEHEIGHT = 0.25,
-     &                                  THICK_DISK_SCALEHEIGHT = 1.5,
-     &                                  MASS_REDUCTION_FACTOR = 0.003,
-     &                               SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
+     &                       THIN_DISK_SCALEHEIGHT = 0.25,
+     &                       THICK_DISK_SCALEHEIGHT = 1.5,
+     &                       MASS_REDUCTION_FACTOR = 0.003,
+     &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
           real :: delta_longitude,
-     &                        min_longitude,
-     &                        max_longitude,
-     &                        longitude_range,
-     &                        min_latitude,
-     &                        max_latitude,
-     &                        normalization_cone_mass,
-     &                        max_density,
-     &                        total_mass,
-     &                        longitude,
-     &                        latitude,
-     &                        density,
-     &                        random_valid_density,
-     &                        get_cone_mass,
-     &                        get_max_density,
-     &                        distance,
-     &                        get_density,
-     &                        generate_star_mass,
-     &                        tmax,
-     &                        tmdisk = 10.0,
-     &                        tau = 2.0,
-     &                        ttry,
-     &                        ttdisk = 12.0,
-     &                        ft,
-     &                        fz,
-     &                        opposite_triangle_side
+     &            min_longitude,
+     &            max_longitude,
+     &            longitude_range,
+     &            min_latitude,
+     &            max_latitude,
+     &            normalization_cone_mass,
+     &            max_density,
+     &            total_mass,
+     &            longitude,
+     &            latitude,
+     &            density,
+     &            random_valid_density,
+     &            get_cone_mass,
+     &            get_max_density,
+     &            distance,
+     &            get_density,
+     &            generate_star_mass,
+     &            tmax,
+     &            tmdisk = 10.0,
+     &            tau = 2.0,
+     &            ttry,
+     &            ttdisk = 12.0,
+     &            ft,
+     &            fz,
+     &            opposite_triangle_side
           integer :: stars_count
 
           common /tm/ starBirthTime,
@@ -86,6 +86,7 @@ C     with its height direction set by longitude and latitude
           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
           min_longitude = cone_height_longitude  - delta_longitude / 2.0
           max_longitude = cone_height_longitude  + delta_longitude / 2.0
+C         TODO: this equals delta_longitude  
           longitude_range = max_longitude - min_longitude
           min_latitude = cone_height_latitude  - DELTA_LATITUDE / 2.0
           max_latitude = cone_height_latitude + DELTA_LATITUDE / 2.0
@@ -178,6 +179,7 @@ C                 converting from galactic to cyl.galactocentric
                   stars_count = stars_count + 1
       
                   disk_belonging(stars_count) = 1
+C                 TODO: we don't need to keep this
                   heightPattern(stars_count) = THIN_DISK_SCALEHEIGHT
       
 C                 assuming uniform distribution
@@ -242,6 +244,7 @@ C                 converting from galactic to cyl.galactocentric
                   stars_count = stars_count + 1
       
                   disk_belonging(stars_count) = 2
+C                 TODO: we don't need this  
                   heightPattern(stars_count) = THICK_DISK_SCALEHEIGHT
       
 C                 assuming uniform distribution
@@ -279,7 +282,6 @@ C                 converting from galactic to cyl.galactocentric
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
                   endif
-      
                   if (total_mass >= normalization_cone_mass) exit
       
                   ! Assuming constant star formation rate

@@ -45,27 +45,26 @@ def run_simulations(*,
                        geometry=geometry,
                        output_file_name=output_file_name)
 
-        with open(output_file_name) as output_file:
-            stars = list(parse_stars(output_file,
-                                     group=group))
         # TODO: uncomment when plotting will work with postgres
+        # with open(output_file_name) as output_file:
+        #     stars = list(parse_stars(output_file,
+        #                              group=group))
         # os.remove(output_file_name)
-
-        session.add(group)
-        session.add_all(parameters)
-        session.add_all(stars)
-        session.commit()
+        # session.add(group)
+        # session.add_all(parameters)
+        # session.add_all(stars)
+        # session.commit()
 
         # TODO: write it to postgres db
-        # with open(file='../test_project/processed_cones.txt',
-        #           mode='a') as file:
-        #     for parameter in parameters:
-        #         if parameter.name == 'longitude':
-        #             longitude = parameter.value
-        #         if parameter.name == 'latitude':
-        #             latitude = parameter.value
-        #     row = str(longitude) + ' ' + str(latitude) + '\n'
-        #     file.write(row)
+        with open(file='../test_project/processed_cones.txt',
+                  mode='a') as file:
+            for parameter in parameters:
+                if parameter.name == 'longitude':
+                    longitude = parameter.value
+                if parameter.name == 'latitude':
+                    latitude = parameter.value
+            row = str(longitude) + ' ' + str(latitude) + '\n'
+            file.write(row)
 
 
 def generate_parameters(*,

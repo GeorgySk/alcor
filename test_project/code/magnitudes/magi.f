@@ -1,4 +1,3 @@
-C***********************************************************************
 C     TODO: rewrite      
       subroutine magi(fractionOfDB,table)
       use external_types
@@ -25,7 +24,7 @@ C=======================================================================
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
       real flagOfWD(numberOfStars)
-      real g(numberOfWDs),v(numberOfStars)
+      real v(numberOfStars)
       real :: coolingTime(numberOfStars)
       integer typeOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
@@ -53,7 +52,16 @@ C     TODO: no need to keep these
      &        ugriz_r,
      &        ugriz_i,
      &        ugriz_z,
-     &        pi
+     &        pi,
+     &        ugriz_u_apparent,
+     &        ugriz_r_apparent,
+     &        ugriz_i_apparent,
+     &        ugriz_z_apparent,
+     &        ugriz_u_apparent_w_error,
+     &        ugriz_g_apparent_w_error,
+     &        ugriz_r_apparent_w_error,
+     &        ugriz_i_apparent_w_error,
+     &        ugriz_z_apparent_w_error
       integer :: JMAX
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
@@ -134,7 +142,6 @@ C         TODO: rename VRR to VR
           ugriz_r = xg - xgr
           ugriz_i = xg - xgi
           ugriz_z = xg - xgi - xiz
-          g(i) = xg
 
           call extinct(real(lgac(i) * 180.0 / pi),
      &                 real(bgac(i) * 180.0 / pi),
@@ -148,22 +155,67 @@ C         TODO: rename VRR to VR
           ugriz_i = ugriz_i + 0.639 * extinction
           ugriz_z = ugriz_z + 0.453 * extinction
 
-          ugriz_ug(i) = ugriz_u - ugriz_g
-          ugriz_gr(i) = ugriz_g - ugriz_r
-          ugriz_ri(i) = ugriz_r - ugriz_i
-          ugriz_iz(i) = ugriz_i - ugriz_z
+C           ugriz_u_apparent = ugriz_u - 5.0 + 5.0 * (log10(rgac(i)) 
+C      &                                              + 3.0)
+C           ugriz_g_apparent(i) = ugriz_g - 5.0 + 5.0 * (log10(rgac(i)) 
+C      &                                              + 3.0)
+C           ugriz_r_apparent = ugriz_r - 5.0 + 5.0 * (log10(rgac(i)) 
+C      &                                              + 3.0)
+C           ugriz_i_apparent = ugriz_i - 5.0 + 5.0 * (log10(rgac(i)) 
+C      &                                              + 3.0)
+C           ugriz_z_apparent = ugriz_z - 5.0 + 5.0 * (log10(rgac(i)) 
+C      &                                              + 3.0)
 
-C         ---  Making g and V apparent magnitude ---
-          ugriz_g_apparent(i) = g(i) - 5.0 + 5.0 * (log10(rgac(i)) 
-     &                                              + 3.0)
+C         TODO: DELETE THIS AFTER CHECKING IF I NEED ABS, NOT APP Mbol
+          ugriz_u_apparent = ugriz_u
+          ugriz_g_apparent(i) = ugriz_g
+          ugriz_r_apparent = ugriz_r
+          ugriz_i_apparent = ugriz_i
+          ugriz_z_apparent = ugriz_z
+
+          call errfot(ugriz_u_apparent,
+     &                ugriz_u_apparent_w_error,
+     &                1)
+          call errfot(ugriz_g_apparent(i),
+     &                ugriz_g_apparent_w_error,
+     &                2)
+C         TODO: figure out what to do with commons
+          ugriz_g_apparent(i) = ugriz_g_apparent_w_error
+          call errfot(ugriz_r_apparent,
+     &                ugriz_r_apparent_w_error,
+     &                3)
+          call errfot(ugriz_i_apparent,
+     &                ugriz_i_apparent_w_error,
+     &                4)
+          call errfot(ugriz_z_apparent,
+     &                ugriz_z_apparent_w_error,
+     &                5)
+
+          ugriz_ug(i) = ugriz_u_apparent_w_error 
+     &                  - ugriz_g_apparent_w_error
+          ugriz_gr(i) = ugriz_g_apparent_w_error 
+     &                  - ugriz_r_apparent_w_error
+          ugriz_ri(i) = ugriz_r_apparent_w_error 
+     &                  - ugriz_i_apparent_w_error
+          ugriz_iz(i) = ugriz_i_apparent_w_error 
+     &                  - ugriz_z_apparent_w_error
+
+C           ugriz_ug(i) = ugriz_u
+C      &                  - ugriz_g
+C           ugriz_gr(i) = ugriz_g
+C      &                  - ugriz_r
+C           ugriz_ri(i) = ugriz_r
+C      &                  - ugriz_i
+C           ugriz_iz(i) = ugriz_i
+C      &                  - ugriz_z
+
+C         ---  Making V apparent magnitude ---
           V(i) = V(i) - 5.0 + 5.0 * (log10(rgac(i)) + 3.0)
 C       ---  ELSE mass >= 1.4  --- EXPLOTA, exceeding Chandrasekar limit
         else
           typeOfWD(i) = 5
         end if
-C       ---  END IF about WD mass ---
       end do
-C     ---  END DO about all the stars ---
 
       write(*,*) "DA CO ",n1
       write(*,*) "DA ONe ",n2
@@ -173,4 +225,3 @@ C     ---  END DO about all the stars ---
 
       return
       end
-C***********************************************************************
