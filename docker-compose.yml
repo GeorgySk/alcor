@@ -26,8 +26,6 @@ services:
 #      - --w-velocities-clouds
 #      - --w-velocities-vs-magnitude
 #      - --w-lepine-criterion
-#      TODO: add checking if geometry is wrong
-#      - --delete-overlapping-cone-stars
       # Plotting
 #      - plot
 #      - --luminosity-function

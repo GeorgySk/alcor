@@ -3,7 +3,7 @@ precision: 6
 # TODO: Change to thick-to-thin disks number of stars fraction
 model_type: 2
 
-geometry: cone
+geometry: cones
 
 parameters:
   commons:
@@ -16,10 +16,10 @@ parameters:
     lifetime_mass_ratio: 1.0
 #   TODO: apply this for cone also
     mass_reduction_factor: 5.0
-  cone:
-    longitude:
+  cones:
+    longitudes:
       csv: ../legacy.csv
       column: 8
-    latitude:
+    latitudes:
       csv: ../legacy.csv
       column: 9

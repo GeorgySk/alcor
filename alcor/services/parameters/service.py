@@ -73,8 +73,8 @@ def generate_parameters_values_ranges_by_names(
 
     variable_simulations_parameters = parameters_dict['commons']
 
-    if geometry == 'cone':
-        variable_simulations_parameters.update(parameters_dict['cone'])
+    if geometry == 'cones':
+        variable_simulations_parameters.update(parameters_dict['cones'])
 
     for parameter_name, parameter_settings in (variable_simulations_parameters.
                                                items()):
@@ -97,22 +97,13 @@ def generate_parameters_values_ranges_by_names(
                     for value_number in range(values_count)]
                 yield parameter_name, values_range
 
-            # Parameter is read from csv file:
+            # Parameters will be read in Fortran from csv file:
             elif all(key in parameter_settings
                      for key in ['csv', 'column']):
                 file_path = parameter_settings['csv']
                 column = parameter_settings['column']
-                values_range = []
-                with open(file_path, 'r') as file:
-                    file_reader = csv.reader(file,
-                                             delimiter=' ',
-                                             skipinitialspace=True)
-                    for row in file_reader:
-                        try:
-                            values_range.append(row[column - 1])
-                        except IndexError:
-                            logger.error('Inconsistent number of lines in '
-                                         'csv file with parameters')
+                # TODO: this is weird but idk how to do it better
+                values_range = [str(file_path) + '-' + str(int(column))]
                 yield parameter_name, values_range
 
             else:

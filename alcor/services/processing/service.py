@@ -18,7 +18,6 @@ def run_processing(*,
                    w_velocities_clouds: bool,
                    w_velocities_vs_magnitude: bool,
                    w_lepine_criterion: bool,
-                   no_overlapping_cones: bool,
                    last_groups_count: int,
                    unprocessed_groups: bool,
                    session: Session) -> None:
@@ -33,7 +32,6 @@ def run_processing(*,
                             w_velocities_clouds=w_velocities_clouds,
                             w_velocities_vs_magnitude=w_velocities_vs_magnitude,
                             w_lepine_criterion=w_lepine_criterion,
-                            no_overlapping_cones=no_overlapping_cones,
                             session=session)
 
 

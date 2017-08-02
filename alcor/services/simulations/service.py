@@ -93,9 +93,20 @@ def run_simulation(*,
             '-km', model_type,
             '-o', output_file_name,
             '-geom', geometry]
-    if geometry == 'cone':
-        args.extend(['-cl', parameters_values['longitude'],
-                     '-cb', parameters_values['latitude']])
+    if geometry == 'cones':
+        # TODO: this is not cool but idk how to do it better
+        try:
+            float(parameters_values['longitudes'])
+        except ValueError:
+            parameters_values['longitudes'] = os.path.abspath(str(
+                parameters_values['longitudes']))
+        try:
+            float(parameters_values['latitudes'])
+        except ValueError:
+            parameters_values['latitudes'] = os.path.abspath(str(
+                parameters_values['latitudes']))
+        args.extend(['-cl', parameters_values['longitudes'],
+                     '-cb', parameters_values['latitudes']])
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')
