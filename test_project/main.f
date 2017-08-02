@@ -548,24 +548,23 @@ C                           TODO: better save ubvri, ugriz is derivative
           end do
       else if (geometry == 'cone') then
 
-         open(421,file='cone_stars_catalog.csv',access='append')
-C          TODO: uncomment this when writing to Cassandra works well        
-C          open(421,file=output_filename)
+C          TODO: delete this if Postgres is ok with checking cones
+C          open(421,file='cone_stars_catalog.csv',access='append')
+         open(421,file=output_filename)
 
-C          TODO: uncomment this when Cassandra is tuned  
-C          write(421, *) 'velocity_u ',
-C      &                 'velocity_v ',
-C      &                 'velocity_w ',
-C      &                 'galactic_distance ',
-C      &                 'galactic_longitude ',
-C      &                 'galactic_latitude ',
-C      &                 'ugriz_g_apparent ',
-C      &                 'ugriz_ug ',
-C      &                 'ugriz_gr ',
-C      &                 'ugriz_ri ',
-C      &                 'ugriz_iz ',
-C      &                 'disk_belonging ',
-C      &                 'spectral_type'
+         write(421, *) 'velocity_u ',
+     &                 'velocity_v ',
+     &                 'velocity_w ',
+     &                 'galactic_distance ',
+     &                 'galactic_longitude ',
+     &                 'galactic_latitude ',
+     &                 'ugriz_g_apparent ',
+     &                 'ugriz_ug ',
+     &                 'ugriz_gr ',
+     &                 'ugriz_ri ',
+     &                 'ugriz_iz ',
+     &                 'disk_belonging ',
+     &                 'spectral_type'
 
 C        TODO:this should be in processing. move it there when Cas is ok
          if (with_overlapping_checking .eqv. .true.) then
@@ -797,18 +796,18 @@ C           if cone crosses 2pi, move it -2pi
             if (max_longitude > 2 * pi) then
                 longitude = longitude - 2 * pi
             end if
-            write(421,"(11(es17.8e3,x),i1,x,f3.1)") uu(i),
+            write(421,"(11(es17.8e3,x),i1,x,i1)") uu(i),
      &                                              vv(i),
      &                                              ww(i),
      &                                              rgac(i),
      &                                              longitude,
      &                                              latitude,
+C     TODO: we need to save u g r i z, not u-g, g-r etc..
      &                                              ugriz_g_apparent(i),
-C      TODO: uncomment
-C      &                                              ugriz_ug(i),
-C      &                                              ugriz_gr(i),
-C      &                                              ugriz_ri(i),
-C      &                                              ugriz_iz(i),
+     &                                              ugriz_ug(i),
+     &                                              ugriz_gr(i),
+     &                                              ugriz_ri(i),
+     &                                              ugriz_iz(i),
      &                                              disk_belonging(i),
      &                                              typeOfWD(i)
          end do

@@ -41,7 +41,6 @@ def process_stars_group(*,
         stars_bins = raw_stars_bins(stars)
         bins = generate_bins(stars_bins=stars_bins,
                              group=group)
-
     session.add_all(clouds)
     session.add_all(bins)
     session.commit()

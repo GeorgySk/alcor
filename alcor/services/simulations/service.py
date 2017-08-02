@@ -33,7 +33,8 @@ def run_simulations(*,
             precision=precision,
             geometry=geometry):
         group_id = uuid.uuid4()
-        group = Group(id=group_id)
+        group = Group(id=group_id,
+                      original_unprocessed_group_id=None)
 
         parameters = generate_parameters(values=parameters_values,
                                          group=group)
@@ -45,26 +46,27 @@ def run_simulations(*,
                        geometry=geometry,
                        output_file_name=output_file_name)
 
-        # TODO: uncomment when plotting will work with postgres
-        # with open(output_file_name) as output_file:
-        #     stars = list(parse_stars(output_file,
-        #                              group=group))
-        # os.remove(output_file_name)
-        # session.add(group)
-        # session.add_all(parameters)
-        # session.add_all(stars)
-        # session.commit()
+        with open(output_file_name) as output_file:
+            stars = list(parse_stars(output_file,
+                                     group=group))
+        os.remove(output_file_name)
 
-        # TODO: write it to postgres db
-        with open(file='../test_project/processed_cones.txt',
-                  mode='a') as file:
-            for parameter in parameters:
-                if parameter.name == 'longitude':
-                    longitude = parameter.value
-                if parameter.name == 'latitude':
-                    latitude = parameter.value
-            row = str(longitude) + ' ' + str(latitude) + '\n'
-            file.write(row)
+        session.add(group)
+        session.add_all(parameters)
+        session.add_all(stars)
+        session.commit()
+
+        # TODO: all cones stars for 1 experiment should be recorded to 1 group
+        if geometry == 'cone':
+            with open(file='../test_project/processed_cones.txt',
+                      mode='a') as file:
+                for parameter in parameters:
+                    if parameter.name == 'longitude':
+                        longitude = parameter.value
+                    if parameter.name == 'latitude':
+                        latitude = parameter.value
+                row = str(longitude) + ' ' + str(latitude) + '\n'
+                file.write(row)
 
 
 def generate_parameters(*,

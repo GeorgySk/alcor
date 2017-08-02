@@ -55,73 +55,73 @@ class Star(Base):
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
     luminosity = Column(Float(asdecimal=True),
-                        nullable=False)
+                        nullable=True)
     proper_motion = Column(Float(asdecimal=True),
-                           nullable=False)
+                           nullable=True)
     proper_motion_component_b = Column(Float(asdecimal=True),
-                                       nullable=False)
+                                       nullable=True)
     proper_motion_component_l = Column(Float(asdecimal=True),
-                                       nullable=False)
+                                       nullable=True)
     proper_motion_component_vr = Column(Float(asdecimal=True),
-                                        nullable=False)
+                                        nullable=True)
     right_ascension = Column(Float(asdecimal=True),
-                             nullable=False)
+                             nullable=True)
     declination = Column(Float(asdecimal=True),
-                         nullable=False)
+                         nullable=True)
     galactic_distance = Column(Float(asdecimal=True),
-                               nullable=False)
+                               nullable=True)
     galactic_latitude = Column(Float(asdecimal=True),
-                               nullable=False)
+                               nullable=True)
     galactic_longitude = Column(Float(asdecimal=True),
-                                nullable=False)
+                                nullable=True)
     ugriz_g_apparent = Column(Float(asdecimal=True),
-                              nullable=False)
+                              nullable=True)
     ugriz_ug = Column(Float(asdecimal=True),
-                      nullable=False)
+                      nullable=True)
     ugriz_gr = Column(Float(asdecimal=True),
-                      nullable=False)
+                      nullable=True)
     ugriz_ri = Column(Float(asdecimal=True),
-                      nullable=False)
+                      nullable=True)
     ugriz_iz = Column(Float(asdecimal=True),
-                      nullable=False)
+                      nullable=True)
     v_photometry = Column(Float(asdecimal=True),
-                          nullable=False)
+                          nullable=True)
     velocity_u = Column(Float(asdecimal=True),
-                        nullable=False)
+                        nullable=True)
     velocity_v = Column(Float(asdecimal=True),
-                        nullable=False)
+                        nullable=True)
     velocity_w = Column(Float(asdecimal=True),
-                        nullable=False)
+                        nullable=True)
     spectral_type = Column(Integer(),
-                           nullable=False)
+                           nullable=True)
     disk_belonging = Column(Integer(),
-                            nullable=False)
+                            nullable=True)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
-                 luminosity: Decimal,
-                 proper_motion: Decimal,
-                 proper_motion_component_b: Decimal,
-                 proper_motion_component_l: Decimal,
-                 proper_motion_component_vr: Decimal,
-                 right_ascension: Decimal,
-                 declination: Decimal,
-                 galactic_distance: Decimal,
-                 galactic_latitude: Decimal,
-                 galactic_longitude: Decimal,
-                 ugriz_g_apparent: Decimal,
-                 ugriz_ug: Decimal,
-                 ugriz_gr: Decimal,
-                 ugriz_ri: Decimal,
-                 ugriz_iz: Decimal,
-                 v_photometry: Decimal,
-                 velocity_u: Decimal,
-                 velocity_v: Decimal,
-                 velocity_w: Decimal,
-                 spectral_type: int,
-                 disk_belonging: int):
+                 luminosity: float=None,
+                 proper_motion: float=None,
+                 proper_motion_component_b: float=None,
+                 proper_motion_component_l: float=None,
+                 proper_motion_component_vr: float=None,
+                 right_ascension: float=None,
+                 declination: float=None,
+                 galactic_distance: float=None,
+                 galactic_latitude: float=None,
+                 galactic_longitude: float=None,
+                 ugriz_g_apparent: float=None,
+                 ugriz_ug: float=None,
+                 ugriz_gr: float=None,
+                 ugriz_ri: float=None,
+                 ugriz_iz: float=None,
+                 v_photometry: float=None,
+                 velocity_u: float=None,
+                 velocity_v: float=None,
+                 velocity_w: float=None,
+                 spectral_type: int=None,
+                 disk_belonging: int=None):
         self.group_id = group_id
         self.luminosity = luminosity
         self.proper_motion = proper_motion
@@ -149,7 +149,7 @@ class Star(Base):
     @property
     def bolometric_magnitude(self) -> float:
         # TODO: find out the meaning of the following constants
-        return Decimal(2.5) * self.luminosity + Decimal(4.75)
+        return 2.5 * float(self.luminosity) + 4.75
 
     @property
     def coordinate_x(self) -> float:

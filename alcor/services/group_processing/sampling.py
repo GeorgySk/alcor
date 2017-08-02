@@ -23,7 +23,7 @@ def check_elimination(star: Star,
     parallax = Fraction(1, Fraction(galactic_distance))
     # TODO: find out the meaning of the following constants
     hrm = star.ugriz_g_apparent + Decimal(5. * log10(star.proper_motion) + 5.)
-    gz = star.ugriz_gr + star.ugriz_rz
+    gz = float(star.ugriz_gr) + float(star.ugriz_rz)
 
     if parallax < MIN_PARALLAX:
         eliminations_counter['parallax'] += 1
@@ -51,7 +51,7 @@ def check_elimination(star: Star,
             eliminations_counter['reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
-        elif hrm < Decimal(3.559) * gz + Decimal(15.17):
+        elif hrm < 3.559 * gz + 15.17:
             eliminations_counter['reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constant

@@ -24,7 +24,7 @@ def generate_stars_bins(stars: List[Star]) -> StarsBinsType:
     stars_bins = [[] for _ in range(BINS_COUNT)]
     for star in stars:
         index = get_stars_bin_index(star)
-        if index >= 0:
+        if BINS_COUNT > index >= 0:
             stars_bins[index].append(star)
     return stars_bins
 
@@ -39,7 +39,7 @@ def points(*,
            stars_bins: StarsBinsType,
            group: Group,
            normalization_factor: float) -> Iterable[Point]:
-    for stars_bin_index, stars_bin in enumerate(bins):
+    for stars_bin_index, stars_bin in enumerate(stars_bins):
         stars_count = len(stars_bin)
         if not stars_count:
             continue

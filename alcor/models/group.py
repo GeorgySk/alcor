@@ -3,8 +3,7 @@ import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
 from sqlalchemy.sql.functions import func
-from sqlalchemy.sql.sqltypes import (Boolean,
-                                     DateTime)
+from sqlalchemy.sql.sqltypes import DateTime
 
 from .base import Base
 
@@ -15,11 +14,11 @@ class Group(Base):
                 primary_key=True)
     original_unprocessed_group_id = Column(UUID(as_uuid=True),
                                            default=None)
-    processed = Column(Boolean(),
-                       default=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
-                 id: uuid.UUID):
+                 id: uuid.UUID,
+                 original_unprocessed_group_id: uuid.UUID,):
         self.id = id
+        self.original_unprocessed_group_id = original_unprocessed_group_id

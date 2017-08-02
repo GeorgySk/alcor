@@ -41,5 +41,5 @@ def run_processing(*,
 def fetch_unprocessed_groups(*,
                              session: Session) -> List[Group]:
     query = (session.query(Group)
-             .filter(Group.processed.is_(False)))
+             .filter(Group.original_unprocessed_group_id.is_(None)))
     return query.all()

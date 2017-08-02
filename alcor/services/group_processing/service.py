@@ -13,6 +13,7 @@ from sqlalchemy.orm.session import Session
 from alcor.models import (Group,
                           Star)
 from alcor.models.eliminations import StarsCounter
+from alcor.models.processed_star_association import ProcessedStarAssociation
 from alcor.models.simulation import Parameter
 from alcor.services import (luminosity_function,
                             velocities,
@@ -57,7 +58,6 @@ def process_stars_group(*,
         stars = list(filterfalse(apply_elimination_criteria,
                                  stars))
 
-    # TODO: shouldn't it be in the models?
     counter = StarsCounter(
         group_id=group.id,
         raw=stars_count,
@@ -94,26 +94,26 @@ def process_stars_group(*,
             w_lepine_criterion=w_lepine_criterion,
             session=session)
 
-    # TODO: add a processed group writing to db
-    # original_unprocessed_group_id = group.id
-    # processed_group_id = uuid.uuid4()
-    # processed_group = Group(
-    #     id=processed_group_id,
-    #     original_unprocessed_group_id=original_unprocessed_group_id,
-    #     processed=True)
-    # insert_groups_statement = model_insert_statement(Group)
-    # insert(instances=[processed_group],
-    #        statement=insert_groups_statement,
-    #        session=session)
+    original_unprocessed_group_id = group.id
+    processed_group_id = uuid.uuid4()
+    processed_group = Group(
+        id=processed_group_id,
+        original_unprocessed_group_id=original_unprocessed_group_id)
+    session.add(processed_group)
 
-    # TODO: add processed stars writing to db
-    # for star in stars:
-    #     star.group_id = processed_group_id
-    #     star.id = uuid.uuid4()
-    # insert_stars_statement = model_insert_statement(Star)
-    # insert(instances=stars,
-    #        statement=insert_stars_statement,
-    #        session=session)
+    for original_star in stars:
+        processed_star = Star(group_id=processed_group_id)
+        if nullify_radial_velocity:
+            processed_star.velocity_u = original_star.velocity_u
+            processed_star.velocity_v = original_star.velocity_v
+            processed_star.velocity_w = original_star.velocity_w
+        session.add(processed_star)
+
+        processed_star_association = ProcessedStarAssociation(
+            original_star_id=original_star.id)
+        session.add(processed_star_association)
+
+    session.commit()
 
 
 # TODO: the logic is broken here. Get rid of Cassandra 1st then come here

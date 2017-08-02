@@ -1,9 +1,9 @@
-from math import ceil
 from statistics import (mean,
                         stdev)
 from typing import (Iterable,
                     Tuple,
-                    List)
+                    List,
+                    Union)
 
 from alcor.models import (Group,
                           Star)
@@ -18,6 +18,7 @@ from alcor.types import (StarsBinsType,
                          RowType)
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.0
+# TODO: do we need max for this type of plot? if no - del check for max index
 MAX_BOLOMETRIC_MAGNITUDE = 21.0
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
@@ -27,9 +28,9 @@ DEFAULT_VELOCITY_STD = 100.
 
 
 def generate_clouds(stars: List[Star],
-                    group: Group) -> Tuple[List[LepineCaseUCloud],
-                                           List[LepineCaseVCloud],
-                                           List[LepineCaseWCloud]]:
+                    group: Group) -> List[Union[LepineCaseUCloud,
+                                                LepineCaseVCloud,
+                                                LepineCaseWCloud]]:
     u_clouds = []
     v_clouds = []
     w_clouds = []
@@ -64,8 +65,12 @@ def generate_clouds(stars: List[Star],
                 LepineCaseVCloud(group_id=group.id,
                                  velocity_v=star.velocity_v,
                                  bolometric_magnitude=star.bolometric_magnitude))
+    clouds = []
+    clouds.extend(u_clouds)
+    clouds.extend(v_clouds)
+    clouds.extend(w_clouds)
 
-    return u_clouds, v_clouds, w_clouds
+    return clouds
 
 
 def generate_u_bins(*,
@@ -162,14 +167,15 @@ def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
 
 def get_stars_bin_index(star: Star) -> int:
     return int((float(star.bolometric_magnitude)
-                - MIN_BOLOMETRIC_MAGNITUDE)/ BIN_SIZE)
+                - MIN_BOLOMETRIC_MAGNITUDE)/BIN_SIZE)
 
 
 def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
     res = [[] for _ in range(BINS_COUNT)]
     for star in stars:
         index = get_stars_bin_index(star)
-        res[index].append(star)
+        if BINS_COUNT > index >= 0:
+            res[index].append(star)
     return res
 
 

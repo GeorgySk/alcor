@@ -155,41 +155,46 @@ C         TODO: rename VRR to VR
           ugriz_i = ugriz_i + 0.639 * extinction
           ugriz_z = ugriz_z + 0.453 * extinction
 
-C           ugriz_u_apparent = ugriz_u - 5.0 + 5.0 * (log10(rgac(i)) 
-C      &                                              + 3.0)
-C           ugriz_g_apparent(i) = ugriz_g - 5.0 + 5.0 * (log10(rgac(i)) 
-C      &                                              + 3.0)
-C           ugriz_r_apparent = ugriz_r - 5.0 + 5.0 * (log10(rgac(i)) 
-C      &                                              + 3.0)
-C           ugriz_i_apparent = ugriz_i - 5.0 + 5.0 * (log10(rgac(i)) 
-C      &                                              + 3.0)
-C           ugriz_z_apparent = ugriz_z - 5.0 + 5.0 * (log10(rgac(i)) 
-C      &                                              + 3.0)
+          ugriz_u_apparent = ugriz_u - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_g_apparent(i) = ugriz_g - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_r_apparent = ugriz_r - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_i_apparent = ugriz_i - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_z_apparent = ugriz_z - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
 
-C         TODO: DELETE THIS AFTER CHECKING IF I NEED ABS, NOT APP Mbol
-          ugriz_u_apparent = ugriz_u
-          ugriz_g_apparent(i) = ugriz_g
-          ugriz_r_apparent = ugriz_r
-          ugriz_i_apparent = ugriz_i
-          ugriz_z_apparent = ugriz_z
+C           call errfot(ugriz_u_apparent,
+C      &                ugriz_u_apparent_w_error,
+C      &                1)
+C           call errfot(ugriz_g_apparent(i),
+C      &                ugriz_g_apparent_w_error,
+C      &                2)
+C C         TODO: figure out what to do with commons
+C           ugriz_g_apparent(i) = ugriz_g_apparent_w_error
+C           call errfot(ugriz_r_apparent,
+C      &                ugriz_r_apparent_w_error,
+C      &                3)
+C           call errfot(ugriz_i_apparent,
+C      &                ugriz_i_apparent_w_error,
+C      &                4)
+C           call errfot(ugriz_z_apparent,
+C      &                ugriz_z_apparent_w_error,
+C      &                5)
 
-          call errfot(ugriz_u_apparent,
-     &                ugriz_u_apparent_w_error,
-     &                1)
-          call errfot(ugriz_g_apparent(i),
-     &                ugriz_g_apparent_w_error,
-     &                2)
-C         TODO: figure out what to do with commons
-          ugriz_g_apparent(i) = ugriz_g_apparent_w_error
-          call errfot(ugriz_r_apparent,
-     &                ugriz_r_apparent_w_error,
-     &                3)
-          call errfot(ugriz_i_apparent,
-     &                ugriz_i_apparent_w_error,
-     &                4)
-          call errfot(ugriz_z_apparent,
-     &                ugriz_z_apparent_w_error,
-     &                5)
+C         TODO: this is another way to calculate phot.error. do smth
+          ugriz_u_apparent_w_error = ugriz_u_apparent 
+     &                               + 0.1 * gasdev(iseed)
+          ugriz_g_apparent_w_error = ugriz_g_apparent(i) 
+     &                               + 0.025 * gasdev(iseed)
+          ugriz_r_apparent_w_error = ugriz_r_apparent 
+     &                               + 0.025 * gasdev(iseed)
+          ugriz_i_apparent_w_error = ugriz_i_apparent 
+     &                               + 0.05 * gasdev(iseed)
+          ugriz_z_apparent_w_error = ugriz_z_apparent 
+     &                               + 0.1 * gasdev(iseed)
 
           ugriz_ug(i) = ugriz_u_apparent_w_error 
      &                  - ugriz_g_apparent_w_error
