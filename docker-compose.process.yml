@@ -34,5 +34,4 @@ services:
       - POSTGRES_PASSWORD=password
 
 volumes:
-  cassandra-data:
   postgres_data:
