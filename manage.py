@@ -14,9 +14,9 @@ from sqlalchemy_utils import (database_exists,
                               drop_database)
 
 from alcor.models.base import Base
-
-from alcor.services.processing import run_processing
 from alcor.services import plots
+from alcor.services.processing import run_processing
+from alcor.services.restrictions import FILTRATION_METHODS
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
@@ -83,9 +83,7 @@ def simulate(ctx: click.Context,
               type=uuid.UUID,
               help='Process a group by id')
 @click.option('--filtration-method', '-m',
-              type=click.Choice(['raw',
-                                 'full',
-                                 'restricted']),
+              type=click.Choice(FILTRATION_METHODS),
               default='raw',
               help='Raw data filtration method: '
                    '"raw" - do nothing, '
