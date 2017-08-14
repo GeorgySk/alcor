@@ -16,19 +16,19 @@ services:
 #      - test_project
 #      - --clean
       # Processing generated data:
-      - process
+#      - process
 #      - --last=1
-      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
-      - --filtration-method
-      - restricted
+#      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
+#      - --filtration-method
+#      - restricted
 #      - --nullify-radial-velocity
-      - --w-luminosity-function
+#      - --w-luminosity-function
 #      - --w-velocities-clouds
 #      - --w-velocities-vs-magnitude
 #      - --w-lepine-criterion
       # Plotting
-#      - plot
-#      - --luminosity-function
+      - plot
+      - --luminosity-function
 #      - --velocities-vs-magnitude
 #      - --velocity-clouds
 #      - --lepine-criterion

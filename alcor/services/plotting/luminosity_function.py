@@ -1,5 +1,6 @@
 from math import (log10,
                   sqrt)
+from typing import List
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -14,7 +15,7 @@ from alcor.models.luminosity_function import Point
 
 FILENAME = 'luminosity_function.ps'
 
-FIGURE_SIZE = (8, 8)
+FIGURE_SIZE = (7, 7)
 DESIRED_DIMENSIONS_RATIO = 10 / 13
 
 X_LABEL = '$M_{bol}$'
@@ -54,7 +55,7 @@ OBSERVATIONAL_LINE_COLOR = 'r'
 def plot(*,
          session: Session) -> None:
 
-    # TODO: Implement getting last points by time(ok?)
+    # TODO: Implement other fetching functions
     graph_points = fetch_all_graph_points(session=session)
 
     avg_bin_magnitudes = [graph_point.avg_bin_magnitude
@@ -110,11 +111,7 @@ def plot(*,
     plt.savefig(FILENAME)
 
 
-# TODO: implement using postgres
-# def fetch_all_graph_points(*,
-#                            session: Session):
-#     query = (Point.objects.all().limit(None))
-#     records = fetch(query=query,
-#                     session=session)
-#     return [Point(**record)
-#             for record in records]
+def fetch_all_graph_points(*,
+                           session: Session) -> List[Point]:
+    query = (session.query(Point))
+    return query.all()

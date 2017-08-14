@@ -2,7 +2,6 @@
 import logging
 import os
 import uuid
-from typing import List
 
 import click
 from sqlalchemy.engine.url import make_url

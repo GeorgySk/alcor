@@ -1,6 +1,6 @@
 import logging
 import uuid
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm.session import Session
 
@@ -17,19 +17,18 @@ def run_processing(*,
                    w_velocities_clouds: bool,
                    w_velocities_vs_magnitude: bool,
                    w_lepine_criterion: bool,
-                   last_groups_count: int,
+                   last_groups_count: Optional[int],
                    unprocessed_groups: bool,
-                   group_id: uuid.UUID,
+                   group_id: Optional[uuid.UUID],
                    session: Session) -> None:
-    # TODO: add fetching by id
     if unprocessed_groups:
         groups = fetch_unprocessed_groups(session=session)
     elif last_groups_count:
         groups = fetch_last_groups(count=last_groups_count,
                                    session=session)
     elif group_id:
-        groups = fetch_groups_by_id(group_id=group_id,
-                                    session=session)
+        groups = fetch_group_by_id(group_id=group_id,
+                                   session=session)
     for group in groups:
         process_stars_group(
             group=group,
@@ -42,7 +41,6 @@ def run_processing(*,
             session=session)
 
 
-# TODO: move this to reading
 def fetch_unprocessed_groups(*,
                              session: Session) -> List[Group]:
     query = (session.query(Group)
@@ -58,9 +56,9 @@ def fetch_last_groups(*,
     return query.all()
 
 
-def fetch_groups_by_id(*,
-                       group_id: uuid.UUID,
-                       session: Session) -> List[Group]:
+def fetch_group_by_id(*,
+                      group_id: uuid.UUID,
+                      session: Session) -> List[Group]:
     query = (session.query(Group)
              .filter(Group.id == group_id))
     return query.all()
