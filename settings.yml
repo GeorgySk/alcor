@@ -15,7 +15,7 @@ parameters:
     initial_mass_function_exponent: -2.35
     lifetime_mass_ratio: 1.0
 #   TODO: apply this for cone also
-    mass_reduction_factor: 5.0
+    mass_reduction_factor: 0.3
   cones:
     longitudes:
       csv: ../legacy.csv

@@ -300,7 +300,6 @@ C     TODO: add choosing what output we want to get
      &                  'ugriz_ug ',    
      &                  'ugriz_gr ',    
      &                  'ugriz_ri ',
-     &                  'v_photometry ',
      &                  'ugriz_iz ',
      &                  'v_photometry ',
      &                  'velocity_u ',

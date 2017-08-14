@@ -85,7 +85,7 @@ C        ---   Galactic coordinate r (Kpc) ---
      &        - 2.d0 * coordinate_R(i) * solarGalactocentricDistance 
      &          * dcos(coordinate_Theta(i))
         rgac(i)=sqrt(ros+(coordinate_Zcylindr(i)*
-     &          coordinate_Zcylindr(i)))
+     &                    coordinate_Zcylindr(i)))
 C     ---   Galactic coordinate lgac ---
         ros = dsqrt(ros)
 C       TODO: do smth about this asin/acos from 1+o(1)
@@ -152,21 +152,21 @@ C       ---   Calculating the right ascension ---
         xc= ((zcdg*zsb-zsdg*zcb*cos(theta-lgac(i)))/
      &      cos(declination(i)))
 C       --Looking at the sign that corresponds to the right ascension---
-        if (xs.ge.0.0) then
-          if (xc.ge.0.0) then 
+        if (xs .ge. 0.0) then
+          if (xc .ge. 0.0) then 
             rightAscension(i) = asin(xs) + alfag
           else
-            rightAscension(i)=acos(xc)+alfag
+            rightAscension(i) = acos(xc) + alfag
           endif    
         else
-          if (xc.lt.0.0) then
-            rightAscension(i)=pi-asin(xs)+alfag
+          if (xc .lt. 0.0) then
+            rightAscension(i) = pi - asin(xs) + alfag
           else
-            rightAscension(i)=2*pi+asin(xs)+alfag
+            rightAscension(i) = 2 * pi + asin(xs) + alfag
           endif
         endif            
-        if (rightAscension(i)*fi.gt.360.0) then
-          rightAscension(i)=rightAscension(i)-2*pi
+        if (rightAscension(i) * fi .gt. 360.0) then
+          rightAscension(i) = rightAscension(i) - 2 * pi
         endif
 C--------------------------------------------------------------------
 C       ---  Calculating the proper motion in ecuatorial coordinates ---

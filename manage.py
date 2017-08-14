@@ -81,6 +81,7 @@ def simulate(ctx: click.Context,
               help='Process last N groups by time')
 @click.option('--group_id',
               default=None,
+              type=uuid.UUID,
               help='Process a group by id')
 @click.option('--filtration-method', '-m',
               type=click.Choice(['raw',
@@ -117,7 +118,7 @@ def process(ctx: click.Context,
             w_lepine_criterion: bool,
             unprocessed: bool,
             last: int,
-            group_id: uuid.uuid4
+            group_id: uuid.UUID
             ) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
@@ -141,7 +142,7 @@ def process(ctx: click.Context,
                        w_lepine_criterion=w_lepine_criterion,
                        last_groups_count=last,
                        unprocessed_groups=unprocessed,
-                       id_groups=group_id,
+                       group_id=group_id,
                        session=session)
 
 

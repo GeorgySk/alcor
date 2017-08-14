@@ -1,4 +1,3 @@
-C***********************************************************************
       subroutine chanco(V,UB,BV,VR,RI,g,xug,xgr,xri,xiz,xgi)
 C---------------------------------------------------------------------
 C     Transformation between the Johnson-Cousins UBVRI photometry 
@@ -27,4 +26,3 @@ C     --- Performing transformations ----
       
       return
       end
-C***********************************************************************

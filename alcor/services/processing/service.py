@@ -19,7 +19,7 @@ def run_processing(*,
                    w_lepine_criterion: bool,
                    last_groups_count: int,
                    unprocessed_groups: bool,
-                   id_groups: uuid.uuid4,
+                   group_id: uuid.UUID,
                    session: Session) -> None:
     # TODO: add fetching by id
     if unprocessed_groups:
@@ -27,8 +27,8 @@ def run_processing(*,
     elif last_groups_count:
         groups = fetch_last_groups(count=last_groups_count,
                                    session=session)
-    elif id_groups:
-        groups = fetch_groups_by_id(id_list=id_groups,
+    elif group_id:
+        groups = fetch_groups_by_id(group_id=group_id,
                                     session=session)
     for group in groups:
         process_stars_group(
@@ -59,8 +59,8 @@ def fetch_last_groups(*,
 
 
 def fetch_groups_by_id(*,
-                       id_list: uuid.uuid4,
+                       group_id: uuid.UUID,
                        session: Session) -> List[Group]:
     query = (session.query(Group)
-             .filter(Group.id.is_(id_list)))
+             .filter(Group.id == group_id))
     return query.all()

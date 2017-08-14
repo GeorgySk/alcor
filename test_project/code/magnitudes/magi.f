@@ -89,13 +89,11 @@ C     TODO: no need to keep these
 
 C     ---  Interpolating Mv, luminosity, colors and other variables
 C          from coolingTime and the mwd  ---
-C     ---  Start DO on all the stars
-      do i=1,numberOfWDs
+      do i = 1, numberOfWDs
 C       ---  ATENTION! choosing only if .lt.1.1!!!  ---
-C       ---  Start IF mass <1.4  ----
-        if(massOfWD(i).le.1.4) then
+        if (massOfWD(i) .le. 1.4) then
 C         ---  IF CO core ---
-          if(massOfWD(i).lt.mone) then  
+          if (massOfWD(i) .lt. mone) then  
 C           --- Atention We put the "old" ones to 0.6Msol ---
 C           --- Distribucion DA/DB ---
             call dbd_fid(iseed,fractionOfDB,in)
@@ -125,10 +123,10 @@ C         ---  ELSE ONe ---
      &           c5,teff,xlog)
           end if
 C         ---  END IF CO/ONe ---
-          if(teff.lt.6000) n4=n4+1
-          luminosityOfWD(i)=-lum
-          effTempOfWD(i)=teff            
-          V(i)=c3
+          if (teff .lt. 6000) n4 = n4 + 1
+          luminosityOfWD(i) = -lum
+          effTempOfWD(i) = teff            
+          V(i) = c3
 C         TODO: no need to keep indexes
 C         TODO: rename VRR to VR
           UB(i)=c1-c2
@@ -143,17 +141,17 @@ C         TODO: rename VRR to VR
           ugriz_i = xg - xgi
           ugriz_z = xg - xgi - xiz
 
-          call extinct(real(lgac(i) * 180.0 / pi),
-     &                 real(bgac(i) * 180.0 / pi),
-     &                 real(rgac(i)),
-     &                 AVT,SAVT,AVC,JMAX,AV,SAV)
-          extinction = AVT + AVC
+C           call extinct(real(lgac(i) * 180.0 / pi),
+C      &                 real(bgac(i) * 180.0 / pi),
+C      &                 real(rgac(i)),
+C      &                 AVT,SAVT,AVC,JMAX,AV,SAV)
+C           extinction = AVT + AVC
 
-          ugriz_u = ugriz_u + 1.579 * extinction
-          ugriz_g = ugriz_g + 1.161 * extinction
-          ugriz_r = ugriz_r + 0.843 * extinction
-          ugriz_i = ugriz_i + 0.639 * extinction
-          ugriz_z = ugriz_z + 0.453 * extinction
+C           ugriz_u = ugriz_u + 1.579 * extinction
+C           ugriz_g = ugriz_g + 1.161 * extinction
+C           ugriz_r = ugriz_r + 0.843 * extinction
+C           ugriz_i = ugriz_i + 0.639 * extinction
+C           ugriz_z = ugriz_z + 0.453 * extinction
 
           ugriz_u_apparent = ugriz_u - 5.0 + 5.0 * (log10(rgac(i)) 
      &                                              + 3.0)
@@ -166,24 +164,24 @@ C         TODO: rename VRR to VR
           ugriz_z_apparent = ugriz_z - 5.0 + 5.0 * (log10(rgac(i)) 
      &                                              + 3.0)
 
-          call errfot(ugriz_u_apparent,
-     &                ugriz_u_apparent_w_error,
-     &                1)
-          call errfot(ugriz_g_apparent(i),
-     &                ugriz_g_apparent_w_error,
-     &                2)
-          call errfot(ugriz_r_apparent,
-     &                ugriz_r_apparent_w_error,
-     &                3)
-          call errfot(ugriz_i_apparent,
-     &                ugriz_i_apparent_w_error,
-     &                4)
-          call errfot(ugriz_z_apparent,
-     &                ugriz_z_apparent_w_error,
-     &                5) 
+C           call errfot(ugriz_u_apparent,
+C      &                ugriz_u_apparent_w_error,
+C      &                1)
+C           call errfot(ugriz_g_apparent(i),
+C      &                ugriz_g_apparent_w_error,
+C      &                2)
+C           call errfot(ugriz_r_apparent,
+C      &                ugriz_r_apparent_w_error,
+C      &                3)
+C           call errfot(ugriz_i_apparent,
+C      &                ugriz_i_apparent_w_error,
+C      &                4)
+C           call errfot(ugriz_z_apparent,
+C      &                ugriz_z_apparent_w_error,
+C      &                5) 
 
 C         TODO: figure out what to do with commons
-          ugriz_g_apparent(i) = ugriz_g_apparent_w_error
+C           ugriz_g_apparent(i) = ugriz_g_apparent_w_error
 
 C         TODO: this is another way to calculate phot.error. do smth
 C           ugriz_u_apparent_w_error = ugriz_u_apparent 
@@ -197,23 +195,23 @@ C      &                               + 0.05 * gasdev(iseed)
 C           ugriz_z_apparent_w_error = ugriz_z_apparent 
 C      &                               + 0.1 * gasdev(iseed)
 
-          ugriz_ug(i) = ugriz_u_apparent_w_error 
-     &                  - ugriz_g_apparent_w_error
-          ugriz_gr(i) = ugriz_g_apparent_w_error 
-     &                  - ugriz_r_apparent_w_error
-          ugriz_ri(i) = ugriz_r_apparent_w_error 
-     &                  - ugriz_i_apparent_w_error
-          ugriz_iz(i) = ugriz_i_apparent_w_error 
-     &                  - ugriz_z_apparent_w_error
+C           ugriz_ug(i) = ugriz_u_apparent_w_error 
+C      &                  - ugriz_g_apparent_w_error
+C           ugriz_gr(i) = ugriz_g_apparent_w_error 
+C      &                  - ugriz_r_apparent_w_error
+C           ugriz_ri(i) = ugriz_r_apparent_w_error 
+C      &                  - ugriz_i_apparent_w_error
+C           ugriz_iz(i) = ugriz_i_apparent_w_error 
+C      &                  - ugriz_z_apparent_w_error
 
-C           ugriz_ug(i) = ugriz_u
-C      &                  - ugriz_g
-C           ugriz_gr(i) = ugriz_g
-C      &                  - ugriz_r
-C           ugriz_ri(i) = ugriz_r
-C      &                  - ugriz_i
-C           ugriz_iz(i) = ugriz_i
-C      &                  - ugriz_z
+          ugriz_ug(i) = ugriz_u
+     &                  - ugriz_g
+          ugriz_gr(i) = ugriz_g
+     &                  - ugriz_r
+          ugriz_ri(i) = ugriz_r
+     &                  - ugriz_i
+          ugriz_iz(i) = ugriz_i
+     &                  - ugriz_z
 
 C         ---  Making V apparent magnitude ---
           V(i) = V(i) - 5.0 + 5.0 * (log10(rgac(i)) + 3.0)
