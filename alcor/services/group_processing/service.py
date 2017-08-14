@@ -15,7 +15,7 @@ from alcor.services import (luminosity_function,
                             velocities,
                             velocities_vs_magnitudes)
 from alcor.services.data_access import fetch_group_stars
-from .sampling import check_elimination
+from . import elimination
 
 logging.basicConfig(format='%(filename)s %(funcName)s '
                            '%(levelname)s: %(message)s',
@@ -35,15 +35,15 @@ def process_stars_group(*,
     stars = fetch_group_stars(group_id=group.id,
                               session=session)
     stars_count = len(stars)
+    logger.info('Starting processing stars, '
+                f'objects number: {stars_count}.')
 
     eliminations_counter = Counter()
-    apply_elimination_criteria = partial(
-        check_elimination,
-        eliminations_counter=eliminations_counter,
-        filtration_method=filtration_method)
     if filtration_method in {'restricted', 'full'}:
-        stars = list(filterfalse(apply_elimination_criteria,
-                                 stars))
+        is_eliminated = partial(elimination.check,
+                                eliminations_counter=eliminations_counter,
+                                filtration_method=filtration_method)
+        stars = list(filterfalse(is_eliminated, stars))
 
     counter = StarsCounter(
         group_id=group.id,
