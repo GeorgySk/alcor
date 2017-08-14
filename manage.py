@@ -146,6 +146,10 @@ def process(ctx: click.Context,
 
 
 @main.command()
+@click.option('--group_id',
+              default=None,
+              type=uuid.UUID,
+              help='Process a group by id')
 @click.option('--luminosity-function', '-lf',
               is_flag=True,
               help='Plot luminosity function.')
@@ -172,6 +176,7 @@ def process(ctx: click.Context,
               help='Plot color-color diagrams for ugriz photometry.')
 @click.pass_context
 def plot(ctx: click.Context,
+         group_id: uuid.UUID,
          luminosity_function: bool,
          velocities_vs_magnitude: bool,
          velocity_clouds: bool,
@@ -185,7 +190,8 @@ def plot(ctx: click.Context,
     with get_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
-        draw_plots(luminosity_function,
+        draw_plots(group_id,
+                   luminosity_function,
                    velocities_vs_magnitude,
                    velocity_clouds,
                    lepine_criterion,

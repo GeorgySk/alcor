@@ -1,5 +1,7 @@
 import logging
-from typing import List
+import uuid
+from typing import (List,
+                    Optional)
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -43,11 +45,16 @@ PECULIAR_SOLAR_VELOCITY_W = 7
 
 
 def plot(*,
+         group_id: Optional[uuid.UUID],
          session: Session,
          axes: str) -> None:
-    # TODO: Figure out what stars I should fetch (all/last group by time/last N
-    # groups by time/selected by ID/marked by some flag(series of simulations))
-    stars = fetch_all_stars(session=session)
+    # TODO: Figure out what stars I should fetch (all/last N groups by time/
+    # by id list)
+    if group_id:
+        stars = fetch_stars_by_group_id(group_id=group_id,
+                                        session=session)
+    else:
+        stars = fetch_all_stars(session=session)
 
     # TODO: add coordinates
     if axes == 'velocities':
@@ -80,14 +87,18 @@ def plot(*,
                   filename=VW_FILENAME)
 
 
-# TODO: implement with postgres
 def fetch_all_stars(*,
-                    session: Session):
-    query = (Star.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [Star(**record)
-            for record in records]
+                    session: Session) -> List[Star]:
+    query = (session.query(Star))
+    return query.all()
+
+
+def fetch_stars_by_group_id(*,
+                            group_id: uuid.UUID,
+                            session: Session) -> List[Star]:
+    query = (session.query(Star)
+             .filter(Star.group_id == group_id))
+    return query.all()
 
 
 def draw_plot(*,

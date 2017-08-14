@@ -28,12 +28,13 @@ services:
 #      - --w-lepine-criterion
       # Plotting
       - plot
-      - --luminosity-function
+      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
+#      - --luminosity-function
 #      - --velocities-vs-magnitude
 #      - --velocity-clouds
 #      - --lepine-criterion
-#      - --heatmap
-#      - velocities
+      - --heatmap
+      - velocities
 #      - --toomre-diagram
 #      - --ugriz-color-color-diagram
     environment:

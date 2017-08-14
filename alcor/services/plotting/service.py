@@ -1,3 +1,6 @@
+import uuid
+from typing import Optional
+
 from . import (luminosity_function,
                velocities_vs_magnitude,
                velocity_clouds,
@@ -8,7 +11,8 @@ from . import (luminosity_function,
 from sqlalchemy.orm.session import Session
 
 
-def draw_plots(with_luminosity_function: bool,
+def draw_plots(group_id: Optional[uuid.UUID],
+               with_luminosity_function: bool,
                with_velocities_vs_magnitude: bool,
                with_velocity_clouds: bool,
                lepine_criterion: bool,
@@ -32,7 +36,8 @@ def draw_plots(with_luminosity_function: bool,
             velocity_clouds.plot(session=session)
 
     if heatmaps_axes:
-        heatmaps.plot(session=session,
+        heatmaps.plot(group_id=group_id,
+                      session=session,
                       axes=heatmaps_axes)
 
     if with_toomre_diagram:
