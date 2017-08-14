@@ -76,7 +76,7 @@ C     ---  Making the transfer of heightPattern, of z  ---
           k=k+1
           heightPattern(k)=zh(i)
           coordinate_Zcylindr(k)=zz(i)
-          if (geometry == 'cone') then
+          if (geometry == 'cones') then
               coordinate_R(k) = coordinate_R(i)
               coordinate_Theta(k) = coordinate_Theta(i)
           end if

@@ -3,7 +3,7 @@ precision: 6
 # TODO: Change to thick-to-thin disks number of stars fraction
 model_type: 2
 
-geometry: cones
+geometry: sphere
 
 parameters:
   commons:

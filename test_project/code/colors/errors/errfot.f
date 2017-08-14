@@ -27,6 +27,7 @@ C=======================================================================
       integer i, iseed
       real c0, c1, c2, c3, c4, c5
       real x, sigma, xnew, gasdev
+      real temp
 
       common /ISEED/ iseed
 
@@ -81,9 +82,10 @@ C     coeff_Z
          c5 = -0.0000584448
       end if
 
-      sigma=c0+c1*x+c2*x**2.0+c3*x**3.0+c4*x**4.0+c5*x**5.0
+      sigma = c0 + (c1 * x) + (c2 * x ** 2.0) + (c3 * x ** 3.0) 
+     &        + (c4 * x ** 4.0) + (c5 * x ** 5.0)
 
-      xnew=x+sigma*gasdev(iseed)
+      xnew = x + sigma * gasdev(iseed)
 
       return
       end

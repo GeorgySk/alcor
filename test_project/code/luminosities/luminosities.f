@@ -107,7 +107,10 @@ C             write (667,*) m(i),massOfWD(i)
       write (6,*) ' Number of WDs: ', numberOfWDs
       xntwd = float(numberOfWDs)
       write (6,*) ' Number of ONe: ', ntwdone
-      write (6,*) ' ONe percentage: ',100.0 * float(ntwdone) /xntwd, '%'
+      if (numberOfWDs /= 0) then
+        write (6,*) ' ONe percentage: ',
+     &              100.0 * float(ntwdone) /xntwd, '%'
+      end if
 
 C     ---   Taking the stars that are WDs ---
       do 2 i=1,numberOfStarsInSample

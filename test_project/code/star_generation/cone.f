@@ -37,7 +37,7 @@ C     with its height direction set by longitude and latitude
      &                       FI = PI / 180.0,
      &                       DELTA_LATITUDE = 2.64 * FI,
      &                       NORMALIZATION_CONE_HEIGHT = 0.2,
-     &                       CONE_HEIGHT = 5.0,
+     &                       CONE_HEIGHT = 2.0,
      &                       THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                       THIN_DISK_STARS_COUNT_FRACTION = 0.92,
      &                       THICK_DISK_STARS_COUNT_FRACTION = 1.0 
@@ -395,19 +395,21 @@ C                 converting from galactic to cyl.galactocentric
      &                         scaleheight) result(max_density)
           implicit none
           real, intent(in) :: longitude,
-     &                                    latitude
+     &                        latitude
           real :: max_density,
-     &                        density,
-     &                        distance,
-     &                        get_density,
-     &                        scaleheight
+     &            density,
+     &            distance,
+     &            get_density,
+     &            scaleheight
           integer :: distance_index
           integer, parameter :: DISTANCE_ITER_COUNT = 1000
-          real, parameter :: CONE_HEIGHT = 5.0,
-     &                                   DISTANCE_INCREMENT=CONE_HEIGHT
-     &                                   / float(DISTANCE_ITER_COUNT),
-     &                               MONTE_CARLO_MAX_SHIFT_FACTOR = 1.1
+          real, parameter :: CONE_HEIGHT = 2.0,
+     &                       DISTANCE_INCREMENT 
+     &                           = CONE_HEIGHT
+     &                             / float(DISTANCE_ITER_COUNT),
+     &                       MONTE_CARLO_MAX_SHIFT_FACTOR = 1.1
   
+          max_density = 0.0
           do distance_index = 1, DISTANCE_ITER_COUNT
               distance = DISTANCE_INCREMENT * float(distance_index)
   
@@ -415,7 +417,7 @@ C                 converting from galactic to cyl.galactocentric
      &                              longitude,
      &                              latitude,
      &                              scaleheight)
-              max_density = max1(max_density, density)
+              max_density = max(max_density, density)
           end do
   
           max_density = MONTE_CARLO_MAX_SHIFT_FACTOR * max_density
@@ -427,27 +429,26 @@ C                 converting from galactic to cyl.galactocentric
           implicit none
           real, intent(in) :: distance, longitude, latitude
           real :: density, 
-     &                        pole_projection, 
-     &                        plane_projection, 
-     &                        galactocentric_distance,
-     &                        opposite_triangle_side,
-     &                        scaleheight
-          real, parameter :: 
-     &          SOLAR_GALACTOCENTRIC_DISTANCE = 8.5,
-     &          THICK_DISK_SCALELENGTH = 3.0
+     &            pole_projection, 
+     &            plane_projection, 
+     &            galactocentric_distance,
+     &            opposite_triangle_side,
+     &            scaleheight
+          real, parameter :: SOLAR_GALACTOCENTRIC_DISTANCE = 8.5,
+     &                       THICK_DISK_SCALELENGTH = 3.0
   
           pole_projection = distance * abs(sin(latitude))
           plane_projection = distance * abs(cos(latitude))
           
           galactocentric_distance  = opposite_triangle_side(
-     &                                  plane_projection, 
-     &                                  SOLAR_GALACTOCENTRIC_DISTANCE, 
-     &                                  longitude)
+     &                                   plane_projection, 
+     &                                   SOLAR_GALACTOCENTRIC_DISTANCE, 
+     &                                   longitude)
   
           density = distance * distance
-     &            * exp(-abs(pole_projection) / scaleheight)
-     &            * exp(-abs(galactocentric_distance)
-     &                         / THICK_DISK_SCALELENGTH)
+     &              * exp(-abs(pole_projection) / scaleheight)
+     &              * exp(-abs(galactocentric_distance)
+     &                     / THICK_DISK_SCALELENGTH)
       end function
 
 

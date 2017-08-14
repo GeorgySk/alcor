@@ -166,35 +166,36 @@ C         TODO: rename VRR to VR
           ugriz_z_apparent = ugriz_z - 5.0 + 5.0 * (log10(rgac(i)) 
      &                                              + 3.0)
 
-C           call errfot(ugriz_u_apparent,
-C      &                ugriz_u_apparent_w_error,
-C      &                1)
-C           call errfot(ugriz_g_apparent(i),
-C      &                ugriz_g_apparent_w_error,
-C      &                2)
-C C         TODO: figure out what to do with commons
-C           ugriz_g_apparent(i) = ugriz_g_apparent_w_error
-C           call errfot(ugriz_r_apparent,
-C      &                ugriz_r_apparent_w_error,
-C      &                3)
-C           call errfot(ugriz_i_apparent,
-C      &                ugriz_i_apparent_w_error,
-C      &                4)
-C           call errfot(ugriz_z_apparent,
-C      &                ugriz_z_apparent_w_error,
-C      &                5)
+          call errfot(ugriz_u_apparent,
+     &                ugriz_u_apparent_w_error,
+     &                1)
+          call errfot(ugriz_g_apparent(i),
+     &                ugriz_g_apparent_w_error,
+     &                2)
+          call errfot(ugriz_r_apparent,
+     &                ugriz_r_apparent_w_error,
+     &                3)
+          call errfot(ugriz_i_apparent,
+     &                ugriz_i_apparent_w_error,
+     &                4)
+          call errfot(ugriz_z_apparent,
+     &                ugriz_z_apparent_w_error,
+     &                5) 
+
+C         TODO: figure out what to do with commons
+          ugriz_g_apparent(i) = ugriz_g_apparent_w_error
 
 C         TODO: this is another way to calculate phot.error. do smth
-          ugriz_u_apparent_w_error = ugriz_u_apparent 
-     &                               + 0.1 * gasdev(iseed)
-          ugriz_g_apparent_w_error = ugriz_g_apparent(i) 
-     &                               + 0.025 * gasdev(iseed)
-          ugriz_r_apparent_w_error = ugriz_r_apparent 
-     &                               + 0.025 * gasdev(iseed)
-          ugriz_i_apparent_w_error = ugriz_i_apparent 
-     &                               + 0.05 * gasdev(iseed)
-          ugriz_z_apparent_w_error = ugriz_z_apparent 
-     &                               + 0.1 * gasdev(iseed)
+C           ugriz_u_apparent_w_error = ugriz_u_apparent 
+C      &                               + 0.1 * gasdev(iseed)
+C           ugriz_g_apparent_w_error = ugriz_g_apparent(i) 
+C      &                               + 0.025 * gasdev(iseed)
+C           ugriz_r_apparent_w_error = ugriz_r_apparent 
+C      &                               + 0.025 * gasdev(iseed)
+C           ugriz_i_apparent_w_error = ugriz_i_apparent 
+C      &                               + 0.05 * gasdev(iseed)
+C           ugriz_z_apparent_w_error = ugriz_z_apparent 
+C      &                               + 0.1 * gasdev(iseed)
 
           ugriz_ug(i) = ugriz_u_apparent_w_error 
      &                  - ugriz_g_apparent_w_error

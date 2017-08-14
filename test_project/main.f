@@ -65,9 +65,20 @@ C     For terminal:
       character(len = 100) :: output_filename
       character(len = 6) :: geometry
       real :: cone_height_longitude,
-     &                    cone_height_latitude
+     &        cone_height_latitude
+      real, allocatable :: cone_height_longitudes(:),
+     &                     cone_height_latitudes(:)
       real :: min_longitude, max_longitude, min_latitude,
-     &                    max_latitude     
+     &                    max_latitude
+      logical :: is_numeric, longitudes_from_csv, latitudes_from_csv
+      integer :: iterations_count, getNumberOfLines
+
+          character(len=:), allocatable :: filename
+          character(len=:), allocatable :: column_number_str
+          character(len=50), allocatable :: junk(:)
+          integer :: dash_index
+          integer :: column_number
+          integer :: lines_count
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
@@ -78,21 +89,7 @@ C     NOTE: use of commons is strongly discouraged!
 
 C     --- Filling info about groups of files (cooling, color tables) ---    
 C ======================================================================
-      call fillTable(table)
-   
-
-C     ---Reading parameters line from $temporary_files/grid_set_line.in
-C ======================================================================
-C       read (10,*) fractionOfDB,galacticDiskAge,parameterIMF,
-C      &            parameterIFMR,timeOfBurst
-
-C     Overwriting parameters
-C     NOTE: this is not good
-C       fractionOfDB=0.20 
-C       galacticDiskAge=8.9
-C       parameterIMF=-2.35
-C       parameterIFMR=1.0
-C       timeOfBurst=0.6     
+      call fillTable(table) 
 
 C     Terminal reading:
       num_args = iargc()
@@ -135,17 +132,64 @@ C           call get_command_argument(i, args(i))
               call getarg(i + 1, geometry)
             case ('-cl')
               call getarg(i + 1, temp_string)
-              read(temp_string, *) cone_height_longitude
+              if (is_numeric(temp_string) .eqv. .TRUE.) then
+                  longitudes_from_csv = .FALSE.
+                  allocate(cone_height_longitudes(1))
+                  read(temp_string, *) cone_height_longitudes(1)
+              else
+                  longitudes_from_csv = .TRUE.
+                  dash_index = index(string=temp_string, substring='-', 
+     &                               back=.true.)
+                  filename = temp_string(1 : dash_index - 1)
+                  column_number_str = temp_string(
+     &                dash_index + 1 : len(temp_string))
+                  read(column_number_str, *) column_number
+                  allocate(junk(column_number - 1))
+                  lines_count = getNumberOfLines(filename)
+                  allocate(cone_height_longitudes(lines_count))
+                  open(597, file = filename)
+                  do j = 1, lines_count
+                      read(597, *) junk, cone_height_longitudes(j)
+                  end do
+                  close(597)
+                  deallocate(junk)
+              end if
             case ('-cb')
               call getarg(i + 1, temp_string)
-              read(temp_string, *) cone_height_latitude
-          end select
+              if (is_numeric(temp_string) .eqv. .TRUE.) then
+                  latitudes_from_csv = .FALSE.
+                  allocate(cone_height_latitudes(1))
+                  read(temp_string, *) cone_height_latitudes(1)
+              else
+                  latitudes_from_csv = .TRUE.
+                  dash_index = index(string=temp_string, substring='-', 
+     &                               back=.true.)
+                  filename = temp_string(1 : dash_index - 1)
+                  column_number_str = temp_string(
+     &                dash_index + 1 : len(temp_string))
+                  read(column_number_str, *) column_number
+                  allocate(junk(column_number - 1))
+                  lines_count = getNumberOfLines(filename)
+                  allocate(cone_height_latitudes(lines_count))
+                  open(597, file = filename)
+                  do j = 1, lines_count
+                      read(597, *) junk, cone_height_latitudes(j)
+                  end do
+                  close(597)
+                  deallocate(junk)
+              end if
+            end select
         end do
+      end if
+
+      if (geometry == 'sphere') then
+          allocate(cone_height_latitudes(1))
+          allocate(cone_height_longitudes(1))
       end if
 
       write(6,*) '=========================================='
       write(6,*) ' '
-      write(6,*) '            Programa monte.f'
+      write(6,*) '            Program monte.f'
       write(6,*) '          by S.Torres, 14.02.11 '
       write(6,*) ' '
       write(6,*) '            Used parameters:'
@@ -195,12 +239,6 @@ C     This style ensures maximum precision when assigning a value to PI.
       pi=4.0*atan(1.0)
       areaOfSector=pi*radiusOfSector**2
 
-C     converting cone height parameters from deg to rad      
-      if (geometry == 'cone') then
-        cone_height_longitude = cone_height_longitude * pi / 180.0
-        cone_height_latitude = cone_height_latitude * pi / 180.0
-      end if
-
 C     ---  Program itself  ---
 C ======================================================================
       write(6,*) '1. Reading the cooling tables (1/9)'
@@ -229,62 +267,133 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
       write (6,*) '   1.5 Reading the tables of CO DA with G variable'      
       call incoolea
 
-      write(6,*) '2. Calling the IMF and SFR (2/9)'
-      if (geometry == 'sphere') then
-        call gen(iseed,parameterOfSFR,areaOfSector,
-     &           numberOfStarsInSample,galacticDiskAge,timeOfBurst,
-     &           massReductionFactor,kinematicModel)
-      else if (geometry == 'cone') then
-        call generate_cone_stars(cone_height_longitude,
-     &                           cone_height_latitude,
-     &                           numberOfStarsInSample,iseed,
-     &                           kinematicModel,galacticDiskAge,
-     &                           min_longitude, max_longitude,
-     &                           min_latitude, max_latitude)
-      else 
-        write(6,*) "wrong geometry name, use 'sphere' or 'cone'"
+      if ((longitudes_from_csv .eqv. .false.) .and. 
+     &      (latitudes_from_csv .eqv. .false.)) then
+          iterations_count = 1
+      else if ((longitudes_from_csv .eqv. .true.) .and. 
+     &         (latitudes_from_csv .eqv. .false.)) then
+          iterations_count = size(cone_height_longitudes)
+      else if ((longitudes_from_csv .eqv. .false.) .and. 
+     &         (latitudes_from_csv .eqv. .true.)) then
+          iterations_count = size(cone_height_latitudes)
+      else
+          iterations_count = size(cone_height_latitudes)
+          if (size(cone_height_latitudes) 
+     &        /= size(cone_height_longitudes)) then
+          end if
       end if
-      write(6,*) "numberOfStarsInSample=", numberOfStarsInSample
+
+C     TODO: add choosing what output we want to get
+      open(421, file = output_filename)
+      if (geometry == 'sphere') then
+          write(421, *) 'luminosity ',
+     &                  'proper_motion ',
+     &                  'proper_motion_component_b ',
+     &                  'proper_motion_component_l ',
+     &                  'proper_motion_component_vr ',
+     &                  'right_ascension ',
+     &                  'declination ',
+     &                  'galactic_distance ',
+     &                  'galactic_latitude ',
+     &                  'galactic_longitude ',
+     &                  'ugriz_g_apparent ',
+     &                  'ugriz_ug ',    
+     &                  'ugriz_gr ',    
+     &                  'ugriz_ri ',
+     &                  'v_photometry ',
+     &                  'ugriz_iz ',
+     &                  'v_photometry ',
+     &                  'velocity_u ',
+     &                  'velocity_v ',
+     &                  'velocity_w ',
+     &                  'spectral_type ',
+     &                  'disk_belonging'
+      else if (geometry == 'cones') then
+          write(421, *) 'velocity_u ',
+     &                  'velocity_v ',
+     &                  'velocity_w ',
+     &                  'galactic_distance ',
+     &                  'galactic_longitude ',
+     &                  'galactic_latitude ',
+     &                  'ugriz_g_apparent ',
+     &                  'ugriz_ug ',
+     &                  'ugriz_gr ',
+     &                  'ugriz_ri ',
+     &                  'ugriz_iz ',
+     &                  'disk_belonging ',
+     &                  'spectral_type'
+      end if
+      close(421)
+
+      do i = 1, iterations_count
+          print *, 'Iteration Nº', i
+C         converting cone height parameters from deg to rad      
+          if (geometry == 'cones') then
+              cone_height_longitudes(i) = cone_height_longitudes(i) 
+     &                                    * pi / 180.0
+              cone_height_latitudes(i) = cone_height_latitudes(i) 
+     &                                   * pi / 180.0
+          end if
+
+          write(6,*) '2. Calling the IMF and SFR (2/9)'
+          if (geometry == 'sphere') then
+              call gen(iseed,parameterOfSFR,areaOfSector,
+     &                 numberOfStarsInSample,galacticDiskAge,
+     &                 timeOfBurst,massReductionFactor,kinematicModel)
+          else if (geometry == 'cones') then
+              call generate_cone_stars(cone_height_longitudes(i),
+     &                                 cone_height_latitudes(i),
+     &                                 numberOfStarsInSample,iseed,
+     &                                 kinematicModel,galacticDiskAge,
+     &                                 min_longitude, max_longitude,
+     &                                 min_latitude, max_latitude)
+          else 
+              write(6,*) "wrong geometry name, use 'sphere' or 'cones'"
+          end if
+          write(6,*) "numberOfStarsInSample=", numberOfStarsInSample
       
-      write(6,*) '3. Calculating luminosities (3/9)'
-      call lumx(iseed,numberOfStarsInSample)      
+          write(6,*) '3. Calculating luminosities (3/9)'
+          call lumx(iseed,numberOfStarsInSample)      
 
-      ! if cone then we already calculated them
-      if (geometry == 'sphere') then
-        write(6,*) '4. Calculating polar coordinates (4/9)'
-        call polar(iseed,minimumSectorRadius,maximumSectorRadius,
-     &         angleCoveringSector,radiusOfSector,
-     &         solarGalactocentricDistance,scaleLength)
-      end if
+          ! if cone then we already calculated them
+          if (geometry == 'sphere') then
+              write(6,*) '4. Calculating polar coordinates (4/9)'
+              call polar(iseed,minimumSectorRadius,maximumSectorRadius,
+     &                   angleCoveringSector,radiusOfSector,
+     &                   solarGalactocentricDistance,scaleLength)
+          end if
 
-      write(6,*) '5. Generating heliocentric velocities (5/9)'
-      call velh(iseed,numberOfStarsInSample,geometry)
+          write(6,*) '5. Generating heliocentric velocities (5/9)'
+          call velh(iseed,numberOfStarsInSample,geometry)
 
-C     QUESTION: why are we missing the next step?
-      goto 7
-C     QUESTION: what does this mean?
-C     ---  Calculating the trajectories according to/along z-coordinate
-      write(6,*) '6. Integrating trajectories (6/9)'
-      call traject(galacticDiskAge)
+C         TODO: find out why are we missing the next step?
+          goto 7
+C         TODO: find out what this means
+C         Calculating the trajectories according to/along z-coordinate
+          write(6,*) '6. Integrating trajectories (6/9)'
+          call traject(galacticDiskAge)
 
-7     write(6,*) '7. Calculating coordinates (7/9)'
-      call coor(solarGalactocentricDistance)
+7         write(6,*) '7. Calculating coordinates (7/9)'
+          call coor(solarGalactocentricDistance)
 
-      write(6,*) '8. Determinating visual magnitudes (8/9)'
-      call magi(fractionOfDB,table) 
+          write(6,*) '8. Determinating visual magnitudes (8/9)'
+          call magi(fractionOfDB,table) 
 
-C     TODO: give a better description to this step
-C     NOTE: This will be in a separate processing module
-C       write(6,*) '9. Working with obtained sample (9/9)'
-C       call volum_40pc
-      call printForProcessing(output_filename, geometry, iseed,
+C         TODO: redo checking processed cones
+          call printForProcessing(output_filename, geometry, iseed,
      &         min_longitude, max_longitude, min_latitude, max_latitude,
-     &         solarGalactocentricDistance,cone_height_longitude,
-     &         cone_height_latitude)
-
-
-      write (6,*) 'End'
+     &         solarGalactocentricDistance,cone_height_longitudes(i),
+     &         cone_height_latitudes(i))
+          open(765, file='processed_cones.txt')
+          write(unit=765,fmt=*) cone_height_longitudes(i),
+     &                          cone_height_latitudes(i)
+          close(765)
+          print *, "_______________END OF ITERATION____________________"
+      end do
+      open  (unit=765, file="processed_cones.txt", status="old")
+      close (unit=765, status="delete")
  
+      write (6,*) 'End'
 
       stop
       end
@@ -496,32 +605,8 @@ C      &, ugriz_g_apparent
       stars_counter = 0
       eliminations_counter = 0
 
+      open(421, file = output_filename, access='append')
       if (geometry == 'sphere') then
-
-          open(421, file = output_filename)
-
-          write(421, *) 'luminosity ',
-     &                  'proper_motion ',
-     &                  'proper_motion_component_b ',
-     &                  'proper_motion_component_l ',
-     &                  'proper_motion_component_vr ',
-     &                  'right_ascension ',
-     &                  'declination ',
-     &                  'galactic_distance ',
-     &                  'galactic_latitude ',
-     &                  'galactic_longitude ',
-     &                  'ugriz_g_apparent ',
-     &                  'ugriz_ug ',    
-     &                  'ugriz_gr ',    
-     &                  'ugriz_ri ',
-     &                  'ugriz_iz ',
-     &                  'v_photometry ',
-     &                  'velocity_u ',
-     &                  'velocity_v ',
-     &                  'velocity_w ',
-     &                  'spectral_type ',
-     &                  'disk_belonging'
-
           do i = 1, numberOfWDs
               write(421, *) luminosityOfWD(i),
      &                      properMotion(i),
@@ -546,182 +631,167 @@ C                           TODO: better save ubvri, ugriz is derivative
      &                      typeOfWD(i),
      &                      disk_belonging(i)
           end do
-      else if (geometry == 'cone') then
-
-C          TODO: delete this if Postgres is ok with checking cones
-C          open(421,file='cone_stars_catalog.csv',access='append')
-         open(421,file=output_filename)
-
-         write(421, *) 'velocity_u ',
-     &                 'velocity_v ',
-     &                 'velocity_w ',
-     &                 'galactic_distance ',
-     &                 'galactic_longitude ',
-     &                 'galactic_latitude ',
-     &                 'ugriz_g_apparent ',
-     &                 'ugriz_ug ',
-     &                 'ugriz_gr ',
-     &                 'ugriz_ri ',
-     &                 'ugriz_iz ',
-     &                 'disk_belonging ',
-     &                 'spectral_type'
-
-C        TODO:this should be in processing. move it there when Cas is ok
+      else if (geometry == 'cones') then
          if (with_overlapping_checking .eqv. .true.) then
-           write(6,*) 'Overlapping checking is on'
-           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
-           min_longitude = cone_height_longitude - delta_longitude/2.0
-           max_longitude = cone_height_longitude + delta_longitude/2.0
-           min_latitude = cone_height_latitude - DELTA_LATITUDE/2.0
-           max_latitude = cone_height_latitude + DELTA_LATITUDE/2.0
-           write(6,*) 'Current angles:'
-           write(6,*) 'L min: ', min_longitude * 180.0 / pi
-           write(6,*) 'L max: ', max_longitude * 180.0 / pi 
-           write(6,*) 'B min: ', min_latitude * 180.0 / pi
-           write(6,*) 'B max: ', max_latitude * 180.0 / pi
+             delta_longitude = DELTA_LATITUDE 
+     &                         / cos(cone_height_latitude)
+             min_longitude = cone_height_longitude - delta_longitude/2.0
+             max_longitude = cone_height_longitude + delta_longitude/2.0
+             min_latitude = cone_height_latitude - DELTA_LATITUDE/2.0
+             max_latitude = cone_height_latitude + DELTA_LATITUDE/2.0
 
-           processed_cones_count 
-     &         = getNumberOfLines('processed_cones.txt')
-           write(6,*) 'Processed cones: ', processed_cones_count 
-           allocate(overlap_min_longitudes(processed_cones_count))
-           allocate(overlap_max_longitudes(processed_cones_count))
-           allocate(overlap_min_latitudes(processed_cones_count))
-           allocate(overlap_max_latitudes(processed_cones_count))
+             processed_cones_count 
+     &           = getNumberOfLines('processed_cones.txt')
+             write(6,*) 'Processed cones: ', processed_cones_count 
+             allocate(overlap_min_longitudes(processed_cones_count))
+             allocate(overlap_max_longitudes(processed_cones_count))
+             allocate(overlap_min_latitudes(processed_cones_count))
+             allocate(overlap_max_latitudes(processed_cones_count))
 
-           open(765, file='processed_cones.txt')
-           do i = 1, processed_cones_count
-            read(765,*) prev_cone_longitude, prev_cone_latitude
-            prev_cone_longitude = prev_cone_longitude * pi / 180.0
-            prev_cone_latitude = prev_cone_latitude * pi / 180.0
+             open(765, file='processed_cones.txt')
+             do i = 1, processed_cones_count
+                 read(765,*) prev_cone_longitude, prev_cone_latitude
 
-            delta_longitude=DELTA_LATITUDE/cos(prev_cone_latitude)
-            prev_min_longitude=prev_cone_longitude-delta_longitude/2.0
-            prev_max_longitude=prev_cone_longitude+delta_longitude/2.0
-            prev_min_latitude=prev_cone_latitude - DELTA_LATITUDE/2.0
-            prev_max_latitude=prev_cone_latitude + DELTA_LATITUDE/2.0
+                 delta_longitude=DELTA_LATITUDE/cos(prev_cone_latitude)
+                 prev_min_longitude 
+     &               = prev_cone_longitude-delta_longitude / 2.0
+                 prev_max_longitude = prev_cone_longitude 
+     &                                + delta_longitude / 2.0
+                 prev_min_latitude = prev_cone_latitude 
+     &                               - DELTA_LATITUDE / 2.0
+                 prev_max_latitude = prev_cone_latitude 
+     &                               + DELTA_LATITUDE / 2.0
 
-            if (min_longitude < (prev_max_longitude - 2.0*pi) 
-     &          .and. min_longitude < 0.0) then
-                   prev_min_longitude = prev_min_longitude - 2.0*pi
-                   prev_max_longitude = prev_max_longitude - 2.0*pi
-            end if
-            if (prev_min_longitude < (max_longitude - 2.0*pi)
-     &          .and. prev_min_longitude < 0.0) then
-                   min_longitude = min_longitude - 2.0*pi
-                   max_longitude = max_longitude - 2.0*pi
-            end if
+                 if (min_longitude < (prev_max_longitude - 2.0*pi) 
+     &                   .and. min_longitude < 0.0) then
+                     prev_min_longitude = prev_min_longitude - 2.0*pi
+                     prev_max_longitude = prev_max_longitude - 2.0*pi
+                 end if
+                 if (prev_min_longitude < (max_longitude - 2.0*pi)
+     &                   .and. prev_min_longitude < 0.0) then
+                     min_longitude = min_longitude - 2.0*pi
+                     max_longitude = max_longitude - 2.0*pi
+                 end if
 
-            longitude_overlapping = .false.
-            latitude_overlapping = .false.
-C            write(6,*) 'L overlap before check ', longitude_overlapping
-C            write(6,*) 'B overlap before check ', latitude_overlapping
-            if (((prev_min_longitude <= min_longitude) .and.
-     &           (min_longitude <= prev_max_longitude)) 
-     &          .or. ((prev_min_longitude <= max_longitude) .and.
-     &                (max_longitude <= prev_max_longitude))
-     &          .or. ((min_longitude <= prev_min_longitude) .and.
-     &                (prev_min_longitude<= max_longitude))
-     &          .or. ((min_longitude <= prev_max_longitude) .and.
-     &                (prev_max_longitude<= max_longitude))) then
-                    longitude_overlapping = .true.
-C                     write(6,*) 'LONGITUDE OVERLAPPING'
-            end if
-            if (((prev_min_latitude <= min_latitude) .and.
-     &            (min_latitude <= prev_max_latitude))
-     &           .or. ((prev_min_latitude <= max_latitude) .and.
-     &            (max_latitude <= prev_max_latitude))
-     &           .or. ((min_latitude <= prev_min_latitude) .and.
-     &            (prev_min_latitude <= max_latitude))
-     &           .or. ((min_latitude <= prev_max_latitude) .and.
-     &            (prev_max_latitude <= max_latitude))) then
-                    latitude_overlapping = .true.
-C                     write(6,*) 'LATITUDE OVERLAPPING'
-            end if
+                 longitude_overlapping = .false.
+                 latitude_overlapping = .false.
 
-            if ((longitude_overlapping .eqv. .true.) 
-     &          .and. (latitude_overlapping .eqv. .true.)) then
+                 if (((prev_min_longitude <= min_longitude) .and.
+     &                (min_longitude <= prev_max_longitude)) 
+     &               .or. ((prev_min_longitude <= max_longitude) .and.
+     &                     (max_longitude <= prev_max_longitude))
+     &               .or. ((min_longitude <= prev_min_longitude) .and.
+     &                     (prev_min_longitude<= max_longitude))
+     &               .or. ((min_longitude <= prev_max_longitude) .and.
+     &                     (prev_max_longitude<= max_longitude))) then
+                         longitude_overlapping = .true.
+                 end if
 
-C              write(6,*) 'L overlap after check', longitude_overlapping
-C              write(6,*) 'B overlap after check', latitude_overlapping
-              overlappings = overlappings + 1
+                 if (((prev_min_latitude <= min_latitude) .and.
+     &                 (min_latitude <= prev_max_latitude))
+     &                .or. ((prev_min_latitude <= max_latitude) .and.
+     &                 (max_latitude <= prev_max_latitude))
+     &                .or. ((min_latitude <= prev_min_latitude) .and.
+     &                 (prev_min_latitude <= max_latitude))
+     &                .or. ((min_latitude <= prev_max_latitude) .and.
+     &                 (prev_max_latitude <= max_latitude))) then
+                         latitude_overlapping = .true.
+                 end if
 
-              overlap_min_longitudes(overlappings) = prev_min_longitude
-              overlap_max_longitudes(overlappings) = prev_max_longitude
-              overlap_min_latitudes(overlappings) = prev_min_latitude
-              overlap_max_latitudes(overlappings) = prev_max_latitude
+                 if ((longitude_overlapping .eqv. .true.) 
+     &                   .and. (latitude_overlapping .eqv. .true.)) then
+                     overlappings = overlappings + 1
+    
+                     overlap_min_longitudes(overlappings) 
+     &                   = prev_min_longitude
+                     overlap_max_longitudes(overlappings) 
+     &                   = prev_max_longitude
+                     overlap_min_latitudes(overlappings) 
+     &                   = prev_min_latitude
+                     overlap_max_latitudes(overlappings) 
+     &                   = prev_max_latitude
+    
+                     write(6,*) 'Overlapping with cone: ', i
+                 end if
+             end do
 
-              write(6,*) 'Overlapping with line: ', i
-C              write(6,*) 'Prev Lmin: ', prev_min_longitude * 180.0 / pi
-C              write(6,*) 'Prev Lmax: ', prev_max_longitude * 180.0 / pi
-C              write(6,*) 'Prev Bmin: ', prev_min_latitude * 180.0 / pi
-C              write(6,*) 'Prev Bmax: ', prev_max_latitude * 180.0 / pi
-            end if
-           end do
+             write(6,*) 'Overlappings count:', overlappings
 
-           write(6,*) 'Overlappings count:', overlappings
+             do i = 1, numberOfWDs
+                 ros = solarGalactocentricDistance 
+     &                 * solarGalactocentricDistance + coordinate_R(i) 
+     &                                                 * coordinate_R(i)
+     &                 - 2.d0 * coordinate_R(i) 
+     &                   * solarGalactocentricDistance 
+     &                   * dcos(coordinate_Theta(i))
+                 ros = dsqrt(ros)
+C                TODO: figure out what to do with ill-conditioned cases            
+                 if ((solarGalactocentricDistance ** 2 + ros**2
+     &                - coordinate_R(i) ** 2)
+     &               / (2.0 * solarGalactocentricDistance * ros) > 1.0) 
+     &           then
+                     longitude = 0.0
+                 else
+                     longitude = dacos((solarGalactocentricDistance ** 2
+     &                                  + ros**2
+     &                                  - coordinate_R(i) ** 2)
+     &                                 / (2.0d0 
+     &                                    * solarGalactocentricDistance 
+     &                                    * ros))
+                 end if
+                 zzx=coordinate_Zcylindr(i)/ros
+                 latitude = atan(zzx)
+                 if (coordinate_R(i) > 8.739 .and. 
+     &                    coordinate_R(i) < 8.74) then
+                      print *, 'Main L,B = ', longitude, latitude
+                      print *, 'corr R = ', coordinate_R(i)
+                      print *, 'corr T = ', coordinate_Theta(i)
+                      print *, 'corr Z = ', coordinate_Zcylindr(i)
+                  end if
+C                TODO: i am confused about how all this works now.
+C                the reason for these conditions is that for angles > pi
+C                longitude is simmetrically reflected on the top half-plane
+                 if (coordinate_Theta(i) < 0
+     &                  .and. cone_height_longitude > 3.0 * pi / 2) then
+                     longitude = 2.0 * pi - longitude
+                 end if
+                 if (coordinate_Theta(i) > 0 
+     &                  .and. cone_height_longitude > 3.0 * pi / 2) then
+                     longitude = 2.0 * pi + longitude
+                 end if
+                 if (coordinate_Theta(i) < 0 
+     &                   .and. cone_height_longitude < pi / 2) then
+                     longitude = -longitude
+                 end if
+                 if (coordinate_Theta(i) < 0 
+     &                   .and. cone_height_longitude < 3.0 * pi / 2
+     &                   .and. cone_height_longitude > pi / 2) then
+                     longitude = 2.0 * pi - longitude
+                 end if
+C                if cone crosses 2pi, move it -2pi
+                 if (max_longitude > 2 * pi) then
+                     longitude = longitude - 2 * pi
+                 end if
 
-           do i = 1, numberOfWDs
-            ros = solarGalactocentricDistance 
-     &            * solarGalactocentricDistance + coordinate_R(i) 
-     &                                            * coordinate_R(i)
-     &            - 2.d0 * coordinate_R(i) 
-     &              * solarGalactocentricDistance 
-     &              * dcos(coordinate_Theta(i))
-            ros = dsqrt(ros)
-C           TODO: figurre out what to do with ill-conditioned cases            
-            if ((solarGalactocentricDistance ** 2 + ros**2
-     &           - coordinate_R(i) ** 2)
-     &          /(2.0 * solarGalactocentricDistance * ros) > 1.0) then
-              longitude = 0.0
-            else
-            longitude = dacos((solarGalactocentricDistance ** 2 + ros**2
-     &                         - coordinate_R(i) ** 2)
-     &                  /(2.0d0 * solarGalactocentricDistance * ros))
-            end if
-            zzx=coordinate_Zcylindr(i)/ros
-            latitude = atan(zzx)
-C           TODO: i am confused about how all this works now.
-C           the reason for these conditions is that for angles > pi
-C           longitude is simmetrically reflected on the top half-plane
-            if (coordinate_Theta(i) < 0
-     &          .and. cone_height_longitude > 3.0 * pi / 2) then
-                longitude = 2.0 * pi - longitude
-            end if
-            if (coordinate_Theta(i) > 0 
-     &          .and. cone_height_longitude > 3.0 * pi / 2) then
-                longitude = 2.0 * pi + longitude
-            end if
-            if (coordinate_Theta(i) < 0 
-     &          .and. cone_height_longitude < pi / 2) then
-                longitude = -longitude
-            end if
-            if (coordinate_Theta(i) < 0 
-     &          .and. cone_height_longitude < 3.0 * pi / 2
-     &          .and. cone_height_longitude > pi / 2) then
-                longitude = 2.0 * pi - longitude
-            end if
-C           if cone crosses 2pi, move it -2pi
-            if (max_longitude > 2 * pi) then
-                longitude = longitude - 2 * pi
-            end if
-
-            star_in_intersection = .false.
-            if (overlappings > 0) then
-              do j = 1, overlappings
-                if (((overlap_min_longitudes(j) < longitude) .and.
-     &                      (longitude < overlap_max_longitudes(j)))
-     &                      .and. ((overlap_min_latitudes(j) 
-     &                           < latitude) .and. 
-     &                      (latitude < overlap_max_latitudes(j)))) then
-                  star_in_intersection = .true.
-                end if
-              end do
-            end if
-            if (star_in_intersection .eqv. .false.) then
-              stars_counter = stars_counter + 1
-C               TODO: uncomment this after ubvri diag-s plotted
-              write(421,"(11(es17.8e3,x),i1,x,i1)") 
-C                 write(421,"(es17.8e3,x,i1,x,i1,x,4(es17.8e3,x))") 
+                 star_in_intersection = .false.
+                 if (overlappings > 0) then
+                     do j = 1, overlappings
+                         if (((overlap_min_longitudes(j) < longitude) 
+     &                        .and. (longitude 
+     &                               < overlap_max_longitudes(j)))
+     &                       .and. ((overlap_min_latitudes(j) 
+     &                                    < latitude) .and. 
+     &                              (latitude 
+     &                               < overlap_max_latitudes(j)))) then
+                             star_in_intersection = .true.
+                         end if
+                     end do
+                 end if
+                 if (star_in_intersection .eqv. .false.) then
+                     stars_counter = stars_counter + 1
+C                    TODO: uncomment this after ubvri diag-s plotted
+                     write(421,"(11(es17.8e3,x),i1,x,i1)") 
+C                    write(421,"(es17.8e3,x,i1,x,i1,x,4(es17.8e3,x))") 
      &                                              uu(i),
      &                                              vv(i),
      &                                              ww(i),
@@ -737,12 +807,16 @@ C                 write(421,"(es17.8e3,x,i1,x,i1,x,4(es17.8e3,x))")
      &                                              typeOfWD(i)
 C                                            TODO: delete this after..
 C      &                                       ,UB(i),BV(i),VRR(i),RI(i)
-            else
-                eliminations_counter = eliminations_counter + 1
-            end if
-           end do
-           write(6, *) 'Recorded stars: ', stars_counter
-           write(6, *) 'Eliminated stars: ', eliminations_counter
+                 else
+                     eliminations_counter = eliminations_counter + 1
+                 end if
+             end do
+             deallocate(overlap_min_longitudes)
+             deallocate(overlap_max_longitudes)
+             deallocate(overlap_min_latitudes)
+             deallocate(overlap_max_latitudes)
+             write(6, *) 'Recorded stars: ', stars_counter
+             write(6, *) 'Eliminated stars: ', eliminations_counter
          else
 
          do i = 1, numberOfWDs
@@ -828,3 +902,43 @@ C     TODO: we need to save u g r i z, not u-g, g-r etc..
         end do
         close(532)
       end function
+
+
+      function is_numeric(string)
+          implicit none
+          character(len=*), intent(in) :: string
+          logical :: is_numeric
+          real :: x
+          integer :: e
+          read(string,'(F50.0)',iostat=e) x
+          is_numeric = e == 0
+      end function
+
+
+      subroutine read_angles(string, angles)
+          implicit none
+          character(len=*), intent(in) :: string
+          real, allocatable, intent(out) :: angles(:)
+          character(len=:), allocatable :: filename
+          character(len=:), allocatable :: column_number_str
+          character(len=50), allocatable :: junk(:)
+          integer :: dash_index
+          integer :: column_number
+          integer :: lines_count, getNumberOfLines
+          integer :: i
+
+          dash_index = index(string=string, substring='-', back=.true.)
+          filename = string(1 : dash_index - 1)
+          column_number_str = string(dash_index + 1 : len(string))
+          read(column_number_str, *) column_number
+          allocate(junk(column_number - 1))
+          lines_count = getNumberOfLines(filename)
+          allocate(angles(lines_count))
+          open(597, file = filename)
+          do i = 1, lines_count
+              read(597, *) junk, angles(i)
+          end do
+          close(597)
+          deallocate(angles)
+          deallocate(junk)
+      end subroutine

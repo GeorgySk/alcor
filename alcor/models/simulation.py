@@ -5,7 +5,6 @@ from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
 from sqlalchemy.sql.sqltypes import (Integer,
-                                     Float,
                                      String,
                                      DateTime)
 
@@ -21,7 +20,7 @@ class Parameter(Base):
                       nullable=False)
     name = Column(String(),
                   nullable=False)
-    value = Column(Float(asdecimal=True),
+    value = Column(String(),
                    nullable=False)
     created_timestamp = Column(DateTime(),
                                server_default=func.now())

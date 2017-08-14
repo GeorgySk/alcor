@@ -3,10 +3,8 @@ import uuid
 from collections import Counter
 from functools import partial
 from itertools import filterfalse
-from math import (pi,
-                  cos)
-from typing import (List,
-                    Tuple)
+from math import pi
+from typing import List
 
 from sqlalchemy.orm.session import Session
 
