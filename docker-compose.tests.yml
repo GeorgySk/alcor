@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  alcor:
+    build: .
+    image: lycantropos/alcor:latest
+    entrypoint: python3
+    volumes:
+      - .:/alcor/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"  # for debugging
+    command: setup.py test
+    environment:
+      - POSTGRES_URI=postgresql://username:password@postgres/alcor
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=alcor
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
