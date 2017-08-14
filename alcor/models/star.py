@@ -1,4 +1,5 @@
 import uuid
+# TODO: figure out if to use Decimal at all or smth else from scipy package
 from decimal import Decimal
 from math import (cos,
                   sin,
@@ -21,6 +22,8 @@ ASTRONOMICAL_UNIT = 4.74
 DEC_GPOLE = 27.128336 * pi / 180.
 RA_GPOLE = 192.859508 * pi / 180.
 AUX_ANGLE = 122.932 * pi / 180.
+
+SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 
 # Description of ugriz color scheme:
 # https://en.wikipedia.org/wiki/Photometric_system
@@ -148,8 +151,10 @@ class Star(Base):
 
     @property
     def bolometric_magnitude(self) -> float:
-        # TODO: find out the meaning of the following constants
-        return 2.5 * float(self.luminosity) + 4.75
+        # For explanations see:
+        # https://en.wikipedia.org/wiki/Absolute_magnitude#Bolometric_magnitude
+        return (2.5 * float(self.luminosity)
+                + SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE)
 
     @property
     def coordinate_x(self) -> float:
