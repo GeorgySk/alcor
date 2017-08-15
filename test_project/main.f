@@ -788,9 +788,7 @@ C                if cone crosses 2pi, move it -2pi
                  end if
                  if (star_in_intersection .eqv. .false.) then
                      stars_counter = stars_counter + 1
-C                    TODO: uncomment this after ubvri diag-s plotted
                      write(421,"(11(es17.8e3,x),i1,x,i1)") 
-C                    write(421,"(es17.8e3,x,i1,x,i1,x,4(es17.8e3,x))") 
      &                                              uu(i),
      &                                              vv(i),
      &                                              ww(i),
@@ -804,8 +802,6 @@ C                    write(421,"(es17.8e3,x,i1,x,i1,x,4(es17.8e3,x))")
      &                                              ugriz_iz(i),
      &                                              disk_belonging(i),
      &                                              typeOfWD(i)
-C                                            TODO: delete this after..
-C      &                                       ,UB(i),BV(i),VRR(i),RI(i)
                  else
                      eliminations_counter = eliminations_counter + 1
                  end if
