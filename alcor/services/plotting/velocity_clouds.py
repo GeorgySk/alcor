@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
@@ -50,7 +52,7 @@ STD_POPULATION_W = 18.1
 
 def plot(session: Session) -> None:
 
-    # TODO: Implement getting last points by time(ok?)
+    # TODO: Implement other fetching functions
     cloud_points = fetch_all_cloud_points(session=session)
 
     velocities_u = [star.velocity_u
@@ -60,7 +62,6 @@ def plot(session: Session) -> None:
     velocities_w = [star.velocity_w
                     for star in cloud_points]
 
-    # TODO: do I need to use sharex or sharey attrs?
     figure, (subplot_uv,
              subplot_uw,
              subplot_vw) = plt.subplots(nrows=3,
@@ -88,7 +89,6 @@ def plot(session: Session) -> None:
                        y=velocities_w,
                        color=CLOUD_COLOR,
                        s=POINT_SIZE)
-    # TODO: check if points count is ok relative to other clouds. I had 35<250
     subplot_vw.scatter(x=velocities_v,
                        y=velocities_w,
                        color=CLOUD_COLOR,
@@ -98,8 +98,9 @@ def plot(session: Session) -> None:
                   subplot_uw,
                   subplot_vw)
 
-    # TODO: why does this apply minorticks only to the last subplot?
-    plt.minorticks_on()
+    subplot_uv.minorticks_on()
+    subplot_uw.minorticks_on()
+    subplot_vw.minorticks_on()
 
     subplot_uv.xaxis.set_ticks_position('both')
     subplot_uv.yaxis.set_ticks_position('both')
@@ -200,12 +201,9 @@ def plot_lepine_case(session: Session):
 
 
 def fetch_all_cloud_points(*,
-                           session: Session):
-    query = (Cloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [Cloud(**record)
-            for record in records]
+                           session: Session) -> List[Cloud]:
+    query = (session.query(Cloud))
+    return query.all()
 
 
 def fetch_all_lepine_case_uv_cloud_points(*,

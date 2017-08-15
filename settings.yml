@@ -1,6 +1,6 @@
 precision: 6
 
-geometry: cones
+geometry: sphere
 
 parameters:
   commons:
