@@ -65,6 +65,7 @@ C     Scale height of the thin disk?
       parameter (hDistr_t = 0.7)
       parameter (hDistr_zf = 0.250)
 C     Scale height of the thick disk:
+C     TODO: this const is also in cone. take it up
       parameter (sheight_thick=0.900)
 C     Parameters of the thick disk
       parameter (ttdisk = 12.0)
@@ -76,8 +77,8 @@ C     Parameters of the thick disk
 C     QUESTION: what is m? massInMainSequence? 
       real m(numberOfStars), 
      &     starBirthTime(numberOfStars),
-     &     heightPattern(numberOfStars),
-     &     flagOfWD(numberOfStars)
+     &     flagOfWD(numberOfStars),
+     &     scale_height
       integer disk_belonging(numberOfStars)
 
       common /tm/ starBirthTime, 
@@ -85,7 +86,6 @@ C     QUESTION: what is m? massInMainSequence?
       common /coorcil/ coordinate_R,
      &                 coordinate_Theta,
      &                 coordinate_Zcylindr
-      common /patron/ heightPattern
       common /index/ flagOfWD,
      &               numberOfWDs,
      &               disk_belonging
@@ -168,28 +168,21 @@ C         --- disk_belonging = 1 (thin disk), = 2 (thick disk)
               t = to + float(i - 1) * deltat + xseed 
               starBirthTime(k) = t
           end if
-       
-C         ---  Calculating the height pattern in kpc ---
-C         ---  model of constant heightPattern  ---
-          if (disk_belonging(k) == 1) then
-              heightPattern(k) = sheight
-          else if (disk_belonging(k) == 2) then
-              heightPattern(k) = sheight_thick
-          else
-              write(6, *) "Error: wrong SFR model"
-          end if
-C         --- model of variable heightPattern  ---
-C           heightPattern(k)=hDistr_zi*dexp(-starBirthTime(k)/hDistr_t)+
-C      &                     hDistr_zf
 
 C         --- Calculating z ---
 C         TODO: delete this goto and put a loop here
-2         xx = zDistribution_zo * heightPattern(k) * ran(iseed)
-          if (xx .eq. 0.0) goto 2 
-          zz = heightPattern(k) * LOG(zDistribution_zo 
-     &                                * heightPattern(k) / xx)
+          if (disk_belonging(k) == 1) then
+              scale_height = sheight
+          else
+              scale_height = sheight_thick
+          end if
 
-C         QUESTION: what is this?
+2         xx = zDistribution_zo * scale_height * ran(iseed)
+          if (xx .eq. 0.0) goto 2 
+          zz = scale_height * LOG(zDistribution_zo 
+     &                            * scale_height / xx)
+
+C         TODO: find out what this is
 C-------------------------------------------------------------------    
 C       z-contstant       zz=0.240*ran(iseed)  
 C-------------------------------------------------------------------    

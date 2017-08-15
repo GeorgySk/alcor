@@ -43,14 +43,12 @@ C--------------------------------------------------------------------
       double precision :: coordinate_R(numberOfStars),
      &                    coordinate_Theta(numberOfStars),
      &                    coordinate_Zcylindr(numberOfStars)
-      real heightPattern(numberOfStars)
       real flagOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
-      real zz(numberOfStars),zh(numberOfStars)
+      real zz(numberOfStars)
       
 C     ---  Commons  ---
       common /vel/ uu,vv,ww
-      common /patron/ heightPattern
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /index/ flagOfWD,numberOfWDs,disk_belonging
 
@@ -64,9 +62,8 @@ C     ---  values from Anguiano et al. 2017
       vo=-12.0
       wo=-7.0
 
-C     ---  Making the transfer of heightPattern, of z  ---
+C     ---  Making the transfer of z  ---
       do 2 i=1,numberOfStarsInSample
-        zh(i)=heightPattern(i)
         zz(i)=coordinate_Zcylindr(i)
 2     continue
 
@@ -74,7 +71,6 @@ C     ---  Making the transfer of heightPattern, of z  ---
       do 3 i=1,numberOfStarsInSample
         if (flagOfWD(i) > 0.95 .and. flagOfWD(i) < 1.05) then
           k=k+1
-          heightPattern(k)=zh(i)
           coordinate_Zcylindr(k)=zz(i)
           if (geometry == 'cones') then
               coordinate_R(k) = coordinate_R(i)
@@ -90,10 +86,6 @@ C     ---  Making the transfer of heightPattern, of z  ---
 C       ---  Calculating the dispersions  ---
 C       ----------------------------------------------------------------      
 C       ---  THIN DISK  ---
-C       ---  model of sigmas depending on h variable
-C         sigma(3)=dsqrt(heightPattern(i)/(6.25d-4))          
-C         sigma(1)=(dsqrt(2.0d0))*sigma(3)
-C         sigma(2)=(dsqrt(0.32+(1.67d-5)*sigma(1)*sigma(1)))*sigma(1)
 C       ---  model of constant sigmas
         if (disk_belonging(i) == 1) then
             sigma(1)=32.4

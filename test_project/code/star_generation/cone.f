@@ -26,7 +26,6 @@ C     with its height direction set by longitude and latitude
           integer, parameter :: numberOfStars = 6000000
           real :: starBirthTime(numberOfStars),
      &                        m(numberOfStars),
-     &                        heightPattern(numberOfStars),
      &                        flagOfWD(numberOfStars)
           double precision :: coordinate_Theta(numberOfStars),
      &                        coordinate_R(numberOfStars),
@@ -77,7 +76,6 @@ C     with its height direction set by longitude and latitude
           common /coorcil/ coordinate_R,
      &                     coordinate_Theta,
      &                     coordinate_Zcylindr
-          common /patron/ heightPattern
           common /index/ flagOfWD,numberOfWDs,disk_belonging
 
           thin_disk_stars_fraction = 1.0 - thick_disk_stars_fraction
@@ -113,8 +111,6 @@ C         TODO: this is a boilerplate
                   stars_count = stars_count + 1
           
                   disk_belonging(stars_count) = 1
-C                 TODO: we don't need to keep this
-                  heightPattern(stars_count) = THIN_DISK_SCALEHEIGHT
           
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
@@ -182,8 +178,6 @@ C                 converting from galactic to cyl.galactocentric
                   stars_count = stars_count + 1
           
                   disk_belonging(stars_count) = 2
-C                 TODO: we don't need this  
-                  heightPattern(stars_count) = THICK_DISK_SCALEHEIGHT
           
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
