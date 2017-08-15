@@ -440,8 +440,6 @@ C***********************************************************************
       include 'code/magnitudes/interp.f'
 
       include 'code/colors/chanco.f'
-
-      include 'code/samples/volum_40pc.f'
       
       include 'code/velocities/vrado.f'
 
