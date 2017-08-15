@@ -51,7 +51,6 @@ STD_POPULATION_W = 18.1
 
 
 def plot(session: Session) -> None:
-
     # TODO: Implement other fetching functions
     cloud_points = fetch_all_cloud_points(session=session)
 
