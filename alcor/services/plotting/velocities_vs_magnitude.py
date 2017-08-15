@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm.session import Session
 import matplotlib
 # See http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
@@ -44,7 +46,7 @@ CSV_DELIMITER = ' '
 
 def plot(session: Session) -> None:
 
-    # TODO: fetch only last by time(ok?) bins
+    # TODO: implement other ways of fetching
     bins = fetch_all_bins(session=session)
 
     avg_bin_magnitudes = [stars_bin.avg_magnitude
@@ -76,7 +78,6 @@ def plot(session: Session) -> None:
                                                      velocities_v_std,
                                                      velocities_w_std))))
 
-    # TODO: do I need to use sharex or sharey attrs?
     figure, (subplot_u,
              subplot_v,
              subplot_w) = plt.subplots(nrows=3,
@@ -119,7 +120,7 @@ def plot(session: Session) -> None:
                        capsize=CAP_SIZE,
                        linewidth=LINEWIDTH)
 
-    # TODO: fetch only last by time(ok?) clouds
+    # TODO: implement other ways of fetching
     clouds = fetch_all_clouds(session=session)
 
     magnitudes = [star.bolometric_magnitude
@@ -304,23 +305,16 @@ def plot_lepine_case(session: Session) -> None:
     plt.savefig(FILENAME)
 
 
-# TODO: implement all this with postgres
 def fetch_all_bins(*,
-                   session: Session):
-    query = (Bin.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [Bin(**record)
-            for record in records]
+                   session: Session) -> List[Bin]:
+    query = (session.query(Bin))
+    return query.all()
 
 
 def fetch_all_clouds(*,
-                     session: Session):
-    query = (Cloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [Cloud(**record)
-            for record in records]
+                     session: Session) -> List[Cloud]:
+    query = (session.query(Cloud))
+    return query.all()
 
 
 def fetch_all_u_vs_mag_bins(*,
