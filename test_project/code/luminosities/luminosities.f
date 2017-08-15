@@ -269,32 +269,24 @@ C-------------------------------------------------------------------
 
       return
       end
-C********************************************************************
       
 
-
-
-
-C     TODO: rewrite
+C     TODO: find out the meaning of the name of the function mmswd
       subroutine mmswd(mass,massOfWD)
-C ======================================================================
-C     IFMR according to model by Catalán et al.2008
-C     combination with the model by Iben for Mi>6Mo
-C=======================================================================
-      implicit real (a-h,m,o-z)
+C         IFMR according to model by Catalán et al.2008
+C         combination with the model by Iben for Mi>6Mo
+          implicit none
 
-      real mass,massOfWD
+          real :: mass,
+     &            massOfWD
       
-      if(mass.lt.2.7)then
-        massOfWD=0.096*mass+0.429
-      elseif((mass.ge.2.7).and.(mass.le.6.0))then
-C       Small correction for continuity
-        massOfWD=0.137*mass+0.3183
-      else
-C       Slope of Iben + continuity in Mi=6Mo
-        massOfWD=0.1057*mass+0.5061
-      end if
-
-      return
-      end
-C***********************************************************************
+          if (mass < 2.7) then
+              massOfWD = 0.096 * mass + 0.429
+          else if ((mass >= 2.7) .and. (mass <= 6.0)) then
+C             Small correction for continuity
+              massOfWD = 0.137 * mass + 0.3183
+          else
+C             Slope of Iben + continuity in Mi=6Mo
+              massOfWD = 0.1057 * mass + 0.5061
+          end if
+      end subroutine
