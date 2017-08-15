@@ -1,6 +1,6 @@
       subroutine gen(iseed,parameterOfSFR,areaOfSector,
      &           numberOfStarsInSample,galacticDiskAge,timeOfBurst,
-     &           massReductionFactor,sfr_model)
+     &           massReductionFactor,thick_disk_stars_fraction)
 C=======================================================================
 C     Divides the SFR in intervals of time. In each interval, the total 
 C     mass of stars is distributed. The mass of each star follows the 
@@ -42,7 +42,7 @@ C     overloading intrinsic 'ran' function by our own RNG
      &     ft,                  fz,
      &     timeOfBurst,         tago, 
      &     tfin,                tsfr,
-     &     ttry,                thick_disk_stars_count_fraction,
+     &     ttry,                thick_disk_stars_fraction,
      &     parameterOfSFR,      areaOfSector,
      &     galacticDiskAge,     cte,
      &     deltat,              massReductionFactor,
@@ -70,7 +70,6 @@ C     Parameters of the thick disk
       parameter (ttdisk = 12.0)
       parameter (tmdisk = 10.0)
       parameter (tau = 2.0)
-      parameter (thick_disk_stars_count_fraction = 0.08)
       double precision :: coordinate_Theta(numberOfStars),
      &                    coordinate_R(numberOfStars),
      &                    coordinate_Zcylindr(numberOfStars)
@@ -151,36 +150,23 @@ C         ---  Ya tenemos la masa  ---
           mgen = mgen + me       
          
 C         --- Birth time from SFR constant  --- 
-C         --- Choosing with what model we generate stars ---
 C         --- disk_belonging = 1 (thin disk), = 2 (thick disk)
-          if (sfr_model == 2) then
-              if (ran(iseed) .le. thick_disk_stars_count_fraction) then
-                  disk_belonging(k) = 2
-                  tmax = tmdisk * exp(-tmdisk / tau)
- 33               ttry = ttdisk * ran(iseed)
-                  ft = ttry * exp(-ttry / tau)
-                  fz = tmax * ran(iseed)
-                  if (fz .le. ft) then
-                      starBirthTime(k) = ttry
-                  else
-                      goto 33
-                  end if
+          if (ran(iseed) .le. thick_disk_stars_fraction) then
+              disk_belonging(k) = 2
+              tmax = tmdisk * exp(-tmdisk / tau)
+ 33           ttry = ttdisk * ran(iseed)
+              ft = ttry * exp(-ttry / tau)
+              fz = tmax * ran(iseed)
+              if (fz .le. ft) then
+                  starBirthTime(k) = ttry
               else
-                  disk_belonging(k) = 1
-                  xseed = deltat * ran(iseed)      
-                  t = to + float(i - 1) * deltat + xseed 
-                  starBirthTime(k) = t
+                  goto 33
               end if
-
-          else if (sfr_model == 1) then 
-C             running ran once more to get same results as for model2 
-              xseed = deltat * ran(iseed)
-              xseed = deltat * ran(iseed)      
-              t = to + float(i - 1)*deltat + xseed 
-              starBirthTime(k) = t
-              disk_belonging(k) = 1
           else
-              write(6,*) 'ERROR: wrong SFR model'
+              disk_belonging(k) = 1
+              xseed = deltat * ran(iseed)      
+              t = to + float(i - 1) * deltat + xseed 
+              starBirthTime(k) = t
           end if
        
 C         ---  Calculating the height pattern in kpc ---

@@ -4,7 +4,7 @@ C     with its height direction set by longitude and latitude
      &                               cone_height_latitude,
      &                               numberOfStarsInSample,
      &                               iseed,
-     &                               kinematicModel,
+     &                               thick_disk_stars_fraction,
      &                               galacticDiskAge,
      &                               min_longitude,
      &                               max_longitude,
@@ -16,11 +16,12 @@ C     with its height direction set by longitude and latitude
           real ran
 
           real :: cone_height_longitude,
-     &                        cone_height_latitude,
-     &                        galacticDiskAge
+     &            cone_height_latitude,
+     &            galacticDiskAge,
+     &            thick_disk_stars_fraction,
+     &            thin_disk_stars_fraction
           integer :: iseed,
-     &               numberOfStarsInSample,
-     &               kinematicModel
+     &               numberOfStarsInSample
 
           integer, parameter :: numberOfStars = 6000000
           real :: starBirthTime(numberOfStars),
@@ -39,9 +40,6 @@ C     with its height direction set by longitude and latitude
      &                       NORMALIZATION_CONE_HEIGHT = 0.2,
      &                       CONE_HEIGHT = 2.0,
      &                       THIN_DISK_DENSITY = 0.095 * 1.0e9,
-     &                       THIN_DISK_STARS_COUNT_FRACTION = 0.92,
-     &                       THICK_DISK_STARS_COUNT_FRACTION = 1.0 
-     &                                 - THIN_DISK_STARS_COUNT_FRACTION,
      &                       THIN_DISK_SCALEHEIGHT = 0.25,
      &                       THICK_DISK_SCALEHEIGHT = 1.5,
      &                       MASS_REDUCTION_FACTOR = 0.003,
@@ -82,6 +80,8 @@ C     with its height direction set by longitude and latitude
           common /patron/ heightPattern
           common /index/ flagOfWD,numberOfWDs,disk_belonging
 
+          thin_disk_stars_fraction = 1.0 - thick_disk_stars_fraction
+
           ! NOTE: this can be infinity
           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
           min_longitude = cone_height_longitude  - delta_longitude / 2.0
@@ -94,114 +94,48 @@ C         TODO: this equals delta_longitude
           total_mass = 0.0
           stars_count = 0
 
-          if (kinematicModel == 1) then
-            normalization_cone_mass=get_cone_mass(cone_height_longitude, 
-     &                                            cone_height_latitude,
-     &                                            THIN_DISK_DENSITY,
-     &                                            THIN_DISK_SCALEHEIGHT)
-            normalization_cone_mass = normalization_cone_mass 
-     &                                * MASS_REDUCTION_FACTOR
+C         TODO: this is a boilerplate
+          if (thin_disk_stars_fraction > 0.0) then
 
-            max_density = get_max_density(cone_height_longitude,
-     &                                    cone_height_latitude,
-     &                                    THIN_DISK_SCALEHEIGHT)
+              normalization_cone_mass = get_cone_mass(
+     &              cone_height_longitude, 
+     &              cone_height_latitude,
+     &              THIN_DISK_DENSITY * thin_disk_stars_fraction,
+     &               THIN_DISK_SCALEHEIGHT)
+              normalization_cone_mass = normalization_cone_mass 
+     &                              * MASS_REDUCTION_FACTOR
 
-              outer_do1: do
-                  stars_count = stars_count + 1
-      
-                  if (stars_count > numberOfStars) then
-                      open(unit=725,file='SKIPPED_PLATES.txt',
-     &                     access='append')
-                      write(unit=725,fmt=*) cone_height_longitude,
-     &                                      cone_height_latitude
-                      stop
-                  end if
+              max_density = get_max_density(cone_height_longitude,
+     &                                      cone_height_latitude,
+     &                                      THIN_DISK_SCALEHEIGHT)
 
-                  disk_belonging(stars_count) = 1
-                  heightPattern(stars_count) = THIN_DISK_SCALEHEIGHT
-      
-C                 assuming uniform distribution
-                  longitude = min_longitude + delta_longitude*ran(iseed)
-                  latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
-      
-                  inner_do1: do
-                      ! Distance between Sun and random point in the cone
-                      distance = CONE_HEIGHT * ran(iseed)
-      
-                      density = get_density(distance,longitude,latitude,
-     &                              THIN_DISK_SCALEHEIGHT)
-      
-                      ! Monte-Carlo accepting/rejecting method
-                      ! QUESTION: can this be outside the inner loop?
-                      random_valid_density = max_density * ran(iseed)
-      
-                      if (random_valid_density <= density) exit
-                  end do inner_do1
-      
-C                 mass
-                  m(stars_count) = generate_star_mass(iseed)
-C                 converting from galactic to cyl.galactocentric
-                  coordinate_R(stars_count) 
-     &                = opposite_triangle_side(
-     &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
-     &                      distance * abs(cos(latitude)), 
-     &                      longitude)
-                  coordinate_Theta(stars_count) 
-     &               = asin(distance*abs(cos(latitude))
-     &                 *sin(longitude)/coordinate_R(stars_count))
-                  coordinate_Zcylindr(stars_count) = distance 
-     &                                               * sin(latitude)
-      
-                  if(distance < NORMALIZATION_CONE_HEIGHT) then
-                      total_mass = total_mass + m(stars_count)
-                  endif
-      
-                  if (total_mass >= normalization_cone_mass) exit
-      
-                  ! Assuming constant star formation rate
-                  starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
-              end do outer_do1
-
-          else if (kinematicModel == 2) then
-
-            normalization_cone_mass=get_cone_mass(cone_height_longitude, 
-     &                                            cone_height_latitude,
-     &               THIN_DISK_DENSITY * THIN_DISK_STARS_COUNT_FRACTION,
-     &                                            THIN_DISK_SCALEHEIGHT)
-            normalization_cone_mass = normalization_cone_mass 
-     &                                * MASS_REDUCTION_FACTOR
-
-            max_density = get_max_density(cone_height_longitude,
-     &                                    cone_height_latitude,
-     &                                    THIN_DISK_SCALEHEIGHT)
-              !running for 92% of thin disk stars:
               outer_do2: do
                   stars_count = stars_count + 1
-      
+          
                   disk_belonging(stars_count) = 1
 C                 TODO: we don't need to keep this
                   heightPattern(stars_count) = THIN_DISK_SCALEHEIGHT
-      
+          
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
                   latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
-      
+          
                   inner_do2: do
                       ! Distance between Sun and random point in the cone
                       distance = CONE_HEIGHT * ran(iseed)
-      
+          
                       density = get_density(distance,
      &                                      longitude,
      &                                      latitude,
      &                                      THIN_DISK_SCALEHEIGHT)
-      
+          
                       ! Monte-Carlo accepting/rejecting method
-                      ! QUESTION: can this be outside the inner loop?
+                      ! TODO: find out if this be outside the inner loop
                       random_valid_density = max_density * ran(iseed)
-      
+          
                       if (random_valid_density <= density) exit
                   end do inner_do2
-      
+          
 C                 mass
                   m(stars_count) = generate_star_mass(iseed)
 C                 converting from galactic to cyl.galactocentric
@@ -215,56 +149,60 @@ C                 converting from galactic to cyl.galactocentric
      &                  *sin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * sin(latitude)
-      
+          
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
-                  endif
-      
+                  end if
+          
                   if (total_mass >= normalization_cone_mass) exit
-      
+          
                   ! Assuming constant star formation rate
                   starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
               end do outer_do2
 
-            total_mass = 0.0
+              total_mass = 0.0
+          end if
 
-            normalization_cone_mass=get_cone_mass(cone_height_longitude, 
-     &                                            cone_height_latitude,
-     &              THIN_DISK_DENSITY * THICK_DISK_STARS_COUNT_FRACTION,
-     &                                          THICK_DISK_SCALEHEIGHT)
-            normalization_cone_mass = normalization_cone_mass 
-     &                                * MASS_REDUCTION_FACTOR
+          if (thick_disk_stars_fraction > 0.0) then
 
-            max_density = get_max_density(cone_height_longitude,
-     &                                    cone_height_latitude,
-     &                                    THICK_DISK_SCALEHEIGHT)
-
+              normalization_cone_mass = get_cone_mass(
+     &            cone_height_longitude, 
+     &            cone_height_latitude,
+     &            THIN_DISK_DENSITY * thick_disk_stars_fraction,
+     &            THICK_DISK_SCALEHEIGHT)
+              normalization_cone_mass = normalization_cone_mass 
+     &                                  * MASS_REDUCTION_FACTOR
+    
+              max_density = get_max_density(cone_height_longitude,
+     &                                      cone_height_latitude,
+     &                                      THICK_DISK_SCALEHEIGHT)
+    
               !running for 8% of thin disk stars:
               outer_do3: do
                   stars_count = stars_count + 1
-      
+          
                   disk_belonging(stars_count) = 2
 C                 TODO: we don't need this  
                   heightPattern(stars_count) = THICK_DISK_SCALEHEIGHT
-      
+          
 C                 assuming uniform distribution
                   longitude = min_longitude + delta_longitude*ran(iseed)
                   latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
-      
+          
                   inner_do3: do
                       ! Distance between Sun and random point in the cone
                       distance = CONE_HEIGHT * ran(iseed)
-      
+          
                       density = get_density(distance,longitude,latitude,
-     &                                      THICK_DISK_SCALEHEIGHT)
-      
+     &                                          THICK_DISK_SCALEHEIGHT)
+          
                       ! Monte-Carlo accepting/rejecting method
-                      ! QUESTION: can this be outside the inner loop?
+                      ! TODO: find out if this can be outside the inner loop
                       random_valid_density = max_density * ran(iseed)
-      
+          
                       if (random_valid_density <= density) exit
                   end do inner_do3
-      
+          
 C                 mass
                   m(stars_count) = generate_star_mass(iseed)
 C                 converting from galactic to cyl.galactocentric
@@ -278,12 +216,11 @@ C                 converting from galactic to cyl.galactocentric
      &                  *sin(longitude)/coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * sin(latitude)
-      
                   if(distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
-                  endif
+                  end if
                   if (total_mass >= normalization_cone_mass) exit
-      
+          
                   ! Assuming constant star formation rate
                   starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
                   tmax = tmdisk * exp(-tmdisk/tau)
@@ -296,7 +233,6 @@ C                 converting from galactic to cyl.galactocentric
                       goto 33
                   end if
               end do outer_do3
-
           end if
 
           numberOfStarsInSample = stars_count

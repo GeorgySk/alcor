@@ -62,7 +62,7 @@ C     For terminal:
       character(len = 30) :: arg
       character(len = 30) :: temp_string
       real :: massReductionFactor
-      integer :: kinematicModel
+      real :: thick_disk_stars_fraction
       character(len = 100) :: output_filename
       character(len = 6) :: geometry
       real :: cone_height_longitude,
@@ -124,9 +124,9 @@ C           call get_command_argument(i, args(i))
             case ("-mr")
               call getarg(i + 1, temp_string)
               read(temp_string, *) massReductionFactor
-            case ("-km")
+            case ("-tdsf")
               call getarg(i + 1, temp_string)
-              read(temp_string, *) kinematicModel
+              read(temp_string, *) thick_disk_stars_fraction
             case ("-o")
               call getarg(i + 1, output_filename)
             case ('-geom')
@@ -339,12 +339,14 @@ C         converting cone height parameters from deg to rad
           if (geometry == 'sphere') then
               call gen(iseed,parameterOfSFR,areaOfSector,
      &                 numberOfStarsInSample,galacticDiskAge,
-     &                 timeOfBurst,massReductionFactor,kinematicModel)
+     &                 timeOfBurst,massReductionFactor,
+     &                 thick_disk_stars_fraction)
           else if (geometry == 'cones') then
               call generate_cone_stars(cone_height_longitudes(i),
      &                                 cone_height_latitudes(i),
      &                                 numberOfStarsInSample,iseed,
-     &                                 kinematicModel,galacticDiskAge,
+     &                                 thick_disk_stars_fraction,
+     &                                 galacticDiskAge,
      &                                 min_longitude, max_longitude,
      &                                 min_latitude, max_latitude)
           else 
@@ -739,13 +741,6 @@ C                TODO: figure out what to do with ill-conditioned cases
                  end if
                  zzx=coordinate_Zcylindr(i)/ros
                  latitude = atan(zzx)
-                 if (coordinate_R(i) > 8.739 .and. 
-     &                    coordinate_R(i) < 8.74) then
-                      print *, 'Main L,B = ', longitude, latitude
-                      print *, 'corr R = ', coordinate_R(i)
-                      print *, 'corr T = ', coordinate_Theta(i)
-                      print *, 'corr Z = ', coordinate_Zcylindr(i)
-                  end if
 C                TODO: i am confused about how all this works now.
 C                the reason for these conditions is that for angles > pi
 C                longitude is simmetrically reflected on the top half-plane

@@ -1,9 +1,6 @@
 precision: 6
 
-# TODO: Change to thick-to-thin disks number of stars fraction
-model_type: 2
-
-geometry: sphere
+geometry: cones
 
 parameters:
   commons:
@@ -17,6 +14,7 @@ parameters:
 #   TODO: apply this for cone also
     mass_reduction_factor: 3.0
   cones:
+    thick_disk_stars_fraction: 0.8
     longitudes:
       csv: ../legacy.csv
       column: 8

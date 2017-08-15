@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 def run_simulations(*,
                     settings: Dict[str, Any],
                     session: Session) -> None:
-    model_type = settings['model_type']
     geometry = settings['geometry']
     precision = settings['precision']
     parameters_info = settings['parameters']
@@ -42,7 +41,6 @@ def run_simulations(*,
         output_file_name = generate_output_file_name(group_id=str(group_id))
 
         run_simulation(parameters_values=parameters_values,
-                       model_type=model_type,
                        geometry=geometry,
                        output_file_name=output_file_name)
 
@@ -68,7 +66,6 @@ def generate_parameters(*,
 
 def run_simulation(*,
                    parameters_values: Dict[str, NumericType],
-                   model_type: int,
                    geometry: str,
                    output_file_name: str) -> None:
     args = ['./main.e',
@@ -78,7 +75,6 @@ def run_simulation(*,
             '-ifr', parameters_values['lifetime_mass_ratio'],
             '-bt', parameters_values['burst_time'],
             '-mr', parameters_values['mass_reduction_factor'],
-            '-km', model_type,
             '-o', output_file_name,
             '-geom', geometry]
     if geometry == 'cones':
@@ -93,8 +89,10 @@ def run_simulation(*,
         except ValueError:
             parameters_values['latitudes'] = os.path.abspath(str(
                 parameters_values['latitudes']))
-        args.extend(['-cl', parameters_values['longitudes'],
-                     '-cb', parameters_values['latitudes']])
+        args.extend([
+            '-cl', parameters_values['longitudes'],
+            '-cb', parameters_values['latitudes'],
+            '-tdsf', parameters_values['thick_disk_stars_fraction']])
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')
