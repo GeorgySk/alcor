@@ -1,3 +1,4 @@
+import logging
 from statistics import (mean,
                         stdev)
 from typing import (Iterable,
@@ -18,13 +19,14 @@ from alcor.types import (StarsBinsType,
                          RowType)
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.0
-# TODO: do we need max for this type of plot? if no - del check for max index
-MAX_BOLOMETRIC_MAGNITUDE = 21.0
+MAX_BOLOMETRIC_MAGNITUDE = 30.0
 BIN_SIZE = 0.5
 BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
                                   - MIN_BOLOMETRIC_MAGNITUDE)
 BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 DEFAULT_VELOCITY_STD = 100.
+
+logger = logging.getLogger(__name__)
 
 
 def generate_clouds(stars: List[Star],
@@ -176,6 +178,9 @@ def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
         index = get_stars_bin_index(star)
         if BINS_COUNT > index >= 0:
             res[index].append(star)
+        else:
+            logger.warning(f'Magnitude is out of bounds: '
+                           f'{star.bolometric_magnitude}')
     return res
 
 
