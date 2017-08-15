@@ -169,7 +169,7 @@ def plot(session: Session) -> None:
 
 def plot_lepine_case(session: Session) -> None:
 
-    # TODO: fetch only last by time(ok?) bins
+    # TODO: implement other fetching functions
     u_vs_mag_bins = fetch_all_u_vs_mag_bins(session=session)
     v_vs_mag_bins = fetch_all_v_vs_mag_bins(session=session)
     w_vs_mag_bins = fetch_all_w_vs_mag_bins(session=session)
@@ -209,7 +209,6 @@ def plot_lepine_case(session: Session) -> None:
                                                      avg_velocities_w,
                                                      velocities_w_std))))
 
-    # TODO: do I need to use sharex or sharey attrs?
     figure, (subplot_u,
              subplot_v,
              subplot_w) = plt.subplots(nrows=3,
@@ -252,7 +251,7 @@ def plot_lepine_case(session: Session) -> None:
                        capsize=CAP_SIZE,
                        linewidth=LINEWIDTH)
 
-    # TODO: fetch only last by time(ok?) clouds
+    # TODO: implement other fetching functions
     u_vs_mag_cloud = fetch_all_u_vs_mag_clouds(session=session)
     v_vs_mag_cloud = fetch_all_v_vs_mag_clouds(session=session)
     w_vs_mag_cloud = fetch_all_w_vs_mag_clouds(session=session)
@@ -305,6 +304,7 @@ def plot_lepine_case(session: Session) -> None:
     plt.savefig(FILENAME)
 
 
+# TODO: write only one function for all of these
 def fetch_all_bins(*,
                    session: Session) -> List[Bin]:
     query = (session.query(Bin))
@@ -318,54 +318,36 @@ def fetch_all_clouds(*,
 
 
 def fetch_all_u_vs_mag_bins(*,
-                            session: Session):
-    query = (LepineCaseUBin.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseUBin(**record)
-            for record in records]
+                            session: Session) -> List[LepineCaseUBin]:
+    query = (session.query(LepineCaseUBin))
+    return query.all()
 
 
 def fetch_all_v_vs_mag_bins(*,
-                            session: Session):
-    query = (LepineCaseVBin.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseVBin(**record)
-            for record in records]
+                            session: Session) -> List[LepineCaseVBin]:
+    query = (session.query(LepineCaseVBin))
+    return query.all()
 
 
 def fetch_all_w_vs_mag_bins(*,
-                            session: Session):
-    query = (LepineCaseWBin.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseWBin(**record)
-            for record in records]
+                            session: Session) -> List[LepineCaseWBin]:
+    query = (session.query(LepineCaseWBin))
+    return query.all()
 
 
 def fetch_all_u_vs_mag_clouds(*,
-                              session: Session):
-    query = (LepineCaseUCloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseUCloud(**record)
-            for record in records]
+                              session: Session) -> List[LepineCaseUCloud]:
+    query = (session.query(LepineCaseUCloud))
+    return query.all()
 
 
 def fetch_all_v_vs_mag_clouds(*,
-                              session: Session):
-    query = (LepineCaseVCloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseVCloud(**record)
-            for record in records]
+                              session: Session) -> List[LepineCaseVCloud]:
+    query = (session.query(LepineCaseVCloud))
+    return query.all()
 
 
 def fetch_all_w_vs_mag_clouds(*,
-                              session: Session):
-    query = (LepineCaseWCloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseWCloud(**record)
-            for record in records]
+                              session: Session) -> List[LepineCaseWCloud]:
+    query = (session.query(LepineCaseWCloud))
+    return query.all()
