@@ -50,6 +50,7 @@ C         mfinal_new=parameterIFMR*mfinal_old
       parameter (minimumSectorRadius=8.45)
       parameter (maximumSectorRadius=8.55)
       parameter (angleCoveringSector=0.674)
+C     TODO: find out if we need this variable or min/max sector radii
       parameter (radiusOfSector=0.050)
       parameter (parameterOfSFR=25.0)
       parameter (scaleLength=3.5)

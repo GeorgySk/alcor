@@ -1,100 +1,129 @@
-C***********************************************************************
-C     TODO: rewrite      
-      subroutine polar(iseed,minimumSectorRadius,maximumSectorRadius,
-     &           angleCoveringSector,radiusOfSector,
-     &           solarGalactocentricDistance,scaleLength)
-C=======================================================================
-C
-C     This subrutina generates the positiones, in polar coordinates, of
-C     the stars.
-C   
-C     Revised in 22.09.07 by S. Torres
-C
-C-----------------------------------------------------------------------
-C     Input parameters:
-C     minimumSectorRadius: minimum radius of the sector; in Kpc from the 
-C                          Galactic Center
-C     maximumSectorRadius: maximum radius
-C     angleCoveringSector: angle covering the sector in degrees;
+      subroutine polar(iseed,
+     &                 minimum_sector_radius,
+     &                 maximum_sector_radius,
+     &                 angle_covering_sector,
+     &                 sector_radius,
+     &                 solar_galactocentric_distance,
+     &                 scale_length)
+C     minimum_sector_radius: minimum radius of the sector; in Kpc from 
+C                            the Galactic Center (GC)
+C     maximum_sector_radius: maximum radius
+C     angle_covering_sector: angle covering the sector in degrees;
 C                          from the GC
-C     QUESTION: did i fail to name this variable correctly?
-C     radiusOfSector: radial distance to the Sun
-C     solarGalactocentricDistance: galactocentric distance of the Sun
-C     scaleLength: scale length
-C     numberOfWDs: total number of WDs
-C=======================================================================
-      implicit real (a-h,m,o-z)
+C     solar_galactocentric_distance: galactocentric distance of the Sun
+      implicit none
 
-C     --- Declaration of variables  ---
       external ran       
-      real ran
-      integer numberOfWDs,iseed,j
-      real dospi,minimumSectorRadius,maximumSectorRadius,
-     &                 angleCoveringSector,radiusOfSector,
-     &                 scaleLength,asr
-      double precision :: solarGalactocentricDistance
-      real drsun2,dist,pi,xmin,xmax,zzz,zzr,zzy,zz,xx,xc,yc
-      real xcte,xinc
-       
-C     ---  Parameters  ---
-      integer numberOfStars
-      parameter (numberOfStars=6000000)
-           
-C     ---  Dimensions  ---
-      double precision :: coordinate_R(numberOfStars),
-     &                    coordinate_Theta(numberOfStars),
-     &                    coordinate_Zcylindr(numberOfStars)
-      real x(numberOfStars),y(numberOfStars)
-      real flagOfWD(numberOfStars)
-      integer disk_belonging(numberOfStars)
+      real :: ran
 
-C     ---  Commons  ---
-      common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
-      common /plano/ x,y
-      common /index/ flagOfWD,numberOfWDs,disk_belonging
+C     TODO: this is numberOfStars, take it up as const for all functions
+      integer, parameter ::  MAX_STARS_COUNT = 6000000
+      real, parameter :: PI = 4.0 * atan(1.0),
+     &                   TAU = 2.0 * PI
 
-C     ---  Inicialization of pi and sigma ---
-      pi=4.0*atan(1.0)
-      dospi=2.0*pi
-      drsun2=radiusOfSector*radiusOfSector
+      integer :: numberOfWDs,
+     &           iseed,
+     &           wd_index
+      real :: minimum_sector_radius,
+     &        maximum_sector_radius,
+     &        angle_covering_sector,
+     &        sector_radius,
+     &        scale_length,
+     &        angle_covering_sector_in_radians,
+     &        squared_sector_radius,
+     &        dist,
+     &        squared_minimum_sector_radius,
+     &        squared_maximum_sector_radius,
+     &        random_valid_radius,
+     &        zzr,
+     &        zzy,
+     &        zz,
+     &        xx,
+     &        xc,
+     &        yc,
+     &        squared_radii_difference,
+     &        sector_diameter
+      double precision :: solar_galactocentric_distance
+
+      double precision :: coordinate_R(MAX_STARS_COUNT),
+     &                    coordinate_Theta(MAX_STARS_COUNT),
+     &                    coordinate_Zcylindr(MAX_STARS_COUNT)
+      real :: x(MAX_STARS_COUNT), 
+     &        y(MAX_STARS_COUNT),
+     &        flagOfWD(MAX_STARS_COUNT)
+      integer :: disk_belonging(MAX_STARS_COUNT)
+
+      common /coorcil/ coordinate_R, 
+     &                 coordinate_Theta,
+     &                 coordinate_Zcylindr
+      common /plano/ x, y
+      common /index/ flagOfWD,
+     &               numberOfWDs,
+     &               disk_belonging
+
+      squared_sector_radius = sector_radius * sector_radius
       
-C     --- Calculating the angle in the sector
-C         -angleCoveringSector/2 y +angleCoveringSector/2 degrees
-C      and radius between minimumSectorRadius and maximumSectorRadius ---
-      asr=(angleCoveringSector*pi)/180.0
-      xmax=(maximumSectorRadius*maximumSectorRadius)
-      xmin=(minimumSectorRadius*minimumSectorRadius)
-      xcte=xmax-xmin
-      xinc=maximumSectorRadius-minimumSectorRadius
+C     Calculating the angle in the sector
+C     -angle_covering_sector / 2 and +angle_covering_sector / 2 degrees
+C     and radius between minimum_sector_radius and maximum_sector_radius
+      angle_covering_sector_in_radians = angle_covering_sector 
+     &                                   * PI / 180.0
+      squared_maximum_sector_radius = maximum_sector_radius 
+     &                                * maximum_sector_radius
+      squared_minimum_sector_radius = minimum_sector_radius 
+     &                                * minimum_sector_radius
+      squared_radii_difference = squared_maximum_sector_radius 
+     &                           - squared_minimum_sector_radius
+      sector_diameter = maximum_sector_radius - minimum_sector_radius
                 
-      do 2 j=1,numberOfWDs
-3       coordinate_Theta(j)=asr*ran(iseed)-(asr/2)
-        if (coordinate_Theta(j).lt.0.0) then
-          coordinate_Theta(j)=dospi+coordinate_Theta(j)
-        endif
-31      zzz=minimumSectorRadius+xinc*ran(iseed)
-        zzy=0.16*ran(iseed)
-        zzr=exp(-zzz/scaleLength)
-        if (zzy.gt.zzr) then
-          goto 31
-        else
-        endif
-        zz=(zzz-minimumSectorRadius)/xinc
-        xx=xmin+(xcte*zz)
-        coordinate_R(j)=sqrt(xx)  
-        xc=coordinate_R(j)*cos(coordinate_Theta(j))
-        yc=coordinate_R(j)*sin(coordinate_Theta(j))
-        dist=((xc-solarGalactocentricDistance)*
-     &       (xc-solarGalactocentricDistance)+yc*yc)
-C       QUESTION: what does it mean?       
-C       --- Sol no hay más que uno ---
-        if (dist.gt.drsun2.or.dist.lt.0.0000015) then 
-          goto 3
-        endif
-        x(j)=xc
-        y(j)=yc
- 2    continue
+      do wd_index = 1, numberOfWDs
+3         coordinate_Theta(wd_index) = (
+     &        angle_covering_sector_in_radians
+     &        * ran(iseed) - angle_covering_sector_in_radians / 2)
+          
+          if (coordinate_Theta(wd_index) < 0.0) then
+              coordinate_Theta(wd_index) = coordinate_Theta(wd_index) 
+     &                                     + TAU
+          end if
+          
+          do 
+              random_valid_radius = minimum_sector_radius 
+     &                              + sector_diameter * ran(iseed)
+C             TODO: find out the meaning of zzy and 0.16
+              zzy = 0.16 * ran(iseed)
+C             TODO: find out the meaning of zzr
+              zzr = exp(-random_valid_radius / scale_length)
+              if (zzy <= zzr) then
+                  exit
+              end if
+          end do
 
-      return
-      end
-C***********************************************************************
+C         TODO: give a good name for zz
+          zz = (random_valid_radius - minimum_sector_radius) 
+     &         / sector_diameter
+C         TODO: find out the meaning of xx
+          xx = squared_minimum_sector_radius 
+     &         + squared_radii_difference 
+     &           * zz
+          coordinate_R(wd_index) = sqrt(xx)
+C         TODO: find out the meanng of xc
+          xc = real(coordinate_R(wd_index) 
+     &              * cos(coordinate_Theta(wd_index)))
+C         TODO: find out the meanng of yc
+          yc = real(coordinate_R(wd_index) 
+     &              * sin(coordinate_Theta(wd_index)))
+C         TODO: find out the meanng of dist
+          dist = real((xc - solar_galactocentric_distance)
+     &                * (xc - solar_galactocentric_distance) 
+     &                + yc * yc)
+C         TODO: find out what this means       
+C         Sol no hay más que uno
+C         TODO: get rid of this goto
+          if (dist > squared_sector_radius .or. dist < 0.0000015) then 
+              goto 3
+          end if
+C         TODO: find out the meanng of x and y
+          x(wd_index) = xc
+          y(wd_index) = yc
+      end do
+      end subroutine

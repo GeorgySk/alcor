@@ -59,9 +59,6 @@ def plot(*,
     # TODO: add coordinates
     if axes == 'velocities':
         # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
-        # TODO: how to work with Decimal type? If I leave it I get:
-        # TypeError: Cannot cast array data from dtype('O') to dtype('float64')
-        # according to the rule 'safe'
         velocities_u = [float(star.velocity_u) + PECULIAR_SOLAR_VELOCITY_U
                         for star in stars]
         velocities_v = [float(star.velocity_v) + PECULIAR_SOLAR_VELOCITY_V
