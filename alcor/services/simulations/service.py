@@ -11,9 +11,9 @@ from sqlalchemy.orm.session import Session
 
 from alcor.models import Group
 from alcor.models.simulation import Parameter
+from alcor.services.common import (OUTPUT_FILE_EXTENSION,
+                                   MAX_OUTPUT_FILE_NAME_LENGTH)
 from alcor.services.parameters import generate_parameters_values
-from alcor.services.restrictions import (OUTPUT_FILE_EXTENSION,
-                                         MAX_OUTPUT_FILE_NAME_LENGTH)
 from alcor.types import ParametersValuesType
 from alcor.utils import parse_stars
 

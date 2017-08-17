@@ -16,7 +16,7 @@ from sqlalchemy_utils import (database_exists,
 from alcor.models.base import Base
 from alcor.services import plots
 from alcor.services.processing import run_processing
-from alcor.services.restrictions import FILTRATION_METHODS
+from alcor.services.common import FILTRATION_METHODS
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
