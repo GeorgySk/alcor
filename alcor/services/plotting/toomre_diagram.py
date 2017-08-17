@@ -1,6 +1,7 @@
 import logging
 from math import sqrt
 from random import random
+from typing import List
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -91,11 +92,7 @@ def plot(*,
     plt.savefig(FILENAME)
 
 
-# TODO: use postgres
 def fetch_all_stars(*,
-                    session: Session):
-    query = (Star.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [Star(**record)
-            for record in records]
+                    session: Session) -> List[Star]:
+    query = session.query(Star)
+    return query.all()
