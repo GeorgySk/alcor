@@ -177,8 +177,9 @@ def plot_lepine_case(session: Session):
                   subplot_uw,
                   subplot_vw)
 
-    # TODO: why does this apply minorticks only to the last subplot?
-    plt.minorticks_on()
+    subplot_uv.minorticks_on()
+    subplot_uw.minorticks_on()
+    subplot_vw.minorticks_on()
 
     subplot_uv.xaxis.set_ticks_position('both')
     subplot_uv.yaxis.set_ticks_position('both')

@@ -77,8 +77,9 @@ def plot(session: Session) -> None:
                              color=POINT_COLOR,
                              s=POINT_SIZE)
 
-    # TODO: why does this apply minorticks only to the last subplot?
-    plt.minorticks_on()
+    subplot_ug_vs_gr.minorticks_on()
+    subplot_gr_vs_ri.minorticks_on()
+    subplot_ri_vs_iz.minorticks_on()
 
     subplot_ug_vs_gr.xaxis.set_ticks_position('both')
     subplot_ug_vs_gr.yaxis.set_ticks_position('both')

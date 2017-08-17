@@ -279,8 +279,9 @@ def plot_lepine_case(session: Session) -> None:
                       color=CLOUD_COLOR,
                       s=CLOUD_POINT_SIZE)
 
-    # TODO: why does this apply minorticks only to the last subplot?
-    plt.minorticks_on()
+    subplot_u.minorticks_on()
+    subplot_v.minorticks_on()
+    subplot_w.minorticks_on()
 
     subplot_u.xaxis.set_ticks_position('both')
     subplot_u.yaxis.set_ticks_position('both')
