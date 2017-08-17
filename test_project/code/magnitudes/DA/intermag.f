@@ -479,20 +479,21 @@ C         lum contenida entre las conocidas
 
       return
       end
-C***********************************************************************
 
 
-C***********************************************************************
-C     TODO:rewrite      
-      subroutine extrap1(lumi,x1,x2,l1,l2,c)
+C     TODO: find out the meaning of arguments
+      subroutine extrap1(lumi, x1, x2, l1, l2, c)
+          implicit none
+          real :: lumi,
+     &            x1,
+     &            x2,
+     &            l1,
+     &            l2,
+     &            c,
+     &            s,
+     &            b
       
-      implicit real (a-h,m,o-z)
-      real lumi,x1,x2,l1,l2,c,s,b
-      
-      s=(x2-x1)/(l2-l1)
-      b=x1-s*l1
-      c=s*lumi+b
-         
-      return
-      end
-C***********************************************************************
+          s = (x2 - x1) / (l2 - l1)
+          b = x1 - s * l1
+          c = s * lumi + b
+      end subroutine
