@@ -46,9 +46,9 @@ C     TODO: find out the meaning of theta(THETA)
      &                    rightAscension(MAX_STARS_COUNT),
      &                    declination(MAX_STARS_COUNT)
       real :: rgac(MAX_STARS_COUNT),
-     &        mpb(MAX_STARS_COUNT),
-     &        mpl(MAX_STARS_COUNT),
-     &        vr(MAX_STARS_COUNT),
+     &        latitude_proper_motion(MAX_STARS_COUNT),
+     &        longitude_proper_motion(MAX_STARS_COUNT),
+     &        radial_velocity(MAX_STARS_COUNT),
      &        uu(MAX_STARS_COUNT),
      &        vv(MAX_STARS_COUNT),
      &        ww(MAX_STARS_COUNT),
@@ -66,7 +66,9 @@ C     TODO: find out the meaning of theta(THETA)
       common /index/ flagOfWD, 
      &               numberOfWDs,
      &               disk_belonging
-      common /mopro/ mpb, mpl, vr
+      common /mopro/ latitude_proper_motion, 
+     &               longitude_proper_motion, 
+     &               radial_velocity
       common /lb/ lgac, bgac
 
 C     Calculating galactocentric coordinates (r,l,b)
@@ -133,19 +135,22 @@ C         TODO: find out the meaning of zkr
           zkri = 1.0 / zkr
 
 C         Calculating the components of the proper motion
-          mpl(wd_index) = real(
+          longitude_proper_motion(wd_index) = real(
      &        (-zkri * (sin_lgac / cos_bgac) * uu(wd_index))
      &        + (zkri * (cos_lgac / cos_bgac) * vv(wd_index)))
-          mpb(wd_index) = real(
+          latitude_proper_motion(wd_index) = real(
      &        (-zkri * cos_lgac * sin_bgac * uu(wd_index))
      &        + (-zkri * sin_bgac * sin_lgac * vv(wd_index))
      &        + (zkri * cos_bgac * ww(wd_index)))
-          vr(wd_index) = real(
+          radial_velocity(wd_index) = real(
      &        (cos_bgac * cos_lgac * uu(wd_index))
      &        + (cos_bgac * sin_lgac * vv(wd_index))
      &        + (sin_bgac * ww(wd_index)))
-          properMotion(wd_index) = sqrt(mpl(wd_index) * mpl(wd_index)
-     &                                  + mpb(wd_index) * mpb(wd_index))
+          properMotion(wd_index) = sqrt(
+     &        longitude_proper_motion(wd_index) 
+     &        * longitude_proper_motion(wd_index)
+     &        + latitude_proper_motion(wd_index) 
+     &          * latitude_proper_motion(wd_index))
 
 C         Calculating right ascension and the declination      
 C         Calculating the declination

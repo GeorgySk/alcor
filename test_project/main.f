@@ -512,8 +512,9 @@ C     NOTE: this 70 comes from nowhere
      &                    coordinate_Zcylindr(numberOfStars)
       real parallax(numberOfStars)
       real tangenVelo(numberOfStars)
-      real mpl(numberOfStars),mpb(numberOfStars),
-     &                 vr(numberOfStars)
+      real longitude_proper_motion(numberOfStars),
+     &     latitude_proper_motion(numberOfStars),
+     &     radial_velocity(numberOfStars)
       real errora(70),ndfa(70)
 C     ugriz-color system and V-band from Johnson system
       real v(numberOfStars)
@@ -586,7 +587,9 @@ C      &                    ugriz_g_apparent(numberOfStars)
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
       common /mad/ properMotion,rightAscension,declination
-      common /mopro/ mpb,mpl,vr
+      common /mopro/ latitude_proper_motion,
+     &               longitude_proper_motion,
+     &               radial_velocity
       common /paral/ rgac
       common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
@@ -610,9 +613,9 @@ C      &, ugriz_g_apparent
           do i = 1, numberOfWDs
               write(421, *) luminosityOfWD(i),
      &                      properMotion(i),
-     &                      mpb(i),
-     &                      mpl(i),
-     &                      vr(i),
+     &                      latitude_proper_motion(i),
+     &                      longitude_proper_motion(i),
+     &                      radial_velocity(i),
      &                      rightAscension(i),
      &                      declination(i),
      &                      rgac(i),
