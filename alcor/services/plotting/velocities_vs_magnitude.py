@@ -153,12 +153,15 @@ def plot(session: Session) -> None:
     subplot_w.xaxis.set_ticks_position('both')
     subplot_w.yaxis.set_ticks_position('both')
 
+    # Removing unnecessary x-labels for top and middle subplots
+    subplot_u.set_xticklabels([])
+    subplot_v.set_xticklabels([])
+
     subplot_u.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_u.get_data_ratio())
     subplot_v.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_v.get_data_ratio())
     subplot_w.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_w.get_data_ratio())
 
     # TODO: delete overlapping y-labels
-    # TODO: delete unnecessary x-labels for top and middle subplots
     figure.subplots_adjust(hspace=0)
 
     # FIXME: cloud and bins are not correlated!
@@ -290,12 +293,15 @@ def plot_lepine_case(session: Session) -> None:
     subplot_w.xaxis.set_ticks_position('both')
     subplot_w.yaxis.set_ticks_position('both')
 
+    # Removing unnecessary x-labels for top and middle subplots
+    subplot_u.set_xticklabels([])
+    subplot_v.set_xticklabels([])
+
     subplot_u.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_u.get_data_ratio())
     subplot_v.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_v.get_data_ratio())
     subplot_w.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot_w.get_data_ratio())
 
     # TODO: delete overlapping y-labels
-    # TODO: delete unnecessary x-labels for top and middle subplots
     figure.subplots_adjust(hspace=0)
 
     # FIXME: cloud and bins are not correlated!

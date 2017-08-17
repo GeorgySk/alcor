@@ -15,7 +15,7 @@ C     TODO: find out the meaning of following constants
 
       integer :: i,
      &           j,
-     &           ird,
+     &           file_unit,
      &           ndatsone(NCOL),
      &           ndatsone2(NCOL2)
       real :: mtabone(NCOL),
@@ -36,10 +36,6 @@ C     TODO: find out the meaning of following constants
       common /colorsone/ bvtabone, vitabone, vrtabone, uvtabone
       common /newone/ lgrtabone, lgt2tabone
       common /newone2/ mtabone2, ndatsone2
-
-C     TODO: give a btter name to ird
-C     ird is the unit of reading archives
-      ird = 121
  
 C     Masses of each archive ---
       mtabONE(1) = 1.06
@@ -54,11 +50,14 @@ C     Masses of each archive ---
       mtabone2(4) = 1.20
       mtabone2(5) = 1.28
 
+      file_unit = 121
+
 C     Reading the files
       do i = 1, NCOL
         do j = 1, NROW
 C         TODO: find out the way to avoid using end-goto
-          read(ird, *, end=2) a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13
+          read(file_unit, *, end=2) a1, a2, a3, a4, a5, a6, a7, a8, a9,
+     &                              a10, a11, a12, a13
           ltabone(i, j) = a1
           mvtabone(i, j) = a12
           lgtabone(i, j) = a13
@@ -69,15 +68,15 @@ C         TODO: find out the way to avoid using end-goto
           uvtabone(i, j) = a10
         end do      
 2       ndatsONE(i) = j - 1  
-        ird = ird + 1
+        file_unit = file_unit + 1
       end do
 
 C     Reading the data of log Teff and log g
-      ird = 127      
+      file_unit = 127      
       do i = 1, NCOL2
         do j = 1, NROW
 C         TODO: find out the way to avoid using end-goto
-          read(ird, *, end=3) a1, a2, a3, a4, a5, a6
+          read(file_unit, *, end=3) a1, a2, a3, a4, a5, a6
 C         Converting radii in cm to radii in solar radius
           a3 = 10.0 ** a3
           a3 = a3 / (6.96e10)
@@ -87,6 +86,6 @@ C         Converting radii in cm to radii in solar radius
         end do      
 3       continue       
         ndatsONE2(i) = j - 1  
-        ird = ird + 1
+        file_unit = file_unit + 1
       end do
       end subroutine

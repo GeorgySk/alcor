@@ -32,7 +32,7 @@ services:
 #      - --luminosity-function
       - --velocities-vs-magnitude
 #      - --velocity-clouds
-#      - --lepine-criterion
+      - --lepine-criterion
 #      - --heatmap
 #      - velocities
 #      - --toomre-diagram

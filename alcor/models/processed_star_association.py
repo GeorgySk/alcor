@@ -4,6 +4,7 @@ from sqlalchemy.sql.sqltypes import BigInteger
 from .base import Base
 
 
+# TODO: fix this
 class ProcessedStarAssociation(Base):
     __tablename__ = 'processed_stars_associations'
     id = Column(BigInteger(),
