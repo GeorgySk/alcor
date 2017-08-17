@@ -1,97 +1,112 @@
-C     NOTE: the following subroutine is actually missed 
-C***********************************************************************
-C     TODO: rewrite
       subroutine traject(galacticDiskAge)
-C=======================================================================
-C     This subroutine calculates the trajectories of the WDs according 
-C     to the z-axis. Using a 4th order Runge-Kuttta.
-C
-C     Revised in 22.09.07. by S. Torres
-C
-C-------------------------------------------------------------------
-C     Input parameters
-C       galacticDiskAge
-C       numberOfStarsInSample
-C=======================================================================
-      implicit real (a-h,m,o-z)
+C     Calculating trajectories of WDs according to z-axis using the 4th 
+C     order Runge-Kuttta.
+      implicit none
       
-      integer numberOfStars,numberOfWDs,njumps,n,i,NOK,NBAD
-      real galacticDiskAge,wosun,hmin,eps,fcgys,tf,xcar,ycar
-      real wo,zo,ecini,tb,tinc,htry,ti,ecinf
-      real epotf,epoti,f
-
-C     ---   Parameters  ---
-      parameter (numberOfStars=6000000)
-      parameter (wosun=-8.0d0)
-      
-C     ---   Dimensions   ---
-      real uu(numberOfStars),vv(numberOfStars),
-     &                 ww(numberOfStars)
-      double precision :: coordinate_R(numberOfStars),
-     &                    coordinate_Theta(numberOfStars),
-     &                    coordinate_Zcylindr(numberOfStars)
-      real starBirthTime(numberOfStars),m(numberOfStars)
-      real flagOfWD(numberOfStars)
-      real yscal(2),y(2),dydx(2)         
-      real xpla(numberOfStars),ypla(numberOfStars)
-      integer disk_belonging(numberOfStars)
+C     TODO: take this up (ex numberOfStars)
+C     TODO: find out the meaning of njumps, n
+      integer, parameter :: MAX_STARS_COUNT = 6000000,
+     &                      NJUMPS = 100,
+     &                      N = 2
+C     TODO: find out the meaning of hmin, wosun
+      real, parameter :: WOSUN = -8.0,
+     &                   HMIN = 0.0,
+     &                   EPSILON = 1.0e-4,
+     &                   SECONDS_IN_HOUR = 3600.0,
+     &                   HOURS_IN_DAY = 24.0,
+     &                   DAYS_IN_YEAR = 365.25,
+     &                   YEARS_IN_GYR = (1.0e+9),
+     &                   SECONDS_IN_GYR = SECONDS_IN_HOUR 
+     &                                    * HOURS_IN_DAY
+     &                                    * DAYS_IN_YEAR
+     &                                    * YEARS_IN_GYR
+      integer :: numberOfWDs,
+     &           wd_index,
+     &           NOK,
+     &           NBAD
+      real :: galacticDiskAge,
+     &        final_time,
+     &        xcar,
+     &        ycar,
+     &        wo,
+     &        zo,
+     &        ecini,
+     &        time_increment,
+     &        htry,
+     &        initial_time,
+     &        ecinf,
+     &        epotf,
+     &        epoti,
+     &        f
+      real :: uu(MAX_STARS_COUNT),
+     &        vv(MAX_STARS_COUNT),
+     &        ww(MAX_STARS_COUNT),
+     &        starBirthTime(MAX_STARS_COUNT),
+     &        m(MAX_STARS_COUNT),
+     &        flagOfWD(MAX_STARS_COUNT),
+     &        yscal(2),
+     &        y(2),
+     &        dydx(2),
+     &        xpla(MAX_STARS_COUNT),
+     &        ypla(MAX_STARS_COUNT)
+      double precision :: coordinate_R(MAX_STARS_COUNT),
+     &                    coordinate_Theta(MAX_STARS_COUNT),
+     &                    coordinate_Zcylindr(MAX_STARS_COUNT)
+      integer :: disk_belonging(MAX_STARS_COUNT)
         
-C     ---   Commons   ---
-      common /vel/ uu,vv,ww
-      common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
-      common /tm/ starBirthTime,m
-      common /index/ flagOfWD,numberOfWDs,disk_belonging         
-C     NOTE: names are different in this block      
-      common /plano/ xpla,ypla
-      common /carte/ xcar,ycar
+      common /vel/ uu, vv, ww
+      common /coorcil/ coordinate_R,
+     &                 coordinate_Theta,
+     &                 coordinate_Zcylindr
+      common /tm/ starBirthTime, m
+      common /index/ flagOfWD,
+     &               numberOfWDs,
+     &               disk_belonging         
+C     TODO: rename these as in other subroutines and find out the mean..    
+      common /plano/ xpla, ypla
+      common /carte/ xcar, ycar
 
-C     ---   Externals  ---
 C     External - specifies procedures as external, and allows their 
 C     symbolic names to be used as actual arguments.
-      EXTERNAL DERIVS
-      EXTERNAL RKQC
+      external DERIVS
+      external RKQC
             
-C     ---   Test   ---
-      njumps=100
-      hmin=0.0
-      eps=1.0e-4
-      n=2
-      fcgys=(1.0e+9)*365.25*24.0*3600.0
-      tf=galacticDiskAge*fcgys 
+      final_time = galacticDiskAge * SECONDS_IN_GYR 
 
-C     ---   Integrating trajectories   ---
-      do 1 i=1,numberOfWDs
-        xcar=xpla(i)
-        ycar=ypla(i)
-        wo=ww(i)+8.0
-        zo=coordinate_Zcylindr(i)*(3.086e+16)
-        ecini=0.5*wo*wo
-        call epot(zo,epoti)
-        tb=starBirthTime(i)
-        tinc=(galacticDiskAge-tb)/float(njumps)
-C       ---  The time in seconds  ---
-        htry=tinc*fcgys
-C       ---  Initial conditions  ---
-        y(1)=zo
-        y(2)=wo
-        dydx(1)=wo
-        call fuerza(zo,f)
-        dydx(2)=f
-        ti=tb*fcgys 
-C       ---  Calling to the Runge-Kutta integrator ---
-
-        call ODEINT(y,n,ti,tf,eps,htry,hmin,NOK,NBAD,DERIVS,RKQC,yscal,
-     &       y,dydx)      
-        ecinf=0.5*y(2)*y(2)
-        call epot(y(1),epotf)
-        coordinate_Zcylindr(i)=y(1)/(3.086e+16)
-        ww(i)=y(2)+wosun
- 1    continue
-
-      return
-      end     
-C***********************************************************************
-     
+C     Integrating trajectories
+      do wd_index = 1, numberOfWDs
+          xcar = xpla(wd_index)
+          ycar = ypla(wd_index)
+C         TODO: find out the meaning of wo and 8.0
+          wo = ww(wd_index) + 8.0
+C         TODO: find out the meaning of zo and 3.086e+16
+          zo = real(coordinate_Zcylindr(wd_index) * (3.086e+16))
+C         TODO: find out the meaning of ecini
+          ecini = 0.5 * wo * wo
+          call epot(zo, epoti)
+          time_increment = (galacticDiskAge - starBirthTime(wd_index)) 
+     &                     / float(NJUMPS)
+C         Time in seconds
+C         TODO: find out the meaning of htry
+          htry = time_increment * SECONDS_IN_GYR
+C         Initial conditions
+C         TODO: find out the meaning of y and dydx
+          y(1) = zo
+          y(2) = wo
+          dydx(1) = wo
+          call fuerza(zo, f)
+          dydx(2) = f
+          initial_time = starBirthTime(wd_index) * SECONDS_IN_GYR 
+C         Calling to the Runge-Kutta integrator
+          call ODEINT(y, N, initial_time, final_time, EPSILON, htry,
+     &                HMIN, NOK, NBAD, DERIVS, RKQC, yscal, y, dydx)
+C         TODO: find out the meaning of ecinf    
+          ecinf = 0.5 * y(2) * y(2)
+          call epot(y(1), epotf)
+          coordinate_Zcylindr(wd_index) = y(1) / (3.086e+16)
+          ww(wd_index) = y(2) + WOSUN
+      end do
+      end subroutine
 
 
 C***********************************************************************      

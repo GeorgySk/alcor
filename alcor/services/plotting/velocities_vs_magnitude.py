@@ -304,47 +304,47 @@ def plot_lepine_case(session: Session) -> None:
 # TODO: write only one function for all of these
 def fetch_all_bins(*,
                    session: Session) -> List[Bin]:
-    query = (session.query(Bin))
+    query = session.query(Bin)
     return query.all()
 
 
 def fetch_all_clouds(*,
                      session: Session) -> List[Cloud]:
-    query = (session.query(Cloud))
+    query = session.query(Cloud)
     return query.all()
 
 
 def fetch_all_u_vs_mag_bins(*,
                             session: Session) -> List[LepineCaseUBin]:
-    query = (session.query(LepineCaseUBin))
+    query = session.query(LepineCaseUBin)
     return query.all()
 
 
 def fetch_all_v_vs_mag_bins(*,
                             session: Session) -> List[LepineCaseVBin]:
-    query = (session.query(LepineCaseVBin))
+    query = session.query(LepineCaseVBin)
     return query.all()
 
 
 def fetch_all_w_vs_mag_bins(*,
                             session: Session) -> List[LepineCaseWBin]:
-    query = (session.query(LepineCaseWBin))
+    query = session.query(LepineCaseWBin)
     return query.all()
 
 
 def fetch_all_u_vs_mag_clouds(*,
                               session: Session) -> List[LepineCaseUCloud]:
-    query = (session.query(LepineCaseUCloud))
+    query = session.query(LepineCaseUCloud)
     return query.all()
 
 
 def fetch_all_v_vs_mag_clouds(*,
                               session: Session) -> List[LepineCaseVCloud]:
-    query = (session.query(LepineCaseVCloud))
+    query = session.query(LepineCaseVCloud)
     return query.all()
 
 
 def fetch_all_w_vs_mag_clouds(*,
                               session: Session) -> List[LepineCaseWCloud]:
-    query = (session.query(LepineCaseWCloud))
+    query = session.query(LepineCaseWCloud)
     return query.all()
