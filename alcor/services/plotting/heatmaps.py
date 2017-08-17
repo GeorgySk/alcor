@@ -13,6 +13,9 @@ from matplotlib import cm
 import numpy as np
 
 from alcor.models.star import Star
+from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
+                                         PECULIAR_SOLAR_VELOCITY_V,
+                                         PECULIAR_SOLAR_VELOCITY_W)
 
 
 logger = logging.getLogger(__name__)
@@ -37,11 +40,6 @@ VELOCITIES_BINS_COUNT = 150
 
 # TODO: find out the meaning of this
 VMIN = 0.01
-
-# TODO: in what reference frame?
-PECULIAR_SOLAR_VELOCITY_U = -11
-PECULIAR_SOLAR_VELOCITY_V = 12
-PECULIAR_SOLAR_VELOCITY_W = 7
 
 
 def plot(*,

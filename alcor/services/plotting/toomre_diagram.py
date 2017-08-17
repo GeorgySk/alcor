@@ -10,6 +10,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from alcor.models.star import Star
+from alcor.services.restrictions import PECULIAR_SOLAR_VELOCITY_V
 
 
 logger = logging.getLogger(__name__)
@@ -24,11 +25,6 @@ DESIRED_DIMENSIONS_RATIO = 10 / 13
 
 X_LABEL = '$V(km/s)$'
 Y_LABEL = '$\sqrt{U^2+W^2}(km/s)$'
-
-# TODO: in what reference frame?
-PECULIAR_SOLAR_VELOCITY_U = -11
-PECULIAR_SOLAR_VELOCITY_V = 12
-PECULIAR_SOLAR_VELOCITY_W = 7
 
 THIN_DISK_CLOUD_COLOR = 'r'
 THICK_DISK_CLOUD_COLOR = 'b'
