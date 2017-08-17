@@ -56,6 +56,7 @@ C     TODO: this is numberOfStars, take it up as const for all functions
       common /coorcil/ coordinate_R, 
      &                 coordinate_Theta,
      &                 coordinate_Zcylindr
+C     TODO: find out what reference frame is used for x, y
       common /plano/ x, y
       common /index/ flagOfWD,
      &               numberOfWDs,
@@ -106,10 +107,8 @@ C         TODO: find out the meaning of xx
      &         + squared_radii_difference 
      &           * zz
           coordinate_R(wd_index) = sqrt(xx)
-C         TODO: find out the meanng of xc
           xc = real(coordinate_R(wd_index) 
      &              * cos(coordinate_Theta(wd_index)))
-C         TODO: find out the meanng of yc
           yc = real(coordinate_R(wd_index) 
      &              * sin(coordinate_Theta(wd_index)))
 C         TODO: find out the meanng of dist

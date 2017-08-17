@@ -83,14 +83,13 @@ C     TODO: find out the meaning
 C     NOTE: this stars_count counter variable is used in GOTO-loop, which is bad
       stars_count = 0
 
-C     TODO: make it factor, not a divisor
       write(6,*) '      Factor of mass reduction=', massReductionFactor
 
 C     Calculating the mass to be distributed at each interval       
       do bin_index = 1, BINS_COUNT
 C         TODO: find out the meaning of 1.0e6 and mrep
           mrep = psi * areaOfSector * 1.0e6
-          mrep = mrep / massReductionFactor
+          mrep = mrep * massReductionFactor
           total_generated_mass_in_bin = 0.0
 
 C         Recent burst

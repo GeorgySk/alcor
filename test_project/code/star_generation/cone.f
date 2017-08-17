@@ -9,7 +9,8 @@ C     with its height direction set by longitude and latitude
      &                               min_longitude,
      &                               max_longitude,
      &                               min_latitude,
-     &                               max_latitude)
+     &                               max_latitude,
+     &                               massReductionFactor)
           implicit none
           
           external ran
@@ -19,14 +20,15 @@ C     with its height direction set by longitude and latitude
      &            cone_height_latitude,
      &            galacticDiskAge,
      &            thick_disk_stars_fraction,
-     &            thin_disk_stars_fraction
+     &            thin_disk_stars_fraction,
+     &            massReductionFactor
           integer :: iseed,
      &               numberOfStarsInSample
 
           integer, parameter :: numberOfStars = 6000000
           real :: starBirthTime(numberOfStars),
-     &                        m(numberOfStars),
-     &                        flagOfWD(numberOfStars)
+     &            m(numberOfStars),
+     &            flagOfWD(numberOfStars)
           double precision :: coordinate_Theta(numberOfStars),
      &                        coordinate_R(numberOfStars),
      &                        coordinate_Zcylindr(numberOfStars)
@@ -41,7 +43,6 @@ C     with its height direction set by longitude and latitude
      &                       THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                       THIN_DISK_SCALEHEIGHT = 0.25,
      &                       THICK_DISK_SCALEHEIGHT = 1.5,
-     &                       MASS_REDUCTION_FACTOR = 0.003,
      &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
           real :: delta_longitude,
      &            min_longitude,
@@ -98,7 +99,7 @@ C         TODO: this is a boilerplate
      &              THIN_DISK_DENSITY * thin_disk_stars_fraction,
      &               THIN_DISK_SCALEHEIGHT)
               normalization_cone_mass = normalization_cone_mass 
-     &                              * MASS_REDUCTION_FACTOR
+     &                              * massReductionFactor
 
               max_density = get_max_density(cone_height_longitude,
      &                                      cone_height_latitude,
@@ -164,13 +165,12 @@ C                 converting from galactic to cyl.galactocentric
      &            THIN_DISK_DENSITY * thick_disk_stars_fraction,
      &            THICK_DISK_SCALEHEIGHT)
               normalization_cone_mass = normalization_cone_mass 
-     &                                  * MASS_REDUCTION_FACTOR
+     &                                  * massReductionFactor
     
               max_density = get_max_density(cone_height_longitude,
      &                                      cone_height_latitude,
      &                                      THICK_DISK_SCALEHEIGHT)
-    
-              !running for 8% of thin disk stars:
+
               outer_do3: do
                   stars_count = stars_count + 1
           
