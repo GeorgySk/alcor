@@ -17,6 +17,8 @@ C     TODO: find out the meaning of following constants
       integer, parameter :: NCOL = 6,
      &                      NCOL2 = 5,
      &                      NROW = 300
+      real, parameter :: SOLAR_MASS_KG = 1.989e30,
+     &                   GRAVITATIONAL_CONST_CM_S_KG = 6.67e-5
 
       integer :: i,
      &           model,
@@ -31,7 +33,6 @@ C     TODO: find out the meaning of following constants
      &        cuv,
      &        zlte,
      &        zlr,
-     &        G,
      &        luminosity,
      &        ubvri_u,
      &        ubvri_b,
@@ -99,11 +100,9 @@ C     TODO: find out what is going on here
 
       effective_temperature = 10.0 ** zlte
 
-C     G in cm/s² kg; M in kg and R in cm
-C     TODO: find out the meaning of G
-      G = 6.67e-5
-C     TODO: find out the meaning of following constants
-      surface_gravity_logarithm = log10(G) + log10(wd_mass * (1.989e30)) 
+C     TODO: find out the meaning of 6.696e10 constant
+      surface_gravity_logarithm = log10(GRAVITATIONAL_CONST_CM_S_KG) 
+     &                            + log10(wd_mass * SOLAR_MASS_KG) 
      &                            - 2.0 * (zlr + log10(6.696e10))
       ubvri_u = cuv + mv
       ubvri_b = cbv + mv
