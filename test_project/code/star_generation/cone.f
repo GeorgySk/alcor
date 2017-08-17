@@ -46,7 +46,6 @@ C     with its height direction set by longitude and latitude
           real :: delta_longitude,
      &            min_longitude,
      &            max_longitude,
-     &            longitude_range,
      &            min_latitude,
      &            max_latitude,
      &            normalization_cone_mass,
@@ -84,8 +83,6 @@ C     with its height direction set by longitude and latitude
           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
           min_longitude = cone_height_longitude  - delta_longitude / 2.0
           max_longitude = cone_height_longitude  + delta_longitude / 2.0
-C         TODO: this equals delta_longitude  
-          longitude_range = max_longitude - min_longitude
           min_latitude = cone_height_latitude  - DELTA_LATITUDE / 2.0
           max_latitude = cone_height_latitude + DELTA_LATITUDE / 2.0
 
@@ -251,7 +248,6 @@ C                 converting from galactic to cyl.galactocentric
      &                        delta_longitude, 
      &                        min_longitude, 
      &                        max_longitude, 
-     &                        longitude_range, 
      &                        min_latitude, 
      &                        max_latitude,
      &                        get_kappa_integral,
@@ -281,7 +277,6 @@ C                 converting from galactic to cyl.galactocentric
      &                      / cos(muted_cone_height_latitude)
           min_longitude=muted_cone_height_longitude-delta_longitude/2.0
           max_longitude=muted_cone_height_longitude+delta_longitude/2.0
-          longitude_range = max_longitude - min_longitude
           min_latitude = muted_cone_height_latitude - DELTA_LATITUDE/2.0
           max_latitude = muted_cone_height_latitude + DELTA_LATITUDE/2.0   
   
@@ -294,7 +289,7 @@ C                 converting from galactic to cyl.galactocentric
           ! Case 1:
           if (min_latitude >= 0.0
      &        .and. max_latitude <= PI / 2.0) then
-                  mass = density * longitude_range 
+                  mass = density * delta_longitude 
      &                   * scaleheight 
      &                   * (get_kappa_integral(min_latitude,scaleheight) 
      &                      - get_kappa_integral(max_latitude,
@@ -303,7 +298,7 @@ C                 converting from galactic to cyl.galactocentric
   
           ! Case 2:
           if (min_latitude < 0.0) then
-              mass = density * longitude_range
+              mass = density * delta_longitude
      &               * (get_iota_integral(abs(min_latitude),
      &                                    scaleheight)
      &                 + get_iota_integral(max_latitude,scaleheight))
@@ -311,7 +306,7 @@ C                 converting from galactic to cyl.galactocentric
   
           ! Case 3:
           if (max_latitude > PI / 2.0) then
-              mass = density * longitude_range
+              mass = density * delta_longitude
      &               * (get_lambda_integral((PI - max_latitude),
      &                                      scaleheight)
      &                   + get_lambda_integral(min_latitude,

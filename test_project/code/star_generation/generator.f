@@ -49,8 +49,7 @@ C                        TODO: these are params of thick disk. exactly?
      &        galacticDiskAge,             normalization_const,
      &        time_increment,              massReductionFactor,
      &        psi,                         star_mass,
-     &        total_generated_mass_in_bin, mrep,
-     &        t                          
+     &        total_generated_mass_in_bin, mrep                         
       real :: mass_from_Salpeter_IMF, 
      &        get_normalization_const
       double precision :: coordinate_Theta(MAX_STARS_COUNT),
@@ -107,7 +106,7 @@ C         Recent burst
 
           do
 C             Calling to the IMF
-1             star_mass = mass_from_Salpeter_IMF(iseed)
+              star_mass = mass_from_Salpeter_IMF(iseed)
 
 C             We already have the mass
               stars_count = stars_count + 1
