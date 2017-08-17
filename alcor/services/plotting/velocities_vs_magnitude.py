@@ -41,11 +41,8 @@ CLOUD_POINT_SIZE = 1
 PLOT_WIDTH = 500
 PLOT_HEIGHT = 250
 
-CSV_DELIMITER = ' '
-
 
 def plot(session: Session) -> None:
-
     # TODO: implement other ways of fetching
     bins = fetch_all_bins(session=session)
 
@@ -145,8 +142,9 @@ def plot(session: Session) -> None:
                       color=CLOUD_COLOR,
                       s=CLOUD_POINT_SIZE)
 
-    # TODO: why does this apply minorticks only to the last subplot?
-    plt.minorticks_on()
+    subplot_u.minorticks_on()
+    subplot_v.minorticks_on()
+    subplot_w.minorticks_on()
 
     subplot_u.xaxis.set_ticks_position('both')
     subplot_u.yaxis.set_ticks_position('both')
@@ -168,7 +166,6 @@ def plot(session: Session) -> None:
 
 
 def plot_lepine_case(session: Session) -> None:
-
     # TODO: implement other fetching functions
     u_vs_mag_bins = fetch_all_u_vs_mag_bins(session=session)
     v_vs_mag_bins = fetch_all_v_vs_mag_bins(session=session)
