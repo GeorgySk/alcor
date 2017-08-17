@@ -179,80 +179,96 @@ C     ---   Total potential  ---
       
       return
       end
-C***********************************************************************
 
 
+      subroutine fuerza(z_coordinate, force)
+C     Calculating the force along z-coordinate. z in km
+      implicit none
 
-C     TODO: rewrite
-C***********************************************************************
-      subroutine fuerza(z,f)
-C=======================================================================
-C
-C     This function calculates the force along z-coordinate.
-C-------------------------------------------------------------------
-C     Input parameters: z(km) xpla,ypla (kpc)
-C-------------------------------------------------------------------
-C     Output parameters: f
-C=======================================================================
-      implicit real (a-h,m,o-z)
-      
-      real ro,vh,rc1,mc1,rc2,mc2,b,md1,md2,md3,a1,a2,a3,g
-      real xcar,ycar,xpla,ypla,rpla,zsig,z,vh2,ro2
-      real rc12,rc22,b2,rpla2,r2,foh,foc1,foc2,foc,bzr
-      real fod1,fod2,fod3,fod,ftot,fcv,f
-      
-C     ---   Parameters   ---
-      parameter(ro = 8.5, vh = 220.0)
-      parameter(rc1 = 2.7, mc1 = 3.0d+09)
-      parameter(rc2 = 0.42, mc2 = 1.6d+10)
-      parameter(b = 0.3)
-      parameter(md1 = 6.6e+10, a1 = 5.81)
-      parameter(md2 = -2.9e+10, a2 = 17.43)
-      parameter(md3 = 3.3d+09, a3 = 34.86)
-      parameter(g = 4.30026e-6)
-      
-C     ---  Common  --- 
-      common /carte/ xcar,ycar
-                 
-C     ---  Calculating some useful variables ---
-      xpla=xcar
-      ypla=ycar
-      zsig=z
-      z = abs(z)/(3.086e+16)
+C     TODO: find out the meaning of all the variables
+      real, parameter :: ro = 8.5,
+     &                   squared_ro = ro * ro,
+     &                   vh = 220.0,
+     &                   squared_vh = vh * vh,
+     &                   rc1 = 2.7,
+     &                   squared_rc1 = rc1 * rc1,
+     &                   mc1 = 3.0d+09,
+     &                   rc2 = 0.42,
+     &                   squared_rc2 = rc2 * rc2,
+     &                   mc2 = 1.6d+10,
+     &                   b = 0.3,
+     &                   squared_b = b * b,
+     &                   md1 = 6.6e+10, 
+     &                   a1 = 5.81, 
+     &                   md2 = -2.9e+10,
+     &                   a2 = 17.43,
+     &                   md3 = 3.3d+09, 
+     &                   a3 = 34.86,
+     &                   g = 4.30026e-6
+
+      real :: xcar, 
+     &        ycar, 
+     &        xpla, 
+     &        ypla,
+     &        rpla,
+     &        zsig, 
+     &        z_coordinate,
+     &        rpla2,
+     &        r2,
+     &        halo_force, 
+     &        central_force_1,
+     &        central_force_2,
+     &        central_force,
+     &        bzr,
+     &        disk_force_1,
+     &        disk_force_2,
+     &        disk_force_3,
+     &        disk_force,
+     &        total_force,
+     &        fcv,
+     &        force
+
+      common /carte/ xcar, ycar
+
+      xpla = xcar
+      ypla = ycar
+      zsig = z_coordinate
+      z_coordinate = abs(z_coordinate) / (3.086e+16)
       rpla2 = xpla * xpla + ypla * ypla
       rpla = sqrt(rpla2)
-      vh2 = vh * vh
-      ro2 = ro * ro
-      rc12 = rc1 * rc1
-      rc22 = rc2 * rc2
-      b2 = b * b
-      r2 = rpla * rpla + z * z
+      r2 = rpla * rpla + z_coordinate * z_coordinate
                    
-C     ---   Calculating the forces  ---
-C     ---   Dark halo  ---
-      foh = vh2 * z / (ro2 + r2)
-C     ---   Central component  ---      
-      foc1 = g * mc1 * z / ((rc12 + r2)**1.5)   
-      foc2 = g * mc2 * z/((rc22 + r2)**1.5)      
-      foc=foc1+foc2         
-C     ---   Disk  ---
-      bzr = sqrt(b2 + z * z)
-      fod1 = g * md1 * z * (a1 + bzr) 
-     &       / (bzr * (rpla2 + (a1 + bzr) * (a1+bzr)) ** 1.5)    
-      fod2 = g * md2 * z * (a2 + bzr) 
+C     Calculating the forces
+C     Dark halo
+      halo_force = squared_vh * z_coordinate / (squared_ro + r2)
+
+C     Central component      
+      central_force_1 = g * mc1 * z_coordinate 
+     &                  / ((squared_rc1 + r2) ** 1.5)   
+      central_force_2 = g * mc2 * z_coordinate
+     &                  / ((squared_rc2 + r2) ** 1.5)      
+      central_force = central_force_1 + central_force_2
+
+C     Disk
+      bzr = sqrt(squared_b + z_coordinate * z_coordinate)
+      disk_force_1 = g * md1 * z_coordinate * (a1 + bzr) 
+     &       / (bzr * (rpla2 + (a1 + bzr) * (a1 + bzr)) ** 1.5)    
+      disk_force_2 = g * md2 * z_coordinate * (a2 + bzr) 
      &       / (bzr * (rpla2 + (a2 + bzr) * (a2 + bzr)) ** 1.5)     
-      fod3 = g * md3 * z * (a3 + bzr) 
+      disk_force_3 = g * md3 * z_coordinate * (a3 + bzr) 
      &       /(bzr * (rpla2 + (a3 + bzr) * (a3 + bzr)) ** 1.5)    
-      fod = fod1 + fod2 + fod3
-C     ---  Total force  ---
-      ftot = foh + foc + fod 
-C     ---  If we want the result in km/s²  ---
-      fcv = 1.0/(3.086e+16)
-      ftot = fcv * abs(ftot)
-C     ---  The sign of z will be  ---
-      f = -sign(ftot, zsig)
-      z = zsig
+      disk_force = disk_force_1 + disk_force_2 + disk_force_3
+
+C     Total force
+      total_force = halo_force + central_force + disk_force 
+
+C     If we want the result in km/s²
+C     TODO: find out the meaning of the following const, conversion?
+      fcv = 1.0 / (3.086e+16)
+      total_force = fcv * abs(total_force)
+
+C     The sign of z_coordinate will be
+      force = -sign(total_force, zsig)
+      z_coordinate = zsig
       
-      return
-      end
-C***********************************************************************
+      end subroutine
