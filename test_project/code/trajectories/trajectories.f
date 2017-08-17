@@ -19,7 +19,8 @@ C     TODO: find out the meaning of hmin, wosun
      &                   SECONDS_IN_GYR = SECONDS_IN_HOUR 
      &                                    * HOURS_IN_DAY
      &                                    * DAYS_IN_YEAR
-     &                                    * YEARS_IN_GYR
+     &                                    * YEARS_IN_GYR,
+     &                   METERS_IN_PARSEC = 3.086e+16
       integer :: numberOfWDs,
      &           wd_index,
      &           NOK,
@@ -79,8 +80,7 @@ C     Integrating trajectories
           ycar = ypla(wd_index)
 C         TODO: find out the meaning of wo and 8.0
           wo = ww(wd_index) + 8.0
-C         TODO: find out the meaning of zo and 3.086e+16
-          zo = real(coordinate_Zcylindr(wd_index) * (3.086e+16))
+          zo = real(coordinate_Zcylindr(wd_index) * METERS_IN_PARSEC)
 C         TODO: find out the meaning of ecini
           ecini = 0.5 * wo * wo
           call epot(zo, epoti)
@@ -103,7 +103,7 @@ C         Calling to the Runge-Kutta integrator
 C         TODO: find out the meaning of ecinf    
           ecinf = 0.5 * y(2) * y(2)
           call epot(y(1), epotf)
-          coordinate_Zcylindr(wd_index) = y(1) / (3.086e+16)
+          coordinate_Zcylindr(wd_index) = y(1) / METERS_IN_PARSEC
           ww(wd_index) = y(2) + WOSUN
       end do
       end subroutine
@@ -124,6 +124,7 @@ C       e: potential energy (km2/s2)
 C=======================================================================
       implicit real (a-h,m,o-z)    
       
+      real, parameter :: METERS_IN_PARSEC = 3.086e+16
       real ro,vh,rc1,mc1,rc2,mc2,b,md1,md2,md3,a1,a2,a3,g
       real xcar,ycar,xpla,ypla,rpla,zsig,z,vh2,ro2
       real rc12,rc22,b2,rpla2,r2,poth,xa,xb,potc,xx
@@ -147,7 +148,7 @@ C     ---  Some calculations of interest   ---
       ypla=ycar
       rpla=sqrt(xpla*xpla+ypla*ypla)
       zsig=z
-      z=abs(z/(3.086e+16))                  
+      z=abs(z/METERS_IN_PARSEC)                  
       vh2=0.5*vh*vh
       ro2=ro*ro
       rc12=rc1*rc1
@@ -204,7 +205,9 @@ C     TODO: find out the meaning of all the variables
      &                   a2 = 17.43,
      &                   md3 = 3.3d+09, 
      &                   a3 = 34.86,
-     &                   g = 4.30026e-6
+     &                   g = 4.30026e-6,
+C                        TODO: take this out
+     &                   METERS_IN_PARSEC = 3.086e+16
 
       real :: xcar, 
      &        ycar, 
@@ -233,7 +236,7 @@ C     TODO: find out the meaning of all the variables
       xpla = xcar
       ypla = ycar
       zsig = z_coordinate
-      z_coordinate = abs(z_coordinate) / (3.086e+16)
+      z_coordinate = abs(z_coordinate) / METERS_IN_PARSEC
       rpla2 = xpla * xpla + ypla * ypla
       rpla = sqrt(rpla2)
       r2 = rpla * rpla + z_coordinate * z_coordinate
@@ -264,7 +267,7 @@ C     Total force
 
 C     If we want the result in km/s²
 C     TODO: find out the meaning of the following const, conversion?
-      fcv = 1.0 / (3.086e+16)
+      fcv = 1.0 / METERS_IN_PARSEC
       total_force = fcv * abs(total_force)
 
 C     The sign of z_coordinate will be
