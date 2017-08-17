@@ -6,8 +6,7 @@ C       Althaus PG-DB, Z=0.01
 C       Althaus for Z=0.06
 C-----------------------------------------------------------------------
 C     I/O parameter:
-C       table: instance of FileGroupInfo class, see tables_linking
-C              for details
+C       table: instance of FileGroupInfo class, more info at tables_linking
 C=======================================================================
       use external_types
       implicit real (a-h,m,o-z)

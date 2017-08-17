@@ -12,6 +12,7 @@ from alcor.types import NumericType
 logger = logging.getLogger(__name__)
 
 
+# TODO: rewrite, use dict
 def generate_parameters_values(*,
                                parameters: Dict[str, Dict[str, NumericType]],
                                precision: int,

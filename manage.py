@@ -108,6 +108,7 @@ def simulate(ctx: click.Context,
               is_flag=True,
               help='Apply Lepine\'s criterion.')
 @click.pass_context
+# TODO: check order
 def process(ctx: click.Context,
             filtration_method: str,
             nullify_radial_velocity: bool,
@@ -190,6 +191,7 @@ def plot(ctx: click.Context,
     with get_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
+        # TODO: rename module to plots, and draw_plots to draw
         draw_plots(group_id,
                    luminosity_function,
                    velocities_vs_magnitude,

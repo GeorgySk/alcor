@@ -8,8 +8,8 @@ C     This subroutine can be used to read the tables for one
 C     metallicity in particular, according to the input index.
 C-----------------------------------------------------------------------
 C     I/O parameter:
-C       table: instance of FileGroupInfo class, see external_types and 
-C              tables_linking for details
+C       table: instance of FileGroupInfo class, more info at external_types and
+C              tables_linking
 C=======================================================================
       use external_types
       implicit real (a-h,m,o-z)

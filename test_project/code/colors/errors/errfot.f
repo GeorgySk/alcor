@@ -3,7 +3,7 @@ C=======================================================================
 C
 C     This soubrutine add a photometric error to the ugriz magnitudes
 C     using a fifth polynomial fit.
-C     See Alberto Rebassa Mansergas et al, 2016, DR12
+C     More info at Alberto Rebassa Mansergas et al, 2016, DR12
 C
 C     Created 03/2016 (ER Cojocaru)
 C     Revised 07/2017 (S Torres)

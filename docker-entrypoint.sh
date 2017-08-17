@@ -5,6 +5,8 @@ cd test_project
 # unzipping seed files
 unzip -o forts.zip
 
+# TODO: move this to docker-compose.yml
+# More info at https://docs.docker.com/compose/environment-variables/
 ffpe_trap_list=$(echo "zero"\
                       "overflow"\
                       "invalid"\

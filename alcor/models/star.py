@@ -151,7 +151,7 @@ class Star(Base):
 
     @property
     def bolometric_magnitude(self) -> float:
-        # For explanations see:
+        # More info at
         # https://en.wikipedia.org/wiki/Absolute_magnitude#Bolometric_magnitude
         return (2.5 * float(self.luminosity)
                 + SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE)

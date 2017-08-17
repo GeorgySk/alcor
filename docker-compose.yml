@@ -10,6 +10,8 @@ services:
     extra_hosts:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
+#    TODO: add more d-c files and call them like:
+#         /set-dockerhost docker-compose -f docker-compose.plot.yml up
       # Generating stars:
 #      - simulate
 #      - --project-dir

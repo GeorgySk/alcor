@@ -15,5 +15,5 @@ ColumnValueType = Union[int,
                         float,
                         str,
                         datetime,
-                        uuid.uuid4,
+                        uuid.UUID,
                         None]
