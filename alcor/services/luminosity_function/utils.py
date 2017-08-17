@@ -7,6 +7,7 @@ from typing import (Iterable,
 from alcor.models import (Group,
                           Star)
 from alcor.models.luminosity_function import Point
+from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
 from alcor.types import StarsBinsType
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.
@@ -17,7 +18,6 @@ BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
 BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
-FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
 def generate_stars_bins(stars: List[Star]) -> StarsBinsType:

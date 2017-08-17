@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from alcor.models.luminosity_function import Point
+from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
 
 
 FILENAME = 'luminosity_function.ps'
@@ -32,8 +33,6 @@ CAP_SIZE = 5
 OBSERVATIONAL_AVG_BIN_MAGNITUDES = np.arange(7.75, 17.25, 0.5)
 OBSERVATIONAL_STARS_COUNTS = [3, 4, 5, 7, 12, 17, 17, 12, 20, 19, 37, 42, 52,
                               72, 96, 62, 20, 3, 1]
-# TODO: this presents in processing as well
-FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 OBSERVATIONAL_STARS_COUNT_LOGARITHMS = [
     log10(_ / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
     for _ in OBSERVATIONAL_STARS_COUNTS]
