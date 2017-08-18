@@ -109,77 +109,94 @@ C         TODO: find out the meaning of ecinf
       end subroutine
 
 
-C***********************************************************************      
-C     TODO: rewrite      
-      subroutine epot(z,e)
-C=======================================================================
-C
-C     This function calculates the force along z-coordinate. 
-C--------------------------------------------------------------------
-C     Input parameters:
-C       z: coordinate z (km)
-C--------------------------------------------------------------------
-C     Output parameters:
-C       e: potential energy (km2/s2)
-C=======================================================================
-      implicit real (a-h,m,o-z)    
+C     TODO: give a better name
+      subroutine epot(coordinate_z_km,
+     &                potential_energy)
+C         Calculating force along z-coordinate. 
+C         potential_energy in km²/s²
+          implicit none   
       
-      real, parameter :: METERS_IN_PARSEC = 3.086e+16
-      real ro,vh,rc1,mc1,rc2,mc2,b,md1,md2,md3,a1,a2,a3,g
-      real xcar,ycar,xpla,ypla,rpla,zsig,z,vh2,ro2
-      real rc12,rc22,b2,rpla2,r2,poth,xa,xb,potc,xx
-      real xd1,xd2,xd3,potd,potd1,potd2,potd3,pot,e
-
-C     ---   Parameters   ---
-      parameter(ro=8.5,vh=220.0)
-      parameter(rc1=2.7,mc1=3.0d+09)
-      parameter(rc2=0.42,mc2=1.6d+10)
-      parameter(b=0.3)
-      parameter(md1=6.6e+10,a1=5.81)
-      parameter(md2=-2.9e+10,a2=17.43)
-      parameter(md3=3.3e+09,a3=34.86)
-      parameter(g=4.30026e-6)
-      
-C     ---   Common  
-      common /carte/ xcar,ycar
-                  
-C     ---  Some calculations of interest   ---
-      xpla=xcar
-      ypla=ycar
-      rpla=sqrt(xpla*xpla+ypla*ypla)
-      zsig=z
-      z=abs(z/METERS_IN_PARSEC)                  
-      vh2=0.5*vh*vh
-      ro2=ro*ro
-      rc12=rc1*rc1
-      rc22=rc2*rc2
-      b2=b*b
-      rpla2=rpla*rpla
-      r2=rpla2+z*z
-
-C     ---   Calculating the potentials  ---           
-C     ---   Dark halo  ---
-      poth=vh2*log(r2+ro2)
-C     ---   Central component  ---      
-      xa=sqrt(r2+rc12)
-      xb=sqrt(r2+rc22)
-      potc=((-g*mc1)/xa)+((-g*mc2)/xb)
-C     ---   Disk  ---
-      xx=sqrt(z*z+b2)
-      xd1=rpla2+((a1+xx)*(a1+xx))
-      xd2=rpla2+((a2+xx)*(a2+xx))
-      xd3=rpla2+((a3+xx)*(a3+xx))
-      potd1=(g*md1)/(sqrt(xd1))
-      potd2=(g*md2)/(sqrt(xd2))
-      potd3=(g*md3)/(sqrt(xd3))
-      potd=-potd1-potd2-potd3
-C     ---   Total potential  ---
-      pot=poth+potc+potd       
-      e=pot
-      z=zsig
-      
-      return
-      end
+          real, parameter :: METERS_IN_PARSEC = 3.086e+16,
+C                            TODO: find out meaning of these constants
+     &                       RO = 8.5,
+     &                       SQUARED_RO = RO * RO,
+     &                       VH = 220.0,
+     &                       HALF_SQUARED_VH = 0.5 * VH * VH,
+     &                       RC1 = 2.7,
+     &                       SQUARED_RC1 = RC1 * RC1,
+     &                       MC1 = 3.0e+09,
+     &                       RC2 = 0.42,
+     &                       SQUARED_RC2 = RC2 * RC2,
+     &                       MC2 = 1.6e+10,
+     &                       B = 0.3,
+     &                       SQUARED_B = B * B,
+     &                       MD1 = 6.6e+10,
+     &                       A1 = 5.81,
+     &                       MD2 = -2.9e+10,
+     &                       A2 = 17.43,
+     &                       MD3 = 3.3e+09,
+     &                       A3 = 34.86,
+     &                       G = 4.30026e-6
+C         TODO: find out the meaning of these variables
+          real :: xcar,
+     &            ycar,
+     &            xpla,
+     &            ypla,
+     &            rpla,
+     &            zsig,
+     &            coordinate_z_km,
+     &            squared_rpla,
+     &            r2,
+     &            dark_halo_potential,
+     &            xa,
+     &            xb,
+     &            central_component_potential,
+     &            xx,
+     &            xd1,
+     &            xd2,
+     &            xd3,
+     &            disk_potential,
+     &            disk_potential_1,
+     &            disk_potential_2,
+     &            disk_potential_3,
+     &            potential_energy
+    
+          common /carte/ xcar,ycar
+                      
+          xpla = xcar
+          ypla = ycar
+          rpla = sqrt(xpla * xpla + ypla * ypla)
+          zsig = coordinate_z_km
+          coordinate_z_km = abs(coordinate_z_km / METERS_IN_PARSEC)
+          squared_rpla = rpla * rpla
+          r2 = squared_rpla + coordinate_z_km * coordinate_z_km
+    
+C         Calculating the potentials          
+C         Dark halo
+          dark_halo_potential = HALF_SQUARED_VH * log(r2 + SQUARED_RO)
+    
+C         Central component     
+          xa = sqrt(r2 + SQUARED_RC1)
+          xb = sqrt(r2 + SQUARED_RC2)
+          central_component_potential = -g * MC1 / xa - g * MC2 / xb
+    
+C         Disk
+          xx = sqrt(coordinate_z_km * coordinate_z_km + SQUARED_B)
+          xd1 = squared_rpla + ((A1 + xx) * (A1 + xx))
+          xd2 = squared_rpla + ((A2 + xx) * (A2 + xx))
+          xd3 = squared_rpla + ((A3 + xx) * (A3 + xx))
+          disk_potential_1 = (G * MD1) / (sqrt(xd1))
+          disk_potential_2 = (G * MD2) / (sqrt(xd2))
+          disk_potential_3 = (G * MD3) / (sqrt(xd3))
+          disk_potential = -disk_potential_1 - disk_potential_2 
+     &                     - disk_potential_3
+    
+C         Total potential
+          potential_energy = dark_halo_potential
+     &                       + central_component_potential 
+     &                       + disk_potential
+          coordinate_z_km = zsig
+      end subroutine
 
 
       subroutine fuerza(z_coordinate, force)
