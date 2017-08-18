@@ -9,7 +9,7 @@ C     minimum_sector_radius: minimum radius of the sector; in Kpc from
 C                            the Galactic Center (GC)
 C     maximum_sector_radius: maximum radius
 C     angle_covering_sector: angle covering the sector in degrees;
-C                          from the GC
+C                            from the GC
 C     solar_galactocentric_distance: galactocentric distance of the Sun
       implicit none
 
@@ -78,49 +78,54 @@ C     and radius between minimum_sector_radius and maximum_sector_radius
       sector_diameter = maximum_sector_radius - minimum_sector_radius
                 
       do wd_index = 1, numberOfWDs
-3         coordinate_Theta(wd_index) = (
-     &        angle_covering_sector_in_radians
-     &        * ran(iseed) - angle_covering_sector_in_radians / 2)
-          
-          if (coordinate_Theta(wd_index) < 0.0) then
-              coordinate_Theta(wd_index) = coordinate_Theta(wd_index) 
-     &                                     + TAU
-          end if
-          
-          do 
-              random_valid_radius = minimum_sector_radius 
-     &                              + sector_diameter * ran(iseed)
-C             TODO: find out the meaning of zzy and 0.16
-              zzy = 0.16 * ran(iseed)
-C             TODO: find out the meaning of zzr
-              zzr = exp(-random_valid_radius / scale_length)
-              if (zzy <= zzr) then
+          do
+              coordinate_Theta(wd_index) = (
+     &            angle_covering_sector_in_radians
+     &            * ran(iseed) - angle_covering_sector_in_radians / 2)
+              
+              if (coordinate_Theta(wd_index) < 0.0) then
+                  coordinate_Theta(wd_index) = (
+     &                coordinate_Theta(wd_index) + TAU)
+              end if
+              
+              do 
+                  random_valid_radius = minimum_sector_radius 
+     &                                  + sector_diameter * ran(iseed)
+C                 TODO: find out the meaning of zzy and 0.16
+                  zzy = 0.16 * ran(iseed)
+C                 TODO: find out the meaning of zzr
+                  zzr = exp(-random_valid_radius / scale_length)
+                  if (zzy <= zzr) then
+                      exit
+                  end if
+              end do
+    
+C             TODO: give a good name for zz
+              zz = (random_valid_radius - minimum_sector_radius) 
+     &             / sector_diameter
+C             TODO: find out the meaning of xx
+              xx = squared_minimum_sector_radius 
+     &             + squared_radii_difference 
+     &               * zz
+              coordinate_R(wd_index) = sqrt(xx)
+              xc = real(coordinate_R(wd_index) 
+     &                  * cos(coordinate_Theta(wd_index)))
+              yc = real(coordinate_R(wd_index) 
+     &                  * sin(coordinate_Theta(wd_index)))
+C             TODO: find out the meanng of dist
+              dist = real((xc - solar_galactocentric_distance)
+     &                    * (xc - solar_galactocentric_distance) 
+     &                    + yc * yc)
+
+C             TODO: find out what this means       
+C             Sol no hay más que uno
+C             TODO: find out the meaning of 0.0000015 const
+              if (dist <= squared_sector_radius 
+     &                .and. dist >= 0.0000015) then 
                   exit
               end if
           end do
 
-C         TODO: give a good name for zz
-          zz = (random_valid_radius - minimum_sector_radius) 
-     &         / sector_diameter
-C         TODO: find out the meaning of xx
-          xx = squared_minimum_sector_radius 
-     &         + squared_radii_difference 
-     &           * zz
-          coordinate_R(wd_index) = sqrt(xx)
-          xc = real(coordinate_R(wd_index) 
-     &              * cos(coordinate_Theta(wd_index)))
-          yc = real(coordinate_R(wd_index) 
-     &              * sin(coordinate_Theta(wd_index)))
-C         TODO: find out the meanng of dist
-          dist = real((xc - solar_galactocentric_distance)
-     &                * (xc - solar_galactocentric_distance) 
-     &                + yc * yc)
-C         TODO: find out what this means       
-C         Sol no hay más que uno
-C         TODO: get rid of this goto
-          if (dist > squared_sector_radius .or. dist < 0.0000015) then 
-              goto 3
-          end if
 C         TODO: find out the meanng of x and y
           x(wd_index) = xc
           y(wd_index) = yc
