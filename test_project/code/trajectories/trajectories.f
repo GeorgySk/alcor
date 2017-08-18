@@ -36,8 +36,6 @@ C     TODO: find out the meaning of hmin, wosun
      &        htry,
      &        initial_time,
      &        ecinf,
-     &        epotf,
-     &        epoti,
      &        f
       real :: uu(MAX_STARS_COUNT),
      &        vv(MAX_STARS_COUNT),
@@ -83,7 +81,6 @@ C         TODO: find out the meaning of wo and 8.0
           zo = real(coordinate_Zcylindr(wd_index) * METERS_IN_PARSEC)
 C         TODO: find out the meaning of ecini
           ecini = 0.5 * wo * wo
-          call get_potential_energy(zo, epoti)
           time_increment = (galacticDiskAge - starBirthTime(wd_index)) 
      &                     / float(NJUMPS)
 C         Time in seconds
@@ -102,99 +99,9 @@ C         Calling to the Runge-Kutta integrator
      &                HMIN, NOK, NBAD, DERIVS, RKQC, yscal, y, dydx)
 C         TODO: find out the meaning of ecinf    
           ecinf = 0.5 * y(2) * y(2)
-          call get_potential_energy(y(1), epotf)
           coordinate_Zcylindr(wd_index) = y(1) / METERS_IN_PARSEC
           ww(wd_index) = y(2) + WOSUN
       end do
-      end subroutine
-
-
-      subroutine get_potential_energy(coordinate_z_km,
-     &                                potential_energy)
-C         Calculating force along z-coordinate. 
-C         potential_energy in km²/s²
-          implicit none   
-      
-          real, parameter :: METERS_IN_PARSEC = 3.086e+16,
-C                            TODO: find out meaning of these constants
-     &                       RO = 8.5,
-     &                       SQUARED_RO = RO * RO,
-     &                       VH = 220.0,
-     &                       HALF_SQUARED_VH = 0.5 * VH * VH,
-     &                       RC1 = 2.7,
-     &                       SQUARED_RC1 = RC1 * RC1,
-     &                       MC1 = 3.0e+09,
-     &                       RC2 = 0.42,
-     &                       SQUARED_RC2 = RC2 * RC2,
-     &                       MC2 = 1.6e+10,
-     &                       B = 0.3,
-     &                       SQUARED_B = B * B,
-     &                       MD1 = 6.6e+10,
-     &                       A1 = 5.81,
-     &                       MD2 = -2.9e+10,
-     &                       A2 = 17.43,
-     &                       MD3 = 3.3e+09,
-     &                       A3 = 34.86,
-     &                       G = 4.30026e-6
-C         TODO: find out the meaning of these variables
-          real :: xcar,
-     &            ycar,
-     &            xpla,
-     &            ypla,
-     &            rpla,
-     &            zsig,
-     &            coordinate_z_km,
-     &            squared_rpla,
-     &            r2,
-     &            dark_halo_potential,
-     &            xa,
-     &            xb,
-     &            central_component_potential,
-     &            xx,
-     &            xd1,
-     &            xd2,
-     &            xd3,
-     &            disk_potential,
-     &            disk_potential_1,
-     &            disk_potential_2,
-     &            disk_potential_3,
-     &            potential_energy
-    
-          common /carte/ xcar,ycar
-                      
-          xpla = xcar
-          ypla = ycar
-          rpla = sqrt(xpla * xpla + ypla * ypla)
-          zsig = coordinate_z_km
-          coordinate_z_km = abs(coordinate_z_km / METERS_IN_PARSEC)
-          squared_rpla = rpla * rpla
-          r2 = squared_rpla + coordinate_z_km * coordinate_z_km
-    
-C         Calculating the potentials          
-C         Dark halo
-          dark_halo_potential = HALF_SQUARED_VH * log(r2 + SQUARED_RO)
-    
-C         Central component     
-          xa = sqrt(r2 + SQUARED_RC1)
-          xb = sqrt(r2 + SQUARED_RC2)
-          central_component_potential = -g * MC1 / xa - g * MC2 / xb
-    
-C         Disk
-          xx = sqrt(coordinate_z_km * coordinate_z_km + SQUARED_B)
-          xd1 = squared_rpla + ((A1 + xx) * (A1 + xx))
-          xd2 = squared_rpla + ((A2 + xx) * (A2 + xx))
-          xd3 = squared_rpla + ((A3 + xx) * (A3 + xx))
-          disk_potential_1 = (G * MD1) / (sqrt(xd1))
-          disk_potential_2 = (G * MD2) / (sqrt(xd2))
-          disk_potential_3 = (G * MD3) / (sqrt(xd3))
-          disk_potential = -disk_potential_1 - disk_potential_2 
-     &                     - disk_potential_3
-    
-C         Total potential
-          potential_energy = dark_halo_potential
-     &                       + central_component_potential 
-     &                       + disk_potential
-          coordinate_z_km = zsig
       end subroutine
 
 
