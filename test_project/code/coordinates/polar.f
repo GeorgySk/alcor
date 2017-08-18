@@ -117,8 +117,6 @@ C             TODO: find out the meanng of dist
      &                    * (xc - solar_galactocentric_distance) 
      &                    + yc * yc)
 
-C             TODO: find out what this means       
-C             Sol no hay más que uno
 C             TODO: find out the meaning of 0.0000015 const
               if (dist <= squared_sector_radius 
      &                .and. dist >= 0.0000015) then 
