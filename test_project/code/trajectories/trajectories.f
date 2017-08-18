@@ -24,7 +24,8 @@ C     TODO: find out the meaning of hmin, wosun
       integer :: numberOfWDs,
      &           wd_index,
      &           NOK,
-     &           NBAD
+     &           NBAD,
+     &           flagOfWD(MAX_STARS_COUNT)
       real :: galacticDiskAge,
      &        final_time,
      &        xcar,
@@ -42,7 +43,6 @@ C     TODO: find out the meaning of hmin, wosun
      &        ww(MAX_STARS_COUNT),
      &        starBirthTime(MAX_STARS_COUNT),
      &        m(MAX_STARS_COUNT),
-     &        flagOfWD(MAX_STARS_COUNT),
      &        yscal(2),
      &        y(2),
      &        dydx(2),

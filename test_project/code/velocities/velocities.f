@@ -20,7 +20,8 @@ C              Lynden-Bell 1986)
      &               i,
      &               k,
      &               numberOfWDs,
-     &               disk_belonging(MAX_STARS_COUNT)
+     &               disk_belonging(MAX_STARS_COUNT),
+     &               flagOfWD(MAX_STARS_COUNT)
           real :: peculiar_solar_velocity_u,
      &            peculiar_solar_velocity_v,
      &            peculiar_solar_velocity_w,
@@ -33,8 +34,7 @@ C         Heliocentric velocities, B3 system
      &            uu(MAX_STARS_COUNT),
      &            vv(MAX_STARS_COUNT),
      &            ww(MAX_STARS_COUNT),
-     &            velocities_dispersions(3),
-     &            flagOfWD(MAX_STARS_COUNT)
+     &            velocities_dispersions(3)
           character(len = 6) :: geometry
           double precision :: coordinate_R(MAX_STARS_COUNT),
      &                        coordinate_Theta(MAX_STARS_COUNT),
@@ -57,8 +57,7 @@ C         TODO: find out why signs are different from values in Python
 C         Making the transfer of z, r, theta
           k = 0      
           do i = 1, sample_stars_count
-C             TODO: make it integer
-              if (flagOfWD(i) > 0.95 .and. flagOfWD(i) < 1.05) then
+              if (flagOfWD(i) == 1) then
                   k = k + 1
                   coordinate_Zcylindr(k) = coordinate_Zcylindr(i)
                   if (geometry == 'cones') then

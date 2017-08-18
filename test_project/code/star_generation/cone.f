@@ -27,13 +27,13 @@ C     with its height direction set by longitude and latitude
 
           integer, parameter :: numberOfStars = 6000000
           real :: starBirthTime(numberOfStars),
-     &            m(numberOfStars),
-     &            flagOfWD(numberOfStars)
+     &            m(numberOfStars)
           double precision :: coordinate_Theta(numberOfStars),
      &                        coordinate_R(numberOfStars),
      &                        coordinate_Zcylindr(numberOfStars)
           integer :: numberOfWDs,
-     &               disk_belonging(numberOfStars)
+     &               disk_belonging(numberOfStars),
+     &               flagOfWD(numberOfStars)
 
           real, parameter :: PI = 4.0 * atan(1.0),
      &                       FI = PI / 180.0,

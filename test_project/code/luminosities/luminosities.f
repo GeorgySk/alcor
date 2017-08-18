@@ -29,9 +29,9 @@ C       m: mass in the main sequence
      &            massOfWD(MAX_STARS_COUNT),
      &            metallicityOfWD(MAX_STARS_COUNT),
      &            effTempOfWD(MAX_STARS_COUNT),
-     &            flagOfWD(MAX_STARS_COUNT),
      &            m(MAX_STARS_COUNT)
-          integer disk_belonging(MAX_STARS_COUNT)
+          integer disk_belonging(MAX_STARS_COUNT),
+     &            flagOfWD(MAX_STARS_COUNT)
 
 C         TODO: give names with one style
           common /tm/ starBirthTime, m
@@ -100,8 +100,7 @@ C                     Using Z solar z = 0.01
           k = 0
 C         Making the transfer
           do i = 1, numberOfStarsInSample
-C             TODO: make it integer
-              if (flagOfWD(i) > 0.95 .and. flagOfWD(i) < 1.05) then
+              if (flagOfWD(i) == 1) then
                   k = k + 1
                   coolingTime(k) = coolingTime(i)
                   massOfWD(k) = massOfWD(i)

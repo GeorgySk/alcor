@@ -39,7 +39,8 @@ C                        TODO: these are params of thick disk. exactly?
      &            bin_index, 
      &            stars_count, 
      &            in, 
-     &            numberOfWDs
+     &            numberOfWDs,
+     &            flagOfWD(MAX_STARS_COUNT)
       real :: zz,                          tmax,
      &        ft,                          fz,
      &        timeOfBurst,                 burst_start_time, 
@@ -58,7 +59,6 @@ C                        TODO: these are params of thick disk. exactly?
 C     TODO: find out what is m. massInMainSequence? 
       real :: m(MAX_STARS_COUNT), 
      &        starBirthTime(MAX_STARS_COUNT),
-     &        flagOfWD(MAX_STARS_COUNT),
      &        scale_height
       integer :: disk_belonging(MAX_STARS_COUNT)
 

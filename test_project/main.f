@@ -493,7 +493,7 @@ C     Parameters of mass histograms
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
-      real flagOfWD(numberOfStars)
+      integer :: flagOfWD(numberOfStars)
 C     rgac - galactocentric distance to WD TODO: give a better name
       real rgac(numberOfStars)
       double precision :: lgac(numberOfStars),

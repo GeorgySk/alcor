@@ -23,7 +23,7 @@ C=======================================================================
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
-      real flagOfWD(numberOfStars)
+      integer :: flagOfWD(numberOfStars)
       real v(numberOfStars)
       real :: coolingTime(numberOfStars)
       integer typeOfWD(numberOfStars)

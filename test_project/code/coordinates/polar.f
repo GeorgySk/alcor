@@ -49,9 +49,9 @@ C     TODO: this is numberOfStars, take it up as const for all functions
      &                    coordinate_Theta(MAX_STARS_COUNT),
      &                    coordinate_Zcylindr(MAX_STARS_COUNT)
       real :: x(MAX_STARS_COUNT), 
-     &        y(MAX_STARS_COUNT),
-     &        flagOfWD(MAX_STARS_COUNT)
-      integer :: disk_belonging(MAX_STARS_COUNT)
+     &        y(MAX_STARS_COUNT)
+      integer :: disk_belonging(MAX_STARS_COUNT),
+     &           flagOfWD(MAX_STARS_COUNT)
 
       common /coorcil/ coordinate_R, 
      &                 coordinate_Theta,

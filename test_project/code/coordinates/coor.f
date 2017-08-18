@@ -51,9 +51,9 @@ C     TODO: find out the meaning of theta(THETA)
      &        radial_velocity(MAX_STARS_COUNT),
      &        uu(MAX_STARS_COUNT),
      &        vv(MAX_STARS_COUNT),
-     &        ww(MAX_STARS_COUNT),
-     &        flagOfWD(MAX_STARS_COUNT)
-      integer disk_belonging(MAX_STARS_COUNT)
+     &        ww(MAX_STARS_COUNT)
+      integer ::  disk_belonging(MAX_STARS_COUNT),
+     &            flagOfWD(MAX_STARS_COUNT)
 
       common /coorcil/ coordinate_R, 
      &                 coordinate_Theta,
