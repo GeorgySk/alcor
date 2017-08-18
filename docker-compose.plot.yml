@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  alcor:
+    build: .
+    image: lycantropos/alcor:latest
+    entrypoint: "/alcor/docker-entrypoint.sh"
+    volumes:
+      - .:/alcor/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"  # for debugging
+    command:
+      # Plotting
+      - plot
+#      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
+      - --luminosity-function
+      - --velocities-vs-magnitude
+      - --velocity-clouds
+      - --lepine-criterion
+      - --heatmap
+      - velocities
+      - --toomre-diagram
+      - --ugriz-color-color-diagram
+    environment:
+      - POSTGRES_URI=postgresql://username:password@postgres/alcor
+
+  postgres:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=alcor
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+
+volumes:
+  cassandra-data:
+  postgres_data:

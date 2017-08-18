@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  alcor:
+    build: .
+    image: lycantropos/alcor:latest
+    entrypoint: "/alcor/docker-entrypoint.sh"
+    volumes:
+      - .:/alcor/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"  # for debugging
+    command:
+      # Generating stars:
+      - simulate
+      - --project-dir
+      - test_project
+      - --clean
+    environment:
+      - POSTGRES_URI=postgresql://username:password@postgres/alcor
+
+  postgres:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=alcor
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+
+volumes:
+  cassandra-data:
+  postgres_data:

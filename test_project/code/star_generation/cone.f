@@ -124,7 +124,7 @@ C                 assuming uniform distribution
      &                                      THIN_DISK_SCALEHEIGHT)
           
                       ! Monte-Carlo accepting/rejecting method
-                      ! TODO: find out if this be outside the inner loop
+                      ! TODO: find out if this can be outside the inner loop
                       random_valid_density = max_density * ran(iseed)
           
                       if (random_valid_density <= density) exit
