@@ -444,8 +444,6 @@ C***********************************************************************
       include 'code/magnitudes/interp.f'
 
       include 'code/colors/chanco.f'
-      
-      include 'code/velocities/vrado.f'
 
       include 'code/math/toSort.f'
 
