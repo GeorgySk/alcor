@@ -1,148 +1,123 @@
-C***********************************************************************
-C     TODO: delete iseed from dummies + rewrite all this
-      subroutine lumx(iseed,numberOfStarsInSample)
-C=======================================================================
-C     This subroutine determines what stars are WDs and calculates
-C     the cooling time and the luminosity of it.
-C
-C     Revised at 26.09.07 by S. Torres
-C     Introduced metalicity 08/2012 (ER Cojocaru)
-C     Adapted for G_Var 14.05.15 by S.Torres
-C-----------------------------------------------------------------------
-C     TODO: figure out what I/O parameters are 
-C=======================================================================
-      implicit real (a-h,m,o-z)
+      subroutine lumx(numberOfStarsInSample)
+C         Determining what stars are WDs and calculating cooling time 
+C         and luminosity for it
+          implicit none
 
-C     ---   Definition of variables  ---
-      integer iseed,numberOfStarsInSample,numberOfWDs,numberOfStars,
-     &        ntwdone,igorda,i,k,param
-      real galacticDiskAge,mebmin,mebmax,xntwd,mone,
-     &                 parameterIFMR
+          integer, parameter :: MAX_STARS_COUNT = 6000000
+C         Mass of Oxygen-Neon White Dwarf (ONe WD)
+          real, parameter :: O_NE_WD_MASS = 1.14
+          integer :: numberOfStarsInSample,
+     &               numberOfWDs,
+C                    Number of WDs of Oxygen-Neon type
+     &               wd_ONe_count,
+     &               i,
+     &               k
+          real :: galacticDiskAge,
+     &            parameterIFMR,
+     &            fractionOfDB,
+     &            parameterIMF,
+     &            timeOfBurst
 
-C     ---   Parameters   ---
-      parameter (numberOfStars=6000000)
-      parameter (mone=1.14)
-
-C     ---   Declaration of variables   ---
-C-----------------------------------------------------------------------
-C       starBirthTime: time of birth of the star
-C       tms: lifetime
-C       coolingTime
-C       luminosityOfWD
-C       massOfWD
+C       TODO: rename tms
+C       tms: lifetime -> main sequence time?
+C       TODO: change to logical - is_WD
 C       flagOfWD: 0 - it's not WD, 1 - it's a WD
+C       TODO: rename
 C       m: mass in the main sequence
-C       numberOfWDs: total number of WDs
-C-----------------------------------------------------------------------
-      real starBirthTime(numberOfStars),tms(numberOfStars)
-      real :: coolingTime(numberOfStars)
-      real luminosityOfWD(numberOfStars),
-     &                 massOfWD(numberOfStars),
-     &                 metallicityOfWD(numberOfStars),
-     &                 effTempOfWD(numberOfStars)
-      real flagOfWD(numberOfStars)
-      real m(numberOfStars)
-      real ztcool(numberOfStars),zmeb(numberOfStars),
-     &                 zzeb(numberOfStars),ztms(numberOfStars)
-      real ztborn(numberOfStars)
-      integer disk_belonging(numberOfStars)
+          real :: starBirthTime(MAX_STARS_COUNT),
+     &            tms(MAX_STARS_COUNT),
+     &            coolingTime(MAX_STARS_COUNT),
+     &            luminosityOfWD(MAX_STARS_COUNT),
+     &            massOfWD(MAX_STARS_COUNT),
+     &            metallicityOfWD(MAX_STARS_COUNT),
+     &            effTempOfWD(MAX_STARS_COUNT),
+     &            flagOfWD(MAX_STARS_COUNT),
+     &            m(MAX_STARS_COUNT)
+          integer disk_belonging(MAX_STARS_COUNT)
 
-C     ---  Commons  ---
-      common /tm/ starBirthTime,m
-      common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
-     &                effTempOfWD
-      common /index/ flagOfWD,numberOfWDs,disk_belonging
-      common /cool/ coolingTime
-      common /tms/ tms
-      common /param/ fractionOfDB,galacticDiskAge,parameterIMF,
-     &               parameterIFMR,timeOfBurst
+C         TODO: give names with one style
+          common /tm/ starBirthTime, m
+          common /enanas/ luminosityOfWD,
+     &                    massOfWD,
+     &                    metallicityOfWD,
+     &                    effTempOfWD
+          common /index/ flagOfWD,
+     &                   numberOfWDs,
+     &                   disk_belonging
+          common /cool/ coolingTime
+          common /tms/ tms
+          common /param/ fractionOfDB,
+     &                   galacticDiskAge,
+     &                   parameterIMF,
+     &                   parameterIFMR,
+     &                   timeOfBurst
 
-C-----------------------------------------------------------------------
-C     ---  Deciding what stars are WDs  ---
-C-----------------------------------------------------------------------
-      mebmin=0.2
-      mebmax=1.2
-      numberOfWDs=0
-      ntwdone=0
-      igorda=0      
-      param=1
+          numberOfWDs = 0
+          wd_ONe_count = 0
 
-C     ---  Deciding if the star is a WD  ---
-      do 1 i=1,numberOfStarsInSample
-        flagOfWD(i)=0
-C       ---  Deciding if the star is a WD  ---
-C       Progenitor star that generates a ONe WD: 8.5<M_MS<10.5
-C       WD of CO: m_WD<1.14; of ONe: m_wd>1.14
-        if (m(i).le.10.5) then
-C         ---  Attributing a solar metallicity to all the stars ---
-          metallicityOfWD(i)=0.01
-C         ---  Calculating the lifetime in the main sequence ---
-          call tsp(m(i),metallicityOfWD(i),tms(i))
-C         ---  Calculating of the cooling time  ---
-          coolingTime(i)=galacticDiskAge-starBirthTime(i)-tms(i)
-          if (coolingTime(i).gt.0.0) then
-C           ---- IFMR -----
-            call mmswd(m(i),massOfWD(i))
-C           Using Z solar z=0.01 
-C             write (667,*) m(i),massOfWD(i)
-            massOfWD(i)=parameterIFMR*massOfWD(i)
-            if(massOfWD(i).le.1.4) then 
-              flagOfWD(i)=1
-              numberOfWDs=numberOfWDs+1
-              if(massOfWD(i).gt.mone) then
-                ntwdone=ntwdone+1
-              endif
-            else
-              flagOfWD(i)=0
-            endif
-          else
-            flagOfWD(i)=0
-          endif
-        else
-          flagOfWD(i)=0
-        endif
- 1    continue
+C         Deciding if the star is a WD
+          do i = 1, numberOfStarsInSample
+              flagOfWD(i) = 0
+C             Progenitor star that generates a ONe WD: 8.5 <M_MS < 10.5
+C             WD of CO: m_WD <1.14; of ONe: m_wd>1.14
+              if (m(i) <= 10.5) then
+C                 Attributing a solar metallicity to all the stars
+                  metallicityOfWD(i) = 0.01
+C                 Calculating the lifetime in the main sequence
+                  call tsp(m(i), 
+     &                     metallicityOfWD(i), 
+     &                     tms(i))
+C                 Calculating the cooling time
+                  coolingTime(i) = galacticDiskAge - starBirthTime(i) 
+     &                             - tms(i)
+                  if (coolingTime(i) > 0.0) then
+C                     Initial-to-Final Mass Relation (IFMR)
+                      call mmswd(m(i), massOfWD(i))
+C                     Using Z solar z = 0.01
+                      massOfWD(i) = parameterIFMR * massOfWD(i)
+                      if (massOfWD(i) <= 1.4) then 
+                          flagOfWD(i) = 1
+                          numberOfWDs = numberOfWDs + 1
+                          if (massOfWD(i) > O_NE_WD_MASS) then
+                              wd_ONe_count = wd_ONe_count + 1
+                          end if
+                      else
+                          flagOfWD(i) = 0
+                      end if
+                  else
+                      flagOfWD(i) = 0
+                  end if
+              else
+                  flagOfWD(i) = 0
+              end if
+          end do
 
-      write (6,*) '******** Data   ***********'
-      write (6,*) ' Number of WDs: ', numberOfWDs
-      xntwd = float(numberOfWDs)
-      write (6,*) ' Number of ONe: ', ntwdone
-      if (numberOfWDs /= 0) then
-        write (6,*) ' ONe percentage: ',
-     &              100.0 * float(ntwdone) /xntwd, '%'
-      end if
-
-C     ---   Taking the stars that are WDs ---
-      do 2 i=1,numberOfStarsInSample
-        ztcool(i)=coolingTime(i)
-        zmeb(i)=massOfWD(i)
-        zzeb(i)=metallicityOfWD(i)
-        ztborn(i)=starBirthTime(i)
-        ztms(i)=tms(i)
-C         zdisk_belonging(i)=disk_belonging(i)
- 2    continue
-
-      k=0
-C     ---   Making the transfer   ---
-      do 3 i=1,numberOfStarsInSample
-        if (flagOfWD(i) > 0.95 .and. flagOfWD(i) < 1.05) then
-          k=k+1
-          coolingTime(k)=ztcool(i)
-          massOfWD(k)=zmeb(i)
-          metallicityOfWD(k)=zzeb(i)
-          starBirthTime(k)=ztborn(i)
-          tms(k)=ztms(i)
-          disk_belonging(k)=disk_belonging(i)
-        endif
- 3    continue
-
-      write(6,*) '      Total number of WDs=',numberOfWDs
-      write(6,*) '      WDs of ONe=',ntwdone
-
-      return
-      end
-C***********************************************************************
-
+          write (6,*) ' Number of WDs: ', numberOfWDs
+          write (6,*) ' Number of ONe: ', wd_ONe_count
+          if (numberOfWDs /= 0) then
+              write (6,*) ' ONe percentage: ',
+     &                    100.0 * float(wd_ONe_count) 
+     &                    / float(numberOfWDs), '%'
+          end if
+    
+          k = 0
+C         Making the transfer
+          do i = 1, numberOfStarsInSample
+C             TODO: make it integer
+              if (flagOfWD(i) > 0.95 .and. flagOfWD(i) < 1.05) then
+                  k = k + 1
+                  coolingTime(k) = coolingTime(i)
+                  massOfWD(k) = massOfWD(i)
+                  metallicityOfWD(k) = metallicityOfWD(i)
+                  starBirthTime(k) = starBirthTime(i)
+                  tms(k) = tms(i)
+                  disk_belonging(k) = disk_belonging(i)
+              end if
+          end do
+    
+          write(6,*) '      Total number of WDs=', numberOfWDs
+          write(6,*) '      WDs of ONe=', wd_ONe_count
+      end subroutine
 
 
 C     TODO: rewrite 
