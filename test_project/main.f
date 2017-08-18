@@ -265,9 +265,6 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
       call color(table(11))
       call colordb(table(10))
 
-      write (6,*) '   1.5 Reading the tables of CO DA with G variable'      
-      call incoolea
-
       if ((longitudes_from_csv .eqv. .false.) .and. 
      &      (latitudes_from_csv .eqv. .false.)) then
           iterations_count = 1
@@ -406,8 +403,6 @@ C***********************************************************************
       include 'code/star_generation/cone.f'
      
       include 'code/cooling/DA/DA_cooling.f'
-
-      include 'code/cooling/unknown/incoolea.f'
 
       include 'code/colors/DA/byRenedo.f'
 
