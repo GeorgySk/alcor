@@ -115,130 +115,128 @@ C         Making the transfer
       end subroutine
 
 
-C     TODO: rewrite 
-      subroutine tsp(m,z,t)
-C===================================================================
-C
-C     This subroutine calculates the lifetime in the main sequence
-C     for a given metallicity Z€[0.01,0.001]
-C     for standart helium content
-C     According to model by Leandro(private com.) & Renedo et al.(2010)
-C     Data in solar masses and Gyr
-C
-C-------------------------------------------------------------------
-C     Input parameters:
-C       m: mass of the star
-C       Z: metallicity
-C-------------------------------------------------------------------
-C     Output parameters:
-C       t: lifetime in the SP.
-C
-C====================================================================
-      implicit real (a-h,m,o-z)
+C     TODO: give a better name
+      subroutine tsp(stellar_mass, 
+     &               metallicity,
+     &               t)
+C         Calculates lifetime in the main sequence for a given 
+C         metallicity Z € [0.01, 0.001] for standart helium content 
+C         according to model by Leandro & Renedo et al.(2010)
+C         Data in solar masses and Gyr
+C         TODO: what is SP?
+C         t: lifetime in the SP.
+          implicit none
 
-C     ---   Dimensions  ---
-      dimension mms(10),tms(10)
-      dimension mms2(7),tms2(7)
+          real :: stellar_mass,
+     &            metallicity,
+     &            t,
+     &            mms(10),
+     &            tms(10),
+     &            mms2(7),
+     &            tms2(7),
+     &            pen,
+     &            tsol,
+     &            tsub
+          integer :: k
 
-C-------------------------------------------------------------------
-C     ---  Table of values Z solar --
-C-------------------------------------------------------------------
-      mms(1)=1.00
-      mms(2)=1.50    
-      mms(3)=1.75   
-      mms(4)=2.00   
-      mms(5)=2.25 
-      mms(6)=2.50 
-      mms(7)=3.00 
-      mms(8)=3.50  
-      mms(9)=4.00 
-      mms(10)=5.00   
+C         Table of values Z solar --
+          mms(1) = 1.00
+          mms(2) = 1.50    
+          mms(3) = 1.75   
+          mms(4) = 2.00   
+          mms(5) = 2.25 
+          mms(6) = 2.50 
+          mms(7) = 3.00 
+          mms(8) = 3.50  
+          mms(9) = 4.00 
+          mms(10) = 5.00   
 
-C     Althaus priv. comm X=0.725, Y=0.265
-      tms(1)=8.614
-      tms(2)=1.968
-      tms(3)=1.249  
-      tms(4)=0.865  
-      tms(5)=0.632
-      tms(6)=0.480
-      tms(7)=0.302
-      tms(8)=0.226 
-      tms(9)=0.149
-      tms(10)=0.088   
+C         Althaus priv. comm X = 0.725, Y = 0.265
+          tms(1) = 8.614
+          tms(2) = 1.968
+          tms(3) = 1.249  
+          tms(4) = 0.865  
+          tms(5) = 0.632
+          tms(6) = 0.480
+          tms(7) = 0.302
+          tms(8) = 0.226 
+          tms(9) = 0.149
+          tms(10) = 0.088   
 
-C     ---  Interpolating ---
-      if (m.lt.mms(1)) then
-C       --- Mass less than the first, linear extrapolation, 2 last 
-C           points 
-        pen=(tms(2)-tms(1))/(mms(2)-mms(1))
-        tsol=pen*m+(tms(1)-pen*mms(1))
-      else
-        if (m.gt.mms(10)) then
-C       --- Mass greater than the last, taking the fraction last point
-          tsol=(mms(10)/m)*tms(10)
-        else
-C         QUESTION:--- Interpolation properly/itself? ---    
-          k=1
-  1       k=k+1
-          if(m.lt.mms(k)) then
-            pen=(tms(k)-tms(k-1))/(mms(k)-mms(k-1))
-            tsol=pen*m+(tms(k)-pen*mms(k))
+C         Interpolating
+          if (stellar_mass < mms(1)) then
+C             Mass less than the first, linear extrapolation, 2 last 
+C             points 
+              pen = (tms(2) - tms(1)) / (mms(2) - mms(1))
+              tsol = pen * stellar_mass + (tms(1) - pen * mms(1))
           else
-            goto 1
-          endif 
-        endif
-      endif
-C-------------------------------------------------------------------
-C     ---  Tabla of values Z Sub-Solar --
-C-------------------------------------------------------------------
-      mms2(1)=0.85
-      mms2(2)=1.00    
-      mms2(3)=1.25   
-      mms2(4)=1.50   
-      mms2(5)=1.75 
-      mms2(6)=2.00 
-      mms2(7)=3.00 
+              if (stellar_mass > mms(10)) then
+C                 Mass greater than the last, taking the fraction last 
+C                 point
+                  tsol = (mms(10) / stellar_mass) * tms(10)
+              else
+C                 TODO: eliminate goto
+                  k = 1
+  1               k = k + 1
+                  if (stellar_mass < mms(k)) then
+                      pen = (tms(k) - tms(k - 1)) 
+     &                      / (mms(k) - mms(k - 1))
+                      tsol = pen * stellar_mass 
+     &                       + (tms(k) - pen * mms(k))
+                  else
+                      goto 1
+                  end if 
+              end if
+          end if
 
-C Althaus priv. comm X=0.752, Y=0.247
-      tms2(1)=10.34
-      tms2(2)=5.756
-      tms2(3)=2.623  
-      tms2(4)=1.412  
-      tms2(5)=0.905
-      tms2(6)=0.639
-      tms2(7)=0.245
+C         Tabla of values Z Sub-Solar
+          mms2(1) = 0.85
+          mms2(2) = 1.00    
+          mms2(3) = 1.25   
+          mms2(4) = 1.50   
+          mms2(5) = 1.75 
+          mms2(6) = 2.00 
+          mms2(7) = 3.00 
 
-C     ---  Interpolating ---
-      if (m.lt.mms2(1)) then
-C       --- Mass less than the first, linear extrapolation, 2 last 
-C           points 
-        pen=(tms2(2)-tms2(1))/(mms2(2)-mms2(1))
-        tsub=pen*m+(tms2(1)-pen*mms2(1))
-      else
-        if (m.gt.mms2(7)) then
-C         --- Masa greater than the last, extrapolating 2 last points
-          tsub=(mms(7)/m)*tms(7)
-        else
-C         QUESTION:--- Interpolation properly/itself? ---   
-          k=1
-  2       k=k+1
-          if(m.lt.mms2(k)) then
-            pen=(tms2(k)-tms2(k-1))/(mms2(k)-mms2(k-1))
-            tsub=pen*m+(tms2(k)-pen*mms2(k))
+C         Althaus priv. comm X = 0.752, Y = 0.247
+          tms2(1) = 10.34
+          tms2(2) = 5.756
+          tms2(3) = 2.623  
+          tms2(4) = 1.412  
+          tms2(5) = 0.905
+          tms2(6) = 0.639
+          tms2(7) = 0.245
+
+C         Interpolating
+          if (stellar_mass < mms2(1)) then
+C             Mass less than the first, linear extrapolation, 2 last 
+C             points 
+              pen = (tms2(2) - tms2(1)) / (mms2(2) - mms2(1))
+              tsub = pen * stellar_mass + (tms2(1) - pen * mms2(1))
           else
-            goto 2
-          endif 
-        endif
-      endif
+              if (stellar_mass > mms2(7)) then
+C                 Masa greater than the last, extrapolating 2 last 
+C                 points
+                  tsub = (mms(7) / stellar_mass) * tms(7)
+              else  
+C                 TODO: eliminate goto 
+                  k = 1
+  2               k = k + 1
+                  if (stellar_mass < mms2(k)) then
+                      pen = (tms2(k) - tms2(k - 1)) 
+     &                      / (mms2(k) - mms2(k - 1))
+                      tsub = pen * stellar_mass 
+     &                       + (tms2(k) - pen * mms2(k))
+                  else
+                      goto 2
+                  end if 
+              end if
+          end if
 
-C-------------------------------------------------------------------
-C     ---  Interpolating for the value of Z --
-C     z solar 10
-C-------------------------------------------------------------------
-      t=tsub+((tsol-tsub)/(0.01-0.001))*(z-0.001)
-
-      return
-      end
+C         Interpolating for the value of Z, z solar 10
+          t = tsub + ((tsol - tsub) / (0.01 - 0.001)) 
+     &               * (metallicity - 0.001)
+      end subroutine
       
 
 C     TODO: find out the meaning of the name of the function mmswd
