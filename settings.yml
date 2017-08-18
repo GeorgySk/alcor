@@ -1,6 +1,6 @@
 precision: 6
 
-geometry: sphere
+geometry: cones
 
 parameters:
   commons:
@@ -15,8 +15,8 @@ parameters:
   cones:
     thick_disk_stars_fraction: 0.8
     longitudes:
-      csv: ../legacy.csv
+      csv: ../test_angles.csv
       column: 8
     latitudes:
-      csv: ../legacy.csv
+      csv: ../test_angles.csv
       column: 9

@@ -13,10 +13,10 @@ services:
 #    TODO: add more d-c files and call them like:
 #         /set-dockerhost docker-compose -f docker-compose.plot.yml up
       # Generating stars:
-#      - simulate
-#      - --project-dir
-#      - test_project
-#      - --clean
+      - simulate
+      - --project-dir
+      - test_project
+      - --clean
       # Processing generated data:
 #      - process
 #      - --last=1
@@ -29,12 +29,12 @@ services:
 #      - --w-velocities-vs-magnitude
 #      - --w-lepine-criterion
       # Plotting
-      - plot
+#      - plot
 #      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
 #      - --luminosity-function
-      - --velocities-vs-magnitude
+#      - --velocities-vs-magnitude
 #      - --velocity-clouds
-      - --lepine-criterion
+#      - --lepine-criterion
 #      - --heatmap
 #      - velocities
 #      - --toomre-diagram
