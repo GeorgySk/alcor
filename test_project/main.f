@@ -218,9 +218,10 @@ C     the sequence of RNs to repeat itself(init:805577 133547):
       open(unit=772,file='input_data/seeds_line.in')
       read(unit=772,fmt=*) iseed1, iseed2
       close(unit=772)
-C       TODO: add if 
-      iseed1 = iseed1 - 1
-      iseed2 = iseed2 + 1
+      if (geometry == 'cones') then
+          iseed1 = iseed1 - 1
+          iseed2 = iseed2 + 1
+      end if
       open(unit=772,file='input_data/seeds_line.in',status='replace')
       write(unit=772,fmt=100) iseed1,iseed2
       close(unit=772)
@@ -366,9 +367,8 @@ C         converting cone height parameters from deg to rad
           write(6,*) '5. Generating heliocentric velocities (5/9)'
           call velh(iseed,numberOfStarsInSample,geometry)
 
-C         TODO: find out why are we missing the next step?
+C         TODO: find out why we are missing the next step
           goto 7
-C         TODO: find out what this means
 C         Calculating the trajectories according to/along z-coordinate
           write(6,*) '6. Integrating trajectories (6/9)'
           call traject(galacticDiskAge)

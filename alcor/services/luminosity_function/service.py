@@ -9,6 +9,8 @@ from .utils import (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME,
                     generate_stars_bins,
                     points)
 
+# More info at (The white dwarf population within 40 pc of the Sun,
+# Torres et al., 2016)
 SMALLEST_ERRORBARS_BINS_INDEXES = {15, 16, 17}
 
 
