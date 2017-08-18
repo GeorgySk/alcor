@@ -18,14 +18,12 @@ C                    Number of WDs of Oxygen-Neon type
      &            parameterIMF,
      &            timeOfBurst
 
-C       TODO: rename tms
-C       tms: lifetime -> main sequence time?
 C       TODO: change to logical - is_WD
 C       flagOfWD: 0 - it's not WD, 1 - it's a WD
 C       TODO: rename
 C       m: mass in the main sequence
           real :: starBirthTime(MAX_STARS_COUNT),
-     &            tms(MAX_STARS_COUNT),
+     &            main_sequence_lifetime(MAX_STARS_COUNT),
      &            coolingTime(MAX_STARS_COUNT),
      &            luminosityOfWD(MAX_STARS_COUNT),
      &            massOfWD(MAX_STARS_COUNT),
@@ -45,7 +43,6 @@ C         TODO: give names with one style
      &                   numberOfWDs,
      &                   disk_belonging
           common /cool/ coolingTime
-          common /tms/ tms
           common /param/ fractionOfDB,
      &                   galacticDiskAge,
      &                   parameterIMF,
@@ -66,10 +63,10 @@ C                 Attributing a solar metallicity to all the stars
 C                 Calculating the lifetime in the main sequence
                   call tsp(m(i), 
      &                     metallicityOfWD(i), 
-     &                     tms(i))
+     &                     main_sequence_lifetime(i))
 C                 Calculating the cooling time
                   coolingTime(i) = galacticDiskAge - starBirthTime(i) 
-     &                             - tms(i)
+     &                             - main_sequence_lifetime(i)
                   if (coolingTime(i) > 0.0) then
 C                     Initial-to-Final Mass Relation (IFMR)
                       call mmswd(m(i), massOfWD(i))
@@ -110,7 +107,6 @@ C             TODO: make it integer
                   massOfWD(k) = massOfWD(i)
                   metallicityOfWD(k) = metallicityOfWD(i)
                   starBirthTime(k) = starBirthTime(i)
-                  tms(k) = tms(i)
                   disk_belonging(k) = disk_belonging(i)
               end if
           end do

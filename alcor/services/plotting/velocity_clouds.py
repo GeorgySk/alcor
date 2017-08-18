@@ -24,6 +24,7 @@ DESIRED_DIMENSIONS_RATIO = 10 / 13
 
 SUBPLOTS_SPACING = 0.25
 
+# TODO: make dict for all labels and limits in all plotting modules
 U_LABEL = '$U(km/s)$'
 V_LABEL = '$V(km/s)$'
 W_LABEL = '$W(km/s)$'
@@ -67,7 +68,6 @@ def plot(session: Session) -> None:
              subplot_vw) = plt.subplots(nrows=3,
                                         figsize=FIGURE_SIZE)
 
-    # TODO: find the way to apply limits once for all subplots
     subplot_uv.set(xlabel=U_LABEL,
                    ylabel=V_LABEL,
                    xlim=U_LIMITS,
@@ -122,7 +122,6 @@ def plot(session: Session) -> None:
 
 
 def plot_lepine_case(session: Session):
-
     # TODO: Implement getting last points by time(ok?)
     uv_points = fetch_all_lepine_case_uv_cloud_points(session=session)
     uw_points = fetch_all_lepine_case_uw_cloud_points(session=session)
@@ -207,6 +206,7 @@ def fetch_all_cloud_points(*,
     return query.all()
 
 
+# TODO: change to postgres
 def fetch_all_lepine_case_uv_cloud_points(*,
                                           session: Session):
     query = (LepineCaseUVCloud.objects.all().limit(None))
