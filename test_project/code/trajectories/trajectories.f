@@ -83,7 +83,7 @@ C         TODO: find out the meaning of wo and 8.0
           zo = real(coordinate_Zcylindr(wd_index) * METERS_IN_PARSEC)
 C         TODO: find out the meaning of ecini
           ecini = 0.5 * wo * wo
-          call epot(zo, epoti)
+          call get_potential_energy(zo, epoti)
           time_increment = (galacticDiskAge - starBirthTime(wd_index)) 
      &                     / float(NJUMPS)
 C         Time in seconds
@@ -102,16 +102,15 @@ C         Calling to the Runge-Kutta integrator
      &                HMIN, NOK, NBAD, DERIVS, RKQC, yscal, y, dydx)
 C         TODO: find out the meaning of ecinf    
           ecinf = 0.5 * y(2) * y(2)
-          call epot(y(1), epotf)
+          call get_potential_energy(y(1), epotf)
           coordinate_Zcylindr(wd_index) = y(1) / METERS_IN_PARSEC
           ww(wd_index) = y(2) + WOSUN
       end do
       end subroutine
 
 
-C     TODO: give a better name
-      subroutine epot(coordinate_z_km,
-     &                potential_energy)
+      subroutine get_potential_energy(coordinate_z_km,
+     &                                potential_energy)
 C         Calculating force along z-coordinate. 
 C         potential_energy in km²/s²
           implicit none   
