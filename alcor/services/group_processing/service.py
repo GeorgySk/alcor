@@ -100,7 +100,8 @@ def process_stars_group(*,
         session.add(processed_star)
 
         processed_star_association = ProcessedStarAssociation(
-            original_star_id=original_star.id)
+            original_star_id=original_star.id,
+            processed_star_id=processed_star.id)
         session.add(processed_star_association)
 
     session.commit()
