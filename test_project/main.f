@@ -75,11 +75,13 @@ C     For terminal:
       integer :: iterations_count, getNumberOfLines
 
           character(len=:), allocatable :: filename
+          character(len=:), allocatable :: longitude_filename,
+     &                                     latitude_filename
           character(len=:), allocatable :: column_number_str
           character(len=50), allocatable :: junk(:)
           integer :: dash_index
           integer :: column_number
-          integer :: lines_count
+          integer :: lines_count, longitude_column, latitude_column
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
@@ -131,56 +133,57 @@ C           call get_command_argument(i, args(i))
               call getarg(i + 1, output_filename)
             case ('-geom')
               call getarg(i + 1, geometry)
-            case ('-cl')
+            case('-cl')
               call getarg(i + 1, temp_string)
-              if (is_numeric(temp_string) .eqv. .TRUE.) then
-                  longitudes_from_csv = .FALSE.
-                  allocate(cone_height_longitudes(1))
-                  read(temp_string, *) cone_height_longitudes(1)
-              else
-                  longitudes_from_csv = .TRUE.
-                  dash_index = index(string=temp_string, substring='-', 
-     &                               back=.true.)
-                  filename = temp_string(1 : dash_index - 1)
-                  column_number_str = temp_string(
-     &                dash_index + 1 : len(temp_string))
-                  read(column_number_str, *) column_number
-                  allocate(junk(column_number - 1))
-                  lines_count = getNumberOfLines(filename)
-                  allocate(cone_height_longitudes(lines_count))
-                  open(597, file = filename)
-                  do j = 1, lines_count
-                      read(597, *) junk, cone_height_longitudes(j)
-                  end do
-                  close(597)
-                  deallocate(junk)
-              end if
-            case ('-cb')
+              longitudes_from_csv = .FALSE.
+              allocate(cone_height_longitudes(1))
+              read(temp_string, *) cone_height_longitudes(1)        
+            case ('-clcsv')
               call getarg(i + 1, temp_string)
-              if (is_numeric(temp_string) .eqv. .TRUE.) then
-                  latitudes_from_csv = .FALSE.
-                  allocate(cone_height_latitudes(1))
-                  read(temp_string, *) cone_height_latitudes(1)
-              else
-                  latitudes_from_csv = .TRUE.
-                  dash_index = index(string=temp_string, substring='-', 
-     &                               back=.true.)
-                  filename = temp_string(1 : dash_index - 1)
-                  column_number_str = temp_string(
-     &                dash_index + 1 : len(temp_string))
-                  read(column_number_str, *) column_number
-                  allocate(junk(column_number - 1))
-                  lines_count = getNumberOfLines(filename)
-                  allocate(cone_height_latitudes(lines_count))
-                  open(597, file = filename)
-                  do j = 1, lines_count
-                      read(597, *) junk, cone_height_latitudes(j)
-                  end do
-                  close(597)
-                  deallocate(junk)
-              end if
+              longitudes_from_csv = .TRUE.
+              longitude_filename = trim(temp_string)
+            case ('-clcol')
+              call getarg(i + 1, temp_string)
+              longitudes_from_csv = .TRUE.
+              read(temp_string, *) longitude_column
+            case('-cb')
+              call getarg(i + 1, temp_string)
+              latitudes_from_csv = .FALSE.
+              allocate(cone_height_latitudes(1))
+              read(temp_string, *) cone_height_latitudes(1)        
+            case ('-cbcsv')
+              call getarg(i + 1, temp_string)
+              latitudes_from_csv = .TRUE.
+              latitude_filename = trim(temp_string)
+            case ('-cbcol')
+              call getarg(i + 1, temp_string)
+              latitudes_from_csv = .TRUE.
+              read(temp_string, *) latitude_column
             end select
         end do
+      end if
+
+      if (longitudes_from_csv .eqv. .true.) then
+        allocate(junk(longitude_column - 1))
+        lines_count = getNumberOfLines(longitude_filename)
+        allocate(cone_height_longitudes(lines_count))
+        open(597, file = longitude_filename)
+        do j = 1, lines_count
+            read(597, *) junk, cone_height_longitudes(j)
+        end do
+        close(597)
+        deallocate(junk)
+      end if
+      if (latitudes_from_csv .eqv. .true.) then
+        allocate(junk(latitude_column - 1))
+        lines_count = getNumberOfLines(latitude_filename)
+        allocate(cone_height_latitudes(lines_count))
+        open(597, file = latitude_filename)
+        do j = 1, lines_count
+            read(597, *) junk, cone_height_latitudes(j)
+        end do
+        close(597)
+        deallocate(junk)
       end if
 
       if (geometry == 'sphere') then
@@ -322,7 +325,7 @@ C     TODO: add choosing what output we want to get
      &                  'spectral_type'
       end if
       close(421)
-
+      
       do i = 1, iterations_count
           print *, 'Iteration Nº', i
 C         converting cone height parameters from deg to rad      

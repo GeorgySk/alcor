@@ -28,7 +28,7 @@ class Parameter(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  name: str,
-                 value: Decimal):
+                 value: str):
         self.group_id = group_id
         self.name = name
         self.value = value

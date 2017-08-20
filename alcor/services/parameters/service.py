@@ -12,105 +12,51 @@ from alcor.types import NumericType
 logger = logging.getLogger(__name__)
 
 
-# TODO: rewrite, use dict
-def generate_parameters_values(*,
-                               parameters: Dict[str, Dict[str, NumericType]],
-                               precision: int,
-                               geometry: str
-                               ) -> Iterable[Dict[str, NumericType]]:
+def generate_parameters_values(
+        parameters_info: Dict[str, Dict[str, NumericType]],
+        precision: int,
+        geometry: str) -> Iterable[Dict[str, NumericType]]:
+    current_geometry_parameters_info = {**parameters_info['commons'],
+                                        **parameters_info[geometry]}
+
+    variable_parameters_info = {}
+    non_variable_parameters_info = {}
+    for parameter, value in (current_geometry_parameters_info.items()):
+        is_variable_parameter = (isinstance(value, dict)
+                                 and all(key in value
+                                         for key in ['start',
+                                                     'step',
+                                                     'count']))
+        if is_variable_parameter:
+            variable_parameter = {parameter: value}
+            variable_parameters_info.update(variable_parameter)
+        else:
+            non_variable_parameter = {parameter: value}
+            non_variable_parameters_info.update(non_variable_parameter)
+
     parameters_values_ranges_by_names = dict(
-        generate_parameters_values_ranges_by_names(parameters_dict=parameters,
-                                                   precision=precision,
-                                                   geometry=geometry))
-
-    parameters_keys_read_from_file = []
-
-    for key, value in parameters_values_ranges_by_names.items():
-        try:
-            if isinstance(value[0], str):
-                parameters_keys_read_from_file.append(key)
-        except IndexError:
-            logger.error(f'No values found in the file for parameter {key}')
-
-    if parameters_keys_read_from_file:
-        file_lines_count = len(parameters_values_ranges_by_names[
-                                   parameters_keys_read_from_file[0]])
-
-        all_simulations_parameters = []
-
-        for file_line in range(file_lines_count):
-            one_simulation_parameters = [
-                [parameters_values_ranges_by_names[key][file_line]]
-                if key in parameters_keys_read_from_file
-                else parameters_values_ranges_by_names[key]
-                for key, value in parameters_values_ranges_by_names.items()]
-            all_simulations_parameters.append(one_simulation_parameters)
-
-        product_list = [tuple(product(*one_simulation_parameters))
-                        for one_simulation_parameters in
-                        all_simulations_parameters]
-
-        unpacked_product_list = [tuple_inner_instance
-                                 for tuple_instance in product_list
-                                 for tuple_inner_instance in tuple_instance]
-
-        parameters_names = list(parameters_values_ranges_by_names.keys())
-
-        for values in unpacked_product_list:
-            yield dict(zip(parameters_names, values))
-    else:
-        parameters_names = list(parameters_values_ranges_by_names.keys())
-
-        for values in product(*parameters_values_ranges_by_names.values()):
-            yield dict(zip(parameters_names,
-                           values))
+        generate_parameters_values_ranges_by_names(
+            parameters_info=variable_parameters_info,
+            precision=precision))
+    parameters_names = list(parameters_values_ranges_by_names.keys())
+    for values in product(*parameters_values_ranges_by_names.values()):
+        variable_parameters_dict = dict(zip(parameters_names, values))
+        output_dict = {**variable_parameters_dict,
+                       **non_variable_parameters_info}
+        yield output_dict
 
 
 def generate_parameters_values_ranges_by_names(
         *,
-        parameters_dict: Dict[str, Dict[str, NumericType]],
-        precision: int,
-        geometry: str) -> Iterable[Tuple[str, List[NumericType]]]:
-
-    variable_simulations_parameters = parameters_dict['commons']
-
-    if geometry == 'cones':
-        variable_simulations_parameters.update(parameters_dict['cones'])
-
-    for parameter_name, parameter_settings in (variable_simulations_parameters.
-                                               items()):
-
-        # Parameter is const during all simulations:
-        if isinstance(parameter_settings, float):
-            values_range = [round(parameter_settings, precision)]
-            yield parameter_name, values_range
-
-        elif isinstance(parameter_settings, dict):
-
-            # Parameter is generated for every simulation:
-            if all(key in parameter_settings
-                   for key in ['start', 'step', 'count']):
-                start_value = round(parameter_settings['start'], precision)
-                step_size = round(parameter_settings['step'], precision)
-                values_count = parameter_settings['count']
-                values_range = [
-                    round(start_value + value_number * step_size, precision)
-                    for value_number in range(values_count)]
-                yield parameter_name, values_range
-
-            # Parameters will be read in Fortran from csv file:
-            elif all(key in parameter_settings
-                     for key in ['csv', 'column']):
-                file_path = parameter_settings['csv']
-                column = parameter_settings['column']
-                # TODO: this is weird but idk how to do it better
-                values_range = [str(file_path) + '-' + str(int(column))]
-                yield parameter_name, values_range
-
-            else:
-                logger.error('Wrong set of keys. Possible sets are '
-                             '(start, step, count) and (csv, column)')
-        else:
-            logger.error(f'Wrong type of settings {parameter_settings}. '
-                         f'Expected float or dict, got '
-                         f'{type(parameter_settings)} instead')
+        parameters_info: Dict[str, Dict[str, NumericType]],
+        precision: int) -> Iterable[Tuple[str, List[NumericType]]]:
+    for parameter_name, parameter_settings in parameters_info.items():
+        start_value = round(parameter_settings['start'], precision)
+        step_size = round(parameter_settings['step'], precision)
+        values_count = parameter_settings['count']
+        values_range = [
+            round(start_value + value_number * step_size,
+                  precision)
+            for value_number in range(values_count)
+            ]
+        yield parameter_name, values_range

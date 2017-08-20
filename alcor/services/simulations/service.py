@@ -5,7 +5,8 @@ from decimal import Decimal
 from subprocess import check_call
 from typing import (Any,
                     Iterable,
-                    Dict)
+                    Dict,
+                    Union)
 
 from sqlalchemy.orm.session import Session
 
@@ -28,7 +29,7 @@ def run_simulations(*,
     parameters_info = settings['parameters']
 
     for parameters_values in generate_parameters_values(
-            parameters=parameters_info,
+            parameters_info=parameters_info,
             precision=precision,
             geometry=geometry):
         group_id = uuid.uuid4()
@@ -61,13 +62,15 @@ def generate_parameters(*,
     for parameter_name, parameter_value in values.items():
         yield Parameter(group_id=group.id,
                         name=parameter_name,
-                        value=parameter_value)
+                        value=str(parameter_value))
 
 
-def run_simulation(*,
-                   parameters_values: Dict[str, NumericType],
-                   geometry: str,
-                   output_file_name: str) -> None:
+def run_simulation(
+        *,
+        parameters_values: Dict[str, Union[
+            NumericType, Dict[str, Union[str, NumericType]]]],
+        geometry: str,
+        output_file_name: str) -> None:
     args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
             '-g', parameters_values['galaxy_age'],
@@ -77,22 +80,24 @@ def run_simulation(*,
             '-mr', parameters_values['mass_reduction_factor'],
             '-o', output_file_name,
             '-geom', geometry]
+
     if geometry == 'cones':
-        # TODO: this is not cool but idk how to do it better
-        try:
-            float(parameters_values['longitudes'])
-        except ValueError:
-            parameters_values['longitudes'] = os.path.abspath(str(
-                parameters_values['longitudes']))
-        try:
-            float(parameters_values['latitudes'])
-        except ValueError:
-            parameters_values['latitudes'] = os.path.abspath(str(
-                parameters_values['latitudes']))
-        args.extend([
-            '-cl', parameters_values['longitudes'],
-            '-cb', parameters_values['latitudes'],
-            '-tdsf', parameters_values['thick_disk_stars_fraction']])
+        args.extend(['-tdsf', parameters_values['thick_disk_stars_fraction']])
+
+        if isinstance(parameters_values['longitudes'], float):
+            args.extend(['-cl', parameters_values['longitudes']])
+        else:
+            longitudes_dict = parameters_values['longitudes']
+            args.extend(['-clcsv', os.path.abspath(longitudes_dict['csv']),
+                         '-clcol', longitudes_dict['column']])
+
+        if isinstance(parameters_values['latitudes'], float):
+            args.extend(['-cb', parameters_values['longitudes']])
+        else:
+            latitudes_dict = parameters_values['latitudes']
+            args.extend(['-cbcsv', os.path.abspath(latitudes_dict['csv']),
+                         '-cbcol', latitudes_dict['column']])
+
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')
