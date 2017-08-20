@@ -9,6 +9,9 @@ from typing import (Iterable,
 from alcor.types import NumericType
 
 
+GRID_SETTINGS_KEYS = ['start', 'step', 'count']
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -24,9 +27,7 @@ def generate_parameters_values(
     for parameter, value in (current_geometry_parameters_info.items()):
         is_variable_parameter = (isinstance(value, dict)
                                  and all(key in value
-                                         for key in ['start',
-                                                     'step',
-                                                     'count']))
+                                         for key in GRID_SETTINGS_KEYS))
         if is_variable_parameter:
             variable_parameters_info[parameter] = value
         else:
