@@ -28,11 +28,9 @@ def generate_parameters_values(
                                                      'step',
                                                      'count']))
         if is_variable_parameter:
-            variable_parameter = {parameter: value}
-            variable_parameters_info.update(variable_parameter)
+            variable_parameters_info[parameter] = value
         else:
-            non_variable_parameter = {parameter: value}
-            non_variable_parameters_info.update(non_variable_parameter)
+            non_variable_parameters_info[parameter] = value
 
     parameters_values_ranges_by_names = dict(
         generate_parameters_values_ranges_by_names(
