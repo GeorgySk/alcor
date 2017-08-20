@@ -3,7 +3,8 @@ from datetime import datetime
 from numbers import Number
 from typing import (Union,
                     List,
-                    Tuple)
+                    Tuple,
+                    Dict)
 
 from alcor.models import Star
 
@@ -17,3 +18,5 @@ ColumnValueType = Union[int,
                         datetime,
                         uuid.UUID,
                         None]
+ParametersValuesType = Dict[str, Union[NumericType,
+                                       Dict[str, Union[str, NumericType]]]]
