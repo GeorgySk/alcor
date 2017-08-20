@@ -5,8 +5,7 @@ from decimal import Decimal
 from subprocess import check_call
 from typing import (Any,
                     Iterable,
-                    Dict,
-                    Union)
+                    Dict)
 
 from sqlalchemy.orm.session import Session
 
@@ -15,7 +14,7 @@ from alcor.models.simulation import Parameter
 from alcor.services.parameters import generate_parameters_values
 from alcor.services.restrictions import (OUTPUT_FILE_EXTENSION,
                                          MAX_OUTPUT_FILE_NAME_LENGTH)
-from alcor.types import NumericType
+from alcor.types import ParametersValuesType
 from alcor.utils import parse_stars
 
 logger = logging.getLogger(__name__)
@@ -67,8 +66,7 @@ def generate_parameters(*,
 
 def run_simulation(
         *,
-        parameters_values: Dict[str, Union[
-            NumericType, Dict[str, Union[str, NumericType]]]],
+        parameters_values: ParametersValuesType,
         geometry: str,
         output_file_name: str) -> None:
     args = ['./main.e',
