@@ -4,7 +4,6 @@ from collections import Counter
 from functools import partial
 from itertools import filterfalse
 from math import pi
-from typing import List
 
 from sqlalchemy.orm.session import Session
 
@@ -15,6 +14,7 @@ from alcor.models.processed_star_association import ProcessedStarsAssociation
 from alcor.services import (luminosity_function,
                             velocities,
                             velocities_vs_magnitudes)
+from alcor.services.data_access import fetch_stars
 from .sampling import check_elimination
 
 logging.basicConfig(format='%(filename)s %(funcName)s '
@@ -104,12 +104,3 @@ def process_stars_group(*,
         session.add(processed_star_association)
 
     session.commit()
-
-
-def fetch_stars(*,
-                group: Group,
-                session: Session
-                ) -> List[Star]:
-    query = (session.query(Star)
-             .filter(Star.group_id == group.id))
-    return query.all()

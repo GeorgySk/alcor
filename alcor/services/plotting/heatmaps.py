@@ -9,12 +9,14 @@ import matplotlib
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+from alcor.services.data_access import fetch_all_stars
+from alcor.services.data_access import fetch_stars_by_group_id
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
 
-from alcor.models.star import Star
 from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
                                          PECULIAR_SOLAR_VELOCITY_V,
                                          PECULIAR_SOLAR_VELOCITY_W)
@@ -80,19 +82,6 @@ def plot(*,
                   xdata=velocities_v,
                   ydata=velocities_w,
                   filename=VW_FILENAME)
-
-
-def fetch_all_stars(session: Session) -> List[Star]:
-    query = session.query(Star)
-    return query.all()
-
-
-def fetch_stars_by_group_id(*,
-                            group_id: uuid.UUID,
-                            session: Session) -> List[Star]:
-    query = (session.query(Star)
-             .filter(Star.group_id == group_id))
-    return query.all()
 
 
 def draw_plot(*,

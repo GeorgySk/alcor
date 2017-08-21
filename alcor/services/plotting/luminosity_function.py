@@ -1,6 +1,5 @@
 from math import (log10,
                   sqrt)
-from typing import List
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -8,11 +7,12 @@ import matplotlib
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+from alcor.services.data_access import fetch_all_graph_points
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-from alcor.models.luminosity_function import Point
 from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
 
 FILENAME = 'luminosity_function.ps'
@@ -107,8 +107,3 @@ def plot(session: Session) -> None:
     subplot.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot.get_data_ratio())
 
     plt.savefig(FILENAME)
-
-
-def fetch_all_graph_points(session: Session) -> List[Point]:
-    query = session.query(Point)
-    return query.all()

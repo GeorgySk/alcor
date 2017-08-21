@@ -4,19 +4,20 @@ from sqlalchemy.orm.session import Session
 import matplotlib
 
 # More info at
-#  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
+# http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+from alcor.services.data_access import (fetch_all_bins,
+                                        fetch_all_u_vs_mag_clouds,
+                                        fetch_all_v_vs_mag_clouds,
+                                        fetch_all_w_vs_mag_clouds,
+                                        fetch_all_u_vs_mag_bins,
+                                        fetch_all_v_vs_mag_bins,
+                                        fetch_all_w_vs_mag_bins)
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from alcor.models.velocities_vs_magnitudes.bins import (Bin,
-                                                        LepineCaseUBin,
-                                                        LepineCaseVBin,
-                                                        LepineCaseWBin)
-from alcor.models.velocities_vs_magnitudes.clouds import (Cloud,
-                                                          LepineCaseUCloud,
-                                                          LepineCaseVCloud,
-                                                          LepineCaseWCloud)
+from alcor.models.velocities_vs_magnitudes.clouds import Cloud
 
 FILENAME = 'velocities_vs_magnitude.ps'
 
@@ -310,50 +311,7 @@ def plot_lepine_case(session: Session) -> None:
     plt.savefig(FILENAME)
 
 
-# TODO: write only one function for all of these
-def fetch_all_bins(*,
-                   session: Session) -> List[Bin]:
-    query = session.query(Bin)
-    return query.all()
-
-
-def fetch_all_clouds(*,
-                     session: Session) -> List[Cloud]:
+# TODO: model name collision
+def fetch_all_clouds(session: Session) -> List[Cloud]:
     query = session.query(Cloud)
-    return query.all()
-
-
-def fetch_all_u_vs_mag_bins(*,
-                            session: Session) -> List[LepineCaseUBin]:
-    query = session.query(LepineCaseUBin)
-    return query.all()
-
-
-def fetch_all_v_vs_mag_bins(*,
-                            session: Session) -> List[LepineCaseVBin]:
-    query = session.query(LepineCaseVBin)
-    return query.all()
-
-
-def fetch_all_w_vs_mag_bins(*,
-                            session: Session) -> List[LepineCaseWBin]:
-    query = session.query(LepineCaseWBin)
-    return query.all()
-
-
-def fetch_all_u_vs_mag_clouds(*,
-                              session: Session) -> List[LepineCaseUCloud]:
-    query = session.query(LepineCaseUCloud)
-    return query.all()
-
-
-def fetch_all_v_vs_mag_clouds(*,
-                              session: Session) -> List[LepineCaseVCloud]:
-    query = session.query(LepineCaseVCloud)
-    return query.all()
-
-
-def fetch_all_w_vs_mag_clouds(*,
-                              session: Session) -> List[LepineCaseWCloud]:
-    query = session.query(LepineCaseWCloud)
     return query.all()

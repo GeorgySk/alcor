@@ -1,18 +1,17 @@
-from typing import List
-
 from sqlalchemy.orm.session import Session
 import matplotlib
 
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+from alcor.services.data_access import fetch_all_cloud_points
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.axes import Axes
 
-from alcor.models.velocities.clouds import (Cloud,
-                                            LepineCaseUVCloud,
+from alcor.models.velocities.clouds import (LepineCaseUVCloud,
                                             LepineCaseUWCloud,
                                             LepineCaseVWCloud)
 
@@ -198,11 +197,6 @@ def plot_lepine_case(session: Session):
     figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
 
     plt.savefig(FILENAME)
-
-
-def fetch_all_cloud_points(session: Session) -> List[Cloud]:
-    query = session.query(Cloud)
-    return query.all()
 
 
 # TODO: change to postgres

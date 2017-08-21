@@ -1,7 +1,6 @@
 import logging
 from math import sqrt
 from random import random
-from typing import List
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -9,10 +8,11 @@ import matplotlib
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+from alcor.services.data_access import fetch_all_stars
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from alcor.models.star import Star
 from alcor.services.restrictions import PECULIAR_SOLAR_VELOCITY_V
 
 logger = logging.getLogger(__name__)
@@ -88,8 +88,3 @@ def plot(session: Session) -> None:
                        / subplot.get_data_ratio())
 
     plt.savefig(FILENAME)
-
-
-def fetch_all_stars(session: Session) -> List[Star]:
-    query = session.query(Star)
-    return query.all()

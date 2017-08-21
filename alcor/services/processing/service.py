@@ -1,10 +1,12 @@
 import logging
 import uuid
-from typing import List, Optional
+from typing import Optional
 
 from sqlalchemy.orm.session import Session
 
-from alcor.models import Group
+from alcor.services.data_access import (fetch_unprocessed_groups,
+                                        fetch_last_groups,
+                                        fetch_group_by_id)
 from alcor.services.group_processing import process_stars_group
 
 logger = logging.getLogger(__name__)
@@ -39,26 +41,3 @@ def run_processing(*,
             w_velocities_vs_magnitude=w_velocities_vs_magnitude,
             w_lepine_criterion=w_lepine_criterion,
             session=session)
-
-
-def fetch_unprocessed_groups(*,
-                             session: Session) -> List[Group]:
-    query = (session.query(Group)
-             .filter(Group.original_unprocessed_group_id.is_(None)))
-    return query.all()
-
-
-def fetch_last_groups(*,
-                      count: int,
-                      session: Session) -> List[Group]:
-    query = (session.query(Group).
-             order_by(Group.updated_timestamp.desc()).limit(count))
-    return query.all()
-
-
-def fetch_group_by_id(*,
-                      group_id: uuid.UUID,
-                      session: Session) -> List[Group]:
-    query = (session.query(Group)
-             .filter(Group.id == group_id))
-    return query.all()
