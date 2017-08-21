@@ -108,17 +108,16 @@ def simulate(ctx: click.Context,
               is_flag=True,
               help='Apply Lepine\'s criterion.')
 @click.pass_context
-# TODO: check order
 def process(ctx: click.Context,
+            unprocessed: bool,
+            last: int,
+            group_id: uuid.UUID,
             filtration_method: str,
             nullify_radial_velocity: bool,
             w_luminosity_function: bool,
             w_velocities_clouds: bool,
             w_velocities_vs_magnitude: bool,
             w_lepine_criterion: bool,
-            unprocessed: bool,
-            last: int,
-            group_id: uuid.UUID
             ) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
