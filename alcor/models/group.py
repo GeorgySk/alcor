@@ -13,13 +13,13 @@ class Group(Base):
     __tablename__ = 'groups'
     id = Column(UUID(as_uuid=True),
                 primary_key=True)
-    original_group_id = Column(UUID(as_uuid=True),
-                               default=None)
+    original_id = Column(UUID(as_uuid=True),
+                         default=None)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
                  id: uuid.UUID,
-                 original_group_id: Optional[uuid.UUID]):
+                 original_id: Optional[uuid.UUID]):
         self.id = id
-        self.original_group_id = original_group_id
+        self.original_id = original_id

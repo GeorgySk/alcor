@@ -29,7 +29,7 @@ def fetch_stars(*,
 def fetch_unprocessed_groups(*,
                              session: Session) -> List[Group]:
     query = (session.query(Group)
-             .filter(Group.original_group_id.is_(None)))
+             .filter(Group.original_id.is_(None)))
     return query.all()
 
 

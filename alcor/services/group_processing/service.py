@@ -83,11 +83,11 @@ def process_stars_group(*,
             w_lepine_criterion=w_lepine_criterion,
             session=session)
 
-    original_group_id = group.id
+    original_id = group.id
     processed_group_id = uuid.uuid4()
     processed_group = Group(
         id=processed_group_id,
-        original_group_id=original_group_id)
+        original_id=original_id)
     session.add(processed_group)
 
     processed_stars = []

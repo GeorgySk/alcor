@@ -8,9 +8,9 @@ from typing import (Iterable,
 
 from alcor.types import NumericType
 
-GRID_SETTINGS_KEYS = ['start', 'step', 'count']
-
 logger = logging.getLogger(__name__)
+
+GRID_SETTINGS_KEYS = ['start', 'step', 'count']
 
 
 def generate_parameters_values(
