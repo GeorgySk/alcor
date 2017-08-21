@@ -90,16 +90,19 @@ def process_stars_group(*,
         original_group_id=original_group_id)
     session.add(processed_group)
 
+    processed_stars = []
     for original_star in stars:
         processed_star = Star(group_id=processed_group_id)
         if nullify_radial_velocity:
             processed_star.velocity_u = original_star.velocity_u
             processed_star.velocity_v = original_star.velocity_v
             processed_star.velocity_w = original_star.velocity_w
-        session.add(processed_star)
+        processed_star.append(processed_star)
+    session.add(processed_stars)
 
+    for star, processed_star in zip(stars, processed_stars):
         processed_star_association = ProcessedStarsAssociation(
-            original_star_id=original_star.id,
+            original_star_id=star.id,
             processed_star_id=processed_star.id)
         session.add(processed_star_association)
 
