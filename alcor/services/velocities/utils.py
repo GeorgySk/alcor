@@ -13,14 +13,14 @@ def star_cloud(star: Star) -> Union[LepineCaseUVCloud,
                              abs(star.coordinate_y),
                              abs(star.coordinate_z))
     if abs(star.coordinate_x) == highest_coordinate:
-        yield LepineCaseVWCloud(group_id=star.group_id,
-                                velocity_v=star.velocity_v,
-                                velocity_w=star.velocity_w)
+        return LepineCaseVWCloud(group_id=star.group_id,
+                                 velocity_v=star.velocity_v,
+                                 velocity_w=star.velocity_w)
     elif abs(star.coordinate_y) == highest_coordinate:
-        yield LepineCaseUWCloud(group_id=star.group_id,
-                                velocity_u=star.velocity_u,
-                                velocity_w=star.velocity_w)
+        return LepineCaseUWCloud(group_id=star.group_id,
+                                 velocity_u=star.velocity_u,
+                                 velocity_w=star.velocity_w)
     else:
-        yield LepineCaseUVCloud(group_id=star.group_id,
-                                velocity_u=star.velocity_u,
-                                velocity_v=star.velocity_v)
+        return LepineCaseUVCloud(group_id=star.group_id,
+                                 velocity_u=star.velocity_u,
+                                 velocity_v=star.velocity_v)
