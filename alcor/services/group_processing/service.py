@@ -11,7 +11,7 @@ from sqlalchemy.orm.session import Session
 from alcor.models import (Group,
                           Star)
 from alcor.models.eliminations import StarsCounter
-from alcor.models.processed_star_association import ProcessedStarAssociation
+from alcor.models.processed_star_association import ProcessedStarsAssociation
 from alcor.services import (luminosity_function,
                             velocities,
                             velocities_vs_magnitudes)
@@ -99,7 +99,7 @@ def process_stars_group(*,
             processed_star.velocity_w = original_star.velocity_w
         session.add(processed_star)
 
-        processed_star_association = ProcessedStarAssociation(
+        processed_star_association = ProcessedStarsAssociation(
             original_star_id=original_star.id,
             processed_star_id=processed_star.id)
         session.add(processed_star_association)

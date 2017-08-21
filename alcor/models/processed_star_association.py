@@ -1,16 +1,17 @@
 from sqlalchemy.schema import Column
+from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import BigInteger
 
 from .base import Base
 
 
-class ProcessedStarAssociation(Base):
+class ProcessedStarsAssociation(Base):
     __tablename__ = 'processed_stars_associations'
-    id = Column(BigInteger(),
-                primary_key=True)
     original_star_id = Column(BigInteger(),
+                              ForeignKey('stars.id'),
                               default=None)
     processed_star_id = Column(BigInteger(),
+                               ForeignKey('stars.id'),
                                default=None)
 
     def __init__(self,
