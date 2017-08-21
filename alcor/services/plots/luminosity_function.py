@@ -68,10 +68,10 @@ def plot(session: Session) -> None:
     (avg_bin_magnitudes,
      stars_count_logarithms,
      upper_errorbars,
-     lower_errorbars) = (_ for _ in zip(*sorted(zip(avg_bin_magnitudes,
-                                                    stars_count_logarithms,
-                                                    upper_errorbars,
-                                                    lower_errorbars))))
+     lower_errorbars) = zip(*sorted(zip(avg_bin_magnitudes,
+                                        stars_count_logarithms,
+                                        upper_errorbars,
+                                        lower_errorbars)))
 
     asymmetric_errorbars = [lower_errorbars,
                             upper_errorbars]

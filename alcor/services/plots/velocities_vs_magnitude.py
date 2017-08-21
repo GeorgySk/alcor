@@ -70,13 +70,13 @@ def plot(session: Session) -> None:
      avg_velocities_w,
      velocities_u_std,
      velocities_v_std,
-     velocities_w_std) = (_ for _ in zip(*sorted(zip(avg_bin_magnitudes,
-                                                     avg_velocities_u,
-                                                     avg_velocities_v,
-                                                     avg_velocities_w,
-                                                     velocities_u_std,
-                                                     velocities_v_std,
-                                                     velocities_w_std))))
+     velocities_w_std) = zip(*sorted(zip(avg_bin_magnitudes,
+                                         avg_velocities_u,
+                                         avg_velocities_v,
+                                         avg_velocities_w,
+                                         velocities_u_std,
+                                         velocities_v_std,
+                                         velocities_w_std)))
 
     figure, (subplot_u,
              subplot_v,
@@ -198,19 +198,19 @@ def plot_lepine_case(session: Session) -> None:
 
     (u_bins_avg_magnitudes,
      avg_velocities_u,
-     velocities_u_std) = (_ for _ in zip(*sorted(zip(u_bins_avg_magnitudes,
-                                                     avg_velocities_u,
-                                                     velocities_u_std))))
+     velocities_u_std) = zip(*sorted(zip(u_bins_avg_magnitudes,
+                                         avg_velocities_u,
+                                         velocities_u_std)))
     (v_bins_avg_magnitudes,
      avg_velocities_v,
-     velocities_v_std) = (_ for _ in zip(*sorted(zip(v_bins_avg_magnitudes,
-                                                     avg_velocities_v,
-                                                     velocities_v_std))))
+     velocities_v_std) = zip(*sorted(zip(v_bins_avg_magnitudes,
+                                         avg_velocities_v,
+                                         velocities_v_std)))
     (w_bins_avg_magnitudes,
      avg_velocities_w,
-     velocities_w_std) = (_ for _ in zip(*sorted(zip(w_bins_avg_magnitudes,
-                                                     avg_velocities_w,
-                                                     velocities_w_std))))
+     velocities_w_std) = zip(*sorted(zip(w_bins_avg_magnitudes,
+                                         avg_velocities_w,
+                                         velocities_w_std)))
 
     figure, (subplot_u,
              subplot_v,
