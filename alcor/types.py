@@ -7,6 +7,8 @@ from typing import (Union,
                     Tuple,
                     List)
 
+import numpy as np
+
 from alcor.models import Star
 
 NumericType = Union[int, float]
