@@ -33,7 +33,7 @@ def run_simulations(*,
             geometry=geometry):
         group_id = uuid.uuid4()
         group = Group(id=group_id,
-                      original_unprocessed_group_id=None)
+                      original_group_id=None)
 
         parameters = generate_parameters(values=parameters_values,
                                          group=group)
