@@ -52,8 +52,7 @@ OBSERVATIONAL_ASYMMETRIC_ERRORBARS = [OBSERVATIONAL_LOWER_ERRORBARS,
 OBSERVATIONAL_LINE_COLOR = 'r'
 
 
-def plot(*,
-         session: Session) -> None:
+def plot(session: Session) -> None:
     # TODO: Implement other fetching functions
     graph_points = fetch_all_graph_points(session=session)
 
@@ -110,7 +109,6 @@ def plot(*,
     plt.savefig(FILENAME)
 
 
-def fetch_all_graph_points(*,
-                           session: Session) -> List[Point]:
+def fetch_all_graph_points(session: Session) -> List[Point]:
     query = session.query(Point)
     return query.all()

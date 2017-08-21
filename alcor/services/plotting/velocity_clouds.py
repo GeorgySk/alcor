@@ -200,15 +200,13 @@ def plot_lepine_case(session: Session):
     plt.savefig(FILENAME)
 
 
-def fetch_all_cloud_points(*,
-                           session: Session) -> List[Cloud]:
+def fetch_all_cloud_points(session: Session) -> List[Cloud]:
     query = session.query(Cloud)
     return query.all()
 
 
 # TODO: change to postgres
-def fetch_all_lepine_case_uv_cloud_points(*,
-                                          session: Session):
+def fetch_all_lepine_case_uv_cloud_points(session: Session):
     query = (LepineCaseUVCloud.objects.all().limit(None))
     records = fetch(query=query,
                     session=session)
@@ -216,8 +214,7 @@ def fetch_all_lepine_case_uv_cloud_points(*,
             for record in records]
 
 
-def fetch_all_lepine_case_uw_cloud_points(*,
-                                          session: Session):
+def fetch_all_lepine_case_uw_cloud_points(session: Session):
     query = (LepineCaseUWCloud.objects.all().limit(None))
     records = fetch(query=query,
                     session=session)
@@ -225,8 +222,7 @@ def fetch_all_lepine_case_uw_cloud_points(*,
             for record in records]
 
 
-def fetch_all_lepine_case_vw_cloud_points(*,
-                                          session: Session):
+def fetch_all_lepine_case_vw_cloud_points(session: Session):
     query = (LepineCaseVWCloud.objects.all().limit(None))
     records = fetch(query=query,
                     session=session)

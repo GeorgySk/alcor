@@ -32,8 +32,7 @@ THICK_DISK_CLOUD_COLOR = 'b'
 POINT_SIZE = 0.5
 
 
-def plot(*,
-         session: Session) -> None:
+def plot(session: Session) -> None:
     # TODO: Figure out what stars I should fetch (all/last group by time/last N
     # groups by time/selected by ID/marked by some flag(series of simulations))
     stars = fetch_all_stars(session=session)
@@ -91,7 +90,6 @@ def plot(*,
     plt.savefig(FILENAME)
 
 
-def fetch_all_stars(*,
-                    session: Session) -> List[Star]:
+def fetch_all_stars(session: Session) -> List[Star]:
     query = session.query(Star)
     return query.all()

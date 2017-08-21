@@ -82,8 +82,7 @@ def plot(*,
                   filename=VW_FILENAME)
 
 
-def fetch_all_stars(*,
-                    session: Session) -> List[Star]:
+def fetch_all_stars(session: Session) -> List[Star]:
     query = session.query(Star)
     return query.all()
 
