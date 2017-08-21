@@ -202,7 +202,7 @@ def plot_lepine_case(session: Session):
 
 def fetch_all_cloud_points(*,
                            session: Session) -> List[Cloud]:
-    query = (session.query(Cloud))
+    query = session.query(Cloud)
     return query.all()
 
 

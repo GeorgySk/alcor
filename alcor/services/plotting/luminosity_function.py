@@ -112,5 +112,5 @@ def plot(*,
 
 def fetch_all_graph_points(*,
                            session: Session) -> List[Point]:
-    query = (session.query(Point))
+    query = session.query(Point)
     return query.all()
