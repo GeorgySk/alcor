@@ -9,10 +9,10 @@ class ProcessedStarsAssociation(Base):
     __tablename__ = 'processed_stars_associations'
     original_star_id = Column(BigInteger(),
                               ForeignKey('stars.id'),
-                              default=None)
+                              primary_key=True)
     processed_star_id = Column(BigInteger(),
                                ForeignKey('stars.id'),
-                               default=None)
+                               primary_key=True)
 
     def __init__(self,
                  original_star_id: int,
