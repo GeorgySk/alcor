@@ -104,27 +104,27 @@ class Star(Base):
 
     def __init__(self,
                  group_id: uuid.UUID,
-                 luminosity: float=None,
-                 proper_motion: float=None,
-                 proper_motion_component_b: float=None,
-                 proper_motion_component_l: float=None,
-                 proper_motion_component_vr: float=None,
-                 right_ascension: float=None,
-                 declination: float=None,
-                 galactic_distance: float=None,
-                 galactic_latitude: float=None,
-                 galactic_longitude: float=None,
-                 ugriz_g_apparent: float=None,
-                 ugriz_ug: float=None,
-                 ugriz_gr: float=None,
-                 ugriz_ri: float=None,
-                 ugriz_iz: float=None,
-                 v_photometry: float=None,
-                 velocity_u: float=None,
-                 velocity_v: float=None,
-                 velocity_w: float=None,
-                 spectral_type: int=None,
-                 disk_belonging: int=None):
+                 luminosity: float = None,
+                 proper_motion: float = None,
+                 proper_motion_component_b: float = None,
+                 proper_motion_component_l: float = None,
+                 proper_motion_component_vr: float = None,
+                 right_ascension: float = None,
+                 declination: float = None,
+                 galactic_distance: float = None,
+                 galactic_latitude: float = None,
+                 galactic_longitude: float = None,
+                 ugriz_g_apparent: float = None,
+                 ugriz_ug: float = None,
+                 ugriz_gr: float = None,
+                 ugriz_ri: float = None,
+                 ugriz_iz: float = None,
+                 v_photometry: float = None,
+                 velocity_u: float = None,
+                 velocity_v: float = None,
+                 velocity_w: float = None,
+                 spectral_type: int = None,
+                 disk_belonging: int = None):
         self.group_id = group_id
         self.luminosity = luminosity
         self.proper_motion = proper_motion
@@ -147,7 +147,6 @@ class Star(Base):
         self.velocity_w = velocity_w
         self.spectral_type = spectral_type
         self.disk_belonging = disk_belonging
-
 
     @property
     def bolometric_magnitude(self) -> float:

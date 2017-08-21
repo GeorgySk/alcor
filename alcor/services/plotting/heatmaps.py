@@ -5,6 +5,7 @@ from typing import (List,
 
 from sqlalchemy.orm.session import Session
 import matplotlib
+
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -18,9 +19,7 @@ from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
                                          PECULIAR_SOLAR_VELOCITY_V,
                                          PECULIAR_SOLAR_VELOCITY_W)
 
-
 logger = logging.getLogger(__name__)
-
 
 UV_FILENAME = 'heatmap_uv.ps'
 UW_FILENAME = 'heatmap_uw.ps'

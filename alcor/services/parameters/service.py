@@ -8,9 +8,7 @@ from typing import (Iterable,
 
 from alcor.types import NumericType
 
-
 GRID_SETTINGS_KEYS = ['start', 'step', 'count']
-
 
 logger = logging.getLogger(__name__)
 
@@ -57,5 +55,5 @@ def generate_parameters_values_ranges_by_names(
             round(start_value + value_number * step_size,
                   precision)
             for value_number in range(values_count)
-            ]
+        ]
         yield parameter_name, values_range

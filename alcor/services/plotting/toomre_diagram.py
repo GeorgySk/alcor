@@ -5,6 +5,7 @@ from typing import List
 
 from sqlalchemy.orm.session import Session
 import matplotlib
+
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -14,9 +15,7 @@ import matplotlib.pyplot as plt
 from alcor.models.star import Star
 from alcor.services.restrictions import PECULIAR_SOLAR_VELOCITY_V
 
-
 logger = logging.getLogger(__name__)
-
 
 DESIRED_FINAL_SAMPLE_STARS_COUNT = 10_000
 

@@ -13,7 +13,6 @@ from alcor.models import (Group,
 from alcor.models import STAR_PARAMETERS_NAMES
 from alcor.types import ColumnValueType
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -33,7 +32,7 @@ def parse_stars(lines: Iterable[str],
                 ) -> Iterable[Star]:
     headers = next(lines).split()
     for header in headers:
-        if not(header in STAR_PARAMETERS_NAMES):
+        if not (header in STAR_PARAMETERS_NAMES):
             logger.error(f'There is no parameter {header} in '
                          f'STAR_PARAMETERS_NAMES')
     for line in lines:

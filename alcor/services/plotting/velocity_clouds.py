@@ -2,6 +2,7 @@ from typing import List
 
 from sqlalchemy.orm.session import Session
 import matplotlib
+
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -14,7 +15,6 @@ from alcor.models.velocities.clouds import (Cloud,
                                             LepineCaseUVCloud,
                                             LepineCaseUWCloud,
                                             LepineCaseVWCloud)
-
 
 FILENAME = 'velocity_clouds.ps'
 

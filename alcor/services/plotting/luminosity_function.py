@@ -4,6 +4,7 @@ from typing import List
 
 from sqlalchemy.orm.session import Session
 import matplotlib
+
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
@@ -13,7 +14,6 @@ import numpy as np
 
 from alcor.models.luminosity_function import Point
 from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
-
 
 FILENAME = 'luminosity_function.ps'
 
@@ -54,7 +54,6 @@ OBSERVATIONAL_LINE_COLOR = 'r'
 
 def plot(*,
          session: Session) -> None:
-
     # TODO: Implement other fetching functions
     graph_points = fetch_all_graph_points(session=session)
 

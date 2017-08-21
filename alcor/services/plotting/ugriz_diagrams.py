@@ -2,15 +2,14 @@ import logging
 
 from sqlalchemy.orm.session import Session
 import matplotlib
+
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-
 logger = logging.getLogger(__name__)
-
 
 FILENAME = 'ugriz.ps'
 

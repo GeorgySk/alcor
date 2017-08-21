@@ -22,7 +22,6 @@ logging.basicConfig(format='%(filename)s %(funcName)s '
                     level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-
 DELTA_LATITUDE = 2.64 * pi / 180.0
 
 
