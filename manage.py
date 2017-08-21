@@ -16,7 +16,7 @@ from sqlalchemy_utils import (database_exists,
 from alcor.models.base import Base
 
 from alcor.services.processing import run_processing
-from alcor.services.plotting import draw_plots
+from alcor.services import plots
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
@@ -191,8 +191,7 @@ def plot(ctx: click.Context,
     with get_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
-        # TODO: rename module to plots, and draw_plots to draw
-        draw_plots(group_id,
+        plots.draw(group_id,
                    luminosity_function,
                    velocities_vs_magnitude,
                    velocity_clouds,

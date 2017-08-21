@@ -11,15 +11,15 @@ from . import (luminosity_function,
 from sqlalchemy.orm.session import Session
 
 
-def draw_plots(group_id: Optional[uuid.UUID],
-               with_luminosity_function: bool,
-               with_velocities_vs_magnitude: bool,
-               with_velocity_clouds: bool,
-               lepine_criterion: bool,
-               heatmaps_axes: str,
-               with_toomre_diagram: bool,
-               with_ugriz_diagrams: bool,
-               session: Session) -> None:
+def draw(group_id: Optional[uuid.UUID],
+         with_luminosity_function: bool,
+         with_velocities_vs_magnitude: bool,
+         with_velocity_clouds: bool,
+         lepine_criterion: bool,
+         heatmaps_axes: str,
+         with_toomre_diagram: bool,
+         with_ugriz_diagrams: bool,
+         session: Session) -> None:
     if with_luminosity_function:
         luminosity_function.plot(session=session)
 
