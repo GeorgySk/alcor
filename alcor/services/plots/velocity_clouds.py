@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from sqlalchemy.orm.session import Session
 import matplotlib
 
@@ -93,9 +95,21 @@ def plot(session: Session) -> None:
                        color=CLOUD_COLOR,
                        s=POINT_SIZE)
 
-    plot_ellipses(subplot_uv,
-                  subplot_uw,
-                  subplot_vw)
+    plot_ellipses(subplot=subplot_uv,
+                  xy=(AVERAGE_POPULATION_VELOCITY_U,
+                      AVERAGE_POPULATION_VELOCITY_V),
+                  x_std=STD_POPULATION_U,
+                  y_std=STD_POPULATION_V)
+    plot_ellipses(subplot=subplot_uw,
+                  xy=(AVERAGE_POPULATION_VELOCITY_U,
+                      AVERAGE_POPULATION_VELOCITY_W),
+                  x_std=STD_POPULATION_U,
+                  y_std=STD_POPULATION_W)
+    plot_ellipses(subplot=subplot_vw,
+                  xy=(AVERAGE_POPULATION_VELOCITY_V,
+                      AVERAGE_POPULATION_VELOCITY_W),
+                  x_std=STD_POPULATION_V,
+                  y_std=STD_POPULATION_W)
 
     subplot_uv.minorticks_on()
     subplot_uw.minorticks_on()
@@ -172,9 +186,21 @@ def plot_lepine_case(session: Session):
                        color=CLOUD_COLOR,
                        s=POINT_SIZE)
 
-    plot_ellipses(subplot_uv,
-                  subplot_uw,
-                  subplot_vw)
+    plot_ellipses(subplot=subplot_uv,
+                  xy=(AVERAGE_POPULATION_VELOCITY_U,
+                      AVERAGE_POPULATION_VELOCITY_V),
+                  x_std=STD_POPULATION_U,
+                  y_std=STD_POPULATION_V)
+    plot_ellipses(subplot=subplot_uw,
+                  xy=(AVERAGE_POPULATION_VELOCITY_U,
+                      AVERAGE_POPULATION_VELOCITY_W),
+                  x_std=STD_POPULATION_U,
+                  y_std=STD_POPULATION_W)
+    plot_ellipses(subplot=subplot_vw,
+                  xy=(AVERAGE_POPULATION_VELOCITY_V,
+                      AVERAGE_POPULATION_VELOCITY_W),
+                  x_std=STD_POPULATION_V,
+                  y_std=STD_POPULATION_W)
 
     subplot_uv.minorticks_on()
     subplot_uw.minorticks_on()
@@ -224,52 +250,21 @@ def fetch_all_lepine_case_vw_cloud_points(session: Session):
             for record in records]
 
 
-def plot_ellipses(uv_plot: Axes,
-                  uw_plot: Axes,
-                  vw_plot: Axes) -> None:
-    uv_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
-                                 AVERAGE_POPULATION_VELOCITY_V),
-                             width=STD_POPULATION_U * 2,
-                             height=STD_POPULATION_V * 2,
-                             fill=False,
-                             edgecolor=ELLIPSE_COLOR,
-                             linestyle='dashed')
-    uw_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
-                                 AVERAGE_POPULATION_VELOCITY_W),
-                             width=STD_POPULATION_U * 2,
-                             height=STD_POPULATION_W * 2,
-                             fill=False,
-                             edgecolor=ELLIPSE_COLOR,
-                             linestyle='dashed')
-    vw_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_V,
-                                 AVERAGE_POPULATION_VELOCITY_W),
-                             width=STD_POPULATION_V * 2,
-                             height=STD_POPULATION_W * 2,
-                             fill=False,
-                             edgecolor=ELLIPSE_COLOR,
-                             linestyle='dashed')
-    uv_double_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
-                                        AVERAGE_POPULATION_VELOCITY_V),
-                                    width=STD_POPULATION_U * 4,
-                                    height=STD_POPULATION_V * 4,
-                                    fill=False,
-                                    edgecolor=ELLIPSE_COLOR)
-    uw_double_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_U,
-                                        AVERAGE_POPULATION_VELOCITY_W),
-                                    width=STD_POPULATION_U * 4,
-                                    height=STD_POPULATION_W * 4,
-                                    fill=False,
-                                    edgecolor=ELLIPSE_COLOR)
-    vw_double_std_ellipse = Ellipse(xy=(AVERAGE_POPULATION_VELOCITY_V,
-                                        AVERAGE_POPULATION_VELOCITY_W),
-                                    width=STD_POPULATION_V * 4,
-                                    height=STD_POPULATION_W * 4,
-                                    fill=False,
-                                    edgecolor=ELLIPSE_COLOR)
+def plot_ellipses(subplot: Axes,
+                  xy: Tuple[float, float],
+                  x_std: float,
+                  y_std: float) -> None:
+    std_ellipse = Ellipse(xy=xy,
+                          width=x_std * 2,
+                          height=y_std * 2,
+                          fill=False,
+                          edgecolor=ELLIPSE_COLOR,
+                          linestyle='dashed')
+    double_std_ellipse = Ellipse(xy=xy,
+                                 width=x_std * 4,
+                                 height=y_std * 4,
+                                 fill=False,
+                                 edgecolor=ELLIPSE_COLOR)
 
-    uv_plot.add_artist(uv_std_ellipse)
-    uw_plot.add_artist(uw_std_ellipse)
-    vw_plot.add_artist(vw_std_ellipse)
-    uv_plot.add_artist(uv_double_std_ellipse)
-    uw_plot.add_artist(uw_double_std_ellipse)
-    vw_plot.add_artist(vw_double_std_ellipse)
+    subplot.add_artist(std_ellipse)
+    subplot.add_artist(double_std_ellipse)
