@@ -151,13 +151,13 @@ def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
     for star in stars:
         index = get_stars_bin_index(star)
 
-        highest_coordinate = max(abs(star.coordinate_x),
-                                 abs(star.coordinate_y),
-                                 abs(star.coordinate_z))
-        if abs(star.coordinate_x) == highest_coordinate:
+        max_coordinates_modulus = max(abs(star.coordinate_x),
+                                      abs(star.coordinate_y),
+                                      abs(star.coordinate_z))
+        if abs(star.coordinate_x) == max_coordinates_modulus:
             v_stars_bins[index].append(star)
             w_stars_bins[index].append(star)
-        elif abs(star.coordinate_y) == highest_coordinate:
+        elif abs(star.coordinate_y) == max_coordinates_modulus:
             u_stars_bins[index].append(star)
             w_stars_bins[index].append(star)
         else:
