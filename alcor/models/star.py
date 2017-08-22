@@ -1,3 +1,4 @@
+import enum
 import uuid
 # TODO: figure out if to use Decimal at all or smth else from scipy package
 from decimal import Decimal
@@ -14,7 +15,7 @@ from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.sqltypes import (BigInteger,
                                      Integer,
                                      Float,
-                                     DateTime)
+                                     DateTime, Enum)
 
 from .base import Base
 
@@ -48,6 +49,11 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'velocity_w',
                          'spectral_type',
                          'disk_belonging']
+
+
+class GalacticDiskEnum(enum.Enum):
+    thin = 1
+    thick = 2
 
 
 class Star(Base):
@@ -97,7 +103,7 @@ class Star(Base):
                         nullable=True)
     spectral_type = Column(Integer(),
                            nullable=True)
-    disk_belonging = Column(Integer(),
+    disk_belonging = Column(Enum(GalacticDiskEnum),
                             nullable=True)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
