@@ -1,43 +1,20 @@
-from typing import Tuple
+from typing import (Tuple,
+                    List)
 
 from sqlalchemy.orm.session import Session
 import matplotlib
-
-# More info at
-# http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
-# TODO: use this: https://stackoverflow.com/a/37605654/7851470
-from alcor.services.data_access import fetch_all_cloud_points
-from alcor.services.data_access import (
-    fetch_all_lepine_case_uv_cloud_points,
-    fetch_all_lepine_case_uw_cloud_points,
-    fetch_all_lepine_case_vw_cloud_points)
-
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.axes import Axes
+# More info at
+# http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
+# TODO: use this: https://stackoverflow.com/a/37605654/7851470
 
-FILENAME = 'velocity_clouds.ps'
-
-# TODO: figure out how to work with sizes
-FIGURE_SIZE = (8, 12)
-DESIRED_DIMENSIONS_RATIO = 10 / 13
-
-SUBPLOTS_SPACING = 0.25
-
-# TODO: make dict for all labels and limits in all plotting modules
-U_LABEL = '$U(km/s)$'
-V_LABEL = '$V(km/s)$'
-W_LABEL = '$W(km/s)$'
-
-U_LIMITS = [-150, 150]
-V_LIMITS = [-150, 150]
-W_LIMITS = [-150, 150]
-
-CLOUD_COLOR = 'k'
-POINT_SIZE = 0.5
-
-ELLIPSE_COLOR = 'b'
+from alcor.services.data_access import (fetch_all_cloud_points,
+                                        fetch_all_lepine_case_uv_cloud_points,
+                                        fetch_all_lepine_case_uw_cloud_points,
+                                        fetch_all_lepine_case_vw_cloud_points)
 
 # Kinematic properties of the thin disk taken from the paper of
 # N.Rowell and N.C.Hambly (mean motions are relative to the Sun):
@@ -53,7 +30,21 @@ STD_POPULATION_V = 23
 STD_POPULATION_W = 18.1
 
 
-def plot(session: Session) -> None:
+def plot(session: Session,
+         filename: str = 'velocity_clouds.ps',
+         figure_size: Tuple[float, float] = (8, 12),
+         spacing: float = 0.25,
+         u_label: str = '$U(km/s)$',
+         v_label: str = '$V(km/s)$',
+         w_label: str = '$W(km/s)$',
+         u_limits: Tuple[float, float] = (-150, 150),
+         v_limits: Tuple[float, float] = (-150, 150),
+         w_limits: Tuple[float, float] = (-150, 150)) -> None:
+    figure, (subplot_uv,
+             subplot_uw,
+             subplot_vw) = plt.subplots(nrows=3,
+                                        figsize=figure_size)
+
     # TODO: Implement other fetching functions
     cloud_points = fetch_all_cloud_points(session=session)
 
@@ -64,78 +55,61 @@ def plot(session: Session) -> None:
     velocities_w = [star.velocity_w
                     for star in cloud_points]
 
+    draw_subplot(subplot=subplot_uv,
+                 xlabel=u_label,
+                 ylabel=v_label,
+                 xlim=u_limits,
+                 ylim=v_limits,
+                 x=velocities_u,
+                 y=velocities_v,
+                 x_avg=AVERAGE_POPULATION_VELOCITY_U,
+                 y_avg=AVERAGE_POPULATION_VELOCITY_V,
+                 x_std=STD_POPULATION_U,
+                 y_std=STD_POPULATION_V)
+    draw_subplot(subplot=subplot_uw,
+                 xlabel=u_label,
+                 ylabel=w_label,
+                 xlim=u_limits,
+                 ylim=w_limits,
+                 x=velocities_u,
+                 y=velocities_w,
+                 x_avg=AVERAGE_POPULATION_VELOCITY_U,
+                 y_avg=AVERAGE_POPULATION_VELOCITY_W,
+                 x_std=STD_POPULATION_U,
+                 y_std=STD_POPULATION_W)
+    draw_subplot(subplot=subplot_vw,
+                 xlabel=v_label,
+                 ylabel=w_label,
+                 xlim=v_limits,
+                 ylim=w_limits,
+                 x=velocities_v,
+                 y=velocities_w,
+                 x_avg=AVERAGE_POPULATION_VELOCITY_V,
+                 y_avg=AVERAGE_POPULATION_VELOCITY_W,
+                 x_std=STD_POPULATION_V,
+                 y_std=STD_POPULATION_W)
+
+    figure.subplots_adjust(hspace=spacing)
+
+    plt.savefig(filename)
+
+
+def plot_lepine_case(session: Session,
+                     filename: str = 'velocity_clouds.ps',
+                     figure_size: Tuple[float, float] = (8, 12),
+                     spacing: float = 0.25,
+                     u_label: str = '$U(km/s)$',
+                     v_label: str = '$V(km/s)$',
+                     w_label: str = '$W(km/s)$',
+                     u_limits: Tuple[float, float] = (-150, 150),
+                     v_limits: Tuple[float, float] = (-150, 150),
+                     w_limits: Tuple[float, float] = (-150, 150)):
     figure, (subplot_uv,
              subplot_uw,
              subplot_vw) = plt.subplots(nrows=3,
-                                        figsize=FIGURE_SIZE)
+                                        figsize=figure_size)
 
-    subplot_uv.set(xlabel=U_LABEL,
-                   ylabel=V_LABEL,
-                   xlim=U_LIMITS,
-                   ylim=V_LIMITS)
-    subplot_uw.set(xlabel=U_LABEL,
-                   ylabel=W_LABEL,
-                   xlim=U_LIMITS,
-                   ylim=W_LIMITS)
-    subplot_vw.set(xlabel=V_LABEL,
-                   ylabel=W_LABEL,
-                   xlim=V_LIMITS,
-                   ylim=W_LIMITS)
-
-    subplot_uv.scatter(x=velocities_u,
-                       y=velocities_v,
-                       color=CLOUD_COLOR,
-                       s=POINT_SIZE)
-    subplot_uw.scatter(x=velocities_u,
-                       y=velocities_w,
-                       color=CLOUD_COLOR,
-                       s=POINT_SIZE)
-    subplot_vw.scatter(x=velocities_v,
-                       y=velocities_w,
-                       color=CLOUD_COLOR,
-                       s=POINT_SIZE)
-
-    plot_ellipses(subplot=subplot_uv,
-                  xy=(AVERAGE_POPULATION_VELOCITY_U,
-                      AVERAGE_POPULATION_VELOCITY_V),
-                  x_std=STD_POPULATION_U,
-                  y_std=STD_POPULATION_V)
-    plot_ellipses(subplot=subplot_uw,
-                  xy=(AVERAGE_POPULATION_VELOCITY_U,
-                      AVERAGE_POPULATION_VELOCITY_W),
-                  x_std=STD_POPULATION_U,
-                  y_std=STD_POPULATION_W)
-    plot_ellipses(subplot=subplot_vw,
-                  xy=(AVERAGE_POPULATION_VELOCITY_V,
-                      AVERAGE_POPULATION_VELOCITY_W),
-                  x_std=STD_POPULATION_V,
-                  y_std=STD_POPULATION_W)
-
-    subplot_uv.minorticks_on()
-    subplot_uw.minorticks_on()
-    subplot_vw.minorticks_on()
-
-    subplot_uv.xaxis.set_ticks_position('both')
-    subplot_uv.yaxis.set_ticks_position('both')
-    subplot_uw.xaxis.set_ticks_position('both')
-    subplot_uw.yaxis.set_ticks_position('both')
-    subplot_vw.xaxis.set_ticks_position('both')
-    subplot_vw.yaxis.set_ticks_position('both')
-
-    subplot_uv.set_aspect(DESIRED_DIMENSIONS_RATIO
-                          / subplot_uv.get_data_ratio())
-    subplot_uw.set_aspect(DESIRED_DIMENSIONS_RATIO
-                          / subplot_uw.get_data_ratio())
-    subplot_vw.set_aspect(DESIRED_DIMENSIONS_RATIO
-                          / subplot_vw.get_data_ratio())
-
-    figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
-
-    plt.savefig(FILENAME)
-
-
-def plot_lepine_case(session: Session):
-    # TODO: Implement getting last points by time(ok?)
+    # TODO: Add other fetching options
     uv_points = fetch_all_lepine_case_uv_cloud_points(session=session)
     uw_points = fetch_all_lepine_case_uw_cloud_points(session=session)
     vw_points = fetch_all_lepine_case_vw_cloud_points(session=session)
@@ -153,93 +127,96 @@ def plot_lepine_case(session: Session):
     vw_cloud_velocities_w = [star.velocity_w
                              for star in vw_points]
 
-    # TODO: do I need to use sharex or sharey attrs?
-    figure, (subplot_uv,
-             subplot_uw,
-             subplot_vw) = plt.subplots(nrows=3,
-                                        figsize=FIGURE_SIZE)
+    draw_subplot(subplot=subplot_uv,
+                 xlabel=u_label,
+                 ylabel=v_label,
+                 xlim=u_limits,
+                 ylim=v_limits,
+                 x=uv_cloud_velocities_u,
+                 y=uv_cloud_velocities_v,
+                 x_avg=AVERAGE_POPULATION_VELOCITY_U,
+                 y_avg=AVERAGE_POPULATION_VELOCITY_V,
+                 x_std=STD_POPULATION_U,
+                 y_std=STD_POPULATION_V)
+    draw_subplot(subplot=subplot_uw,
+                 xlabel=u_label,
+                 ylabel=w_label,
+                 xlim=u_limits,
+                 ylim=w_limits,
+                 x=uw_cloud_velocities_u,
+                 y=uw_cloud_velocities_w,
+                 x_avg=AVERAGE_POPULATION_VELOCITY_U,
+                 y_avg=AVERAGE_POPULATION_VELOCITY_W,
+                 x_std=STD_POPULATION_U,
+                 y_std=STD_POPULATION_W)
+    draw_subplot(subplot=subplot_vw,
+                 xlabel=v_label,
+                 ylabel=w_label,
+                 xlim=v_limits,
+                 ylim=w_limits,
+                 x=vw_cloud_velocities_v,
+                 y=vw_cloud_velocities_w,
+                 x_avg=AVERAGE_POPULATION_VELOCITY_V,
+                 y_avg=AVERAGE_POPULATION_VELOCITY_W,
+                 x_std=STD_POPULATION_V,
+                 y_std=STD_POPULATION_W)
 
-    # TODO: find the way to apply limits once for all subplots
-    subplot_uv.set(xlabel=U_LABEL,
-                   ylabel=V_LABEL,
-                   xlim=U_LIMITS,
-                   ylim=V_LIMITS)
-    subplot_uw.set(xlabel=U_LABEL,
-                   ylabel=W_LABEL,
-                   xlim=U_LIMITS,
-                   ylim=W_LIMITS)
-    subplot_vw.set(xlabel=V_LABEL,
-                   ylabel=W_LABEL,
-                   xlim=V_LIMITS,
-                   ylim=W_LIMITS)
+    figure.subplots_adjust(hspace=spacing)
 
-    subplot_uv.scatter(x=uv_cloud_velocities_u,
-                       y=uv_cloud_velocities_v,
-                       color=CLOUD_COLOR,
-                       s=POINT_SIZE)
-    subplot_uw.scatter(x=uw_cloud_velocities_u,
-                       y=uw_cloud_velocities_w,
-                       color=CLOUD_COLOR,
-                       s=POINT_SIZE)
-    subplot_vw.scatter(x=vw_cloud_velocities_v,
-                       y=vw_cloud_velocities_w,
-                       color=CLOUD_COLOR,
-                       s=POINT_SIZE)
+    plt.savefig(filename)
 
-    plot_ellipses(subplot=subplot_uv,
-                  xy=(AVERAGE_POPULATION_VELOCITY_U,
-                      AVERAGE_POPULATION_VELOCITY_V),
-                  x_std=STD_POPULATION_U,
-                  y_std=STD_POPULATION_V)
-    plot_ellipses(subplot=subplot_uw,
-                  xy=(AVERAGE_POPULATION_VELOCITY_U,
-                      AVERAGE_POPULATION_VELOCITY_W),
-                  x_std=STD_POPULATION_U,
-                  y_std=STD_POPULATION_W)
-    plot_ellipses(subplot=subplot_vw,
-                  xy=(AVERAGE_POPULATION_VELOCITY_V,
-                      AVERAGE_POPULATION_VELOCITY_W),
-                  x_std=STD_POPULATION_V,
-                  y_std=STD_POPULATION_W)
 
-    subplot_uv.minorticks_on()
-    subplot_uw.minorticks_on()
-    subplot_vw.minorticks_on()
-
-    subplot_uv.xaxis.set_ticks_position('both')
-    subplot_uv.yaxis.set_ticks_position('both')
-    subplot_uw.xaxis.set_ticks_position('both')
-    subplot_uw.yaxis.set_ticks_position('both')
-    subplot_vw.xaxis.set_ticks_position('both')
-    subplot_vw.yaxis.set_ticks_position('both')
-
-    subplot_uv.set_aspect(DESIRED_DIMENSIONS_RATIO
-                          / subplot_uv.get_data_ratio())
-    subplot_uw.set_aspect(DESIRED_DIMENSIONS_RATIO
-                          / subplot_uw.get_data_ratio())
-    subplot_vw.set_aspect(DESIRED_DIMENSIONS_RATIO
-                          / subplot_vw.get_data_ratio())
-
-    figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
-
-    plt.savefig(FILENAME)
+def draw_subplot(*,
+                 subplot: Axes,
+                 xlabel: str,
+                 ylabel: str,
+                 xlim: Tuple[float, float],
+                 ylim: Tuple[float, float],
+                 x: List[float],
+                 y: List[float],
+                 cloud_color: str = 'k',
+                 point_size: float = 0.5,
+                 x_avg: float,
+                 y_avg: float,
+                 x_std: float,
+                 y_std: float,
+                 ratio: float = 10 / 13) -> None:
+    subplot.set(xlabel=xlabel,
+                ylabel=ylabel,
+                xlim=xlim,
+                ylim=ylim)
+    subplot.scatter(x=x,
+                    y=y,
+                    color=cloud_color,
+                    s=point_size)
+    plot_ellipses(subplot=subplot,
+                  x_avg=x_avg,
+                  y_avg=y_avg,
+                  x_std=x_std,
+                  y_std=y_std)
+    subplot.minorticks_on()
+    subplot.xaxis.set_ticks_position('both')
+    subplot.yaxis.set_ticks_position('both')
+    subplot.set_aspect(ratio / subplot.get_data_ratio())
 
 
 def plot_ellipses(subplot: Axes,
-                  xy: Tuple[float, float],
+                  x_avg: float,
+                  y_avg: float,
                   x_std: float,
-                  y_std: float) -> None:
-    std_ellipse = Ellipse(xy=xy,
+                  y_std: float,
+                  ellipse_color: str = 'b') -> None:
+    std_ellipse = Ellipse(xy=(x_avg, y_avg),
                           width=x_std * 2,
                           height=y_std * 2,
                           fill=False,
-                          edgecolor=ELLIPSE_COLOR,
+                          edgecolor=ellipse_color,
                           linestyle='dashed')
-    double_std_ellipse = Ellipse(xy=xy,
+    double_std_ellipse = Ellipse(xy=(x_avg, y_avg),
                                  width=x_std * 4,
                                  height=y_std * 4,
                                  fill=False,
-                                 edgecolor=ELLIPSE_COLOR)
+                                 edgecolor=ellipse_color)
 
     subplot.add_artist(std_ellipse)
     subplot.add_artist(double_std_ellipse)
