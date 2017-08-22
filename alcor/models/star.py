@@ -101,6 +101,7 @@ class Star(Base):
                         nullable=True)
     velocity_w = Column(Float(asdecimal=True),
                         nullable=True)
+    # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
                            nullable=True)
     disk_belonging = Column(Enum(GalacticDiskEnum),

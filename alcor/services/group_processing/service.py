@@ -98,7 +98,9 @@ def process_stars_group(*,
             processed_star.velocity_v = original_star.velocity_v
             processed_star.velocity_w = original_star.velocity_w
         processed_star.append(processed_star)
-    session.add(processed_stars)
+    session.add_all(processed_stars)
+
+    session.commit()
 
     for star, processed_star in zip(stars, processed_stars):
         processed_star_association = ProcessedStarsAssociation(
