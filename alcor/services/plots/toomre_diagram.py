@@ -1,21 +1,20 @@
 import logging
 from math import sqrt
 from random import random
-from typing import List
+from typing import (List,
+                    Tuple)
 
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
 import matplotlib
-
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+
 from alcor.models.star import Star
 from alcor.services.data_access import fetch_all_stars
-
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
 from alcor.services.restrictions import PECULIAR_SOLAR_VELOCITY_V
 
 logger = logging.getLogger(__name__)
@@ -25,20 +24,16 @@ THICK_DISK_INDEX = 2
 
 DESIRED_FINAL_SAMPLE_STARS_COUNT = 10_000
 
-FILENAME = 'toomre_diagram.ps'
 
-FIGURE_SIZE = (8, 8)
-DESIRED_DIMENSIONS_RATIO = 10 / 13
-
-X_LABEL = '$V(km/s)$'
-Y_LABEL = '$\sqrt{U^2+W^2}(km/s)$'
-
-THIN_DISK_CLOUD_COLOR = 'r'
-THICK_DISK_CLOUD_COLOR = 'b'
-
-
-def plot(session: Session) -> None:
-    figure, subplot = plt.subplots(figsize=FIGURE_SIZE)
+def plot(session: Session,
+         filename: str = 'toomre_diagram.ps',
+         figure_size: Tuple[float, float] = (8, 8),
+         ratio: float = 10 / 13,
+         xlabel: str = '$V(km/s)$',
+         ylabel: str = '$\sqrt{U^2+W^2}(km/s)$',
+         thin_disk_color: str = 'r',
+         thick_disk_color: str = 'b') -> None:
+    figure, subplot = plt.subplots(figsize=figure_size)
 
     # TODO: add other fetching options
     stars = fetch_all_stars(session=session)
@@ -52,25 +47,24 @@ def plot(session: Session) -> None:
     plot_stars_by_disk(subplot=subplot,
                        stars=random_stars_sample,
                        disk_index=THIN_DISK_INDEX,
-                       color=THIN_DISK_CLOUD_COLOR)
+                       color=thin_disk_color)
     plot_stars_by_disk(subplot=subplot,
                        stars=random_stars_sample,
                        disk_index=THICK_DISK_INDEX,
-                       color=THICK_DISK_CLOUD_COLOR)
+                       color=thick_disk_color)
 
     # TODO: add sliders
-    subplot.set(xlabel=X_LABEL,
-                ylabel=Y_LABEL)
+    subplot.set(xlabel=xlabel,
+                ylabel=ylabel)
 
     plt.minorticks_on()
 
     subplot.xaxis.set_ticks_position('both')
     subplot.yaxis.set_ticks_position('both')
 
-    subplot.set_aspect(DESIRED_DIMENSIONS_RATIO
-                       / subplot.get_data_ratio())
+    subplot.set_aspect(ratio / subplot.get_data_ratio())
 
-    plt.savefig(FILENAME)
+    plt.savefig(filename)
 
 
 def plot_stars_by_disk(*,
