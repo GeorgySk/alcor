@@ -7,15 +7,15 @@ import matplotlib
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
 from alcor.services.data_access import fetch_all_cloud_points
+from alcor.services.data_access import (
+    fetch_all_lepine_case_uv_cloud_points,
+    fetch_all_lepine_case_uw_cloud_points,
+    fetch_all_lepine_case_vw_cloud_points)
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.axes import Axes
-
-from alcor.models.velocities.clouds import (LepineCaseUVCloud,
-                                            LepineCaseUWCloud,
-                                            LepineCaseVWCloud)
 
 FILENAME = 'velocity_clouds.ps'
 
@@ -223,31 +223,6 @@ def plot_lepine_case(session: Session):
     figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
 
     plt.savefig(FILENAME)
-
-
-# TODO: change to postgres
-def fetch_all_lepine_case_uv_cloud_points(session: Session):
-    query = (LepineCaseUVCloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseUVCloud(**record)
-            for record in records]
-
-
-def fetch_all_lepine_case_uw_cloud_points(session: Session):
-    query = (LepineCaseUWCloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseUWCloud(**record)
-            for record in records]
-
-
-def fetch_all_lepine_case_vw_cloud_points(session: Session):
-    query = (LepineCaseVWCloud.objects.all().limit(None))
-    records = fetch(query=query,
-                    session=session)
-    return [LepineCaseVWCloud(**record)
-            for record in records]
 
 
 def plot_ellipses(subplot: Axes,

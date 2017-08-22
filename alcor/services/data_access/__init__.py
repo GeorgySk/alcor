@@ -12,4 +12,7 @@ from .service import (fetch_stars,
                       fetch_all_v_vs_mag_bins,
                       fetch_all_v_vs_mag_clouds,
                       fetch_all_w_vs_mag_bins,
-                      fetch_all_w_vs_mag_clouds)
+                      fetch_all_w_vs_mag_clouds,
+                      fetch_all_lepine_case_vw_cloud_points,
+                      fetch_all_lepine_case_uw_cloud_points,
+                      fetch_all_lepine_case_uv_cloud_points)

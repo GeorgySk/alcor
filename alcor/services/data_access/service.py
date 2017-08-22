@@ -6,7 +6,10 @@ from sqlalchemy.orm.session import Session
 from alcor.models.group import Group
 from alcor.models.luminosity_function import Point
 from alcor.models.star import Star
-from alcor.models.velocities.clouds import Cloud
+from alcor.models.velocities.clouds import (Cloud,
+                                            LepineCaseUVCloud,
+                                            LepineCaseUWCloud,
+                                            LepineCaseVWCloud)
 from alcor.models.velocities_vs_magnitudes.bins import (Bin,
                                                         LepineCaseUBin,
                                                         LepineCaseVBin,
@@ -107,4 +110,22 @@ def fetch_all_v_vs_mag_clouds(session: Session) -> List[LepineCaseVCloud]:
 
 def fetch_all_w_vs_mag_clouds(session: Session) -> List[LepineCaseWCloud]:
     query = session.query(LepineCaseWCloud)
+    return query.all()
+
+
+def fetch_all_lepine_case_uv_cloud_points(session: Session
+                                          ) -> List[LepineCaseUVCloud]:
+    query = session.query(LepineCaseUVCloud)
+    return query.all()
+
+
+def fetch_all_lepine_case_uw_cloud_points(session: Session
+                                          ) -> List[LepineCaseUWCloud]:
+    query = session.query(LepineCaseUWCloud)
+    return query.all()
+
+
+def fetch_all_lepine_case_vw_cloud_points(session: Session
+                                          ) -> List[LepineCaseVWCloud]:
+    query = session.query(LepineCaseVWCloud)
     return query.all()
