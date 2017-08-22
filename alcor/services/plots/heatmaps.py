@@ -1,7 +1,7 @@
 import logging
 import uuid
 from typing import (List,
-                    Optional)
+                    Optional, Tuple)
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -23,31 +23,20 @@ from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
 
 logger = logging.getLogger(__name__)
 
-UV_FILENAME = 'heatmap_uv.ps'
-UW_FILENAME = 'heatmap_uw.ps'
-VW_FILENAME = 'heatmap_vw.ps'
-
-FIGURE_SIZE = (8, 8)
-DESIRED_DIMENSIONS_RATIO = 10 / 13
-SUBPLOTS_SPACING = 0.25
-FIGURE_GRID_HEIGHT_RATIOS = [0.05, 1]
-
 COLORMAP = cm.get_cmap('jet')
 COLORMAP.set_under('w')
-
-U_LABEL = '$U(km/s)$'
-V_LABEL = '$V(km/s)$'
-W_LABEL = '$W(km/s)$'
-VELOCITIES_BINS_COUNT = 150
-
-# TODO: find out the meaning of this
-VMIN = 0.01
 
 
 def plot(*,
          group_id: Optional[uuid.UUID],
          session: Session,
-         axes: str) -> None:
+         axes: str,
+         uv_filename: str = 'heatmap_uv.ps',
+         uw_filename: str = 'heatmap_uw.ps',
+         vw_filename: str = 'heatmap_vw.ps',
+         u_label: str = '$U(km/s)$',
+         v_label: str = '$V(km/s)$',
+         w_label: str = '$W(km/s)$') -> None:
     # TODO: Figure out what stars I should fetch (all/last N groups by time/
     # by id list)
     if group_id:
@@ -67,21 +56,21 @@ def plot(*,
                         for star in stars]
 
         # TODO: add option of plotting 3 heatmaps in one fig. at the same time
-        draw_plot(xlabel=U_LABEL,
-                  ylabel=V_LABEL,
+        draw_plot(xlabel=u_label,
+                  ylabel=v_label,
                   xdata=velocities_u,
                   ydata=velocities_v,
-                  filename=UV_FILENAME)
-        draw_plot(xlabel=U_LABEL,
-                  ylabel=W_LABEL,
+                  filename=uv_filename)
+        draw_plot(xlabel=u_label,
+                  ylabel=w_label,
                   xdata=velocities_u,
                   ydata=velocities_w,
-                  filename=UW_FILENAME)
-        draw_plot(xlabel=V_LABEL,
-                  ylabel=W_LABEL,
+                  filename=uw_filename)
+        draw_plot(xlabel=v_label,
+                  ylabel=w_label,
                   xdata=velocities_v,
                   ydata=velocities_w,
-                  filename=VW_FILENAME)
+                  filename=vw_filename)
 
 
 def draw_plot(*,
@@ -89,11 +78,20 @@ def draw_plot(*,
               ylabel: str,
               xdata: List[float],
               ydata: List[float],
-              filename: str) -> None:
+              filename: str,
+              figure_size: Tuple[float, float] = (8, 8),
+              ratio: float = 10 / 13,
+              spacing: float = 0.25,
+              figure_grid_height_ratios: List[float] = None,
+              bins_count: int = 150,
+              vmin: float = 0.01) -> None:
+    if figure_grid_height_ratios is None:
+        figure_grid_height_ratios = [0.05, 1]
+
     figure, (colorbar, subplot) = plt.subplots(
         nrows=2,
-        figsize=FIGURE_SIZE,
-        gridspec_kw={"height_ratios": FIGURE_GRID_HEIGHT_RATIOS})
+        figsize=figure_size,
+        gridspec_kw={"height_ratios": figure_grid_height_ratios})
 
     # TODO: add sliders
     subplot.set(xlabel=xlabel,
@@ -101,13 +99,13 @@ def draw_plot(*,
 
     heatmap, xedges, yedges = np.histogram2d(x=xdata,
                                              y=ydata,
-                                             bins=VELOCITIES_BINS_COUNT)
+                                             bins=bins_count)
     extent = [xedges[0], xedges[-1],
               yedges[0], yedges[-1]]
 
     colorbar_src = subplot.imshow(X=heatmap.T,
                                   cmap=COLORMAP,
-                                  vmin=VMIN,
+                                  vmin=vmin,
                                   extent=extent,
                                   origin='lower')
 
@@ -120,9 +118,8 @@ def draw_plot(*,
                     cax=colorbar,
                     orientation="horizontal")
 
-    subplot.set_aspect(DESIRED_DIMENSIONS_RATIO
-                       / subplot.get_data_ratio())
+    subplot.set_aspect(ratio / subplot.get_data_ratio())
 
-    figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
+    figure.subplots_adjust(hspace=spacing)
 
     plt.savefig(filename)
