@@ -1,5 +1,6 @@
 from math import (log10,
                   sqrt)
+from typing import Tuple
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -14,21 +15,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
-
-FILENAME = 'luminosity_function.ps'
-
-FIGURE_SIZE = (7, 7)
-DESIRED_DIMENSIONS_RATIO = 10 / 13
-
-X_LABEL = '$M_{bol}$'
-Y_LABEL = '$\log N (pc^{-3}M_{bol}^{-1})$'
-
-X_LIMITS = [7, 19]
-Y_LIMITS = [-6, -2]
-
-LINE_COLOR = 'k'
-MARKER = 's'
-CAP_SIZE = 5
 
 # Observational LF of 40pc sample from Althaus
 OBSERVATIONAL_AVG_BIN_MAGNITUDES = np.arange(7.75, 17.25, 0.5)
@@ -51,10 +37,19 @@ OBSERVATIONAL_LOWER_ERRORBARS = [
 OBSERVATIONAL_ASYMMETRIC_ERRORBARS = [OBSERVATIONAL_LOWER_ERRORBARS,
                                       OBSERVATIONAL_UPPER_ERRORBARS]
 
-OBSERVATIONAL_LINE_COLOR = 'r'
 
-
-def plot(session: Session) -> None:
+def plot(session: Session,
+         filename: str = 'luminosity_function.ps',
+         figure_size: Tuple[float, float] = (7, 7),
+         ratio: float = 10 / 13,
+         xlabel: str = '$M_{bol}$',
+         ylabel: str = '$\log N (pc^{-3}M_{bol}^{-1})$',
+         xlimits: Tuple[float, float] = (7, 19),
+         ylimits: Tuple[float, float] = (-6, -2),
+         line_color: str = 'k',
+         marker: str = 's',
+         capsize: float = 5,
+         observational_line_color: str = 'r') -> None:
     # TODO: Implement other fetching functions
     graph_points = fetch_all_graph_points(session=session)
 
@@ -78,27 +73,27 @@ def plot(session: Session) -> None:
     asymmetric_errorbars = [lower_errorbars,
                             upper_errorbars]
 
-    figure, subplot = plt.subplots(figsize=FIGURE_SIZE)
+    figure, subplot = plt.subplots(figsize=figure_size)
 
-    subplot.set(xlabel=X_LABEL,
-                ylabel=Y_LABEL,
-                xlim=X_LIMITS,
-                ylim=Y_LIMITS)
+    subplot.set(xlabel=xlabel,
+                ylabel=ylabel,
+                xlim=xlimits,
+                ylim=ylimits)
 
     subplot.errorbar(x=avg_bin_magnitudes,
                      y=stars_count_logarithms,
                      yerr=asymmetric_errorbars,
-                     marker=MARKER,
-                     color=LINE_COLOR,
-                     capsize=CAP_SIZE,
+                     marker=marker,
+                     color=line_color,
+                     capsize=capsize,
                      zorder=2)
 
     subplot.errorbar(x=OBSERVATIONAL_AVG_BIN_MAGNITUDES,
                      y=OBSERVATIONAL_STARS_COUNTS_LOGARITHMS,
                      yerr=OBSERVATIONAL_ASYMMETRIC_ERRORBARS,
-                     marker=MARKER,
-                     color=OBSERVATIONAL_LINE_COLOR,
-                     capsize=CAP_SIZE,
+                     marker=marker,
+                     color=observational_line_color,
+                     capsize=capsize,
                      zorder=1)
 
     plt.minorticks_on()
@@ -106,6 +101,6 @@ def plot(session: Session) -> None:
     subplot.xaxis.set_ticks_position('both')
     subplot.yaxis.set_ticks_position('both')
 
-    subplot.set_aspect(DESIRED_DIMENSIONS_RATIO / subplot.get_data_ratio())
+    subplot.set_aspect(ratio / subplot.get_data_ratio())
 
-    plt.savefig(FILENAME)
+    plt.savefig(filename)
