@@ -1,36 +1,32 @@
 import logging
-from typing import List
+from typing import List, Tuple
 
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
 import matplotlib
-
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
-from alcor.services.data_access import fetch_all_stars
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+from alcor.services.data_access import fetch_all_stars
 
 logger = logging.getLogger(__name__)
 
-FILENAME = 'ugriz.ps'
 
-FIGURE_SIZE = (8, 8)
-SUBPLOTS_SPACING = 0.25
-
-UG_LABEL = '$u-g$'
-GR_LABEL = '$g-r$'
-RI_LABEL = '$r-i$'
-IZ_LABEL = '$i-z$'
-
-
-def plot(session: Session) -> None:
+def plot(session: Session,
+         filename: str = 'ugriz.ps',
+         figure_size: Tuple[float, float] = (8, 8),
+         spacing: float = 0.25,
+         ug_label: str = '$u-g$',
+         gr_label: str = '$g-r$',
+         ri_label: str = '$r-i$',
+         iz_label: str = '$i-z$') -> None:
     figure, (subplot_ug_vs_gr,
              subplot_gr_vs_ri,
              subplot_ri_vs_iz) = plt.subplots(nrows=3,
-                                              figsize=FIGURE_SIZE)
+                                              figsize=figure_size)
 
     # TODO: add more fetching options
     stars = fetch_all_stars(session=session)
@@ -45,24 +41,24 @@ def plot(session: Session) -> None:
                 for star in stars]
 
     draw_subplot(subplot=subplot_ug_vs_gr,
-                 xlabel=GR_LABEL,
-                 ylabel=UG_LABEL,
+                 xlabel=gr_label,
+                 ylabel=ug_label,
                  x=ugriz_gr,
                  y=ugriz_ug)
     draw_subplot(subplot=subplot_gr_vs_ri,
-                 xlabel=RI_LABEL,
-                 ylabel=GR_LABEL,
+                 xlabel=ri_label,
+                 ylabel=gr_label,
                  x=ugriz_ri,
                  y=ugriz_gr)
     draw_subplot(subplot=subplot_ri_vs_iz,
-                 xlabel=IZ_LABEL,
-                 ylabel=RI_LABEL,
+                 xlabel=iz_label,
+                 ylabel=ri_label,
                  x=ugriz_iz,
                  y=ugriz_ri)
 
-    figure.subplots_adjust(hspace=SUBPLOTS_SPACING)
+    figure.subplots_adjust(hspace=spacing)
 
-    plt.savefig(FILENAME)
+    plt.savefig(filename)
 
 
 def draw_subplot(subplot: Axes,
