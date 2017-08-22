@@ -17,6 +17,9 @@ services:
       - --clean
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
+      - FORTRAN_COMPILER_OPTIONS=-g -fbacktrace
+        -ffpe-trap=zero,overflow,invalid -Wall -Wextra -Wconversion
+        -fbounds-check -fcheck=all
 
   postgres:
     image: postgres:latest
