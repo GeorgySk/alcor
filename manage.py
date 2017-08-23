@@ -127,7 +127,7 @@ def process(ctx: click.Context,
         session = session_factory()
 
         if last is not None and group_id is not None:
-            raise ValueError('\'last\' and \'id_groups\' options are mutually'
+            raise ValueError('"last" and "id_groups" options are mutually'
                              'exclusive')
 
         if last is not None or group_id is not None:

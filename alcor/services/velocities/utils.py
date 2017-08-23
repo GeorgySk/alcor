@@ -9,14 +9,11 @@ from alcor.models.velocities import (LepineCaseUVCloud,
 def star_cloud(star: Star) -> Union[LepineCaseUVCloud,
                                     LepineCaseUWCloud,
                                     LepineCaseVWCloud]:
-    max_coordinates_modulus = max(abs(star.coordinate_x),
-                                  abs(star.coordinate_y),
-                                  abs(star.coordinate_z))
-    if abs(star.coordinate_x) == max_coordinates_modulus:
+    if abs(star.coordinate_x) == star.max_coordinates_modulus:
         return LepineCaseVWCloud(group_id=star.group_id,
                                  velocity_v=star.velocity_v,
                                  velocity_w=star.velocity_w)
-    elif abs(star.coordinate_y) == max_coordinates_modulus:
+    elif abs(star.coordinate_y) == star.max_coordinates_modulus:
         return LepineCaseUWCloud(group_id=star.group_id,
                                  velocity_u=star.velocity_u,
                                  velocity_w=star.velocity_w)

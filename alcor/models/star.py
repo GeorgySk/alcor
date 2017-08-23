@@ -174,6 +174,12 @@ class Star(Base):
         return float(self.to_cartesian_from_equatorial()[2])
 
     @property
+    def max_coordinates_modulus(self) -> float:
+        return max(abs(self.coordinate_x),
+                   abs(self.coordinate_y),
+                   abs(self.coordinate_z))
+
+    @property
     def ugriz_rz(self) -> float:
         return float(self.ugriz_ri) + float(self.ugriz_iz)
 
