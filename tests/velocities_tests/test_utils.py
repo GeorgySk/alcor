@@ -2,11 +2,11 @@ from alcor.models import Star
 from alcor.models.velocities import (LepineCaseUVCloud,
                                      LepineCaseUWCloud,
                                      LepineCaseVWCloud)
-from alcor.services.velocities.utils import star_cloud
+from alcor.services.velocities.utils import lepine_cloud
 
 
-def test_star_cloud(star: Star) -> None:
-    cloud = star_cloud(star)
+def test_lepine_cloud(star: Star) -> None:
+    cloud = lepine_cloud(star)
 
     assert isinstance(cloud, (LepineCaseUVCloud,
                               LepineCaseUWCloud,
