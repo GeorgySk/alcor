@@ -1,97 +1,113 @@
 import csv
+from typing import List
 
 import numpy as np
 
-from alcor.types import CoolingSequenceType
 
-COOLING_SEQUENCES_FILES = {'metallicity = 0.001': ['wd0505_z0001.trk',
-                                                   'wd0553_z0001.trk',
-                                                   'wd0593_z0001.trk',
-                                                   'wd0627_z0001.trk',
-                                                   'wd0660_z0001.trk',
-                                                   'wd0692_z0001.trk',
-                                                   'wd0863_z0001.trk'],
-                           'metallicity = 0.01': ['wd0524_z001.trk',
-                                                  'wd0570_z001.trk',
-                                                  'wd0593_z001.trk',
-                                                  'wd0609_z001.trk',
-                                                  'wd0632_z001.trk',
-                                                  'wd0659_z001.trk',
-                                                  'wd0705_z001.trk',
-                                                  'wd0767_z001.trk',
-                                                  'wd0837_z001.trk',
-                                                  'wd0877_z001.trk'],
-                           'metallicity = 0.03': ['0524_003_sflhdiff.trk',
-                                                  '0570_003_sflhdiff.trk',
-                                                  '0593_003_sflhdiff.trk',
-                                                  '0610_003_sflhdiff.trk',
-                                                  '0632_003_sflhdiff.trk',
-                                                  '0659_003_sflhdiff.trk',
-                                                  '0705_003_sflhdiff.trk',
-                                                  '1000_003_sflhdiff.trk'],
-                           'metallicity = 0.06': ['0524_006_sflhdiff.trk',
-                                                  '0570_006_sflhdiff.trk',
-                                                  '0593_006_sflhdiff.trk',
-                                                  '0610_006_sflhdiff.trk',
-                                                  '0632_006_sflhdiff.trk',
-                                                  '0659_006_sflhdiff.trk',
-                                                  '0705_006_sflhdiff.trk',
-                                                  '1000_006_sflhdiff.trk']}
+def initialize_sequences() -> None:
+    # Metallicities were multiplied by 1000 in order to keep dict.keys as ints
+    files_names_by_metallicities = {1: ['wd0505_z0001.trk',
+                                        'wd0553_z0001.trk',
+                                        'wd0593_z0001.trk',
+                                        'wd0627_z0001.trk',
+                                        'wd0660_z0001.trk',
+                                        'wd0692_z0001.trk',
+                                        'wd0863_z0001.trk'],
+                                    10: ['wd0524_z001.trk',
+                                         'wd0570_z001.trk',
+                                         'wd0593_z001.trk',
+                                         'wd0609_z001.trk',
+                                         'wd0632_z001.trk',
+                                         'wd0659_z001.trk',
+                                         'wd0705_z001.trk',
+                                         'wd0767_z001.trk',
+                                         'wd0837_z001.trk',
+                                         'wd0877_z001.trk'],
+                                    30: ['0524_003_sflhdiff.trk',
+                                         '0570_003_sflhdiff.trk',
+                                         '0593_003_sflhdiff.trk',
+                                         '0610_003_sflhdiff.trk',
+                                         '0632_003_sflhdiff.trk',
+                                         '0659_003_sflhdiff.trk',
+                                         '0705_003_sflhdiff.trk',
+                                         '1000_003_sflhdiff.trk'],
+                                    60: ['0524_006_sflhdiff.trk',
+                                         '0570_006_sflhdiff.trk',
+                                         '0593_006_sflhdiff.trk',
+                                         '0610_006_sflhdiff.trk',
+                                         '0632_006_sflhdiff.trk',
+                                         '0659_006_sflhdiff.trk',
+                                         '0705_006_sflhdiff.trk',
+                                         '1000_006_sflhdiff.trk']}
+
+    metallicities_per_thousand = [1, 10, 30, 60]
+    masses = [np.array([0.505, 0.553, 0.593, 0.627, 0.660, 0.692, 0.863]),
+              np.array([0.524, 0.570, 0.593, 0.609, 0.632,
+                        0.659, 0.705, 0.767, 0.837, 0.877]),
+              np.array([0.524, 0.570, 0.593, 0.609,
+                        0.632, 0.659, 0.705, 1.000]),
+              np.array([0.524, 0.570, 0.593, 0.609,
+                        0.632, 0.659, 0.705, 1.000])]
+    pre_wd_lifetimes = [
+        np.zeros(len(files_names_by_metallicities[1])),
+        np.zeros(len(files_names_by_metallicities[10])),
+        np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892, 0.7422, 0.4431, 0.0]),
+        np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892, 0.7422, 0.4431, 0.0])]
+
+    cooling_sequences_by_metallicities = dict(metallicities_cooling_sequences(
+        metallicities_per_thousand,
+        files_names_by_metallicities,
+        masses,
+        pre_wd_lifetimes))
+
+    fill_types_by_metallicities = {1: 1,
+                                   10: 1,
+                                   30: 2,
+                                   60: 2}
+
+    for metallicity in metallicities_per_thousand:
+        fill_by_data_from_files(
+            cooling_sequences_by_metallicities[metallicity],
+            filenames=files_names_by_metallicities[metallicity],
+            fill_type=fill_types_by_metallicities[metallicity])
 
 
-def initialilze_sequences() -> CoolingSequenceType:
-    cooling_sequences_of_DA_WDs = {
-        'metallicity = 0.001':
-            {'mass': np.array(
-                [0.505, 0.553, 0.593, 0.627, 0.660, 0.692, 0.863]),
-                'preWD_lifetime': np.zeros(7),
-                'cooling_time': np.full((7, 650), np.nan),
-                'effective_temperature': np.full((7, 650), np.nan),
-                'surface_gravity': np.full((7, 650), np.nan),
-                'luminosity': np.full((7, 650), np.nan),
-                'rows_counts': np.empty(7)},
-        'metallicity = 0.01':
-            {'mass': np.array(
-                [0.524, 0.570, 0.593, 0.609, 0.632,
-                 0.659, 0.705, 0.767, 0.837, 0.877]),
-                'preWD_lifetime': np.zeros(10),
-                'cooling_time': np.full((10, 650), np.nan),
-                'effective_temperature': np.full((10, 650), np.nan),
-                'surface_gravity': np.full((10, 650), np.nan),
-                'luminosity': np.full((10, 650), np.nan),
-                'rows_counts': np.empty(10)},
-        'metallicity = 0.03':
-            {'mass': np.array([0.524, 0.570, 0.593, 0.609,
-                               0.632, 0.659, 0.705, 1.000]),
-             'preWD_lifetime': np.array([11.117, 2.7004, 1.699, 1.2114,
-                                         0.9892, 0.7422, 0.4431, 0.0]),
-             'cooling_time': np.full((8, 650), np.nan),
-             'effective_temperature': np.full((8, 650), np.nan),
-             'surface_gravity': np.full((8, 650), np.nan),
-             'luminosity': np.full((8, 650), np.nan),
-             'rows_counts': np.empty(8)
-             },
-        'metallicity = 0.06':
-            {'mass': np.array([0.524, 0.570, 0.593, 0.609,
-                               0.632, 0.659, 0.705, 1.000]),
-             'preWD_lifetime': np.array([11.117, 2.7004, 1.699, 1.2114,
-                                         0.9892, 0.7422, 0.4431, 0.0]),
-             'cooling_time': np.full((8, 650), np.nan),
-             'effective_temperature': np.full((8, 650), np.nan),
-             'surface_gravity': np.full((8, 650), np.nan),
-             'luminosity': np.full((8, 650), np.nan),
-             'rows_counts': np.empty(8)
-             }
-    }
+def metallicities_cooling_sequences(
+        metallicities: List[int],
+        files_names_by_metallicities: Dict[int, List[str]],
+        masses: List[np.ndarray],
+        pre_wd_lifetimes: List[np.ndarray],
+        columns_count: int = 650
+        ) -> Iterator[Tuple[int, Dict[str, np.ndarray]]]:
+    for metallicity, mass, pre_wd_lifetime in zip(metallicities,
+                                                  masses,
+                                                  pre_wd_lifetimes):
+        files_count = len(files_names_by_metallicities[metallicity])
+        shape = (files_count, columns_count)
+        cooling_sequence = dict(mass=mass,
+                                pre_wd_lifetime=pre_wd_lifetime,
+                                cooling_time=nan_matrix(shape),
+                                effective_temperature=nan_matrix(shape),
+                                surface_gravity=nan_matrix(shape),
+                                luminosity=nan_matrix(shape),
+                                rows_counts=np.empty(files_count))
+        yield metallicity, cooling_sequence
 
-    for filename_index, filename in COOLING_SEQUENCES_FILES[
-            'metallicity = 0.001']:
-        cooling_sequences = cooling_sequences_of_DA_WDs['metallicity = 0.001']
-        cooling_time = cooling_sequences['cooling_time']
-        effective_temperature = cooling_sequences['effective_temperature']
-        surface_gravity = cooling_sequences['surface_gravity']
-        luminosity = cooling_sequences['luminosity']
-        rows_counts = cooling_sequences['rows_counts']
+
+def nan_matrix(shape: Tuple[int, ...]) -> np.ndarray:
+    return np.full(shape, np.nan)
+
+
+def fill_by_data_from_files(sequence: Dict[str, np.ndarray],
+                            filenames: List[str],
+                            fill_type: int) -> None:
+    for filename_index, filename in filenames:
+        cooling_time = sequence['cooling_time']
+        effective_temperature = sequence['effective_temperature']
+        surface_gravity = sequence['surface_gravity']
+        luminosity = sequence['luminosity']
+        pre_wd_lifetime = sequence['pre_wd_lifetime']
+        rows_counts = sequence['rows_counts']
 
         with open(filename, 'r') as file:
             filereader = csv.reader(file,
