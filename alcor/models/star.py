@@ -15,7 +15,8 @@ from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.sqltypes import (BigInteger,
                                      Integer,
                                      Float,
-                                     DateTime, Enum)
+                                     DateTime,
+                                     Enum)
 
 from .base import Base
 
@@ -131,7 +132,7 @@ class Star(Base):
                  velocity_v: float = None,
                  velocity_w: float = None,
                  spectral_type: int = None,
-                 disk_belonging: int = None):
+                 disk_belonging: str = None):
         self.group_id = group_id
         self.luminosity = luminosity
         self.proper_motion = proper_motion

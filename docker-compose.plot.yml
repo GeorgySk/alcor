@@ -13,14 +13,14 @@ services:
       # Plotting
       - plot
 #      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
-      - --luminosity-function
-      - --velocities-vs-magnitude
-      - --velocity-clouds
-      - --lepine-criterion
-      - --heatmap
-      - velocities
+#      - --luminosity-function
+#      - --velocities-vs-magnitude
+#      - --velocity-clouds
+#      - --lepine-criterion
+#      - --heatmap
+#      - velocities
       - --toomre-diagram
-      - --ugriz-color-color-diagram
+#      - --ugriz-color-color-diagram
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 

@@ -1,3 +1,4 @@
+import decimal
 import logging
 from collections import OrderedDict
 from decimal import Decimal
@@ -37,7 +38,7 @@ def parse_stars(lines: Iterable[str],
                          f'STAR_PARAMETERS_NAMES')
     for line in lines:
         parts = line.split()
-        params = map(Decimal, parts)
+        params = map(to_decimal, parts)
         values = OrderedDict(zip(headers,
                                  params))
         yield Star(group_id=group.id,
@@ -50,3 +51,10 @@ def get_columns(rows: Iterable[Tuple[str, ...]],
     converted_rows = (map(data_type, row)
                       for row in rows)
     return zip(*converted_rows)
+
+
+def to_decimal(data: str) -> Any:
+    try:
+        return Decimal(data)
+    except decimal.InvalidOperation:
+        return data

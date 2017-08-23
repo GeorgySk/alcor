@@ -580,6 +580,7 @@ C       TODO: no need to keep these
       real :: UB(numberOfStars), BV(numberOfStars), 
      &                    VRR(numberOfStars), RI(numberOfStars)
 C      &                    ugriz_g_apparent(numberOfStars)
+      character(len=:), allocatable :: disk_str
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -608,6 +609,11 @@ C      &, ugriz_g_apparent
       open(421, file = output_filename, access='append')
       if (geometry == 'sphere') then
           do i = 1, numberOfWDs
+              if (disk_belonging(i) == 1) then
+                  disk_str = 'thin'
+              else if (disk_belonging(i) == 2) then
+                  disk_str = 'thick'
+              end if
               write(421, *) luminosityOfWD(i),
      &                      properMotion(i),
      &                      latitude_proper_motion(i),
@@ -629,7 +635,7 @@ C                           TODO: better save ubvri, ugriz is derivative
      &                      vv(i),
      &                      ww(i),
      &                      typeOfWD(i),
-     &                      disk_belonging(i)
+     &                      disk_str
           end do
       else if (geometry == 'cones') then
          if (with_overlapping_checking .eqv. .true.) then
@@ -782,20 +788,24 @@ C                if cone crosses 2pi, move it -2pi
                  end if
                  if (star_in_intersection .eqv. .false.) then
                      stars_counter = stars_counter + 1
-                     write(421,"(11(es17.8e3,x),i1,x,i1)") 
-     &                                              uu(i),
-     &                                              vv(i),
-     &                                              ww(i),
-     &                                              rgac(i),
-     &                                              longitude,
-     &                                              latitude,
-     &                                              ugriz_g_apparent(i),
-     &                                              ugriz_ug(i),
-     &                                              ugriz_gr(i),
-     &                                              ugriz_ri(i),
-     &                                              ugriz_iz(i),
-     &                                              disk_belonging(i),
-     &                                              typeOfWD(i)
+                     if (disk_belonging(i) == 1) then
+                         disk_str = 'thin'
+                     else if (disk_belonging(i) == 2) then
+                         disk_str = 'thick'
+                     end if
+                     write(421,*) uu(i),
+     &                            vv(i),
+     &                            ww(i),
+     &                            rgac(i),
+     &                            longitude,
+     &                            latitude,
+     &                            ugriz_g_apparent(i),
+     &                            ugriz_ug(i),
+     &                            ugriz_gr(i),
+     &                            ugriz_ri(i),
+     &                            ugriz_iz(i),
+     &                            disk_str,
+     &                            typeOfWD(i)
                  else
                      eliminations_counter = eliminations_counter + 1
                  end if
@@ -859,20 +869,25 @@ C           if cone crosses 2pi, move it -2pi
             if (max_longitude > 2 * pi) then
                 longitude = longitude - 2 * pi
             end if
-            write(421,"(11(es17.8e3,x),i1,x,i1)") uu(i),
-     &                                              vv(i),
-     &                                              ww(i),
-     &                                              rgac(i),
-     &                                              longitude,
-     &                                              latitude,
+            if (disk_belonging(i) == 1) then
+                disk_str = 'thin'
+            else if (disk_belonging(i) == 2) then
+                disk_str = 'thick'
+            end if
+            write(421,*) uu(i),
+     &                   vv(i),
+     &                   ww(i),
+     &                   rgac(i),
+     &                   longitude,
+     &                   latitude,
 C     TODO: we need to save u g r i z, not u-g, g-r etc..
-     &                                              ugriz_g_apparent(i),
-     &                                              ugriz_ug(i),
-     &                                              ugriz_gr(i),
-     &                                              ugriz_ri(i),
-     &                                              ugriz_iz(i),
-     &                                              disk_belonging(i),
-     &                                              typeOfWD(i)
+     &                   ugriz_g_apparent(i),
+     &                   ugriz_ug(i),
+     &                   ugriz_gr(i),
+     &                   ugriz_ri(i),
+     &                   ugriz_iz(i),
+     &                   disk_str,
+     &                   typeOfWD(i)
          end do
          end if
       end if
