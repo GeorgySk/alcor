@@ -37,7 +37,9 @@ def generate_clouds(stars: List[Star],
     v_clouds = []
     w_clouds = []
     for star in stars:
-        if abs(star.coordinate_x) == star.max_coordinates_modulus:
+        max_coordinates_modulus = star.max_coordinates_modulus
+
+        if abs(star.coordinate_x) == max_coordinates_modulus:
             v_clouds.append(
                 LepineCaseVCloud(group_id=group.id,
                                  velocity_v=star.velocity_v,
@@ -46,7 +48,7 @@ def generate_clouds(stars: List[Star],
                 LepineCaseWCloud(group_id=group.id,
                                  velocity_w=star.velocity_w,
                                  bolometric_magnitude=star.bolometric_magnitude))
-        elif abs(star.coordinate_y) == star.max_coordinates_modulus:
+        elif abs(star.coordinate_y) == max_coordinates_modulus:
             u_clouds.append(
                 LepineCaseUCloud(group_id=group.id,
                                  velocity_u=star.velocity_u,
@@ -148,10 +150,12 @@ def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
     for star in stars:
         index = get_stars_bin_index(star)
 
-        if abs(star.coordinate_x) == star.max_coordinates_modulus:
+        max_coordinates_modulus = star.max_coordinates_modulus
+
+        if abs(star.coordinate_x) == max_coordinates_modulus:
             v_stars_bins[index].append(star)
             w_stars_bins[index].append(star)
-        elif abs(star.coordinate_y) == star.max_coordinates_modulus:
+        elif abs(star.coordinate_y) == max_coordinates_modulus:
             u_stars_bins[index].append(star)
             w_stars_bins[index].append(star)
         else:

@@ -173,6 +173,7 @@ class Star(Base):
     def coordinate_z(self) -> float:
         return float(self.to_cartesian_from_equatorial()[2])
 
+    # TODO: make memoized property
     @property
     def max_coordinates_modulus(self) -> float:
         return max(abs(self.coordinate_x),
