@@ -101,16 +101,16 @@ def nan_matrix(shape: Tuple[int, ...]) -> np.ndarray:
     return np.full(shape, np.nan)
 
 
-def fill_by_data_from_files(sequence: Dict[str, np.ndarray],
+def fill_by_data_from_files(cooling_sequence: Dict[str, np.ndarray],
                             filenames: List[str],
                             fill_type: int) -> None:
     for filename_index, filename in filenames:
-        cooling_time = sequence['cooling_time']
-        effective_temperature = sequence['effective_temperature']
-        surface_gravity = sequence['surface_gravity']
-        luminosity = sequence['luminosity']
-        pre_wd_lifetime = sequence['pre_wd_lifetime']
-        rows_counts = sequence['rows_counts']
+        cooling_time = cooling_sequence['cooling_time']
+        effective_temperature = cooling_sequence['effective_temperature']
+        surface_gravity = cooling_sequence['surface_gravity']
+        luminosity = cooling_sequence['luminosity']
+        pre_wd_lifetime = cooling_sequence['pre_wd_lifetime']
+        rows_counts = cooling_sequence['rows_counts']
 
         with open(filename, 'r') as file:
             filereader = csv.reader(file,
