@@ -1,6 +1,6 @@
 from math import (log10,
                   sqrt)
-from typing import (Iterable,
+from typing import (Iterator,
                     List)
 
 from alcor.models import (Group,
@@ -37,7 +37,7 @@ def get_stars_bin_index(star: Star) -> int:
 def points(*,
            stars_bins: StarsBinsType,
            group: Group,
-           normalization_factor: float) -> Iterable[Point]:
+           normalization_factor: float) -> Iterator[Point]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
         stars_count = len(stars_bin)
         if not stars_count:
@@ -46,8 +46,8 @@ def points(*,
         avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
                              + BIN_SIZE * (stars_bin_index + 0.5))
         stars_count_logarithm = get_stars_count_logarithm(
-            stars_count=stars_count,
-            normalization_factor=normalization_factor)
+                stars_count=stars_count,
+                normalization_factor=normalization_factor)
         upper_error_bar = get_upper_error_bar(stars_count)
         lower_error_bar = get_lower_error_bar(stars_count)
         yield Point(group_id=group.id,

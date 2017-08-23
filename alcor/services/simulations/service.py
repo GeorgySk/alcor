@@ -4,7 +4,7 @@ import uuid
 from decimal import Decimal
 from subprocess import check_call
 from typing import (Any,
-                    Iterable,
+                    Iterator,
                     Dict)
 
 from sqlalchemy.orm.session import Session
@@ -57,7 +57,7 @@ def run_simulations(*,
 
 def generate_parameters(*,
                         values: Dict[str, Decimal],
-                        group: Group) -> Iterable[Parameter]:
+                        group: Group) -> Iterator[Parameter]:
     for parameter_name, parameter_value in values.items():
         yield Parameter(group_id=group.id,
                         name=parameter_name,

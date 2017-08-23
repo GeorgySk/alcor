@@ -4,15 +4,14 @@ from collections import OrderedDict
 from decimal import Decimal
 from typing import (Any,
                     Iterable,
-                    Dict,
-                    Tuple)
+                    Iterator,
+                    Dict)
 
 import yaml
 
-from alcor.models import (Group,
+from alcor.models import (STAR_PARAMETERS_NAMES,
+                          Group,
                           Star)
-from alcor.models import STAR_PARAMETERS_NAMES
-from alcor.types import ColumnValueType
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,8 @@ def join_str(items: Iterable[Any],
     return sep.join(map(str, items))
 
 
-def parse_stars(lines: Iterable[str],
-                group: Group
-                ) -> Iterable[Star]:
+def parse_stars(lines: Iterator[str],
+                group: Group) -> Iterator[Star]:
     headers = next(lines).split()
     for header in headers:
         if not (header in STAR_PARAMETERS_NAMES):
@@ -38,23 +36,15 @@ def parse_stars(lines: Iterable[str],
                          f'STAR_PARAMETERS_NAMES')
     for line in lines:
         parts = line.split()
-        params = map(to_decimal, parts)
+        params = map(str_to_decimal, parts)
         values = OrderedDict(zip(headers,
                                  params))
         yield Star(group_id=group.id,
                    **values)
 
 
-def get_columns(rows: Iterable[Tuple[str, ...]],
-                data_type: ColumnValueType = float
-                ) -> Iterable[Tuple[ColumnValueType, ...]]:
-    converted_rows = (map(data_type, row)
-                      for row in rows)
-    return zip(*converted_rows)
-
-
-def to_decimal(data: str) -> Any:
+def str_to_decimal(string: str) -> Any:
     try:
-        return Decimal(data)
+        return Decimal(string)
     except decimal.InvalidOperation:
-        return data
+        return string
