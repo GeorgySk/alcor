@@ -1,6 +1,5 @@
 import uuid
 
-from decimal import Decimal
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column

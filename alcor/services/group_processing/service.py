@@ -92,10 +92,10 @@ def process_stars_group(*,
         original_id=original_id)
     session.add(processed_group)
 
-    processed_stars = list(blank_stars(
-        stars,
-        group_id=processed_group_id,
-        copy_velocities=nullify_radial_velocity))
+    processed_stars = [Star(group_id=processed_group_id)
+                       for _ in range(len(stars))]
+    if nullify_radial_velocity:
+        copy_velocities(stars, processed_stars)
     session.add_all(processed_stars)
 
     session.commit()
@@ -109,14 +109,9 @@ def process_stars_group(*,
     session.commit()
 
 
-def blank_stars(stars: List[Star],
-                *,
-                group_id: uuid.UUID,
-                copy_velocities: bool) -> Iterable[Star]:
-    for original_star in stars:
-        processed_star = Star(group_id=group_id)
-        if copy_velocities:
-            processed_star.velocity_u = original_star.velocity_u
-            processed_star.velocity_v = original_star.velocity_v
-            processed_star.velocity_w = original_star.velocity_w
-        yield processed_star
+def copy_velocities(src_stars: List[Star],
+                    dst_stars: List[Star]) -> None:
+    for src_star, dst_star in zip(src_stars, dst_stars):
+        dst_star.velocity_u = src_star.velocity_u
+        dst_star.velocity_v = src_star.velocity_v
+        dst_star.velocity_w = src_star.velocity_w

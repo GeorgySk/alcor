@@ -3,9 +3,9 @@ import logging
 from collections import OrderedDict
 from decimal import Decimal
 from typing import (Any,
-                    Iterable,
+                    Tuple,
                     Dict,
-                    Tuple)
+                    Iterable)
 
 import yaml
 

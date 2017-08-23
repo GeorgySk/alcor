@@ -1,8 +1,7 @@
-from math import (ceil,
-                  log10,
+from math import (log10,
                   sqrt)
-from typing import (Iterable,
-                    List)
+from typing import (List,
+                    Iterable)
 
 from alcor.models import (Group,
                           Star)

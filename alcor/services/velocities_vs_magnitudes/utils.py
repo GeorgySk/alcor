@@ -1,9 +1,9 @@
 import logging
 from statistics import (mean,
                         stdev)
-from typing import (Iterable,
+from typing import (List,
                     Tuple,
-                    List,
+                    Iterable,
                     Union)
 
 from alcor.models import (Group,

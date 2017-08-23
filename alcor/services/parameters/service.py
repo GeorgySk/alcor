@@ -1,10 +1,9 @@
-import csv
 import logging
 from itertools import product
-from typing import (Iterable,
-                    Dict,
+from typing import (List,
                     Tuple,
-                    List)
+                    Dict,
+                    Iterable)
 
 from alcor.types import NumericType
 

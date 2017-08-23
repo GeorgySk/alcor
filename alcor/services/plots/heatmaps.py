@@ -1,7 +1,8 @@
 import logging
 import uuid
 from typing import (List,
-                    Optional, Tuple)
+                    Tuple,
+                    Optional)
 
 from sqlalchemy.orm.session import Session
 import matplotlib

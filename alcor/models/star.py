@@ -1,7 +1,5 @@
 import enum
 import uuid
-# TODO: figure out if to use Decimal at all or smth else from scipy package
-from decimal import Decimal
 from math import (cos,
                   sin,
                   pi,
