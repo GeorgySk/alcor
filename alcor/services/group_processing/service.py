@@ -17,9 +17,6 @@ from alcor.services.data_access import fetch_group_stars
 from . import elimination
 from .utils import copy_velocities
 
-logging.basicConfig(format='%(filename)s %(funcName)s '
-                           '%(levelname)s: %(message)s',
-                    level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -46,14 +43,15 @@ def process_stars_group(*,
         stars = list(filterfalse(is_eliminated, stars))
 
     counter = StarsCounter(
-        group_id=group.id,
-        raw=stars_count,
-        by_parallax=eliminations_counter['parallax'],
-        by_declination=eliminations_counter['declination'],
-        by_velocity=eliminations_counter['velocity'],
-        by_proper_motion=eliminations_counter['proper_motion'],
-        by_reduced_proper_motion=eliminations_counter['reduced_proper_motion'],
-        by_apparent_magnitude=eliminations_counter['apparent_magnitude'])
+            group_id=group.id,
+            raw=stars_count,
+            by_parallax=eliminations_counter['parallax'],
+            by_declination=eliminations_counter['declination'],
+            by_velocity=eliminations_counter['velocity'],
+            by_proper_motion=eliminations_counter['proper_motion'],
+            by_reduced_proper_motion=eliminations_counter[
+                'reduced_proper_motion'],
+            by_apparent_magnitude=eliminations_counter['apparent_magnitude'])
 
     session.add(counter)
 
@@ -63,29 +61,29 @@ def process_stars_group(*,
 
     if w_luminosity_function:
         luminosity_function.process_stars_group(
-            stars=stars,
-            group=group,
-            session=session)
+                stars=stars,
+                group=group,
+                session=session)
 
     if w_velocities_clouds:
         velocities.process_stars_group(
-            stars=stars,
-            group=group,
-            w_lepine_criterion=w_lepine_criterion,
-            session=session)
+                stars=stars,
+                group=group,
+                w_lepine_criterion=w_lepine_criterion,
+                session=session)
 
     if w_velocities_vs_magnitude:
         velocities_vs_magnitudes.process_stars_group(
-            stars=stars,
-            group=group,
-            w_lepine_criterion=w_lepine_criterion,
-            session=session)
+                stars=stars,
+                group=group,
+                w_lepine_criterion=w_lepine_criterion,
+                session=session)
 
     original_id = group.id
     processed_group_id = uuid.uuid4()
     processed_group = Group(
-        id=processed_group_id,
-        original_id=original_id)
+            id=processed_group_id,
+            original_id=original_id)
     session.add(processed_group)
 
     processed_stars = [Star(group_id=processed_group_id)
@@ -98,8 +96,8 @@ def process_stars_group(*,
 
     for star, processed_star in zip(stars, processed_stars):
         processed_star_association = ProcessedStarsAssociation(
-            original_star_id=star.id,
-            processed_star_id=processed_star.id)
+                original_star_id=star.id,
+                processed_star_id=processed_star.id)
         session.add(processed_star_association)
 
     session.commit()

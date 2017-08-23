@@ -15,8 +15,8 @@ from sqlalchemy_utils import (database_exists,
 
 from alcor.models.base import Base
 from alcor.services import plots
-from alcor.services.processing import run_processing
 from alcor.services.common import FILTRATION_METHODS
+from alcor.services.processing import run_processing
 from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
@@ -26,7 +26,9 @@ logger = logging.getLogger(__name__)
 @click.group()
 @click.pass_context
 def main(ctx: click.Context) -> None:
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(format='%(filename)s %(funcName)s '
+                               '%(levelname)s: %(message)s',
+                        level=logging.DEBUG)
     ctx.obj = make_url(os.environ['POSTGRES_URI'])
 
 
