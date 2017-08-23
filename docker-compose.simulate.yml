@@ -11,20 +11,15 @@ services:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
       # Generating stars:
-#      - simulate
-#      - --project-dir
-#      - test_project
-      # Processing generated data:
-      - process
-      - --filtration-method
-      - restricted
-      - --nullify-radial-velocity
-      - --w-luminosity-function
-      - --w-velocities-clouds
-      - --w-velocities-vs-magnitude
-      - --w-lepine-criterion
+      - simulate
+      - --project-dir
+      - test_project
+      - --clean
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
+      - FORTRAN_COMPILER_OPTIONS=-g -fbacktrace
+        -ffpe-trap=zero,overflow,invalid -Wall -Wextra -Wconversion
+        -fbounds-check -fcheck=all
 
   postgres:
     image: postgres:latest

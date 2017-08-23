@@ -24,12 +24,12 @@ C       logg: logarithm of the superficial gravity
 C       c1,c2,c3,c4,c5: UBVRI colors 
 C=======================================================================
       use external_types
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
       
 C     ---   Parameters   ---
       integer nrow,model,modlog
       parameter (nrow=650)
-      double precision zet1,zet2,zet3,zet4
+      real zet1,zet2,zet3,zet4
       parameter (zet1=0.001)
       parameter (zet2=0.01)
       parameter (zet3=0.03)
@@ -41,30 +41,30 @@ C     ---   Declaration of variables   ---
      &        numberOfMassesWithCoolSeq_4
       integer ntrkda(10),numberOfRows_1(7),numberOfRows_2(10),
      &        numberOfRows_3(8),numberOfRows_4(8)
-      double precision tcool,mass,Z,lum,teff,logg,c1,c2,c3,c4,c5
-      double precision Z1,lum1,teff1,logg1
-      double precision Z2,lum2,teff2,logg2
-      double precision massOfWD(10),massOfWD_1(7),massOfWD_2(10),
+      real tcool,mass,Z,lum,teff,logg,c1,c2,c3,c4,c5
+      real Z1,lum1,teff1,logg1
+      real Z2,lum2,teff2,logg2
+      real massOfWD(10),massOfWD_1(7),massOfWD_2(10),
      &                 massOfWD_3(8),massOfWD_4(8)
-      double precision tprewdda1(7),tprewdda2(10),tprewdda3(8)
-      double precision tprewdda4(8),coolingTimes_1(7,nrow),
+      real tprewdda1(7),tprewdda2(10),tprewdda3(8)
+      real tprewdda4(8),coolingTimes_1(7,nrow),
      &                 coolingTimes_2(10,nrow)
-      double precision coolingTimes_3(8,nrow),coolingTimes_4(8,nrow)
-      double precision luminosity_1(7,nrow),
+      real coolingTimes_3(8,nrow),coolingTimes_4(8,nrow)
+      real luminosity_1(7,nrow),
      &                 effectiveTemperature_1(7,nrow),
      &                 gravitationalAcceleration_1(7,nrow)
-      double precision luminosity_2(10,nrow),
+      real luminosity_2(10,nrow),
      &                 effectiveTemperature_2(10,nrow),
      &                 gravitationalAcceleration_2(10,nrow)
-      double precision luminosity_3(8,nrow),
+      real luminosity_3(8,nrow),
      &                 effectiveTemperature_3(8,nrow),
      &                 gravitationalAcceleration_3(8,nrow)
-      double precision luminosity_4(8,nrow),
+      real luminosity_4(8,nrow),
      &                 effectiveTemperature_4(8,nrow),
      &                 gravitationalAcceleration_4(8,nrow)
-      double precision luminosity(10,nrow),color_U(10,nrow),
+      real luminosity(10,nrow),color_U(10,nrow),
      &                 color_B(10,nrow),color_V(10,nrow)
-      double precision color_R(10,nrow),color_I(10,nrow)
+      real color_R(10,nrow),color_I(10,nrow)
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 

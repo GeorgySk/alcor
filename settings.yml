@@ -1,36 +1,22 @@
-model_type: 1
-
-# specifies to which decimal place
-# floating point numbers should be rounded
 precision: 6
 
+geometry: cones
+
 parameters:
-  DB_fraction:
-    start: 0.2
-    step: 0.1
-    count: 1
-
-  galaxy_age:
-    start: 9.2
-    step: 0.5
-    count: 1
-
-  initial_mass_function_exponent:
-    start: -2.35
-    step: 0.1
-    count: 1
-
-  lifetime_mass_ratio:
-    start: 1.0
-    step: 0.1
-    count: 1
-
-  burst_time:
-    start: 0.6
-    step: 0.1
-    count: 1
-
-  mass_reduction_factor:
-    start: 3.7
-    step: 0.1
-    count: 1
+  commons:
+#   TODO: this is not applied to cone
+    burst_time: 0.6
+    DB_fraction: 0.2
+#   TODO: there are other values for cone
+    galaxy_age: 9.2
+    initial_mass_function_exponent: -2.35
+    lifetime_mass_ratio: 1.0
+    mass_reduction_factor: 0.03
+  cones:
+    thick_disk_stars_fraction: 0.8
+    longitudes:
+      csv: ../test_angles.csv
+      column: 8
+    latitudes:
+      csv: ../test_angles.csv
+      column: 9

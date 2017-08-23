@@ -1,5 +1,4 @@
-from math import (ceil,
-                  log10,
+from math import (log10,
                   sqrt)
 from typing import (Iterable,
                     List)
@@ -7,6 +6,7 @@ from typing import (Iterable,
 from alcor.models import (Group,
                           Star)
 from alcor.models.luminosity_function import Point
+from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
 from alcor.types import StarsBinsType
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.
@@ -17,32 +17,34 @@ BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
 BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
 
 OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT = 220
-FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
 def generate_stars_bins(stars: List[Star]) -> StarsBinsType:
     stars_bins = [[] for _ in range(BINS_COUNT)]
     for star in stars:
         index = get_stars_bin_index(star)
-        stars_bins[index].append(star)
+        if BINS_COUNT > index >= 0:
+            stars_bins[index].append(star)
     return stars_bins
 
 
 def get_stars_bin_index(star: Star) -> int:
-    return int(ceil((float(star.bolometric_magnitude)
-                     - MIN_BOLOMETRIC_MAGNITUDE)
-                    / BIN_SIZE))
+    return int((float(star.bolometric_magnitude)
+                - MIN_BOLOMETRIC_MAGNITUDE)
+               / BIN_SIZE)
 
 
 def points(*,
            stars_bins: StarsBinsType,
            group: Group,
            normalization_factor: float) -> Iterable[Point]:
-    non_empty_bins = filter(None, stars_bins)
-    for stars_bin_index, stars_bin in enumerate(non_empty_bins):
+    for stars_bin_index, stars_bin in enumerate(stars_bins):
         stars_count = len(stars_bin)
+        if not stars_count:
+            continue
+
         avg_bin_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                             + BIN_SIZE * (stars_bin_index - 0.5))
+                             + BIN_SIZE * (stars_bin_index + 0.5))
         stars_count_logarithm = get_stars_count_logarithm(
             stars_count=stars_count,
             normalization_factor=normalization_factor)

@@ -1,4 +1,5 @@
 import logging
+import uuid
 from collections import Counter
 from functools import partial
 from itertools import filterfalse
@@ -9,9 +10,11 @@ from sqlalchemy.orm.session import Session
 from alcor.models import (Group,
                           Star)
 from alcor.models.eliminations import StarsCounter
+from alcor.models.processed_star_association import ProcessedStarsAssociation
 from alcor.services import (luminosity_function,
                             velocities,
                             velocities_vs_magnitudes)
+from alcor.services.data_access import fetch_group_stars
 from .sampling import check_elimination
 
 logging.basicConfig(format='%(filename)s %(funcName)s '
@@ -21,7 +24,6 @@ logger = logging.getLogger(__name__)
 
 
 def process_stars_group(*,
-                        stars: List[Star],
                         group: Group,
                         filtration_method: str,
                         nullify_radial_velocity: bool,
@@ -30,9 +32,10 @@ def process_stars_group(*,
                         w_velocities_vs_magnitude: bool,
                         w_lepine_criterion: bool,
                         session: Session) -> None:
+    stars = fetch_group_stars(group_id=group.id,
+                              session=session)
     stars_count = len(stars)
-    logger.info('Starting processing stars, '
-                f'objects number: {stars_count}.')
+
     eliminations_counter = Counter()
     apply_elimination_criteria = partial(
         check_elimination,
@@ -77,3 +80,34 @@ def process_stars_group(*,
             group=group,
             w_lepine_criterion=w_lepine_criterion,
             session=session)
+
+    original_id = group.id
+    processed_group_id = uuid.uuid4()
+    processed_group = Group(
+        id=processed_group_id,
+        original_id=original_id)
+    session.add(processed_group)
+
+    processed_stars = [Star(group_id=processed_group_id)
+                       for _ in range(len(stars))]
+    if nullify_radial_velocity:
+        copy_velocities(stars, processed_stars)
+    session.add_all(processed_stars)
+
+    session.commit()
+
+    for star, processed_star in zip(stars, processed_stars):
+        processed_star_association = ProcessedStarsAssociation(
+            original_star_id=star.id,
+            processed_star_id=processed_star.id)
+        session.add(processed_star_association)
+
+    session.commit()
+
+
+def copy_velocities(src_stars: List[Star],
+                    dst_stars: List[Star]) -> None:
+    for src_star, dst_star in zip(src_stars, dst_stars):
+        dst_star.u_velocity = src_star.u_velocity
+        dst_star.v_velocity = src_star.v_velocity
+        dst_star.w_velocity = src_star.w_velocity

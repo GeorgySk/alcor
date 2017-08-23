@@ -19,17 +19,17 @@ class Bin(Base):
                       nullable=False)
     avg_magnitude = Column(Float(asdecimal=True),
                            nullable=False)
-    avg_velocity_u = Column(Float(asdecimal=True),
+    avg_u_velocity = Column(Float(asdecimal=True),
                             nullable=False)
-    avg_velocity_v = Column(Float(asdecimal=True),
+    avg_v_velocity = Column(Float(asdecimal=True),
                             nullable=False)
-    avg_velocity_w = Column(Float(asdecimal=True),
+    avg_w_velocity = Column(Float(asdecimal=True),
                             nullable=False)
-    velocity_u_std = Column(Float(asdecimal=True),
+    u_velocity_std = Column(Float(asdecimal=True),
                             nullable=False)
-    velocity_v_std = Column(Float(asdecimal=True),
+    v_velocity_std = Column(Float(asdecimal=True),
                             nullable=False)
-    velocity_w_std = Column(Float(asdecimal=True),
+    w_velocity_std = Column(Float(asdecimal=True),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -37,20 +37,20 @@ class Bin(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  avg_magnitude: float,
-                 avg_velocity_u: float,
-                 avg_velocity_v: float,
-                 avg_velocity_w: float,
-                 velocity_u_std: float,
-                 velocity_v_std: float,
-                 velocity_w_std: float):
+                 avg_u_velocity: float,
+                 avg_v_velocity: float,
+                 avg_w_velocity: float,
+                 u_velocity_std: float,
+                 v_velocity_std: float,
+                 w_velocity_std: float):
         self.group_id = group_id
         self.avg_magnitude = avg_magnitude
-        self.avg_velocity_u = avg_velocity_u
-        self.avg_velocity_v = avg_velocity_v
-        self.avg_velocity_w = avg_velocity_w
-        self.velocity_u_std = velocity_u_std
-        self.velocity_v_std = velocity_v_std
-        self.velocity_w_std = velocity_w_std
+        self.avg_u_velocity = avg_u_velocity
+        self.avg_v_velocity = avg_v_velocity
+        self.avg_w_velocity = avg_w_velocity
+        self.u_velocity_std = u_velocity_std
+        self.v_velocity_std = v_velocity_std
+        self.w_velocity_std = w_velocity_std
 
 
 class LepineCaseUBin(Base):
@@ -62,9 +62,9 @@ class LepineCaseUBin(Base):
                       nullable=False)
     avg_magnitude = Column(Float(asdecimal=True),
                            nullable=False)
-    avg_velocity_u = Column(Float(asdecimal=True),
+    avg_u_velocity = Column(Float(asdecimal=True),
                             nullable=False)
-    velocity_u_std = Column(Float(asdecimal=True),
+    u_velocity_std = Column(Float(asdecimal=True),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -72,12 +72,12 @@ class LepineCaseUBin(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  avg_magnitude: float,
-                 avg_velocity_u: float,
-                 velocity_u_std: float):
+                 avg_u_velocity: float,
+                 u_velocity_std: float):
         self.group_id = group_id
         self.avg_magnitude = avg_magnitude
-        self.avg_velocity_u = avg_velocity_u
-        self.velocity_u_std = velocity_u_std
+        self.avg_u_velocity = avg_u_velocity
+        self.u_velocity_std = u_velocity_std
 
 
 class LepineCaseVBin(Base):
@@ -89,9 +89,9 @@ class LepineCaseVBin(Base):
                       nullable=False)
     avg_magnitude = Column(Float(asdecimal=True),
                            nullable=False)
-    avg_velocity_v = Column(Float(asdecimal=True),
+    avg_v_velocity = Column(Float(asdecimal=True),
                             nullable=False)
-    velocity_v_std = Column(Float(asdecimal=True),
+    v_velocity_std = Column(Float(asdecimal=True),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -99,12 +99,12 @@ class LepineCaseVBin(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  avg_magnitude: float,
-                 avg_velocity_v: float,
-                 velocity_v_std: float):
+                 avg_v_velocity: float,
+                 v_velocity_std: float):
         self.group_id = group_id
         self.avg_magnitude = avg_magnitude
-        self.avg_velocity_v = avg_velocity_v
-        self.velocity_v_std = velocity_v_std
+        self.avg_v_velocity = avg_v_velocity
+        self.v_velocity_std = v_velocity_std
 
 
 class LepineCaseWBin(Base):
@@ -116,9 +116,9 @@ class LepineCaseWBin(Base):
                       nullable=False)
     avg_magnitude = Column(Float(asdecimal=True),
                            nullable=False)
-    avg_velocity_w = Column(Float(asdecimal=True),
+    avg_w_velocity = Column(Float(asdecimal=True),
                             nullable=False)
-    velocity_w_std = Column(Float(asdecimal=True),
+    w_velocity_std = Column(Float(asdecimal=True),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -126,9 +126,9 @@ class LepineCaseWBin(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  avg_magnitude: float,
-                 avg_velocity_w: float,
-                 velocity_w_std: float):
+                 avg_w_velocity: float,
+                 w_velocity_std: float):
         self.group_id = group_id
         self.avg_magnitude = avg_magnitude
-        self.avg_velocity_w = avg_velocity_w
-        self.velocity_w_std = velocity_w_std
+        self.avg_w_velocity = avg_w_velocity
+        self.w_velocity_std = w_velocity_std

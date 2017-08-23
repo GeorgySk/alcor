@@ -1,4 +1,3 @@
-C***********************************************************************
 C     TODO: rewrite      
       subroutine magi(fractionOfDB,table)
       use external_types
@@ -9,52 +8,78 @@ C     and apparent magnitude of the WDs.
 C     
 C     Created by S.Torres
 C     Introduced metallicity 08/2012 (ER Cojocaru)
-C
-C-----------------------------------------------------------------------
-C     Input parameters:
-C       numberOfStarsInSample
-C-----------------------------------------------------------------------
-C     Output parameters
-C       none
 C=======================================================================
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
       integer numberOfStars,iseed,i,numberOfWDs,in
-      
-C     ---   Variables  ---
-      double precision lum,teff,xlog,c1,c2,c3,c4,c5,n1,n2,n3,n4,n5
-      double precision UB,BV,VR,RI,xg,xug,xgr,xri,xiz,xgi,fractionOfDB
-      double precision mone
+      real lum,teff,xlog,c1,c2,c3,c4,c5,n1,n2,n3,n4,n5
+      real xg,xug,xgr,xri,xiz,xgi,fractionOfDB
+      real mone
 
-C     ---   Parameters  ---
       parameter (numberOfStars=6000000)
       parameter (mone=1.14)
 
-C     ---   Dimensions  ---
-      double precision luminosityOfWD(numberOfStars),
+      real luminosityOfWD(numberOfStars),
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
      &                 effTempOfWD(numberOfStars)
-      double precision flagOfWD(numberOfStars)
-      double precision rgac(numberOfStars)
-      double precision g(numberOfStars),go(numberOfStars),
-     &                 gr(numberOfStars),v(numberOfStars)
-      double precision gi(numberOfStars),ur(numberOfStars),
-     &                 rz(numberOfStars)
-      double precision coolingTime(numberOfStars)
+      integer :: flagOfWD(numberOfStars)
+      real v(numberOfStars)
+      real :: coolingTime(numberOfStars)
       integer typeOfWD(numberOfStars)
       integer disk_belonging(numberOfStars)
+
+C     TODO: no need to keep these
+      real :: ugriz_ug(numberOfStars),
+     &        ugriz_gr(numberOfStars),
+     &        ugriz_ri(numberOfStars),
+     &        ugriz_iz(numberOfStars)
+
+      real :: UB(numberOfStars), BV(numberOfStars), 
+     &        VRR(numberOfStars), RI(numberOfStars),
+     &        ugriz_g_apparent(numberOfStars),
+     &        rgac(numberOfStars)
+      double precision :: lgac(numberOfStars),
+     &                    bgac(numberOfStars)
+      real :: AVT,
+     &        SAVT,
+     &        AVC,
+     &        AV(5),
+     &        SAV(5),
+     &        extinction,
+     &        ugriz_u,
+     &        ugriz_g,
+     &        ugriz_r,
+     &        ugriz_i,
+     &        ugriz_z,
+     &        pi,
+     &        ugriz_u_apparent,
+     &        ugriz_r_apparent,
+     &        ugriz_i_apparent,
+     &        ugriz_z_apparent,
+     &        ugriz_u_apparent_w_error,
+     &        ugriz_g_apparent_w_error,
+     &        ugriz_r_apparent_w_error,
+     &        ugriz_i_apparent_w_error,
+     &        ugriz_z_apparent_w_error
+      integer :: JMAX
+
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
-C     ---   Commons   ---
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /paral/ rgac
-      common /photo/ go,gr,gi,ur,rz
+C     TODO: no need to keep these
+      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
+     &               ugriz_g_apparent
       common /johnson/ v
       common /cool/ coolingTime
       common /indexdb/ typeOfWD
+      common /ubvri/ UB, BV, VRR, RI
+      common /lb/ lgac,bgac
+
+      pi = 4.0 * atan(1.0)
 
       n1=0
       n2=0
@@ -64,13 +89,11 @@ C     ---   Commons   ---
 
 C     ---  Interpolating Mv, luminosity, colors and other variables
 C          from coolingTime and the mwd  ---
-C     ---  Start DO on all the stars
-      do i=1,numberOfWDs
+      do i = 1, numberOfWDs
 C       ---  ATENTION! choosing only if .lt.1.1!!!  ---
-C       ---  Start IF mass <1.4  ----
-        if(massOfWD(i).le.1.4) then
+        if (massOfWD(i) .le. 1.4) then
 C         ---  IF CO core ---
-          if(massOfWD(i).lt.mone) then  
+          if (massOfWD(i) .lt. mone) then  
 C           --- Atention We put the "old" ones to 0.6Msol ---
 C           --- Distribucion DA/DB ---
             call dbd_fid(iseed,fractionOfDB,in)
@@ -100,30 +123,103 @@ C         ---  ELSE ONe ---
      &           c5,teff,xlog)
           end if
 C         ---  END IF CO/ONe ---
-          if(teff.lt.6000) n4=n4+1
-          luminosityOfWD(i)=-lum
-          effTempOfWD(i)=teff            
-          V(i)=c3
-          UB=c1-c2
-          BV=c2-c3
-          VR=c3-c4
-          RI=c4-c5
-          call chanco(V(i),UB,BV,VR,RI,xg,xug,xgr,xri,xiz,xgi)
-          g(i)=xg
-          gr(i)=xgr
-          gi(i)=xgi
-          ur(i)=xug+xgr
-          rz(i)=xri+xiz
-C         ---  Making g and V apparent magnitude ---
-          go(i)=g(i)-5.0d0+5.0d0*(dlog10(rgac(i))+3.0d0)
-          V(i)=V(i)-5.0d0+5.0d0*(dlog10(rgac(i))+3.0d0)
+          if (teff .lt. 6000) n4 = n4 + 1
+          luminosityOfWD(i) = -lum
+          effTempOfWD(i) = teff            
+          V(i) = c3
+C         TODO: no need to keep indexes
+C         TODO: rename VRR to VR
+          UB(i)=c1-c2
+          BV(i)=c2-c3
+          VRR(i)=c3-c4
+          RI(i)=c4-c5
+          call chanco(V(i),UB(i),BV(i),VRR(i),RI(i),xg,xug,xgr,xri,xiz,
+     &                xgi)
+          ugriz_u = xug + xg
+          ugriz_g = xg
+          ugriz_r = xg - xgr
+          ugriz_i = xg - xgi
+          ugriz_z = xg - xgi - xiz
+
+C           call extinct(real(lgac(i) * 180.0 / pi),
+C      &                 real(bgac(i) * 180.0 / pi),
+C      &                 real(rgac(i)),
+C      &                 AVT,SAVT,AVC,JMAX,AV,SAV)
+C           extinction = AVT + AVC
+
+C           ugriz_u = ugriz_u + 1.579 * extinction
+C           ugriz_g = ugriz_g + 1.161 * extinction
+C           ugriz_r = ugriz_r + 0.843 * extinction
+C           ugriz_i = ugriz_i + 0.639 * extinction
+C           ugriz_z = ugriz_z + 0.453 * extinction
+
+          ugriz_u_apparent = ugriz_u - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_g_apparent(i) = ugriz_g - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_r_apparent = ugriz_r - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_i_apparent = ugriz_i - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+          ugriz_z_apparent = ugriz_z - 5.0 + 5.0 * (log10(rgac(i)) 
+     &                                              + 3.0)
+
+C           call errfot(ugriz_u_apparent,
+C      &                ugriz_u_apparent_w_error,
+C      &                1)
+C           call errfot(ugriz_g_apparent(i),
+C      &                ugriz_g_apparent_w_error,
+C      &                2)
+C           call errfot(ugriz_r_apparent,
+C      &                ugriz_r_apparent_w_error,
+C      &                3)
+C           call errfot(ugriz_i_apparent,
+C      &                ugriz_i_apparent_w_error,
+C      &                4)
+C           call errfot(ugriz_z_apparent,
+C      &                ugriz_z_apparent_w_error,
+C      &                5) 
+
+C         TODO: figure out what to do with commons
+C           ugriz_g_apparent(i) = ugriz_g_apparent_w_error
+
+C         TODO: this is another way to calculate phot.error. do smth
+C           ugriz_u_apparent_w_error = ugriz_u_apparent 
+C      &                               + 0.1 * gasdev(iseed)
+C           ugriz_g_apparent_w_error = ugriz_g_apparent(i) 
+C      &                               + 0.025 * gasdev(iseed)
+C           ugriz_r_apparent_w_error = ugriz_r_apparent 
+C      &                               + 0.025 * gasdev(iseed)
+C           ugriz_i_apparent_w_error = ugriz_i_apparent 
+C      &                               + 0.05 * gasdev(iseed)
+C           ugriz_z_apparent_w_error = ugriz_z_apparent 
+C      &                               + 0.1 * gasdev(iseed)
+
+C           ugriz_ug(i) = ugriz_u_apparent_w_error 
+C      &                  - ugriz_g_apparent_w_error
+C           ugriz_gr(i) = ugriz_g_apparent_w_error 
+C      &                  - ugriz_r_apparent_w_error
+C           ugriz_ri(i) = ugriz_r_apparent_w_error 
+C      &                  - ugriz_i_apparent_w_error
+C           ugriz_iz(i) = ugriz_i_apparent_w_error 
+C      &                  - ugriz_z_apparent_w_error
+
+          ugriz_ug(i) = ugriz_u
+     &                  - ugriz_g
+          ugriz_gr(i) = ugriz_g
+     &                  - ugriz_r
+          ugriz_ri(i) = ugriz_r
+     &                  - ugriz_i
+          ugriz_iz(i) = ugriz_i
+     &                  - ugriz_z
+
+C         ---  Making V apparent magnitude ---
+          V(i) = V(i) - 5.0 + 5.0 * (log10(rgac(i)) + 3.0)
 C       ---  ELSE mass >= 1.4  --- EXPLOTA, exceeding Chandrasekar limit
         else
-          typeOfWD(i)=5
+          typeOfWD(i) = 5
         end if
-C       ---  END IF about WD mass ---
       end do
-C     ---  END DO about all the stars ---
 
       write(*,*) "DA CO ",n1
       write(*,*) "DA ONe ",n2
@@ -133,4 +229,3 @@ C     ---  END DO about all the stars ---
 
       return
       end
-C***********************************************************************

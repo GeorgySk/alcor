@@ -17,24 +17,24 @@ class Cloud(Base):
     id = Column(Integer(),
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True))
-    velocity_u = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(asdecimal=True),
                         nullable=False)
-    velocity_v = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(asdecimal=True),
                         nullable=False)
-    velocity_w = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
-                 velocity_u: Decimal,
-                 velocity_v: Decimal,
-                 velocity_w: Decimal):
+                 u_velocity: Decimal,
+                 v_velocity: Decimal,
+                 w_velocity: Decimal):
         self.group_id = group_id
-        self.velocity_u = velocity_u
-        self.velocity_v = velocity_v
-        self.velocity_w = velocity_w
+        self.u_velocity = u_velocity
+        self.v_velocity = v_velocity
+        self.w_velocity = w_velocity
 
 
 class LepineCaseUVCloud(Base):
@@ -44,20 +44,20 @@ class LepineCaseUVCloud(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    velocity_u = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(asdecimal=True),
                         nullable=False)
-    velocity_v = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
-                 velocity_u: Decimal,
-                 velocity_v: Decimal):
+                 u_velocity: Decimal,
+                 v_velocity: Decimal):
         self.group_id = group_id
-        self.velocity_u = velocity_u
-        self.velocity_v = velocity_v
+        self.u_velocity = u_velocity
+        self.v_velocity = v_velocity
 
 
 class LepineCaseUWCloud(Base):
@@ -67,20 +67,20 @@ class LepineCaseUWCloud(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    velocity_u = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(asdecimal=True),
                         nullable=False)
-    velocity_w = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
-                 velocity_u: Decimal,
-                 velocity_w: Decimal):
+                 u_velocity: Decimal,
+                 w_velocity: Decimal):
         self.group_id = group_id
-        self.velocity_u = velocity_u
-        self.velocity_w = velocity_w
+        self.u_velocity = u_velocity
+        self.w_velocity = w_velocity
 
 
 class LepineCaseVWCloud(Base):
@@ -90,17 +90,17 @@ class LepineCaseVWCloud(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    velocity_v = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(asdecimal=True),
                         nullable=False)
-    velocity_w = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
-                 velocity_v: Decimal,
-                 velocity_w: Decimal):
+                 v_velocity: Decimal,
+                 w_velocity: Decimal):
         self.group_id = group_id
-        self.velocity_v = velocity_v
-        self.velocity_w = velocity_w
+        self.v_velocity = v_velocity
+        self.w_velocity = w_velocity

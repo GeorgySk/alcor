@@ -9,8 +9,9 @@ from .utils import (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME,
                     generate_stars_bins,
                     points)
 
-# TODO: find out the name for set of indexes
-MAGIC_STARS_BINS_INDEXES = {16, 17, 18}
+# More info at (The white dwarf population within 40 pc of the Sun,
+# Torres et al., 2016)
+SMALLEST_ERRORBARS_BINS_INDEXES = {15, 16, 17}
 
 
 def process_stars_group(*,
@@ -18,11 +19,11 @@ def process_stars_group(*,
                         group: Group,
                         session: Session) -> None:
     stars_bins = generate_stars_bins(stars)
-    # TODO: find out the meaning of sum
-    magic_bins_lengths_sum = sum(len(stars_bins[index])
-                                 for index in MAGIC_STARS_BINS_INDEXES)
+    smallest_errorbars_bins_lengths_sum = (
+        sum(len(stars_bins[index])
+            for index in SMALLEST_ERRORBARS_BINS_INDEXES))
     normalization_factor = (FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
-                            * magic_bins_lengths_sum
+                            * smallest_errorbars_bins_lengths_sum
                             / OBSERVATIONAL_DATA_TRUSTED_BINS_OBJECT_COUNT)
     graph_points = points(stars_bins=stars_bins,
                           group=group,

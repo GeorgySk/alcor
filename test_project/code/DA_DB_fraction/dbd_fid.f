@@ -1,32 +1,22 @@
-C***********************************************************************
-      subroutine dbd_fid(iseed,fractionOfDB,in)
-C=======================================================================
-C
-C     This subroutine determines if the WD is DA or non-DA (DB),
-C     using the model A (20/80) by Torres (A&A, 2010) 
-C    
-C     in=0 DA
-C     in=1 non-DA
-C
-C     Created by ER Cojocaru (11/2012)
-C
-C=======================================================================
-      implicit double precision (a-h,m,o-z)
-      
-C     ---   Declaration of variables  ---
-      external ran
-      real ran
-      integer iseed,in
-      double precision x,fractionOfDB
-      
-C     --- Fiducial model: 20% DB, 80% DA
-      x=ran(iseed)
-      if(x.lt.fractionOfDB) then 
-        in=1
-      else
-        in=0
-      endif
+C     TODO: give a better name
+      subroutine dbd_fid(iseed,
+     &                   DB_fraction,
+     &                   in)
+C     Determines if WD is DA or non-DA (DB) based on DB_fraction
+C     TODO: change to logical type 
+C     in = 0 DA
+C     in = 1 non-DA
+          implicit none
 
-      return
-      end
-C***********************************************************************
+          external ran
+          real ran
+          integer :: iseed,
+     &               in
+          real :: DB_fraction
+      
+          if (ran(iseed) < DB_fraction) then 
+              in = 1
+          else
+              in = 0
+          end if
+      end subroutine

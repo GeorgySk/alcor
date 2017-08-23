@@ -41,3 +41,4 @@ main.e
 # outputs
 *.res
 *.csv
+*.html

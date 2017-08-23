@@ -34,14 +34,13 @@ def process_stars_group(*,
     else:
         clouds = [Cloud(group_id=group.id,
                         bolometric_magnitude=star.bolometric_magnitude,
-                        velocity_u=star.velocity_u,
-                        velocity_v=star.velocity_v,
-                        velocity_w=star.velocity_w)
+                        u_velocity=star.u_velocity,
+                        v_velocity=star.v_velocity,
+                        w_velocity=star.w_velocity)
                   for star in stars]
         stars_bins = raw_stars_bins(stars)
         bins = generate_bins(stars_bins=stars_bins,
                              group=group)
-
     session.add_all(clouds)
     session.add_all(bins)
     session.commit()

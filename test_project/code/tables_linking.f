@@ -1,6 +1,6 @@
       subroutine fillTable(table)
       use external_types
-      implicit double precision (a-h,m,o-z)
+      implicit real (a-h,m,o-z)
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 

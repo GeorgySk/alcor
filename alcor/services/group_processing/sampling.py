@@ -19,24 +19,24 @@ def check_elimination(star: Star,
                       eliminations_counter: Counter,
                       filtration_method: str) -> bool:
     # TODO: implement pc/kpc units
-    galactocentric_distance = star.galactocentric_distance * Decimal(1e3)
-    parallax = Fraction(1, Fraction(galactocentric_distance))
+    galactic_distance = star.galactic_distance * Decimal(1e3)
+    parallax = Fraction(1, Fraction(galactic_distance))
     # TODO: find out the meaning of the following constants
-    hrm = star.go_photometry + Decimal(5. * log10(star.proper_motion) + 5.)
-    gz = star.gr_photometry + star.rz_photometry
+    hrm = star.ugriz_g_apparent + Decimal(5. * log10(star.proper_motion) + 5.)
+    gz = float(star.ugriz_gr) + float(star.ugriz_rz)
 
     if parallax < MIN_PARALLAX:
-        eliminations_counter['by_parallax'] += 1
+        eliminations_counter['parallax'] += 1
         return True
 
     northern_hemisphere_star = star.declination < MIN_DECLINATION
     if northern_hemisphere_star:
-        eliminations_counter['by_declination'] += 1
+        eliminations_counter['declination'] += 1
         return True
 
-    hypervelocity_star = (star.velocity_u ** 2
-                          + star.velocity_v ** 2
-                          + star.velocity_w ** 2
+    hypervelocity_star = (star.u_velocity ** 2
+                          + star.v_velocity ** 2
+                          + star.w_velocity ** 2
                           > MAX_VELOCITY ** 2)
     if hypervelocity_star:
         eliminations_counter['velocity'] += 1
@@ -51,7 +51,7 @@ def check_elimination(star: Star,
             eliminations_counter['reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
-        elif hrm < Decimal(3.559) * gz + Decimal(15.17):
+        elif hrm < 3.559 * gz + 15.17:
             eliminations_counter['reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constant

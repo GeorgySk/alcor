@@ -1,3 +1,4 @@
+import logging
 from itertools import product
 from typing import (Iterable,
                     Dict,
@@ -6,18 +7,39 @@ from typing import (Iterable,
 
 from alcor.types import NumericType
 
+logger = logging.getLogger(__name__)
+
+GRID_SETTINGS_KEYS = ['start', 'step', 'count']
+
 
 def generate_parameters_values(
         parameters_info: Dict[str, Dict[str, NumericType]],
-        precision: int) -> Iterable[Dict[str, NumericType]]:
+        precision: int,
+        geometry: str) -> Iterable[Dict[str, NumericType]]:
+    current_geometry_parameters_info = {**parameters_info['commons'],
+                                        **parameters_info[geometry]}
+
+    variable_parameters_info = {}
+    non_variable_parameters_info = {}
+    for parameter, value in (current_geometry_parameters_info.items()):
+        is_variable_parameter = (isinstance(value, dict)
+                                 and all(key in value
+                                         for key in GRID_SETTINGS_KEYS))
+        if is_variable_parameter:
+            variable_parameters_info[parameter] = value
+        else:
+            non_variable_parameters_info[parameter] = value
+
     parameters_values_ranges_by_names = dict(
         generate_parameters_values_ranges_by_names(
-            parameters_info=parameters_info,
+            parameters_info=variable_parameters_info,
             precision=precision))
     parameters_names = list(parameters_values_ranges_by_names.keys())
     for values in product(*parameters_values_ranges_by_names.values()):
-        yield dict(zip(parameters_names,
-                       values))
+        variable_parameters_dict = dict(zip(parameters_names, values))
+        output_dict = {**variable_parameters_dict,
+                       **non_variable_parameters_info}
+        yield output_dict
 
 
 def generate_parameters_values_ranges_by_names(
@@ -32,5 +54,5 @@ def generate_parameters_values_ranges_by_names(
             round(start_value + value_number * step_size,
                   precision)
             for value_number in range(values_count)
-            ]
+        ]
         yield parameter_name, values_range
