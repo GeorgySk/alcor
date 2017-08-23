@@ -3,6 +3,7 @@ from statistics import (mean,
                         stdev)
 from typing import (Union,
                     Iterable,
+                    Iterator,
                     Tuple,
                     List)
 
@@ -30,48 +31,39 @@ logger = logging.getLogger(__name__)
 
 
 def generate_clouds(stars: List[Star],
-                    group: Group) -> List[Union[LepineCaseUCloud,
-                                                LepineCaseVCloud,
-                                                LepineCaseWCloud]]:
-    u_clouds = []
-    v_clouds = []
-    w_clouds = []
+                    group: Group) -> Iterator[Union[LepineCaseUCloud,
+                                                    LepineCaseVCloud,
+                                                    LepineCaseWCloud]]:
     for star in stars:
         max_coordinates_modulus = star.max_coordinates_modulus
 
         if abs(star.x_coordinate) == max_coordinates_modulus:
-            v_clouds.append(
-                LepineCaseVCloud(group_id=group.id,
-                                 v_velocity=star.v_velocity,
-                                 bolometric_magnitude=star.bolometric_magnitude))
-            w_clouds.append(
-                LepineCaseWCloud(group_id=group.id,
-                                 w_velocity=star.w_velocity,
-                                 bolometric_magnitude=star.bolometric_magnitude))
+            yield LepineCaseVCloud(
+                    group_id=group.id,
+                    v_velocity=star.v_velocity,
+                    bolometric_magnitude=star.bolometric_magnitude)
+            yield LepineCaseWCloud(
+                    group_id=group.id,
+                    w_velocity=star.w_velocity,
+                    bolometric_magnitude=star.bolometric_magnitude)
         elif abs(star.y_coordinate) == max_coordinates_modulus:
-            u_clouds.append(
-                LepineCaseUCloud(group_id=group.id,
-                                 u_velocity=star.u_velocity,
-                                 bolometric_magnitude=star.bolometric_magnitude))
-            w_clouds.append(
-                LepineCaseWCloud(group_id=group.id,
-                                 w_velocity=star.w_velocity,
-                                 bolometric_magnitude=star.bolometric_magnitude))
+            yield LepineCaseUCloud(
+                    group_id=group.id,
+                    u_velocity=star.u_velocity,
+                    bolometric_magnitude=star.bolometric_magnitude)
+            yield LepineCaseWCloud(
+                    group_id=group.id,
+                    w_velocity=star.w_velocity,
+                    bolometric_magnitude=star.bolometric_magnitude)
         else:
-            u_clouds.append(
-                LepineCaseUCloud(group_id=group.id,
-                                 u_velocity=star.u_velocity,
-                                 bolometric_magnitude=star.bolometric_magnitude))
-            v_clouds.append(
-                LepineCaseVCloud(group_id=group.id,
-                                 v_velocity=star.v_velocity,
-                                 bolometric_magnitude=star.bolometric_magnitude))
-    clouds = []
-    clouds.extend(u_clouds)
-    clouds.extend(v_clouds)
-    clouds.extend(w_clouds)
-
-    return clouds
+            yield LepineCaseUCloud(
+                    group_id=group.id,
+                    u_velocity=star.u_velocity,
+                    bolometric_magnitude=star.bolometric_magnitude)
+            yield LepineCaseVCloud(
+                    group_id=group.id,
+                    v_velocity=star.v_velocity,
+                    bolometric_magnitude=star.bolometric_magnitude)
 
 
 def generate_u_bins(*,
@@ -167,7 +159,7 @@ def lepine_stars_bins(stars: List[Star]) -> Tuple[StarsBinsType,
 
 def get_stars_bin_index(star: Star) -> int:
     return int((float(star.bolometric_magnitude)
-                - MIN_BOLOMETRIC_MAGNITUDE)/BIN_SIZE)
+                - MIN_BOLOMETRIC_MAGNITUDE) / BIN_SIZE)
 
 
 def raw_stars_bins(stars: List[Star]) -> StarsBinsType:
