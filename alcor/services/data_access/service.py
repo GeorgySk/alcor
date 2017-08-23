@@ -29,8 +29,7 @@ def fetch_stars(*,
     return query.all()
 
 
-def fetch_unprocessed_groups(*,
-                             session: Session) -> List[Group]:
+def fetch_unprocessed_groups(session: Session) -> List[Group]:
     query = (session.query(Group)
              .filter(Group.original_id.is_(None)))
     return query.all()
@@ -39,8 +38,9 @@ def fetch_unprocessed_groups(*,
 def fetch_last_groups(*,
                       count: int,
                       session: Session) -> List[Group]:
-    query = (session.query(Group).
-             order_by(Group.updated_timestamp.desc()).limit(count))
+    query = (session.query(Group)
+             .order_by(Group.updated_timestamp.desc())
+             .limit(count))
     return query.all()
 
 
@@ -76,8 +76,7 @@ def fetch_stars_by_group_id(*,
     return query.all()
 
 
-def fetch_all_bins(*,
-                   session: Session) -> List[Bin]:
+def fetch_all_bins(session: Session) -> List[Bin]:
     query = session.query(Bin)
     return query.all()
 
@@ -92,8 +91,7 @@ def fetch_all_v_vs_mag_bins(session: Session) -> List[LepineCaseVBin]:
     return query.all()
 
 
-def fetch_all_w_vs_mag_bins(*,
-                            session: Session) -> List[LepineCaseWBin]:
+def fetch_all_w_vs_mag_bins(session: Session) -> List[LepineCaseWBin]:
     query = session.query(LepineCaseWBin)
     return query.all()
 

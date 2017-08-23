@@ -4,6 +4,8 @@ from collections import Counter
 from functools import partial
 from itertools import filterfalse
 from math import pi
+from typing import (List,
+                    Iterable)
 
 from sqlalchemy.orm.session import Session
 
@@ -90,14 +92,10 @@ def process_stars_group(*,
         original_id=original_id)
     session.add(processed_group)
 
-    processed_stars = []
-    for original_star in stars:
-        processed_star = Star(group_id=processed_group_id)
-        if nullify_radial_velocity:
-            processed_star.velocity_u = original_star.velocity_u
-            processed_star.velocity_v = original_star.velocity_v
-            processed_star.velocity_w = original_star.velocity_w
-        processed_star.append(processed_star)
+    processed_stars = list(blank_stars(
+        stars,
+        group_id=processed_group_id,
+        copy_velocities=nullify_radial_velocity))
     session.add_all(processed_stars)
 
     session.commit()
@@ -109,3 +107,16 @@ def process_stars_group(*,
         session.add(processed_star_association)
 
     session.commit()
+
+
+def blank_stars(stars: List[Star],
+                *,
+                group_id: uuid.UUID,
+                copy_velocities: bool) -> Iterable[Star]:
+    for original_star in stars:
+        processed_star = Star(group_id=group_id)
+        if copy_velocities:
+            processed_star.velocity_u = original_star.velocity_u
+            processed_star.velocity_v = original_star.velocity_v
+            processed_star.velocity_w = original_star.velocity_w
+        yield processed_star
