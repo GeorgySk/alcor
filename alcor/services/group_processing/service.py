@@ -3,7 +3,6 @@ import uuid
 from collections import Counter
 from functools import partial
 from itertools import filterfalse
-from typing import List
 
 from sqlalchemy.orm.session import Session
 
@@ -16,6 +15,7 @@ from alcor.services import (luminosity_function,
                             velocities_vs_magnitudes)
 from alcor.services.data_access import fetch_group_stars
 from . import elimination
+from .utils import copy_velocities
 
 logging.basicConfig(format='%(filename)s %(funcName)s '
                            '%(levelname)s: %(message)s',
@@ -103,11 +103,3 @@ def process_stars_group(*,
         session.add(processed_star_association)
 
     session.commit()
-
-
-def copy_velocities(src_stars: List[Star],
-                    dst_stars: List[Star]) -> None:
-    for src_star, dst_star in zip(src_stars, dst_stars):
-        dst_star.u_velocity = src_star.u_velocity
-        dst_star.v_velocity = src_star.v_velocity
-        dst_star.w_velocity = src_star.w_velocity
