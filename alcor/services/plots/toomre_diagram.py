@@ -16,7 +16,7 @@ from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
 
 from alcor.models import (Star,
-                          GalacticDiskTypes)
+                          GalacticDiskType)
 from alcor.services.common import PECULIAR_SOLAR_VELOCITY_V
 from alcor.services.data_access import fetch_all
 
@@ -47,11 +47,11 @@ def plot(session: Session,
     # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
     plot_stars_by_disk(subplot=subplot,
                        stars=random_stars_sample,
-                       galactic_disk=GalacticDiskTypes.thin,
+                       galactic_disk=GalacticDiskType.thin,
                        color=thin_disk_color)
     plot_stars_by_disk(subplot=subplot,
                        stars=random_stars_sample,
-                       galactic_disk=GalacticDiskTypes.thick,
+                       galactic_disk=GalacticDiskType.thick,
                        color=thick_disk_color)
 
     # TODO: add sliders

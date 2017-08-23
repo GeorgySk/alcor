@@ -5,7 +5,7 @@ from hypothesis import strategies
 from hypothesis.searchstrategy.strategies import MappedSearchStrategy
 
 from alcor.models import Star
-from alcor.models.star import GalacticDiskTypes
+from alcor.models.star import GalacticDiskType
 from alcor.services.common import STARS_SPECTRAL_TYPES
 
 
@@ -66,7 +66,7 @@ def stars_factory(nullable: bool) -> MappedSearchStrategy:
         # spectral_type
         strategies.one_of(*map(strategies.just, STARS_SPECTRAL_TYPES)),
         # disk_belonging
-        strategies.one_of(*map(strategies.just, GalacticDiskTypes)))
+        strategies.one_of(*map(strategies.just, GalacticDiskType)))
 
 
 defined_stars = stars_factory(nullable=False)
