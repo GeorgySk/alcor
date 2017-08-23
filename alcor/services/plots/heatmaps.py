@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from alcor.services.data_access import (fetch_all,
-                                        fetch_by_group_id)
+                                        fetch_group_stars)
 from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
                                          PECULIAR_SOLAR_VELOCITY_V,
                                          PECULIAR_SOLAR_VELOCITY_W)
@@ -40,8 +40,7 @@ def plot(*,
          w_label: str = '$W(km/s)$') -> None:
     # TODO: Add other fetching options
     if group_id:
-        stars = fetch_by_group_id(Star,
-                                  group_id=group_id,
+        stars = fetch_group_stars(group_id=group_id,
                                   session=session)
     else:
         stars = fetch_all(Star,

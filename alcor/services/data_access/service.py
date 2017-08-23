@@ -5,6 +5,7 @@ from sqlalchemy.orm.session import Session
 
 from alcor.models.base import Base
 from alcor.models.group import Group
+from alcor.models.star import Star
 
 
 def fetch_all(model: Base,
@@ -14,12 +15,11 @@ def fetch_all(model: Base,
     return query.all()
 
 
-def fetch_by_group_id(model: Base,
-                      *,
+def fetch_group_stars(*,
                       group_id: uuid.UUID,
-                      session: Session) -> List[Base]:
-    query = (session.query(model)
-             .filter(model.group_id == group_id))
+                      session: Session) -> List[Star]:
+    query = (session.query(Star)
+             .filter(Star.group_id == group_id))
     return query.all()
 
 

@@ -15,7 +15,7 @@ from alcor.models.processed_star_association import ProcessedStarsAssociation
 from alcor.services import (luminosity_function,
                             velocities,
                             velocities_vs_magnitudes)
-from alcor.services.data_access import fetch_by_group_id
+from alcor.services.data_access import fetch_group_stars
 from .sampling import check_elimination
 
 logging.basicConfig(format='%(filename)s %(funcName)s '
@@ -35,8 +35,7 @@ def process_stars_group(*,
                         w_velocities_vs_magnitude: bool,
                         w_lepine_criterion: bool,
                         session: Session) -> None:
-    stars = fetch_by_group_id(Star,
-                              group_id=group.id,
+    stars = fetch_group_stars(group_id=group.id,
                               session=session)
     stars_count = len(stars)
 
