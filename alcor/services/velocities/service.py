@@ -18,9 +18,9 @@ def process_stars_group(*,
         clouds = map(star_cloud, stars)
     else:
         clouds = (Cloud(group_id=group.id,
-                        velocity_u=star.velocity_u,
-                        velocity_v=star.velocity_v,
-                        velocity_w=star.velocity_w)
+                        u_velocity=star.u_velocity,
+                        v_velocity=star.v_velocity,
+                        w_velocity=star.w_velocity)
                   for star in stars)
     session.add_all(clouds)
     session.commit()

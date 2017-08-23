@@ -19,11 +19,11 @@ class Cloud(Base):
                       nullable=False)
     bolometric_magnitude = Column(Float(asdecimal=True),
                                   nullable=False)
-    velocity_u = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(asdecimal=True),
                         nullable=False)
-    velocity_v = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(asdecimal=True),
                         nullable=False)
-    velocity_w = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -31,14 +31,14 @@ class Cloud(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  bolometric_magnitude: float,
-                 velocity_u: float,
-                 velocity_v: float,
-                 velocity_w: float):
+                 u_velocity: float,
+                 v_velocity: float,
+                 w_velocity: float):
         self.group_id = group_id
         self.bolometric_magnitude = bolometric_magnitude
-        self.velocity_u = velocity_u
-        self.velocity_v = velocity_v
-        self.velocity_w = velocity_w
+        self.u_velocity = u_velocity
+        self.v_velocity = v_velocity
+        self.w_velocity = w_velocity
 
 
 class LepineCaseUCloud(Base):
@@ -50,7 +50,7 @@ class LepineCaseUCloud(Base):
                       nullable=False)
     bolometric_magnitude = Column(Float(asdecimal=True),
                                   nullable=False)
-    velocity_u = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -58,10 +58,10 @@ class LepineCaseUCloud(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  bolometric_magnitude: float,
-                 velocity_u: float):
+                 u_velocity: float):
         self.group_id = group_id
         self.bolometric_magnitude = bolometric_magnitude
-        self.velocity_u = velocity_u
+        self.u_velocity = u_velocity
 
 
 class LepineCaseVCloud(Base):
@@ -73,7 +73,7 @@ class LepineCaseVCloud(Base):
                       nullable=False)
     bolometric_magnitude = Column(Float(asdecimal=True),
                                   nullable=False)
-    velocity_v = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -81,10 +81,10 @@ class LepineCaseVCloud(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  bolometric_magnitude: float,
-                 velocity_v: float):
+                 v_velocity: float):
         self.group_id = group_id
         self.bolometric_magnitude = bolometric_magnitude
-        self.velocity_v = velocity_v
+        self.v_velocity = v_velocity
 
 
 class LepineCaseWCloud(Base):
@@ -96,7 +96,7 @@ class LepineCaseWCloud(Base):
                       nullable=False)
     bolometric_magnitude = Column(Float(asdecimal=True),
                                   nullable=False)
-    velocity_w = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(asdecimal=True),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -104,7 +104,7 @@ class LepineCaseWCloud(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  bolometric_magnitude: float,
-                 velocity_w: float):
+                 w_velocity: float):
         self.group_id = group_id
         self.bolometric_magnitude = bolometric_magnitude
-        self.velocity_w = velocity_w
+        self.w_velocity = w_velocity

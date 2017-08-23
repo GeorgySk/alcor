@@ -76,16 +76,16 @@ def plot_stars_by_disk(*,
     # TODO: how to work with Decimal type? If I leave it I get:
     # TypeError: Cannot cast array data from dtype('O') to dtype('float64')
     # according to the rule 'safe'
-    velocities_v = [float(star.velocity_v)
+    v_velocities = [float(star.v_velocity)
                     + PECULIAR_SOLAR_VELOCITY_V
                     for star in stars
                     if star.disk_belonging == galactic_disk]
     uw_velocities_square_sums_square_root = [
-        sqrt(float(star.velocity_u) ** 2 + float(star.velocity_w) ** 2)
+        sqrt(float(star.u_velocity) ** 2 + float(star.w_velocity) ** 2)
         for star in stars
         if star.disk_belonging == galactic_disk]
 
-    subplot.scatter(x=velocities_v,
+    subplot.scatter(x=v_velocities,
                     y=uw_velocities_square_sums_square_root,
                     color=color,
                     s=point_size)

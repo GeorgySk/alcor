@@ -41,51 +41,51 @@ def plot(session: Session,
          u_limits: Tuple[float, float] = (-150, 150),
          v_limits: Tuple[float, float] = (-150, 150),
          w_limits: Tuple[float, float] = (-150, 150)) -> None:
-    figure, (subplot_uv,
-             subplot_uw,
-             subplot_vw) = plt.subplots(nrows=3,
+    figure, (uv_subplot,
+             uw_subplot,
+             vw_subplot) = plt.subplots(nrows=3,
                                         figsize=figure_size)
 
     # TODO: Implement other fetching functions
     cloud_points = fetch_all(Cloud,
                              session=session)
 
-    velocities_u = [star.velocity_u
+    u_velocities = [star.u_velocity
                     for star in cloud_points]
-    velocities_v = [star.velocity_v
+    v_velocities = [star.v_velocity
                     for star in cloud_points]
-    velocities_w = [star.velocity_w
+    w_velocities = [star.w_velocity
                     for star in cloud_points]
 
-    draw_subplot(subplot=subplot_uv,
+    draw_subplot(subplot=uv_subplot,
                  xlabel=u_label,
                  ylabel=v_label,
                  xlim=u_limits,
                  ylim=v_limits,
-                 x=velocities_u,
-                 y=velocities_v,
+                 x=u_velocities,
+                 y=v_velocities,
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_V,
                  x_std=STD_POPULATION_U,
                  y_std=STD_POPULATION_V)
-    draw_subplot(subplot=subplot_uw,
+    draw_subplot(subplot=uw_subplot,
                  xlabel=u_label,
                  ylabel=w_label,
                  xlim=u_limits,
                  ylim=w_limits,
-                 x=velocities_u,
-                 y=velocities_w,
+                 x=u_velocities,
+                 y=w_velocities,
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_U,
                  y_std=STD_POPULATION_W)
-    draw_subplot(subplot=subplot_vw,
+    draw_subplot(subplot=vw_subplot,
                  xlabel=v_label,
                  ylabel=w_label,
                  xlim=v_limits,
                  ylim=w_limits,
-                 x=velocities_v,
-                 y=velocities_w,
+                 x=v_velocities,
+                 y=w_velocities,
                  x_avg=AVERAGE_POPULATION_VELOCITY_V,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_V,
@@ -106,9 +106,9 @@ def plot_lepine_case(session: Session,
                      u_limits: Tuple[float, float] = (-150, 150),
                      v_limits: Tuple[float, float] = (-150, 150),
                      w_limits: Tuple[float, float] = (-150, 150)):
-    figure, (subplot_uv,
-             subplot_uw,
-             subplot_vw) = plt.subplots(nrows=3,
+    figure, (uv_subplot,
+             uw_subplot,
+             vw_subplot) = plt.subplots(nrows=3,
                                         figsize=figure_size)
 
     # TODO: Add other fetching options
@@ -119,48 +119,48 @@ def plot_lepine_case(session: Session,
     vw_points = fetch_all(LepineCaseVWCloud,
                           session=session)
 
-    uv_cloud_velocities_u = [star.velocity_u
+    uv_cloud_u_velocities = [star.u_velocity
                              for star in uv_points]
-    uv_cloud_velocities_v = [star.velocity_v
+    uv_cloud_v_velocities = [star.v_velocity
                              for star in uv_points]
-    uw_cloud_velocities_u = [star.velocity_u
+    uw_cloud_u_velocities = [star.u_velocity
                              for star in uw_points]
-    uw_cloud_velocities_w = [star.velocity_w
+    uw_cloud_w_velocities = [star.w_velocity
                              for star in uw_points]
-    vw_cloud_velocities_v = [star.velocity_v
+    vw_cloud_v_velocities = [star.v_velocity
                              for star in vw_points]
-    vw_cloud_velocities_w = [star.velocity_w
+    vw_cloud_w_velocities = [star.w_velocity
                              for star in vw_points]
 
-    draw_subplot(subplot=subplot_uv,
+    draw_subplot(subplot=uv_subplot,
                  xlabel=u_label,
                  ylabel=v_label,
                  xlim=u_limits,
                  ylim=v_limits,
-                 x=uv_cloud_velocities_u,
-                 y=uv_cloud_velocities_v,
+                 x=uv_cloud_u_velocities,
+                 y=uv_cloud_v_velocities,
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_V,
                  x_std=STD_POPULATION_U,
                  y_std=STD_POPULATION_V)
-    draw_subplot(subplot=subplot_uw,
+    draw_subplot(subplot=uw_subplot,
                  xlabel=u_label,
                  ylabel=w_label,
                  xlim=u_limits,
                  ylim=w_limits,
-                 x=uw_cloud_velocities_u,
-                 y=uw_cloud_velocities_w,
+                 x=uw_cloud_u_velocities,
+                 y=uw_cloud_w_velocities,
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_U,
                  y_std=STD_POPULATION_W)
-    draw_subplot(subplot=subplot_vw,
+    draw_subplot(subplot=vw_subplot,
                  xlabel=v_label,
                  ylabel=w_label,
                  xlim=v_limits,
                  ylim=w_limits,
-                 x=vw_cloud_velocities_v,
-                 y=vw_cloud_velocities_w,
+                 x=vw_cloud_v_velocities,
+                 y=vw_cloud_w_velocities,
                  x_avg=AVERAGE_POPULATION_VELOCITY_V,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_V,

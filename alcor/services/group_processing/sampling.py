@@ -34,9 +34,9 @@ def check_elimination(star: Star,
         eliminations_counter['declination'] += 1
         return True
 
-    hypervelocity_star = (star.velocity_u ** 2
-                          + star.velocity_v ** 2
-                          + star.velocity_w ** 2
+    hypervelocity_star = (star.u_velocity ** 2
+                          + star.v_velocity ** 2
+                          + star.w_velocity ** 2
                           > MAX_VELOCITY ** 2)
     if hypervelocity_star:
         eliminations_counter['velocity'] += 1

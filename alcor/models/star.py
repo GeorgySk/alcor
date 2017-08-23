@@ -43,9 +43,9 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'ugriz_ri',
                          'ugriz_iz',
                          'v_photometry',
-                         'velocity_u',
-                         'velocity_v',
-                         'velocity_w',
+                         'u_velocity',
+                         'v_velocity',
+                         'w_velocity',
                          'spectral_type',
                          'disk_belonging']
 
@@ -94,11 +94,11 @@ class Star(Base):
                       nullable=True)
     v_photometry = Column(Float(asdecimal=True),
                           nullable=True)
-    velocity_u = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(asdecimal=True),
                         nullable=True)
-    velocity_v = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(asdecimal=True),
                         nullable=True)
-    velocity_w = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(asdecimal=True),
                         nullable=True)
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
@@ -126,9 +126,9 @@ class Star(Base):
                  ugriz_ri: float = None,
                  ugriz_iz: float = None,
                  v_photometry: float = None,
-                 velocity_u: float = None,
-                 velocity_v: float = None,
-                 velocity_w: float = None,
+                 u_velocity: float = None,
+                 v_velocity: float = None,
+                 w_velocity: float = None,
                  spectral_type: int = None,
                  disk_belonging: str = None):
         self.group_id = group_id
@@ -148,9 +148,9 @@ class Star(Base):
         self.ugriz_ri = ugriz_ri
         self.ugriz_iz = ugriz_iz
         self.v_photometry = v_photometry
-        self.velocity_u = velocity_u
-        self.velocity_v = velocity_v
-        self.velocity_w = velocity_w
+        self.u_velocity = u_velocity
+        self.v_velocity = v_velocity
+        self.w_velocity = w_velocity
         self.spectral_type = spectral_type
         self.disk_belonging = disk_belonging
 
@@ -162,23 +162,23 @@ class Star(Base):
                 + SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE)
 
     @property
-    def coordinate_x(self) -> float:
+    def x_coordinate(self) -> float:
         return float(self.to_cartesian_from_equatorial()[0])
 
     @property
-    def coordinate_y(self) -> float:
+    def y_coordinate(self) -> float:
         return float(self.to_cartesian_from_equatorial()[1])
 
     @property
-    def coordinate_z(self) -> float:
+    def z_coordinate(self) -> float:
         return float(self.to_cartesian_from_equatorial()[2])
 
     # TODO: make memoized property
     @property
     def max_coordinates_modulus(self) -> float:
-        return max(abs(self.coordinate_x),
-                   abs(self.coordinate_y),
-                   abs(self.coordinate_z))
+        return max(abs(self.x_coordinate),
+                   abs(self.y_coordinate),
+                   abs(self.z_coordinate))
 
     @property
     def ugriz_rz(self) -> float:
@@ -199,12 +199,12 @@ class Star(Base):
         longitude = atan(x / y) + AUX_ANGLE - pi / 2.
         if x > 0. and 0. > y or x <= 0. and y <= 0.:
             longitude += pi
-        coordinate_x = distance * cos(latitude) * cos(longitude)
-        coordinate_y = distance * cos(latitude) * sin(longitude)
-        coordinate_z = distance * sin(latitude)
-        return (coordinate_x,
-                coordinate_y,
-                coordinate_z)
+        x_coordinate = distance * cos(latitude) * cos(longitude)
+        y_coordinate = distance * cos(latitude) * sin(longitude)
+        z_coordinate = distance * sin(latitude)
+        return (x_coordinate,
+                y_coordinate,
+                z_coordinate)
 
     def set_radial_velocity_to_zero(self) -> None:
         # TODO: implement pc/kpc units
@@ -220,7 +220,7 @@ class Star(Base):
               * sin(galactic_longitude))
         b1 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
               * cos(galactic_longitude))
-        self.velocity_u = ((a1 * proper_motion_component_l
+        self.u_velocity = ((a1 * proper_motion_component_l
                             + b1 * proper_motion_component_b)
                            * distance_in_pc)
 
@@ -228,10 +228,10 @@ class Star(Base):
               * cos(galactic_longitude))
         b2 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
               * sin(galactic_longitude))
-        self.velocity_v = ((a2 * proper_motion_component_l
+        self.v_velocity = ((a2 * proper_motion_component_l
                             + b2 * proper_motion_component_b)
                            * distance_in_pc)
 
         b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
-        self.velocity_w = (b3 * proper_motion_component_b
+        self.w_velocity = (b3 * proper_motion_component_b
                            * distance_in_pc)

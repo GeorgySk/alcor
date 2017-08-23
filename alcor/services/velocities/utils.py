@@ -11,15 +11,15 @@ def star_cloud(star: Star) -> Union[LepineCaseUVCloud,
                                     LepineCaseVWCloud]:
     max_coordinates_modulus = star.max_coordinates_modulus
 
-    if abs(star.coordinate_x) == max_coordinates_modulus:
+    if abs(star.x_coordinate) == max_coordinates_modulus:
         return LepineCaseVWCloud(group_id=star.group_id,
-                                 velocity_v=star.velocity_v,
-                                 velocity_w=star.velocity_w)
-    elif abs(star.coordinate_y) == max_coordinates_modulus:
+                                 v_velocity=star.v_velocity,
+                                 w_velocity=star.w_velocity)
+    elif abs(star.y_coordinate) == max_coordinates_modulus:
         return LepineCaseUWCloud(group_id=star.group_id,
-                                 velocity_u=star.velocity_u,
-                                 velocity_w=star.velocity_w)
+                                 u_velocity=star.u_velocity,
+                                 w_velocity=star.w_velocity)
     else:
         return LepineCaseUVCloud(group_id=star.group_id,
-                                 velocity_u=star.velocity_u,
-                                 velocity_v=star.velocity_v)
+                                 u_velocity=star.u_velocity,
+                                 v_velocity=star.v_velocity)

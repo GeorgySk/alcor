@@ -39,30 +39,30 @@ def plot(session: Session,
 
     avg_bin_magnitudes = [stars_bin.avg_magnitude
                           for stars_bin in bins]
-    avg_velocities_u = [stars_bin.avg_velocity_u
+    avg_u_velocities = [stars_bin.avg_u_velocity
                         for stars_bin in bins]
-    avg_velocities_v = [stars_bin.avg_velocity_v
+    avg_velocities_v = [stars_bin.avg_v_velocity
                         for stars_bin in bins]
-    avg_velocities_w = [stars_bin.avg_velocity_w
+    avg_velocities_w = [stars_bin.avg_w_velocity
                         for stars_bin in bins]
-    velocities_u_std = [stars_bin.velocity_u_std
+    u_velocities_std = [stars_bin.u_velocity_std
                         for stars_bin in bins]
-    velocities_v_std = [stars_bin.velocity_v_std
+    velocities_v_std = [stars_bin.v_velocity_std
                         for stars_bin in bins]
-    velocities_w_std = [stars_bin.velocity_w_std
+    velocities_w_std = [stars_bin.w_velocity_std
                         for stars_bin in bins]
 
     (avg_bin_magnitudes,
-     avg_velocities_u,
+     avg_u_velocities,
      avg_velocities_v,
      avg_velocities_w,
-     velocities_u_std,
+     u_velocities_std,
      velocities_v_std,
      velocities_w_std) = zip(*sorted(zip(avg_bin_magnitudes,
-                                         avg_velocities_u,
+                                         avg_u_velocities,
                                          avg_velocities_v,
                                          avg_velocities_w,
-                                         velocities_u_std,
+                                         u_velocities_std,
                                          velocities_v_std,
                                          velocities_w_std)))
 
@@ -72,27 +72,27 @@ def plot(session: Session,
 
     magnitudes = [star.bolometric_magnitude
                   for star in clouds]
-    velocities_u = [star.velocity_u
+    u_velocities = [star.u_velocity
                     for star in clouds]
-    velocities_v = [star.velocity_v
+    v_velocities = [star.v_velocity
                     for star in clouds]
-    velocities_w = [star.velocity_w
+    w_velocities = [star.w_velocity
                     for star in clouds]
 
     draw_subplot(subplot=subplot_u,
                  ylabel=u_label,
                  x_line=avg_bin_magnitudes,
-                 y_line=avg_velocities_u,
-                 yerr=velocities_u_std,
+                 y_line=avg_u_velocities,
+                 yerr=u_velocities_std,
                  x_scatter=magnitudes,
-                 y_scatter=velocities_u)
+                 y_scatter=u_velocities)
     draw_subplot(subplot=subplot_v,
                  ylabel=v_label,
                  x_line=avg_bin_magnitudes,
                  y_line=avg_velocities_v,
                  yerr=velocities_v_std,
                  x_scatter=magnitudes,
-                 y_scatter=velocities_v)
+                 y_scatter=v_velocities)
     draw_subplot(subplot=subplot_w,
                  xlabel=magnitude_label,
                  ylabel=w_label,
@@ -100,7 +100,7 @@ def plot(session: Session,
                  y_line=avg_velocities_w,
                  yerr=velocities_w_std,
                  x_scatter=magnitudes,
-                 y_scatter=velocities_w)
+                 y_scatter=w_velocities)
 
     # Removing unnecessary x-labels for top and middle subplots
     subplot_u.set_xticklabels([])
@@ -134,28 +134,28 @@ def plot_lepine_case(session: Session,
 
     u_bins_avg_magnitudes = [stars_bin.avg_magnitude
                              for stars_bin in u_vs_mag_bins]
-    avg_velocities_u = [stars_bin.avg_velocity_u
+    avg_u_velocities = [stars_bin.avg_u_velocity
                         for stars_bin in u_vs_mag_bins]
-    velocities_u_std = [stars_bin.velocity_u_std
+    u_velocities_std = [stars_bin.u_velocity_std
                         for stars_bin in u_vs_mag_bins]
     v_bins_avg_magnitudes = [stars_bin.avg_magnitude
                              for stars_bin in v_vs_mag_bins]
-    avg_velocities_v = [stars_bin.avg_velocity_v
+    avg_velocities_v = [stars_bin.avg_v_velocity
                         for stars_bin in v_vs_mag_bins]
-    velocities_v_std = [stars_bin.velocity_v_std
+    velocities_v_std = [stars_bin.v_velocity_std
                         for stars_bin in v_vs_mag_bins]
     w_bins_avg_magnitudes = [stars_bin.avg_magnitude
                              for stars_bin in w_vs_mag_bins]
-    avg_velocities_w = [stars_bin.avg_velocity_w
+    avg_velocities_w = [stars_bin.avg_w_velocity
                         for stars_bin in w_vs_mag_bins]
-    velocities_w_std = [stars_bin.velocity_w_std
+    velocities_w_std = [stars_bin.w_velocity_std
                         for stars_bin in w_vs_mag_bins]
 
     (u_bins_avg_magnitudes,
-     avg_velocities_u,
-     velocities_u_std) = zip(*sorted(zip(u_bins_avg_magnitudes,
-                                         avg_velocities_u,
-                                         velocities_u_std)))
+     avg_u_velocities,
+     u_velocities_std) = zip(*sorted(zip(u_bins_avg_magnitudes,
+                                         avg_u_velocities,
+                                         u_velocities_std)))
     (v_bins_avg_magnitudes,
      avg_velocities_v,
      velocities_v_std) = zip(*sorted(zip(v_bins_avg_magnitudes,
@@ -177,31 +177,31 @@ def plot_lepine_case(session: Session,
 
     u_magnitudes = [star.bolometric_magnitude
                     for star in u_vs_mag_cloud]
-    velocities_u = [star.velocity_u
+    u_velocities = [star.u_velocity
                     for star in u_vs_mag_cloud]
     v_magnitudes = [star.bolometric_magnitude
                     for star in v_vs_mag_cloud]
-    velocities_v = [star.velocity_v
+    v_velocities = [star.v_velocity
                     for star in v_vs_mag_cloud]
     w_magnitudes = [star.bolometric_magnitude
                     for star in w_vs_mag_cloud]
-    velocities_w = [star.velocity_w
+    w_velocities = [star.w_velocity
                     for star in w_vs_mag_cloud]
 
     draw_subplot(subplot=subplot_u,
                  ylabel=u_label,
                  x_line=u_bins_avg_magnitudes,
-                 y_line=avg_velocities_u,
-                 yerr=velocities_u_std,
+                 y_line=avg_u_velocities,
+                 yerr=u_velocities_std,
                  x_scatter=u_magnitudes,
-                 y_scatter=velocities_u)
+                 y_scatter=u_velocities)
     draw_subplot(subplot=subplot_v,
                  ylabel=v_label,
                  x_line=v_bins_avg_magnitudes,
                  y_line=avg_velocities_v,
                  yerr=velocities_v_std,
                  x_scatter=v_magnitudes,
-                 y_scatter=velocities_v)
+                 y_scatter=v_velocities)
     draw_subplot(subplot=subplot_w,
                  xlabel=magnitude_label,
                  ylabel=w_label,
@@ -209,7 +209,7 @@ def plot_lepine_case(session: Session,
                  y_line=avg_velocities_w,
                  yerr=velocities_w_std,
                  x_scatter=w_magnitudes,
-                 y_scatter=velocities_w)
+                 y_scatter=w_velocities)
 
     # Removing unnecessary x-labels for top and middle subplots
     subplot_u.set_xticklabels([])
