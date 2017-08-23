@@ -26,7 +26,7 @@ def run_processing(*,
     if unprocessed_groups:
         groups = fetch_unprocessed_groups(session=session)
     elif last_groups_count:
-        groups = fetch_last_groups(count=last_groups_count,
+        groups = fetch_last_groups(limit=last_groups_count,
                                    session=session)
     elif group_id:
         groups = fetch_group_by_id(group_id=group_id,

@@ -30,11 +30,11 @@ def fetch_unprocessed_groups(session: Session) -> List[Group]:
 
 
 def fetch_last_groups(*,
-                      count: int,
+                      limit: int,
                       session: Session) -> List[Group]:
     query = (session.query(Group)
              .order_by(Group.updated_timestamp.desc())
-             .limit(count))
+             .limit(limit))
     return query.all()
 
 
