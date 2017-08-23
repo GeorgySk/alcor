@@ -6,26 +6,23 @@ from typing import (Optional,
 
 from sqlalchemy.orm.session import Session
 import matplotlib
-
+matplotlib.use('Agg')
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
-from alcor.services.data_access import fetch_all_stars
-from alcor.services.data_access import fetch_stars_by_group_id
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 from matplotlib import cm
+from matplotlib.colors import Colormap
+import matplotlib.pyplot as plt
 import numpy as np
 
+from alcor.services.data_access import (fetch_all_stars,
+                                        fetch_stars_by_group_id)
 from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
                                          PECULIAR_SOLAR_VELOCITY_V,
                                          PECULIAR_SOLAR_VELOCITY_W)
 
 logger = logging.getLogger(__name__)
-
-COLORMAP = cm.get_cmap('jet')
-COLORMAP.set_under('w')
 
 
 def plot(*,
@@ -105,8 +102,10 @@ def draw_plot(*,
     extent = [xedges[0], xedges[-1],
               yedges[0], yedges[-1]]
 
+    colormap = colormap_by_name('jet', under='w')
+
     colorbar_src = subplot.imshow(X=heatmap.T,
-                                  cmap=COLORMAP,
+                                  cmap=colormap,
                                   vmin=vmin,
                                   extent=extent,
                                   origin='lower')
@@ -125,3 +124,12 @@ def draw_plot(*,
     figure.subplots_adjust(hspace=spacing)
 
     plt.savefig(filename)
+
+
+def colormap_by_name(name: str,
+                     *,
+                     under: str = None) -> Colormap:
+    colormap = cm.get_cmap(name)
+    if under is not None:
+        colormap.set_under(under)
+    return colormap
