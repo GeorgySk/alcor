@@ -50,7 +50,7 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'disk_belonging']
 
 
-class GalacticDiskEnum(enum.Enum):
+class GalacticDiskTypes(enum.Enum):
     thin = 1
     thick = 2
 
@@ -103,7 +103,7 @@ class Star(Base):
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
                            nullable=True)
-    disk_belonging = Column(Enum(GalacticDiskEnum),
+    disk_belonging = Column(Enum(GalacticDiskTypes),
                             nullable=True)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())

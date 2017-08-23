@@ -17,7 +17,7 @@ from matplotlib.colors import Colormap
 import numpy as np
 from sqlalchemy.orm.session import Session
 
-from alcor.models.star import Star
+from alcor.models import Star
 from alcor.services.common import (PECULIAR_SOLAR_VELOCITY_U,
                                    PECULIAR_SOLAR_VELOCITY_V,
                                    PECULIAR_SOLAR_VELOCITY_W)
@@ -91,9 +91,9 @@ def draw_plot(*,
         figure_grid_height_ratios = [0.05, 1]
 
     figure, (colorbar, subplot) = plt.subplots(
-        nrows=2,
-        figsize=figure_size,
-        gridspec_kw={'height_ratios': figure_grid_height_ratios})
+            nrows=2,
+            figsize=figure_size,
+            gridspec_kw={'height_ratios': figure_grid_height_ratios})
 
     # TODO: add sliders
     subplot.set(xlabel=xlabel,

@@ -3,9 +3,9 @@ from typing import List
 
 from sqlalchemy.orm.session import Session
 
+from alcor.models import (Group,
+                          Star)
 from alcor.models.base import Base
-from alcor.models.group import Group
-from alcor.models.star import Star
 
 
 def fetch_all(model: Base,

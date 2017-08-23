@@ -12,7 +12,7 @@ from sqlalchemy.orm.session import Session
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
-from alcor.models.star import Star
+from alcor.models import Star
 from alcor.services.data_access import fetch_all
 
 logger = logging.getLogger(__name__)
