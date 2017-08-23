@@ -63,18 +63,16 @@ def initialize_sequences() -> None:
         masses,
         pre_wd_lifetimes))
 
-    fill_by_data_from_files(cooling_sequences_by_metallicities[1],
-                            filenames=files_names_by_metallicities[1],
-                            fill_type=1)
-    fill_by_data_from_files(cooling_sequences_by_metallicities[10],
-                            filenames=files_names_by_metallicities[10],
-                            fill_type=1)
-    fill_by_data_from_files(cooling_sequences_by_metallicities[30],
-                            filenames=files_names_by_metallicities[30],
-                            fill_type=2)
-    fill_by_data_from_files(cooling_sequences_by_metallicities[60],
-                            filenames=files_names_by_metallicities[60],
-                            fill_type=2)
+    fill_types_by_metallicities = {1: 1,
+                                   10: 1,
+                                   30: 2,
+                                   60: 2}
+
+    for metallicity in metallicities_per_thousand:
+        fill_by_data_from_files(
+            cooling_sequences_by_metallicities[metallicity],
+            filenames=files_names_by_metallicities[metallicity],
+            fill_type=fill_types_by_metallicities[metallicity])
 
 
 def metallicities_cooling_sequences(
