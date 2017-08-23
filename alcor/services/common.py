@@ -8,4 +8,9 @@ PECULIAR_SOLAR_VELOCITY_V = 12
 PECULIAR_SOLAR_VELOCITY_W = 7
 
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
+
 FILTRATION_METHODS = ['raw', 'full', 'restricted']
+
+STARS_SPECTRAL_TYPES = {0: 'DA',
+                        1: 'DB',
+                        2: 'ONe'}
