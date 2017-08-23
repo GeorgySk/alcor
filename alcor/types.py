@@ -22,4 +22,4 @@ ColumnValueType = Union[int,
                         None]
 ParametersValuesType = Dict[str, Union[NumericType,
                                        Dict[str, Union[str, NumericType]]]]
-CoolingSequenceType = Dict[str, Dict[str, np.ndarray]]
+CoolingSequenceType = Dict[float, Dict[str, np.ndarray]]
