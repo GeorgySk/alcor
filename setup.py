@@ -3,6 +3,7 @@ from setuptools import (setup,
 
 from alcor.config import PROJECT_NAME
 
+project_base_url = 'https://github.com/lycantropos/alcor/'
 setup(name=PROJECT_NAME,
       packages=find_packages(),
       version='0.0.0',
@@ -11,9 +12,8 @@ setup(name=PROJECT_NAME,
              'Azat Ibrakov',
       author_email='skorobogatov@phystech.edu, '
                    'azatibrakov@gmail.com',
-      url='https://github.com/lycantropos/alcor',
-      download_url='https://github.com/lycantropos/'
-                   'alcor/archive/master.tar.gz',
+      url=project_base_url,
+      download_url=project_base_url + 'archive/master.tar.gz',
       keywords=['astronomy'],
       install_requires=[
           'psycopg2>=2.7.1',
