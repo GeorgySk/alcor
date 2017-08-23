@@ -2,9 +2,9 @@ import uuid
 from datetime import datetime
 from numbers import Number
 from typing import (Union,
-                    List,
+                    Dict,
                     Tuple,
-                    Dict)
+                    List)
 
 from alcor.models import Star
 

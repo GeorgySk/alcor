@@ -1,5 +1,5 @@
-from typing import (List,
-                    Tuple)
+from typing import (Tuple,
+                    List)
 
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session

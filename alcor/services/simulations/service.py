@@ -4,8 +4,8 @@ import uuid
 from decimal import Decimal
 from subprocess import check_call
 from typing import (Any,
-                    Dict,
-                    Iterable)
+                    Iterable,
+                    Dict)
 
 from sqlalchemy.orm.session import Session
 

@@ -4,8 +4,7 @@ from collections import Counter
 from functools import partial
 from itertools import filterfalse
 from math import pi
-from typing import (List,
-                    Iterable)
+from typing import List
 
 from sqlalchemy.orm.session import Session
 

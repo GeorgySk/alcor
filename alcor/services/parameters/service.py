@@ -1,9 +1,9 @@
 import logging
 from itertools import product
-from typing import (List,
-                    Tuple,
+from typing import (Iterable,
                     Dict,
-                    Iterable)
+                    Tuple,
+                    List)
 
 from alcor.types import NumericType
 

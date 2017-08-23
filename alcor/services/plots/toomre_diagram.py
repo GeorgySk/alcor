@@ -2,8 +2,8 @@ import enum
 import logging
 from math import sqrt
 from random import random
-from typing import (List,
-                    Tuple)
+from typing import (Tuple,
+                    List)
 
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session

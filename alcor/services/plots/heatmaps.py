@@ -1,8 +1,8 @@
 import logging
 import uuid
-from typing import (List,
+from typing import (Optional,
                     Tuple,
-                    Optional)
+                    List)
 
 from sqlalchemy.orm.session import Session
 import matplotlib
@@ -38,8 +38,7 @@ def plot(*,
          u_label: str = '$U(km/s)$',
          v_label: str = '$V(km/s)$',
          w_label: str = '$W(km/s)$') -> None:
-    # TODO: Figure out what stars I should fetch (all/last N groups by time/
-    # by id list)
+    # TODO: Add other fetching options
     if group_id:
         stars = fetch_stars_by_group_id(group_id=group_id,
                                         session=session)
@@ -47,31 +46,33 @@ def plot(*,
         stars = fetch_all_stars(session=session)
 
     # TODO: add coordinates
-    if axes == 'velocities':
-        # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
-        velocities_u = [float(star.velocity_u) + PECULIAR_SOLAR_VELOCITY_U
-                        for star in stars]
-        velocities_v = [float(star.velocity_v) + PECULIAR_SOLAR_VELOCITY_V
-                        for star in stars]
-        velocities_w = [float(star.velocity_w) + PECULIAR_SOLAR_VELOCITY_W
-                        for star in stars]
+    if axes != 'velocities':
+        return
 
-        # TODO: add option of plotting 3 heatmaps in one fig. at the same time
-        draw_plot(xlabel=u_label,
-                  ylabel=v_label,
-                  xdata=velocities_u,
-                  ydata=velocities_v,
-                  filename=uv_filename)
-        draw_plot(xlabel=u_label,
-                  ylabel=w_label,
-                  xdata=velocities_u,
-                  ydata=velocities_w,
-                  filename=uw_filename)
-        draw_plot(xlabel=v_label,
-                  ylabel=w_label,
-                  xdata=velocities_v,
-                  ydata=velocities_w,
-                  filename=vw_filename)
+    # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
+    velocities_u = [float(star.velocity_u) + PECULIAR_SOLAR_VELOCITY_U
+                    for star in stars]
+    velocities_v = [float(star.velocity_v) + PECULIAR_SOLAR_VELOCITY_V
+                    for star in stars]
+    velocities_w = [float(star.velocity_w) + PECULIAR_SOLAR_VELOCITY_W
+                    for star in stars]
+
+    # TODO: add option of plotting 3 heatmaps in one fig. at the same time
+    draw_plot(xlabel=u_label,
+              ylabel=v_label,
+              xdata=velocities_u,
+              ydata=velocities_v,
+              filename=uv_filename)
+    draw_plot(xlabel=u_label,
+              ylabel=w_label,
+              xdata=velocities_u,
+              ydata=velocities_w,
+              filename=uw_filename)
+    draw_plot(xlabel=v_label,
+              ylabel=w_label,
+              xdata=velocities_v,
+              ydata=velocities_w,
+              filename=vw_filename)
 
 
 def draw_plot(*,
@@ -92,7 +93,7 @@ def draw_plot(*,
     figure, (colorbar, subplot) = plt.subplots(
         nrows=2,
         figsize=figure_size,
-        gridspec_kw={"height_ratios": figure_grid_height_ratios})
+        gridspec_kw={'height_ratios': figure_grid_height_ratios})
 
     # TODO: add sliders
     subplot.set(xlabel=xlabel,
@@ -117,7 +118,7 @@ def draw_plot(*,
 
     figure.colorbar(mappable=colorbar_src,
                     cax=colorbar,
-                    orientation="horizontal")
+                    orientation='horizontal')
 
     subplot.set_aspect(ratio / subplot.get_data_ratio())
 
