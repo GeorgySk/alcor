@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 from alcor.models.star import (Star,
                                GalacticDiskEnum)
-from alcor.services.data_access import fetch_all_stars
+from alcor.services.data_access import fetch_all
 from alcor.services.restrictions import PECULIAR_SOLAR_VELOCITY_V
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,8 @@ def plot(session: Session,
     figure, subplot = plt.subplots(figsize=figure_size)
 
     # TODO: add other fetching options
-    stars = fetch_all_stars(session=session)
+    stars = fetch_all(Star,
+                      session=session)
 
     # TODO: or is it better to place this in fetch_.. function?
     choosing_probability = DESIRED_FINAL_SAMPLE_STARS_COUNT / len(stars)

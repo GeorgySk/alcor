@@ -4,17 +4,18 @@ from typing import (Tuple,
 from sqlalchemy.orm.session import Session
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-from matplotlib.patches import Ellipse
-from matplotlib.axes import Axes
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+from matplotlib.axes import Axes
 
-from alcor.services.data_access import (fetch_all_cloud_points,
-                                        fetch_all_lepine_case_uv_cloud_points,
-                                        fetch_all_lepine_case_uw_cloud_points,
-                                        fetch_all_lepine_case_vw_cloud_points)
+from alcor.services.data_access import fetch_all
+from alcor.models.velocities.clouds import (Cloud,
+                                            LepineCaseUVCloud,
+                                            LepineCaseUWCloud,
+                                            LepineCaseVWCloud)
 
 # Kinematic properties of the thin disk taken from the paper of
 # N.Rowell and N.C.Hambly (mean motions are relative to the Sun):
@@ -46,7 +47,8 @@ def plot(session: Session,
                                         figsize=figure_size)
 
     # TODO: Implement other fetching functions
-    cloud_points = fetch_all_cloud_points(session=session)
+    cloud_points = fetch_all(Cloud,
+                             session=session)
 
     velocities_u = [star.velocity_u
                     for star in cloud_points]
@@ -110,9 +112,12 @@ def plot_lepine_case(session: Session,
                                         figsize=figure_size)
 
     # TODO: Add other fetching options
-    uv_points = fetch_all_lepine_case_uv_cloud_points(session=session)
-    uw_points = fetch_all_lepine_case_uw_cloud_points(session=session)
-    vw_points = fetch_all_lepine_case_vw_cloud_points(session=session)
+    uv_points = fetch_all(LepineCaseUVCloud,
+                          session=session)
+    uw_points = fetch_all(LepineCaseUWCloud,
+                          session=session)
+    vw_points = fetch_all(LepineCaseVWCloud,
+                          session=session)
 
     uv_cloud_velocities_u = [star.velocity_u
                              for star in uv_points]

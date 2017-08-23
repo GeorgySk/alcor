@@ -8,7 +8,8 @@ import matplotlib
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
-from alcor.services.data_access import fetch_all_graph_points
+from alcor.models.luminosity_function import Point
+from alcor.services.data_access import fetch_all
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -51,7 +52,8 @@ def plot(session: Session,
          capsize: float = 5,
          observational_line_color: str = 'r') -> None:
     # TODO: Implement other fetching functions
-    graph_points = fetch_all_graph_points(session=session)
+    graph_points = fetch_all(Point,
+                             session=session)
 
     avg_bin_magnitudes = [graph_point.avg_bin_magnitude
                           for graph_point in graph_points]

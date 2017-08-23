@@ -5,13 +5,16 @@ from typing import (Tuple,
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
 import matplotlib
+
+from alcor.models.star import Star
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
 
-from alcor.services.data_access import fetch_all_stars
+from alcor.services.data_access import fetch_all
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +33,8 @@ def plot(session: Session,
                                               figsize=figure_size)
 
     # TODO: add more fetching options
-    stars = fetch_all_stars(session=session)
+    stars = fetch_all(Star,
+                      session=session)
 
     ugriz_ug = [float(star.ugriz_ug)
                 for star in stars]

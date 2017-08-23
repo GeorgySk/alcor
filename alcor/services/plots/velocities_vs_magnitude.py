@@ -4,21 +4,21 @@ from typing import (Tuple,
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
 import matplotlib
-
+matplotlib.use('Agg')
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from alcor.services.data_access import (fetch_all_bins,
-                                        fetch_all_u_vs_mag_clouds,
-                                        fetch_all_v_vs_mag_clouds,
-                                        fetch_all_w_vs_mag_clouds,
-                                        fetch_all_u_vs_mag_bins,
-                                        fetch_all_v_vs_mag_bins,
-                                        fetch_all_w_vs_mag_bins)
-from alcor.models.velocities_vs_magnitudes.clouds import Cloud
+from alcor.services.data_access import fetch_all
+from alcor.models.velocities_vs_magnitudes.bins import (Bin,
+                                                        LepineCaseUBin,
+                                                        LepineCaseVBin,
+                                                        LepineCaseWBin)
+from alcor.models.velocities_vs_magnitudes.clouds import (Cloud,
+                                                          LepineCaseUCloud,
+                                                          LepineCaseVCloud,
+                                                          LepineCaseWCloud)
 
 
 def plot(session: Session,
@@ -34,7 +34,8 @@ def plot(session: Session,
                                        figsize=figure_size)
 
     # TODO: implement other ways of fetching
-    bins = fetch_all_bins(session=session)
+    bins = fetch_all(Bin,
+                     session=session)
 
     avg_bin_magnitudes = [stars_bin.avg_magnitude
                           for stars_bin in bins]
@@ -66,7 +67,8 @@ def plot(session: Session,
                                          velocities_w_std)))
 
     # TODO: implement other ways of fetching
-    clouds = fetch_all_clouds(session=session)
+    clouds = fetch_all(Cloud,
+                       session=session)
 
     magnitudes = [star.bolometric_magnitude
                   for star in clouds]
@@ -123,9 +125,12 @@ def plot_lepine_case(session: Session,
                                        figsize=figure_size)
 
     # TODO: implement other fetching functions
-    u_vs_mag_bins = fetch_all_u_vs_mag_bins(session=session)
-    v_vs_mag_bins = fetch_all_v_vs_mag_bins(session=session)
-    w_vs_mag_bins = fetch_all_w_vs_mag_bins(session=session)
+    u_vs_mag_bins = fetch_all(LepineCaseUBin,
+                              session=session)
+    v_vs_mag_bins = fetch_all(LepineCaseVBin,
+                              session=session)
+    w_vs_mag_bins = fetch_all(LepineCaseWBin,
+                              session=session)
 
     u_bins_avg_magnitudes = [stars_bin.avg_magnitude
                              for stars_bin in u_vs_mag_bins]
@@ -163,9 +168,12 @@ def plot_lepine_case(session: Session,
                                          velocities_w_std)))
 
     # TODO: implement other fetching functions
-    u_vs_mag_cloud = fetch_all_u_vs_mag_clouds(session=session)
-    v_vs_mag_cloud = fetch_all_v_vs_mag_clouds(session=session)
-    w_vs_mag_cloud = fetch_all_w_vs_mag_clouds(session=session)
+    u_vs_mag_cloud = fetch_all(LepineCaseUCloud,
+                               session=session)
+    v_vs_mag_cloud = fetch_all(LepineCaseVCloud,
+                               session=session)
+    w_vs_mag_cloud = fetch_all(LepineCaseWCloud,
+                               session=session)
 
     u_magnitudes = [star.bolometric_magnitude
                     for star in u_vs_mag_cloud]
@@ -253,9 +261,3 @@ def draw_subplot(*,
     subplot.xaxis.set_ticks_position('both')
     subplot.yaxis.set_ticks_position('both')
     subplot.set_aspect(ratio / subplot.get_data_ratio())
-
-
-# TODO: model name collision
-def fetch_all_clouds(session: Session) -> List[Cloud]:
-    query = session.query(Cloud)
-    return query.all()

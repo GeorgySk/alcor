@@ -6,6 +6,9 @@ from typing import (Optional,
 
 from sqlalchemy.orm.session import Session
 import matplotlib
+
+from alcor.models.star import Star
+
 matplotlib.use('Agg')
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
@@ -16,8 +19,8 @@ from matplotlib.colors import Colormap
 import matplotlib.pyplot as plt
 import numpy as np
 
-from alcor.services.data_access import (fetch_all_stars,
-                                        fetch_stars_by_group_id)
+from alcor.services.data_access import (fetch_all,
+                                        fetch_by_group_id)
 from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
                                          PECULIAR_SOLAR_VELOCITY_V,
                                          PECULIAR_SOLAR_VELOCITY_W)
@@ -37,10 +40,12 @@ def plot(*,
          w_label: str = '$W(km/s)$') -> None:
     # TODO: Add other fetching options
     if group_id:
-        stars = fetch_stars_by_group_id(group_id=group_id,
-                                        session=session)
+        stars = fetch_by_group_id(Star,
+                                  group_id=group_id,
+                                  session=session)
     else:
-        stars = fetch_all_stars(session=session)
+        stars = fetch_all(Star,
+                          session=session)
 
     # TODO: add coordinates
     if axes != 'velocities':
