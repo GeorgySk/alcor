@@ -4,26 +4,25 @@ from typing import (Optional,
                     Tuple,
                     List)
 
-from sqlalchemy.orm.session import Session
 import matplotlib
 
-from alcor.models.star import Star
-
-matplotlib.use('Agg')
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+matplotlib.use('Agg')
 
 from matplotlib import cm
+from matplotlib import pyplot as plt
 from matplotlib.colors import Colormap
-import matplotlib.pyplot as plt
 import numpy as np
+from sqlalchemy.orm.session import Session
 
+from alcor.models.star import Star
+from alcor.services.common import (PECULIAR_SOLAR_VELOCITY_U,
+                                   PECULIAR_SOLAR_VELOCITY_V,
+                                   PECULIAR_SOLAR_VELOCITY_W)
 from alcor.services.data_access import (fetch_all,
                                         fetch_group_stars)
-from alcor.services.restrictions import (PECULIAR_SOLAR_VELOCITY_U,
-                                         PECULIAR_SOLAR_VELOCITY_V,
-                                         PECULIAR_SOLAR_VELOCITY_W)
 
 logger = logging.getLogger(__name__)
 

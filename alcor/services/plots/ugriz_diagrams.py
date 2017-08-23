@@ -2,18 +2,17 @@ import logging
 from typing import (Tuple,
                     List)
 
+import matplotlib
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
-import matplotlib
 
-from alcor.models.star import Star
-
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
 
+from alcor.models.star import Star
 from alcor.services.data_access import fetch_all
 
 logger = logging.getLogger(__name__)

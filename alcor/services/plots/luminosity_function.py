@@ -2,20 +2,19 @@ from math import (log10,
                   sqrt)
 from typing import Tuple
 
-from sqlalchemy.orm.session import Session
 import matplotlib
 
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
-from alcor.models.luminosity_function import Point
-from alcor.services.data_access import fetch_all
-
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 import numpy as np
+from sqlalchemy.orm.session import Session
 
-from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
+from alcor.models.luminosity_function import Point
+from alcor.services.common import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
+from alcor.services.data_access import fetch_all
 
 # Observational LF of 40pc sample from Althaus
 OBSERVATIONAL_AVG_BIN_MAGNITUDES = np.arange(7.75, 17.25, 0.5)

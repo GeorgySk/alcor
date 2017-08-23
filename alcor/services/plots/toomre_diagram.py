@@ -5,19 +5,20 @@ from random import random
 from typing import (Tuple,
                     List)
 
-from matplotlib.axes import Axes
-from sqlalchemy.orm.session import Session
 import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from sqlalchemy.orm.session import Session
 
 from alcor.models.star import (Star,
                                GalacticDiskEnum)
+from alcor.services.common import PECULIAR_SOLAR_VELOCITY_V
 from alcor.services.data_access import fetch_all
-from alcor.services.restrictions import PECULIAR_SOLAR_VELOCITY_V
 
 logger = logging.getLogger(__name__)
 

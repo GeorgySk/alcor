@@ -6,7 +6,7 @@ from typing import (Iterable,
 from alcor.models import (Group,
                           Star)
 from alcor.models.luminosity_function import Point
-from alcor.services.restrictions import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
+from alcor.services.common import FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
 from alcor.types import StarsBinsType
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.
