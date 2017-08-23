@@ -2,13 +2,22 @@ from alcor.models import Star
 
 MIN_BOLOMETRIC_MAGNITUDE = 6.0
 MAX_BOLOMETRIC_MAGNITUDE = 30.0
-BIN_SIZE = 0.5
-BOLOMETRIC_MAGNITUDE_AMPLITUDE = (MAX_BOLOMETRIC_MAGNITUDE
-                                  - MIN_BOLOMETRIC_MAGNITUDE)
-BINS_COUNT = int(BOLOMETRIC_MAGNITUDE_AMPLITUDE / BIN_SIZE)
+STARS_BIN_SIZE = 0.5
+
+
+def bolometric_magnitude_to_stars_bin_index(
+        magnitude: float,
+        *,
+        min_magnitude: float = MIN_BOLOMETRIC_MAGNITUDE,
+        stars_bin_size: float = STARS_BIN_SIZE) -> int:
+    magnitude_amplitude = magnitude - min_magnitude
+    return int(magnitude_amplitude / stars_bin_size)
+
+
+STARS_BINS_COUNT = bolometric_magnitude_to_stars_bin_index(
+        MAX_BOLOMETRIC_MAGNITUDE)
 DEFAULT_VELOCITY_STD = 100.
 
 
-def get_stars_bin_index(star: Star) -> int:
-    return int((float(star.bolometric_magnitude)
-                - MIN_BOLOMETRIC_MAGNITUDE) / BIN_SIZE)
+def stars_bin_index(star: Star) -> int:
+    return bolometric_magnitude_to_stars_bin_index(star.bolometric_magnitude)

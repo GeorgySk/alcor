@@ -14,11 +14,11 @@ from alcor.models.velocities_vs_magnitudes import (LepineCaseUCloud,
                                                    LepineCaseVBin,
                                                    LepineCaseWBin)
 from alcor.types import StarsBinsType
-from .utils import (BIN_SIZE,
-                    BINS_COUNT,
+from .utils import (STARS_BIN_SIZE,
+                    STARS_BINS_COUNT,
                     DEFAULT_VELOCITY_STD,
                     MIN_BOLOMETRIC_MAGNITUDE,
-                    get_stars_bin_index)
+                    stars_bin_index)
 
 
 def clouds(stars: List[Star],
@@ -70,12 +70,12 @@ def bins(*,
 def stars_bins_by_velocities(stars: List[Star]) -> Tuple[StarsBinsType,
                                                          StarsBinsType,
                                                          StarsBinsType]:
-    u_stars_bins = [[] for _ in range(BINS_COUNT)]
-    v_stars_bins = [[] for _ in range(BINS_COUNT)]
-    w_stars_bins = [[] for _ in range(BINS_COUNT)]
+    u_stars_bins = [[] for _ in range(STARS_BINS_COUNT)]
+    v_stars_bins = [[] for _ in range(STARS_BINS_COUNT)]
+    w_stars_bins = [[] for _ in range(STARS_BINS_COUNT)]
 
     for star in stars:
-        index = get_stars_bin_index(star)
+        index = stars_bin_index(star)
 
         max_coordinates_modulus = star.max_coordinates_modulus
 
@@ -100,7 +100,7 @@ def u_bins(*,
             continue
 
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (index + 0.5))
+                         + STARS_BIN_SIZE * (index + 0.5))
         avg_u_velocity = mean(star.u_velocity
                               for star in stars_bin)
         if len(stars_bin) == 1:
@@ -122,7 +122,7 @@ def v_bins(*,
             continue
 
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (stars_bin_index + 0.5))
+                         + STARS_BIN_SIZE * (stars_bin_index + 0.5))
         avg_v_velocity = mean(star.v_velocity
                               for star in stars_bin)
         if len(stars_bin) == 1:
@@ -144,7 +144,7 @@ def w_bins(*,
             continue
 
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (stars_bin_index + 0.5))
+                         + STARS_BIN_SIZE * (stars_bin_index + 0.5))
         avg_w_velocity = mean(star.w_velocity
                               for star in stars_bin)
         if len(stars_bin) == 1:

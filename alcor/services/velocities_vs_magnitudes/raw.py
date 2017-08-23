@@ -8,11 +8,11 @@ from alcor.models import (Group,
                           Star)
 from alcor.models.velocities_vs_magnitudes import Bin
 from alcor.types import StarsBinsType
-from .utils import (BIN_SIZE,
-                    BINS_COUNT,
+from .utils import (STARS_BIN_SIZE,
+                    STARS_BINS_COUNT,
                     DEFAULT_VELOCITY_STD,
                     MIN_BOLOMETRIC_MAGNITUDE,
-                    get_stars_bin_index)
+                    stars_bin_index)
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def bins(*,
             continue
 
         avg_magnitude = (MIN_BOLOMETRIC_MAGNITUDE
-                         + BIN_SIZE * (index + 0.5))
+                         + STARS_BIN_SIZE * (index + 0.5))
         avg_u_velocity = mean(star.u_velocity
                               for star in stars_bin)
         avg_v_velocity = mean(star.v_velocity
@@ -55,10 +55,10 @@ def bins(*,
 
 
 def stars_bins(stars: List[Star]) -> StarsBinsType:
-    res = [[] for _ in range(BINS_COUNT)]
+    res = [[] for _ in range(STARS_BINS_COUNT)]
     for star in stars:
-        index = get_stars_bin_index(star)
-        if BINS_COUNT > index >= 0:
+        index = stars_bin_index(star)
+        if STARS_BINS_COUNT > index >= 0:
             res[index].append(star)
         else:
             logger.warning('Magnitude is out of bounds: '
