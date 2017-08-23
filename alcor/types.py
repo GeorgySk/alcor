@@ -6,8 +6,6 @@ from typing import (Union,
                     Tuple,
                     List)
 
-import numpy as np
-
 from alcor.models import Star
 
 NumericType = Union[int, float]
@@ -22,4 +20,3 @@ ColumnValueType = Union[int,
                         None]
 ParametersValuesType = Dict[str, Union[NumericType,
                                        Dict[str, Union[str, NumericType]]]]
-CoolingSequenceType = Dict[float, Dict[str, np.ndarray]]
