@@ -1,9 +1,11 @@
+import sys
 from decimal import Decimal
 
-import sys
 from hypothesis import strategies
 
 from alcor.models import Star
+from alcor.models.star import GalacticDiskEnum
+from alcor.services.common import STARS_SPECTRAL_TYPES
 
 stars = strategies.builds(
     Star,
@@ -31,35 +33,43 @@ stars = strategies.builds(
     # declination
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # galactocentric_distance
+    # galactic_distance
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # galactocentric_coordinate_b
+    # galactic_latitude
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # galactocentric_coordinate_l
+    # galactic_longitude
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # go_photometry
+    # ugriz_g_apparent
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # gr_photometry
+    # ugriz_ug
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # rz_photometry
+    # ugriz_gr
+    strategies.decimals(allow_nan=False,
+                        allow_infinity=False),
+    # ugriz_ri
+    strategies.decimals(allow_nan=False,
+                        allow_infinity=False),
+    # ugriz_iz
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
     # v_photometry
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # velocity_u
+    # u_velocity
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # velocity_v
+    # v_velocity
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
-    # velocity_w
+    # w_velocity
     strategies.decimals(allow_nan=False,
                         allow_infinity=False),
     # spectral_type
-    strategies.integers())
+    strategies.one_of(*map(strategies.just, STARS_SPECTRAL_TYPES)),
+    # disk_belonging
+    strategies.one_of(*map(strategies.just, GalacticDiskEnum)))
