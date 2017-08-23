@@ -40,32 +40,26 @@ def stars_clouds(stars: List[Star],
         bolometric_magnitude = star.bolometric_magnitude
 
         if abs(star.x_coordinate) == max_coordinates_modulus:
-            yield LepineCaseVCloud(
-                    group_id=group_id,
-                    v_velocity=star.v_velocity,
-                    bolometric_magnitude=bolometric_magnitude)
-            yield LepineCaseWCloud(
-                    group_id=group_id,
-                    w_velocity=star.w_velocity,
-                    bolometric_magnitude=bolometric_magnitude)
+            yield LepineCaseVCloud(group_id=group_id,
+                                   v_velocity=star.v_velocity,
+                                   bolometric_magnitude=bolometric_magnitude)
+            yield LepineCaseWCloud(group_id=group_id,
+                                   w_velocity=star.w_velocity,
+                                   bolometric_magnitude=bolometric_magnitude)
         elif abs(star.y_coordinate) == max_coordinates_modulus:
-            yield LepineCaseUCloud(
-                    group_id=group_id,
-                    u_velocity=star.u_velocity,
-                    bolometric_magnitude=bolometric_magnitude)
-            yield LepineCaseWCloud(
-                    group_id=group_id,
-                    w_velocity=star.w_velocity,
-                    bolometric_magnitude=bolometric_magnitude)
+            yield LepineCaseUCloud(group_id=group_id,
+                                   u_velocity=star.u_velocity,
+                                   bolometric_magnitude=bolometric_magnitude)
+            yield LepineCaseWCloud(group_id=group_id,
+                                   w_velocity=star.w_velocity,
+                                   bolometric_magnitude=bolometric_magnitude)
         else:
-            yield LepineCaseUCloud(
-                    group_id=group_id,
-                    u_velocity=star.u_velocity,
-                    bolometric_magnitude=bolometric_magnitude)
-            yield LepineCaseVCloud(
-                    group_id=group_id,
-                    v_velocity=star.v_velocity,
-                    bolometric_magnitude=bolometric_magnitude)
+            yield LepineCaseUCloud(group_id=group_id,
+                                   u_velocity=star.u_velocity,
+                                   bolometric_magnitude=bolometric_magnitude)
+            yield LepineCaseVCloud(group_id=group_id,
+                                   v_velocity=star.v_velocity,
+                                   bolometric_magnitude=bolometric_magnitude)
 
 
 def generate_u_bins(*,
