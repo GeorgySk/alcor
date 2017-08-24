@@ -42,16 +42,9 @@ def process_stars_group(*,
                                 filtration_method=filtration_method)
         stars = list(filterfalse(is_eliminated, stars))
 
-    counter = StarsCounter(
-            group_id=group.id,
-            raw=stars_count,
-            by_parallax=eliminations_counter['parallax'],
-            by_declination=eliminations_counter['declination'],
-            by_velocity=eliminations_counter['velocity'],
-            by_proper_motion=eliminations_counter['proper_motion'],
-            by_reduced_proper_motion=eliminations_counter[
-                'reduced_proper_motion'],
-            by_apparent_magnitude=eliminations_counter['apparent_magnitude'])
+    counter = StarsCounter(group_id=group.id,
+                           raw=stars_count,
+                           **eliminations_counter)
 
     session.add(counter)
 
