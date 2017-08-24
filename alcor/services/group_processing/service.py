@@ -32,8 +32,6 @@ def process_stars_group(*,
     stars = fetch_group_stars(group_id=group.id,
                               session=session)
     stars_count = len(stars)
-    logger.info('Starting processing stars, '
-                f'objects number: {stars_count}.')
 
     eliminations_counter = Counter()
     if filtration_method in {'restricted', 'full'}:

@@ -28,16 +28,16 @@ def run_processing(*,
     elif last_groups_count:
         groups = fetch_last_groups(limit=last_groups_count,
                                    session=session)
-    elif group_id:
-        groups = fetch_group_by_id(group_id=group_id,
-                                   session=session)
+    else:
+        groups = [fetch_group_by_id(group_id=group_id,
+                                    session=session)]
     for group in groups:
         process_stars_group(
-            group=group,
-            filtration_method=filtration_method,
-            nullify_radial_velocity=nullify_radial_velocity,
-            w_luminosity_function=w_luminosity_function,
-            w_velocities_clouds=w_velocities_clouds,
-            w_velocities_vs_magnitude=w_velocities_vs_magnitude,
-            w_lepine_criterion=w_lepine_criterion,
-            session=session)
+                group=group,
+                filtration_method=filtration_method,
+                nullify_radial_velocity=nullify_radial_velocity,
+                w_luminosity_function=w_luminosity_function,
+                w_velocities_clouds=w_velocities_clouds,
+                w_velocities_vs_magnitude=w_velocities_vs_magnitude,
+                w_lepine_criterion=w_lepine_criterion,
+                session=session)
