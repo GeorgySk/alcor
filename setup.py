@@ -14,7 +14,7 @@ setup(name=PROJECT_NAME,
                    'azatibrakov@gmail.com',
       url=project_base_url,
       download_url=project_base_url + 'archive/master.tar.gz',
-      keywords=['astronomy'],
+      keywords=['astrophysics'],
       install_requires=[
           'psycopg2>=2.7.1',
           'PyYAML>=3.12.0',  # settings loading
