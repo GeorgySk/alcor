@@ -1,7 +1,7 @@
 from math import (log10,
                   sqrt)
-from typing import (Iterator,
-                    Iterable)
+from typing import (Iterable,
+                    Iterator)
 
 from alcor.models import Group
 from alcor.models.luminosity_function import Point

@@ -1,6 +1,7 @@
 import uuid
 from typing import List
 
+from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
 from alcor.models import (Group,
@@ -12,6 +13,16 @@ def fetch_all(model: Base,
               *,
               session: Session) -> List[Base]:
     query = session.query(model)
+    return query.all()
+
+
+def fetch_random(model: Base,
+                 *,
+                 limit: int = None,
+                 session: Session) -> List[Base]:
+    query = (session.query(model)
+             .order_by(func.random())
+             .limit(limit))
     return query.all()
 
 
