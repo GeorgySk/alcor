@@ -69,9 +69,9 @@ def initialize_sequences() -> None:
                                    60: 2}
 
     for metallicity in metallicities_per_thousand:
-        fill_by_data_from_files(
-            cooling_sequences_by_metallicities[metallicity],
-            file_names=files_names_by_metallicities[metallicity],
+        read_files(
+            files_paths=files_names_by_metallicities[metallicity],
+            cooling_sequence=cooling_sequences_by_metallicities[metallicity],
             fill_type=fill_types_by_metallicities[metallicity])
 
 
@@ -101,33 +101,35 @@ def nan_matrix(shape: Tuple[int, ...]) -> np.ndarray:
     return np.full(shape, np.nan)
 
 
-def fill_by_data_from_files(cooling_sequence: Dict[str, np.ndarray],
-                            file_names: List[str],
-                            fill_type: int) -> None:
+def read_files(files_paths: List[str],
+               cooling_sequence: Dict[str, np.ndarray],
+               fill_type: int) -> None:
     cooling_time = cooling_sequence['cooling_time']
-    
+
     effective_temperature = cooling_sequence['effective_temperature']
     surface_gravity = cooling_sequence['surface_gravity']
     luminosity = cooling_sequence['luminosity']
     pre_wd_lifetime = cooling_sequence['pre_wd_lifetime']
     rows_counts = cooling_sequence['rows_counts']
 
-    for filename_index, filename in file_names:
-        with open(filename, 'r') as file:
+    for file_path_index, file_path in files_paths:
+        with open(file_path, 'r') as file:
             filereader = csv.reader(file,
                                     delimiter=' ',
                                     skipinitialspace=True)
-            rows_counts[filename_index] = sum(1 for row in filereader)
+            rows_counts[file_path_index] = sum(1 for row in filereader)
             for row_index, row in enumerate(filereader):
-                luminosity[filename_index, row_index] = float(row[0])
-                effective_temperature[filename_index, row_index] = (
+                luminosity[file_path_index, row_index] = float(row[0])
+                effective_temperature[file_path_index, row_index] = (
                     10. ** float(row[1]))
                 if fill_type == 1:
-                    cooling_time[filename_index, row_index] = (float(row[5])
-                                                               / 1000.0)
-                    surface_gravity[filename_index, row_index] = float(row[11])
+                    cooling_time[file_path_index, row_index] = (float(row[5])
+                                                                / 1000.0)
+                    surface_gravity[file_path_index, row_index] = float(
+                        row[11])
                 if fill_type == 2:
-                    cooling_time[filename_index, row_index] = (
+                    cooling_time[file_path_index, row_index] = (
                         10. ** float(row[8]) / 1000.
-                        - pre_wd_lifetime[filename_index])
-                    surface_gravity[filename_index, row_index] = float(row[22])
+                        - pre_wd_lifetime[file_path_index])
+                    surface_gravity[file_path_index, row_index] = float(
+                        row[22])
