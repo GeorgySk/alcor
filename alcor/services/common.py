@@ -4,9 +4,8 @@ from typing import (Callable,
 
 from alcor.models import Star
 from alcor.types import (BolometricIndexType,
+                         StarBolometricIndexType,
                          StarsBinsType)
-
-StarBolometricIndexType = Callable[[Star], int]
 
 logger = logging.getLogger(__name__)
 
