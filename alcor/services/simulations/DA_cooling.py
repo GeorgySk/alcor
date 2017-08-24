@@ -9,7 +9,7 @@ import numpy as np
 
 def initialize_sequences() -> None:
     # Metallicities were multiplied by 1000 in order to keep dict.keys as ints
-    files_names_by_metallicities = {1: ['wd0505_z0001.trk',
+    files_paths_by_metallicities = {1: ['wd0505_z0001.trk',
                                         'wd0553_z0001.trk',
                                         'wd0593_z0001.trk',
                                         'wd0627_z0001.trk',
@@ -52,14 +52,14 @@ def initialize_sequences() -> None:
               np.array([0.524, 0.570, 0.593, 0.609,
                         0.632, 0.659, 0.705, 1.000])]
     pre_wd_lifetimes = [
-        np.zeros(len(files_names_by_metallicities[1])),
-        np.zeros(len(files_names_by_metallicities[10])),
+        np.zeros(len(files_paths_by_metallicities[1])),
+        np.zeros(len(files_paths_by_metallicities[10])),
         np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892, 0.7422, 0.4431, 0.0]),
         np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892, 0.7422, 0.4431, 0.0])]
 
     cooling_sequences_by_metallicities = dict(metallicities_cooling_sequences(
         metallicities_per_thousand,
-        files_names_by_metallicities,
+        files_paths_by_metallicities,
         masses,
         pre_wd_lifetimes))
 
@@ -70,14 +70,14 @@ def initialize_sequences() -> None:
 
     for metallicity, fill_type in fill_types_by_metallicities.items():
         read_files(
-            files_paths=files_names_by_metallicities[metallicity],
+            files_paths=files_paths_by_metallicities[metallicity],
             cooling_sequence=cooling_sequences_by_metallicities[metallicity],
             fill_type=fill_type)
 
 
 def metallicities_cooling_sequences(
         metallicities: List[int],
-        files_names_by_metallicities: Dict[int, List[str]],
+        files_paths_by_metallicities: Dict[int, List[str]],
         masses: List[np.ndarray],
         pre_wd_lifetimes: List[np.ndarray],
         columns_count: int = 650
@@ -85,7 +85,7 @@ def metallicities_cooling_sequences(
     for metallicity, mass, pre_wd_lifetime in zip(metallicities,
                                                   masses,
                                                   pre_wd_lifetimes):
-        files_count = len(files_names_by_metallicities[metallicity])
+        files_count = len(files_paths_by_metallicities[metallicity])
         shape = (files_count, columns_count)
         cooling_sequence = dict(mass=mass,
                                 pre_wd_lifetime=pre_wd_lifetime,
