@@ -112,7 +112,7 @@ def read_files(files_paths: List[str],
     pre_wd_lifetime = cooling_sequence['pre_wd_lifetime']
     rows_counts = cooling_sequence['rows_counts']
 
-    for file_path_index, file_path in files_paths:
+    for file_path_index, file_path in enumerate(files_paths):
         with open(file_path, 'r') as file:
             filereader = csv.reader(file,
                                     delimiter=' ',
