@@ -18,35 +18,35 @@ class StarsCounter(Base):
                       nullable=False)
     raw = Column(Integer(),
                  nullable=False)
-    parallax = Column(Integer(),
-                      nullable=False)
-    declination = Column(Integer(),
+    by_parallax = Column(Integer(),
                          nullable=False)
-    velocity = Column(Integer(),
-                      nullable=False)
-    proper_motion = Column(Integer(),
-                           nullable=False)
-    reduced_proper_motion = Column(Integer(),
+    by_declination = Column(Integer(),
+                            nullable=False)
+    by_velocity = Column(Integer(),
+                         nullable=False)
+    by_proper_motion = Column(Integer(),
+                              nullable=False)
+    by_reduced_proper_motion = Column(Integer(),
+                                      nullable=False)
+    by_apparent_magnitude = Column(Integer(),
                                    nullable=False)
-    apparent_magnitude = Column(Integer(),
-                                nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
                  group_id: uuid.UUID,
                  raw: int,
-                 parallax: int = 0,
-                 declination: int = 0,
-                 velocity: int = 0,
-                 proper_motion: int = 0,
-                 reduced_proper_motion: int = 0,
-                 apparent_magnitude: int = 0):
+                 by_parallax: int = 0,
+                 by_declination: int = 0,
+                 by_velocity: int = 0,
+                 by_proper_motion: int = 0,
+                 by_reduced_proper_motion: int = 0,
+                 by_apparent_magnitude: int = 0):
         self.group_id = group_id
         self.raw = raw
-        self.parallax = parallax
-        self.declination = declination
-        self.velocity = velocity
-        self.proper_motion = proper_motion
-        self.reduced_proper_motion = reduced_proper_motion
-        self.apparent_magnitude = apparent_magnitude
+        self.by_parallax = by_parallax
+        self.by_declination = by_declination
+        self.by_velocity = by_velocity
+        self.by_proper_motion = by_proper_motion
+        self.by_reduced_proper_motion = by_reduced_proper_motion
+        self.by_apparent_magnitude = by_apparent_magnitude

@@ -26,12 +26,12 @@ def check(star: Star,
     gz = float(star.ugriz_gr) + float(star.ugriz_rz)
 
     if parallax < min_parallax:
-        eliminations_counter['parallax'] += 1
+        eliminations_counter['by_parallax'] += 1
         return True
 
     northern_hemisphere_star = star.declination < min_declination
     if northern_hemisphere_star:
-        eliminations_counter['declination'] += 1
+        eliminations_counter['by_declination'] += 1
         return True
 
     hypervelocity_star = (star.u_velocity ** 2
@@ -39,23 +39,23 @@ def check(star: Star,
                           + star.w_velocity ** 2
                           > max_velocity ** 2)
     if hypervelocity_star:
-        eliminations_counter['velocity'] += 1
+        eliminations_counter['by_velocity'] += 1
         return True
 
     if filtration_method == 'restricted':
         if star.proper_motion < min_proper_motion:
-            eliminations_counter['proper_motion'] += 1
+            eliminations_counter['by_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
         elif gz < -0.33 and hrm < 14.:
-            eliminations_counter['reduced_proper_motion'] += 1
+            eliminations_counter['by_reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
         elif hrm < 3.559 * gz + 15.17:
-            eliminations_counter['reduced_proper_motion'] += 1
+            eliminations_counter['by_reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constant
         elif star.v_photometry >= 19.:
-            eliminations_counter['apparent_magnitude'] += 1
+            eliminations_counter['by_apparent_magnitude'] += 1
             return True
     return False
