@@ -1,4 +1,3 @@
-import enum
 import logging
 from math import sqrt
 from typing import (Tuple,
@@ -14,10 +13,10 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
 
-from alcor.models import (Star,
-                          GalacticDiskType)
+from alcor.models import (GalacticDiskType,
+                          Star)
 from alcor.services.common import PECULIAR_SOLAR_VELOCITY_V
-from alcor.services.data_access.service import fetch_random
+from alcor.services.data_access import fetch_random
 
 logger = logging.getLogger(__name__)
 
@@ -39,13 +38,19 @@ def plot(session: Session,
                          session=session)
 
     # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
+    disks_types_stars = {}
+    for star in stars:
+        (disks_types_stars
+         .setdefault(star.galactic_disk_type, [])
+         .append(star))
+
+    thin_disk_stars = disks_types_stars.get(GalacticDiskType.thin, [])
+    thick_disk_stars = disks_types_stars.get(GalacticDiskType.thick, [])
     plot_stars_by_galactic_disk_type(subplot=subplot,
-                                     stars=stars,
-                                     galactic_disk_type=GalacticDiskType.thin,
+                                     stars=thin_disk_stars,
                                      color=thin_disk_color)
     plot_stars_by_galactic_disk_type(subplot=subplot,
-                                     stars=stars,
-                                     galactic_disk_type=GalacticDiskType.thick,
+                                     stars=thick_disk_stars,
                                      color=thick_disk_color)
 
     # TODO: add sliders
@@ -65,7 +70,6 @@ def plot(session: Session,
 def plot_stars_by_galactic_disk_type(*,
                                      subplot: Axes,
                                      stars: List[Star],
-                                     galactic_disk_type: enum.Enum,
                                      color: str,
                                      point_size: float = 0.5) -> None:
     # TODO: how to work with Decimal type? If I leave it I get:
@@ -73,14 +77,12 @@ def plot_stars_by_galactic_disk_type(*,
     # according to the rule 'safe'
     v_velocities = [float(star.v_velocity)
                     + PECULIAR_SOLAR_VELOCITY_V
-                    for star in stars
-                    if star.galactic_disk_type == galactic_disk_type]
-    uw_velocities_square_sums_square_root = [
-        sqrt(float(star.u_velocity) ** 2 + float(star.w_velocity) ** 2)
-        for star in stars
-        if star.galactic_disk_type == galactic_disk_type]
+                    for star in stars]
+    uw_velocities_magnitudes = [sqrt(float(star.u_velocity) ** 2
+                                     + float(star.w_velocity) ** 2)
+                                for star in stars]
 
     subplot.scatter(x=v_velocities,
-                    y=uw_velocities_square_sums_square_root,
+                    y=uw_velocities_magnitudes,
                     color=color,
                     s=point_size)
