@@ -1,6 +1,6 @@
 precision: 6
 
-geometry: cones
+geometry: sphere
 
 parameters:
   commons:
@@ -12,7 +12,7 @@ parameters:
     initial_mass_function_exponent: -2.35
     lifetime_mass_ratio: 1.0
     mass_reduction_factor: 0.03
-  cones:
+  sphere:
     thick_disk_stars_fraction: 0.8
     longitudes:
       csv: ../test_angles.csv
