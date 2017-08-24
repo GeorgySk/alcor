@@ -2,45 +2,34 @@ import logging
 import os
 import uuid
 from subprocess import check_call
-from typing import (Any,
-                    Iterator,
-                    Dict)
+from typing import Dict
 
 from sqlalchemy.orm.session import Session
 
 from alcor.models import Group
 from alcor.models.simulation import Parameter
-from alcor.services.common import (OUTPUT_FILE_EXTENSION,
-                                   MAX_OUTPUT_FILE_NAME_LENGTH)
-from alcor.services.parameters import generate_parameters_values
-from alcor.types import (ParametersValuesType,
-                         NumericType)
+from alcor.services.common import group_output_file_name
+from alcor.types import (GridParametersInfoType,
+                         CSVParametersInfoType)
 from alcor.utils import parse_stars
+from . import grid
 
 logger = logging.getLogger(__name__)
 
 
 def run_simulations(*,
-                    settings: Dict[str, Any],
+                    geometry: str,
+                    precision: int,
+                    grid_parameters_info: GridParametersInfoType,
+                    csv_parameters_info: CSVParametersInfoType,
                     session: Session) -> None:
-    geometry = settings['geometry']
-    precision = settings['precision']
-    parameters_info = settings['parameters']
-
-    for parameters_values in generate_parameters_values(
-            parameters_info=parameters_info,
-            precision=precision,
-            geometry=geometry):
-        group_id = uuid.uuid4()
-        group = Group(id=group_id,
-                      original_id=None)
-
-        parameters = group_parameters(group,
-                                      values=parameters_values)
-
-        output_file_name = generate_output_file_name(group_id=str(group_id))
-
+    for parameters_values in grid.parameters_values(
+            parameters_info=grid_parameters_info,
+            precision=precision):
+        group = Group(id=uuid.uuid4())
+        output_file_name = group_output_file_name(group=group)
         run_simulation(parameters_values=parameters_values,
+                       csv_parameters_info=csv_parameters_info,
                        geometry=geometry,
                        output_file_name=output_file_name)
 
@@ -49,26 +38,22 @@ def run_simulations(*,
                                      group=group))
         os.remove(output_file_name)
 
+        parameters = [Parameter(group_id=group.id,
+                                name=name,
+                                value=str(value))
+                      for name, value in parameters_values.items()]
+
         session.add(group)
         session.add_all(parameters)
         session.add_all(stars)
         session.commit()
 
 
-def group_parameters(group: Group,
-                     *,
-                     values: Dict[str, NumericType]) -> Iterator[Parameter]:
-    for parameter_name, parameter_value in values.items():
-        yield Parameter(group_id=group.id,
-                        name=parameter_name,
-                        value=str(parameter_value))
-
-
-def run_simulation(
-        *,
-        parameters_values: ParametersValuesType,
-        geometry: str,
-        output_file_name: str) -> None:
+def run_simulation(*,
+                   parameters_values: Dict[str, float],
+                   csv_parameters_info: CSVParametersInfoType,
+                   geometry: str,
+                   output_file_name: str) -> None:
     args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
             '-g', parameters_values['galaxy_age'],
@@ -82,26 +67,21 @@ def run_simulation(
     if geometry == 'cones':
         args.extend(['-tdsf', parameters_values['thick_disk_stars_fraction']])
 
-        if isinstance(parameters_values['longitudes'], float):
+        try:
             args.extend(['-cl', parameters_values['longitudes']])
-        else:
-            longitudes_dict = parameters_values['longitudes']
-            args.extend(['-clcsv', os.path.abspath(longitudes_dict['csv']),
-                         '-clcol', longitudes_dict['column']])
+        except KeyError:
+            longitudes_info = csv_parameters_info['longitudes']
+            args.extend(['-clcsv', os.path.abspath(longitudes_info['path']),
+                         '-clcol', longitudes_info['column']])
 
-        if isinstance(parameters_values['latitudes'], float):
-            args.extend(['-cb', parameters_values['longitudes']])
-        else:
-            latitudes_dict = parameters_values['latitudes']
-            args.extend(['-cbcsv', os.path.abspath(latitudes_dict['csv']),
+        try:
+            args.extend(['-cb', parameters_values['latitudes']])
+        except KeyError:
+            latitudes_dict = csv_parameters_info['latitudes']
+            args.extend(['-cbcsv', os.path.abspath(latitudes_dict['path']),
                          '-cbcol', latitudes_dict['column']])
 
     args = list(map(str, args))
     args_str = ' '.join(args)
     logger.info(f'Invoking simulation with command "{args_str}".')
     check_call(args)
-
-
-def generate_output_file_name(group_id: str) -> str:
-    base_name = group_id[:MAX_OUTPUT_FILE_NAME_LENGTH]
-    return ''.join([base_name, OUTPUT_FILE_EXTENSION])

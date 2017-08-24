@@ -67,7 +67,19 @@ def simulate(ctx: click.Context,
         settings = load_settings(settings_path)
         os.chdir(project_dir)
 
-        run_simulations(settings=settings,
+        geometry = settings['geometry']
+        precision = settings['precision']
+        grid_parameters_settings = settings['grid']
+        csv_parameters_settings = settings['csv']
+        csv_parameters_info = {**csv_parameters_settings.get('common', {}),
+                               **csv_parameters_settings.get(geometry, {})}
+        grid_parameters_info = {**grid_parameters_settings.get('common', {}),
+                                **grid_parameters_settings.get(geometry, {})}
+
+        run_simulations(geometry=geometry,
+                        precision=precision,
+                        grid_parameters_info=grid_parameters_info,
+                        csv_parameters_info=csv_parameters_info,
                         session=session)
 
 

@@ -2,15 +2,13 @@ import logging
 from typing import (Callable,
                     List)
 
+from alcor.models import Group
 from alcor.models import Star
 from alcor.types import (BolometricIndexType,
                          StarBolometricIndexType,
                          StarsBinsType)
 
 logger = logging.getLogger(__name__)
-
-OUTPUT_FILE_EXTENSION = '.res'
-MAX_OUTPUT_FILE_NAME_LENGTH = 5
 
 # Motion of the Sun taken with respect to the Local Standard of Rest (LSR)
 # according to (Schönrich R., Binney J., Dehnen W., 2010, MNRAS, 403, 1829)
@@ -25,6 +23,15 @@ FILTRATION_METHODS = ['raw', 'full', 'restricted']
 STARS_SPECTRAL_TYPES = {0: 'DA',
                         1: 'DB',
                         2: 'ONe'}
+
+
+def group_output_file_name(group: Group,
+                           *,
+                           extension='.res',
+                           file_name_length: int = 5) -> str:
+    group_id_str = str(group.id)
+    base_name = group_id_str[:file_name_length]
+    return ''.join([base_name, extension])
 
 
 def bolometric_indexer(*,
@@ -57,9 +64,10 @@ def stars_packer(*,
             if stars_bins_count > index >= 0:
                 res[index].append(star)
             else:
-                logger.warning(f'Bolometric magnitude {star.bolometric_magnitude} '
-                               'is out of bounds '
-                               f'for star with id {star.id}.')
+                logger.warning(
+                    f'Bolometric magnitude {star.bolometric_magnitude} '
+                    'is out of bounds '
+                    f'for star with id {star.id}.')
         return res
 
     return pack_stars
