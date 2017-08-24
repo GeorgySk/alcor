@@ -36,12 +36,12 @@ class StarsCounter(Base):
     def __init__(self,
                  group_id: uuid.UUID,
                  raw: int,
-                 parallax: int,
-                 declination: int,
-                 velocity: int,
-                 proper_motion: int,
-                 reduced_proper_motion: int,
-                 apparent_magnitude: int):
+                 parallax: int = 0,
+                 declination: int = 0,
+                 velocity: int = 0,
+                 proper_motion: int = 0,
+                 reduced_proper_motion: int = 0,
+                 apparent_magnitude: int = 0):
         self.group_id = group_id
         self.raw = raw
         self.parallax = parallax

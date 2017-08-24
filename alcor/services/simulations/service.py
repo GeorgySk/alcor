@@ -1,7 +1,6 @@
 import logging
 import os
 import uuid
-from decimal import Decimal
 from subprocess import check_call
 from typing import (Any,
                     Iterator,
@@ -14,7 +13,8 @@ from alcor.models.simulation import Parameter
 from alcor.services.common import (OUTPUT_FILE_EXTENSION,
                                    MAX_OUTPUT_FILE_NAME_LENGTH)
 from alcor.services.parameters import generate_parameters_values
-from alcor.types import ParametersValuesType
+from alcor.types import (ParametersValuesType,
+                         NumericType)
 from alcor.utils import parse_stars
 
 logger = logging.getLogger(__name__)
@@ -35,8 +35,8 @@ def run_simulations(*,
         group = Group(id=group_id,
                       original_id=None)
 
-        parameters = generate_parameters(values=parameters_values,
-                                         group=group)
+        parameters = group_parameters(group,
+                                      values=parameters_values)
 
         output_file_name = generate_output_file_name(group_id=str(group_id))
 
@@ -55,9 +55,9 @@ def run_simulations(*,
         session.commit()
 
 
-def generate_parameters(*,
-                        values: Dict[str, Decimal],
-                        group: Group) -> Iterator[Parameter]:
+def group_parameters(group: Group,
+                     *,
+                     values: Dict[str, NumericType]) -> Iterator[Parameter]:
     for parameter_name, parameter_value in values.items():
         yield Parameter(group_id=group.id,
                         name=parameter_name,
