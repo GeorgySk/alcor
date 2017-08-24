@@ -47,7 +47,7 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'v_velocity',
                          'w_velocity',
                          'spectral_type',
-                         'disk_belonging']
+                         'galactic_disk_type']
 
 
 class GalacticDiskType(enum.Enum):
@@ -103,8 +103,8 @@ class Star(Base):
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
                            nullable=True)
-    disk_belonging = Column(Enum(GalacticDiskType),
-                            nullable=True)
+    galactic_disk_type = Column(Enum(GalacticDiskType),
+                                nullable=True)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
@@ -130,7 +130,7 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  spectral_type: int = None,
-                 disk_belonging: str = None):
+                 galactic_disk_type: str = None):
         self.group_id = group_id
         self.luminosity = luminosity
         self.proper_motion = proper_motion
@@ -152,7 +152,7 @@ class Star(Base):
         self.v_velocity = v_velocity
         self.w_velocity = w_velocity
         self.spectral_type = spectral_type
-        self.disk_belonging = disk_belonging
+        self.galactic_disk_type = galactic_disk_type
 
     @property
     def bolometric_magnitude(self) -> float:

@@ -64,9 +64,9 @@ def stars_factory(nullable: bool) -> MappedSearchStrategy:
         # w_velocity
         decimals,
         # spectral_type
-        strategies.one_of(*map(strategies.just, STARS_SPECTRAL_TYPES)),
-        # disk_belonging
-        strategies.one_of(*map(strategies.just, GalacticDiskType)))
+        strategies.one_of(map(strategies.just, STARS_SPECTRAL_TYPES)),
+        # galactic_disk_type
+        strategies.one_of(map(strategies.just, GalacticDiskType)))
 
 
 defined_stars = stars_factory(nullable=False)

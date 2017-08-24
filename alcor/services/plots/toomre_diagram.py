@@ -80,11 +80,11 @@ def plot_stars_by_disk(*,
     v_velocities = [float(star.v_velocity)
                     + PECULIAR_SOLAR_VELOCITY_V
                     for star in stars
-                    if star.disk_belonging == galactic_disk]
+                    if star.galactic_disk_type == galactic_disk]
     uw_velocities_square_sums_square_root = [
         sqrt(float(star.u_velocity) ** 2 + float(star.w_velocity) ** 2)
         for star in stars
-        if star.disk_belonging == galactic_disk]
+        if star.galactic_disk_type == galactic_disk]
 
     subplot.scatter(x=v_velocities,
                     y=uw_velocities_square_sums_square_root,
