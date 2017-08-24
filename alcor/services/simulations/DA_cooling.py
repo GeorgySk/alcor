@@ -111,11 +111,11 @@ def read_files(files_paths: List[str],
 
     for file_path_index, file_path in enumerate(files_paths):
         with open(file_path, 'r') as file:
-            filereader = csv.reader(file,
+            csv_reader = csv.reader(file,
                                     delimiter=' ',
                                     skipinitialspace=True)
-            rows_counts[file_path_index] = sum(1 for row in filereader)
-            for row_index, row in enumerate(filereader):
+            rows_counts[file_path_index] = sum(1 for row in csv_reader)
+            for row_index, row in enumerate(csv_reader):
                 luminosity[file_path_index, row_index] = float(row[0])
                 effective_temperature[file_path_index, row_index] = (
                     10. ** float(row[1]))
