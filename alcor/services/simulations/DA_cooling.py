@@ -68,7 +68,7 @@ def initialize_sequences() -> None:
     for metallicity in metallicities_per_thousand:
         fill_by_data_from_files(
             cooling_sequences_by_metallicities[metallicity],
-            filenames=files_names_by_metallicities[metallicity],
+            file_names=files_names_by_metallicities[metallicity],
             fill_type=fill_types_by_metallicities[metallicity])
 
 
@@ -99,16 +99,17 @@ def nan_matrix(shape: Tuple[int, ...]) -> np.ndarray:
 
 
 def fill_by_data_from_files(cooling_sequence: Dict[str, np.ndarray],
-                            filenames: List[str],
+                            file_names: List[str],
                             fill_type: int) -> None:
-    for filename_index, filename in filenames:
-        cooling_time = cooling_sequence['cooling_time']
-        effective_temperature = cooling_sequence['effective_temperature']
-        surface_gravity = cooling_sequence['surface_gravity']
-        luminosity = cooling_sequence['luminosity']
-        pre_wd_lifetime = cooling_sequence['pre_wd_lifetime']
-        rows_counts = cooling_sequence['rows_counts']
+    cooling_time = cooling_sequence['cooling_time']
+    
+    effective_temperature = cooling_sequence['effective_temperature']
+    surface_gravity = cooling_sequence['surface_gravity']
+    luminosity = cooling_sequence['luminosity']
+    pre_wd_lifetime = cooling_sequence['pre_wd_lifetime']
+    rows_counts = cooling_sequence['rows_counts']
 
+    for filename_index, filename in file_names:
         with open(filename, 'r') as file:
             filereader = csv.reader(file,
                                     delimiter=' ',
