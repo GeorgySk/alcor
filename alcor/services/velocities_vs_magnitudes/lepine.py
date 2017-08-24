@@ -18,7 +18,7 @@ from .utils import (STARS_BIN_SIZE,
                     STARS_BINS_COUNT,
                     DEFAULT_VELOCITY_STD,
                     MIN_BOLOMETRIC_MAGNITUDE,
-                    stars_bin_index)
+                    star_bolometric_index)
 
 
 def clouds(stars: List[Star],
@@ -75,7 +75,7 @@ def stars_bins_by_velocities(stars: List[Star]) -> Tuple[StarsBinsType,
     w_stars_bins = [[] for _ in range(STARS_BINS_COUNT)]
 
     for star in stars:
-        index = stars_bin_index(star)
+        index = star_bolometric_index(star)
 
         max_coordinates_modulus = star.max_coordinates_modulus
 

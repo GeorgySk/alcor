@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from numbers import Number
 from typing import (Union,
+                    Callable,
                     Dict,
                     Tuple,
                     List)
@@ -20,3 +21,4 @@ ColumnValueType = Union[int,
                         None]
 ParametersValuesType = Dict[str, Union[NumericType,
                                        Dict[str, Union[str, NumericType]]]]
+BolometricIndexType = Callable[[float], int]

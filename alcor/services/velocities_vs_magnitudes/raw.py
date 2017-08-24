@@ -1,4 +1,3 @@
-import logging
 from statistics import (mean,
                         stdev)
 from typing import (Iterator,
@@ -7,21 +6,18 @@ from typing import (Iterator,
 from alcor.models import (Group,
                           Star)
 from alcor.models.velocities_vs_magnitudes import Bin
-from alcor.types import StarsBinsType
 from .utils import (STARS_BIN_SIZE,
-                    STARS_BINS_COUNT,
                     DEFAULT_VELOCITY_STD,
                     MIN_BOLOMETRIC_MAGNITUDE,
-                    stars_bin_index)
-
-logger = logging.getLogger(__name__)
+                    pack_stars)
 
 
 def bins(*,
          stars: List[Star],
          group: Group) -> Iterator[Bin]:
     group_id = group.id
-    for index, stars_bin in enumerate(stars_bins(stars)):
+    stars_bins = pack_stars(stars)
+    for index, stars_bin in enumerate(stars_bins):
         if not stars_bin:
             continue
 
@@ -52,15 +48,3 @@ def bins(*,
                   u_velocity_std=u_velocity_std,
                   v_velocity_std=v_velocity_std,
                   w_velocity_std=w_velocity_std)
-
-
-def stars_bins(stars: List[Star]) -> StarsBinsType:
-    res = [[] for _ in range(STARS_BINS_COUNT)]
-    for star in stars:
-        index = stars_bin_index(star)
-        if STARS_BINS_COUNT > index >= 0:
-            res[index].append(star)
-        else:
-            logger.warning('Magnitude is out of bounds: '
-                           f'{star.bolometric_magnitude}')
-    return res
