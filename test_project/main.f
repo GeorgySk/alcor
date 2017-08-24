@@ -308,7 +308,7 @@ C     TODO: add choosing what output we want to get
      &                  'v_velocity ',
      &                  'w_velocity ',
      &                  'spectral_type ',
-     &                  'disk_belonging'
+     &                  'galactic_disk_type'
       else if (geometry == 'cones') then
           write(421, *) 'u_velocity ',
      &                  'v_velocity ',
@@ -321,7 +321,7 @@ C     TODO: add choosing what output we want to get
      &                  'ugriz_gr ',
      &                  'ugriz_ri ',
      &                  'ugriz_iz ',
-     &                  'disk_belonging ',
+     &                  'galactic_disk_type ',
      &                  'spectral_type'
       end if
       close(421)
