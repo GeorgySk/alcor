@@ -65,11 +65,11 @@ def initialize_sequences() -> None:
                                    30: 2,
                                    60: 2}
 
-    for metallicity in metallicities_per_thousand:
+    for metallicity, fill_type in fill_types_by_metallicities.items():
         read_files(
             files_paths=files_names_by_metallicities[metallicity],
             cooling_sequence=cooling_sequences_by_metallicities[metallicity],
-            fill_type=fill_types_by_metallicities[metallicity])
+            fill_type=fill_type)
 
 
 def metallicities_cooling_sequences(
