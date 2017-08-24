@@ -9,7 +9,7 @@ import numpy as np
 
 def initialize_sequences() -> None:
     # Metallicities were multiplied by 1000 in order to keep dict.keys as ints
-    files_names_by_metallicities = {1: ['wd0505_z0001.trk',
+    files_paths_by_metallicities = {1: ['wd0505_z0001.trk',
                                         'wd0553_z0001.trk',
                                         'wd0593_z0001.trk',
                                         'wd0627_z0001.trk',
@@ -52,34 +52,32 @@ def initialize_sequences() -> None:
               np.array([0.524, 0.570, 0.593, 0.609,
                         0.632, 0.659, 0.705, 1.000])]
     pre_wd_lifetimes = [
-        np.zeros(len(files_names_by_metallicities[1])),
-        np.zeros(len(files_names_by_metallicities[10])),
+        np.zeros(len(files_paths_by_metallicities[1])),
+        np.zeros(len(files_paths_by_metallicities[10])),
         np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892, 0.7422, 0.4431, 0.0]),
         np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892, 0.7422, 0.4431, 0.0])]
 
     cooling_sequences_by_metallicities = dict(metallicities_cooling_sequences(
         metallicities_per_thousand,
-        files_names_by_metallicities,
+        files_paths_by_metallicities,
         masses,
         pre_wd_lifetimes))
 
-    fill_by_data_from_files(cooling_sequences_by_metallicities[1],
-                            filenames=files_names_by_metallicities[1],
-                            fill_type=1)
-    fill_by_data_from_files(cooling_sequences_by_metallicities[10],
-                            filenames=files_names_by_metallicities[10],
-                            fill_type=1)
-    fill_by_data_from_files(cooling_sequences_by_metallicities[30],
-                            filenames=files_names_by_metallicities[30],
-                            fill_type=2)
-    fill_by_data_from_files(cooling_sequences_by_metallicities[60],
-                            filenames=files_names_by_metallicities[60],
-                            fill_type=2)
+    fill_types_by_metallicities = {1: 1,
+                                   10: 1,
+                                   30: 2,
+                                   60: 2}
+
+    for metallicity, fill_type in fill_types_by_metallicities.items():
+        read_files(
+            files_paths=files_paths_by_metallicities[metallicity],
+            cooling_sequence=cooling_sequences_by_metallicities[metallicity],
+            fill_type=fill_type)
 
 
 def metallicities_cooling_sequences(
         metallicities: List[int],
-        files_names_by_metallicities: Dict[int, List[str]],
+        files_paths_by_metallicities: Dict[int, List[str]],
         masses: List[np.ndarray],
         pre_wd_lifetimes: List[np.ndarray],
         columns_count: int = 650
@@ -87,7 +85,7 @@ def metallicities_cooling_sequences(
     for metallicity, mass, pre_wd_lifetime in zip(metallicities,
                                                   masses,
                                                   pre_wd_lifetimes):
-        files_count = len(files_names_by_metallicities[metallicity])
+        files_count = len(files_paths_by_metallicities[metallicity])
         shape = (files_count, columns_count)
         cooling_sequence = dict(mass=mass,
                                 pre_wd_lifetime=pre_wd_lifetime,
@@ -103,32 +101,35 @@ def nan_matrix(shape: Tuple[int, ...]) -> np.ndarray:
     return np.full(shape, np.nan)
 
 
-def fill_by_data_from_files(sequence: Dict[str, np.ndarray],
-                            filenames: List[str],
-                            fill_type: int) -> None:
-    for filename_index, filename in filenames:
-        cooling_time = sequence['cooling_time']
-        effective_temperature = sequence['effective_temperature']
-        surface_gravity = sequence['surface_gravity']
-        luminosity = sequence['luminosity']
-        pre_wd_lifetime = sequence['pre_wd_lifetime']
-        rows_counts = sequence['rows_counts']
+def read_files(files_paths: List[str],
+               cooling_sequence: Dict[str, np.ndarray],
+               fill_type: int) -> None:
+    cooling_time = cooling_sequence['cooling_time']
 
-        with open(filename, 'r') as file:
-            filereader = csv.reader(file,
+    effective_temperature = cooling_sequence['effective_temperature']
+    surface_gravity = cooling_sequence['surface_gravity']
+    luminosity = cooling_sequence['luminosity']
+    pre_wd_lifetime = cooling_sequence['pre_wd_lifetime']
+    rows_counts = cooling_sequence['rows_counts']
+
+    for file_path_index, file_path in enumerate(files_paths):
+        with open(file_path, 'r') as file:
+            csv_reader = csv.reader(file,
                                     delimiter=' ',
                                     skipinitialspace=True)
-            rows_counts[filename_index] = sum(1 for row in filereader)
-            for row_index, row in enumerate(filereader):
-                luminosity[filename_index, row_index] = float(row[0])
-                effective_temperature[filename_index, row_index] = (
+            rows_counts[file_path_index] = sum(1 for row in csv_reader)
+            for row_index, row in enumerate(csv_reader):
+                luminosity[file_path_index, row_index] = float(row[0])
+                effective_temperature[file_path_index, row_index] = (
                     10. ** float(row[1]))
                 if fill_type == 1:
-                    cooling_time[filename_index, row_index] = (float(row[5])
-                                                               / 1000.0)
-                    surface_gravity[filename_index, row_index] = float(row[11])
+                    cooling_time[file_path_index, row_index] = (float(row[5])
+                                                                / 1000.0)
+                    surface_gravity[file_path_index, row_index] = float(
+                        row[11])
                 if fill_type == 2:
-                    cooling_time[filename_index, row_index] = (
+                    cooling_time[file_path_index, row_index] = (
                         10. ** float(row[8]) / 1000.
-                        - pre_wd_lifetime[filename_index])
-                    surface_gravity[filename_index, row_index] = float(row[22])
+                        - pre_wd_lifetime[file_path_index])
+                    surface_gravity[file_path_index, row_index] = float(
+                        row[22])
