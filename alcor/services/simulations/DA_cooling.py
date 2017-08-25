@@ -1,4 +1,5 @@
 import csv
+import os
 from typing import (Iterator,
                     Dict,
                     Tuple,
@@ -6,8 +7,11 @@ from typing import (Iterator,
 
 import numpy as np
 
+from alcor.types import CoolingSequencesType
 
-def initialize_sequences() -> None:
+
+def initialize_sequences(rows_count: int = 650
+                         ) -> CoolingSequencesType:
     # Metallicities were multiplied by 1000 in order to keep dict.keys as ints
     files_paths_by_metallicities = {1: ['wd0505_z0001.trk',
                                         'wd0553_z0001.trk',
@@ -42,6 +46,19 @@ def initialize_sequences() -> None:
                                          '0659_006_sflhdiff.trk',
                                          '0705_006_sflhdiff.trk',
                                          '1000_006_sflhdiff.trk']}
+    folders_paths_by_metallicities = {
+        1:  './da_cooling_tables/Z0001',
+        10: './da_cooling_tables/Z001',
+        30: './da_cooling_tables/Z003',
+        60: './da_cooling_tables/Z006'}
+
+    base_dir = os.path.dirname(__file__)
+
+    for metallicity, folder_path in folders_paths_by_metallicities.items():
+        files_paths = files_paths_by_metallicities[metallicity]
+        files_paths_by_metallicities[metallicity] = [
+            os.path.join(base_dir, folder_path, file_path)
+            for file_path in files_paths]
 
     metallicities_per_thousand = [1, 10, 30, 60]
     masses = [np.array([0.505, 0.553, 0.593, 0.627, 0.660, 0.692, 0.863]),
@@ -61,7 +78,8 @@ def initialize_sequences() -> None:
         metallicities_per_thousand,
         files_paths_by_metallicities,
         masses,
-        pre_wd_lifetimes))
+        pre_wd_lifetimes,
+        rows_count))
 
     fill_types_by_metallicities = {1: 1,
                                    10: 1,
@@ -72,7 +90,10 @@ def initialize_sequences() -> None:
         read_files(
             files_paths=files_paths_by_metallicities[metallicity],
             cooling_sequence=cooling_sequences_by_metallicities[metallicity],
-            fill_type=fill_type)
+            fill_type=fill_type,
+            max_rows=rows_count)
+
+    return cooling_sequences_by_metallicities
 
 
 def metallicities_cooling_sequences(
@@ -80,20 +101,20 @@ def metallicities_cooling_sequences(
         files_paths_by_metallicities: Dict[int, List[str]],
         masses: List[np.ndarray],
         pre_wd_lifetimes: List[np.ndarray],
-        columns_count: int = 650
+        rows_count: int
         ) -> Iterator[Tuple[int, Dict[str, np.ndarray]]]:
     for metallicity, mass, pre_wd_lifetime in zip(metallicities,
                                                   masses,
                                                   pre_wd_lifetimes):
         files_count = len(files_paths_by_metallicities[metallicity])
-        shape = (files_count, columns_count)
+        shape = (files_count, rows_count)
         cooling_sequence = dict(mass=mass,
                                 pre_wd_lifetime=pre_wd_lifetime,
                                 cooling_time=nan_matrix(shape),
                                 effective_temperature=nan_matrix(shape),
                                 surface_gravity=nan_matrix(shape),
                                 luminosity=nan_matrix(shape),
-                                rows_counts=np.empty(files_count))
+                                rows_counts=np.empty(files_count, dtype='i'))
         yield metallicity, cooling_sequence
 
 
@@ -103,9 +124,9 @@ def nan_matrix(shape: Tuple[int, ...]) -> np.ndarray:
 
 def read_files(files_paths: List[str],
                cooling_sequence: Dict[str, np.ndarray],
-               fill_type: int) -> None:
+               fill_type: int,
+               max_rows: int) -> None:
     cooling_time = cooling_sequence['cooling_time']
-
     effective_temperature = cooling_sequence['effective_temperature']
     surface_gravity = cooling_sequence['surface_gravity']
     luminosity = cooling_sequence['luminosity']
@@ -117,13 +138,16 @@ def read_files(files_paths: List[str],
             csv_reader = csv.reader(file,
                                     delimiter=' ',
                                     skipinitialspace=True)
-            rows_counts[file_path_index] = sum(1 for row in csv_reader)
             for row_index, row in enumerate(csv_reader):
+                if row_index == max_rows:
+                    break
+                # In Fortran indexation starts from 1
+                rows_counts[file_path_index] = row_index + 1
                 luminosity[file_path_index, row_index] = float(row[0])
                 effective_temperature[file_path_index, row_index] = (
                     10. ** float(row[1]))
                 if fill_type == 1:
-                    cooling_time[file_path_index, row_index] = (float(row[5])
+                    cooling_time[file_path_index, row_index] = (float(row[4])
                                                                 / 1000.0)
                     surface_gravity[file_path_index, row_index] = float(
                         row[11])
