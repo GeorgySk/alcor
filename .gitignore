@@ -42,3 +42,6 @@ main.e
 *.res
 *.csv
 *.html
+
+# inputs
+*.trk
