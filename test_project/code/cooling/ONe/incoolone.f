@@ -58,15 +58,24 @@ C     Reading the files
 C         TODO: find out the way to avoid using end-goto
           read(file_unit, *, end=2) a1, a2, a3, a4, a5, a6, a7, a8, a9,
      &                              a10, a11, a12, a13
+C         luminosity
           ltabone(i, j) = a1
+C         apparent V from UBVRI
           mvtabone(i, j) = a12
+C         log cooling time
           lgtabone(i, j) = a13
+C         log effective temperature
           lgtetabone(i, j) = a2
+C         B - V from UBVRI
           bvtabone(i, j) = a3
+C         V - I from UBVRI
           vitabone(i, j) = a9
+C         V - R from UBVRI
           vrtabone(i, j) = a4
+C         U - V from UBVRI
           uvtabone(i, j) = a10
         end do      
+C       rows count
 2       ndatsONE(i) = j - 1  
         file_unit = file_unit + 1
       end do
@@ -81,10 +90,13 @@ C         Converting radii in cm to radii in solar radius
           a3 = 10.0 ** a3
           a3 = a3 / (6.96e10)
           a3 = log10(a3)
+C         log surface gravity?
           lgrtabone(i, j) = a3
+C         log cooling time
           lgt2tabone(i, j) = a5 
         end do      
-3       continue       
+3       continue   
+C       rows count    
         ndatsONE2(i) = j - 1  
         file_unit = file_unit + 1
       end do
