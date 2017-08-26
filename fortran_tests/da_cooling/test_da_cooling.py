@@ -4,7 +4,7 @@ from typing import (Union,
 
 import numpy as np
 
-from alcor.services.simulations.DA_cooling import initialize_sequences
+from alcor.services.simulations.da_cooling import initialize_sequences
 import da_cooling
 
 from alcor.types import CoolingSequencesType
