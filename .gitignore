@@ -42,3 +42,9 @@ main.e
 *.res
 *.csv
 *.html
+
+# inputs
+*.out
+*.dat
+*.trk
+*.seq
