@@ -43,7 +43,7 @@ def initialize_sequences(rows_count: int = 300
     shape = (files_count, rows_count)
     color_table = dict(mass=color_masses,
                        luminosity=nan_matrix(shape),
-                       v_ubvri_apparent=nan_matrix(shape),
+                       v_ubvri_absolute=nan_matrix(shape),
                        log_cooling_time=nan_matrix(shape),
                        log_effective_temperature=nan_matrix(shape),
                        bv_ubvri=nan_matrix(shape),
@@ -58,7 +58,8 @@ def initialize_sequences(rows_count: int = 300
 
     files_count = len(cooling_tables_files_paths)
     shape = (files_count, rows_count)
-    cooling_table = dict(log_surface_gravity=nan_matrix(shape),
+    cooling_table = dict(mass=cooling_masses,
+                         log_surface_gravity=nan_matrix(shape),
                          log_cooling_time=nan_matrix(shape),
                          rows_counts=np.empty(files_count, dtype='i'))
     read_cooling_files(
@@ -75,7 +76,7 @@ def read_color_files(files_paths: List[str],
                      cooling_sequence: Dict[str, np.ndarray],
                      max_rows: int) -> None:
     luminosity = cooling_sequence['luminosity']
-    v_ubvri_apparent = cooling_sequence['v_ubvri_apparent ']
+    v_ubvri_absolute = cooling_sequence['v_ubvri_absolute']
     log_cooling_time = cooling_sequence['log_cooling_time']
     log_effective_temperature = cooling_sequence['log_effective_temperature']
     bv_ubvri = cooling_sequence['bv_ubvri']
@@ -95,7 +96,7 @@ def read_color_files(files_paths: List[str],
                 # In Fortran indexation starts from 1
                 rows_counts[file_path_index] = row_index + 1
                 luminosity[file_path_index, row_index] = float(row[0])
-                v_ubvri_apparent[file_path_index, row_index] = float(row[11])
+                v_ubvri_absolute[file_path_index, row_index] = float(row[11])
                 log_cooling_time[file_path_index, row_index] = float(row[12])
                 log_effective_temperature[file_path_index, row_index] = float(
                     row[1])
