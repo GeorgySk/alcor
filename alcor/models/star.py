@@ -135,7 +135,7 @@ class Star(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 group_id: uuid.UUID = None,
                  mass: float = None,
                  luminosity: float = None,
                  proper_motion: float = None,
