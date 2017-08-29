@@ -7,4 +7,3 @@ GridParametersInfoType = Dict[str, Union[NumericType,
 CSVParametersInfoType = Dict[str, Dict[str, Union[str, int]]]
 ParametersValuesType = Dict[str, Union[NumericType,
                                        Dict[str, Union[str, NumericType]]]]
-CoolingSequenceType = Dict[float, Dict[str, np.ndarray]]
