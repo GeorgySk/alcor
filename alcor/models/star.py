@@ -49,6 +49,12 @@ class GalacticDiskType(enum.IntEnum):
     halo = 3
 
 
+class SpectralTypeEnum(enum.Enum):
+    DA = 0
+    DB = 1
+    ONe = 2
+
+
 class Star(Base):
     __tablename__ = 'stars'
 
@@ -106,8 +112,7 @@ class Star(Base):
                         nullable=True)
     birth_time = Column(Float(),
                         nullable=True)
-    # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
-    spectral_type = Column(Integer(),
+    spectral_type = Column(Enum(SpectralTypeEnum),
                            nullable=True)
     galactic_disk_type = Column(Enum(GalacticDiskType),
                                 nullable=True)
@@ -141,7 +146,7 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
-                 spectral_type: int = None,
+                 spectral_type: enum.Enum = None,
                  galactic_disk_type: GalacticDiskType = None):
         self.id = None
         self.group_id = group_id
