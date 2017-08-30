@@ -1,20 +1,23 @@
-from typing import List
+from typing import (Iterator,
+                    List)
 
 import numpy as np
 
-from alcor.models.star import Star
+from alcor.models import Star
 
 
 def get_white_dwarfs(stars: List[Star],
                      thin_disk_age: float,
-                     ifmr_parameter: float) -> List[Star]:
-    white_dwarfs = []
+                     ifmr_parameter: float,
+                     chandrasekhar_limit: float = 1.4,
+                     max_mass: float = 10.5,
+                     solar_metallicity: float = 0.01) -> Iterator[Star]:
 
     for star in stars:
-        if star.progenitor_mass <= 10.5:
+        if star.progenitor_mass <= max_mass:
             end_evolution_star = Star()
 
-            end_evolution_star.metallicity = 0.01
+            end_evolution_star.metallicity = solar_metallicity
 
             main_sequence_lifetime = get_main_sequence_life_time(
                 mass=star.progenitor_mass,
@@ -27,10 +30,8 @@ def get_white_dwarfs(stars: List[Star],
                 end_evolution_star.mass = (get_wd_mass(star.progenitor_mass)
                                            * ifmr_parameter)
 
-            if end_evolution_star.mass <= 1.4:
-                white_dwarfs.append(end_evolution_star)
-
-    return white_dwarfs
+            if end_evolution_star.mass <= chandrasekhar_limit:
+                yield end_evolution_star
 
 
 # According to model by Leandro & Renedo et al.(2010)
