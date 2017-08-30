@@ -1,15 +1,21 @@
+from math import (sqrt,
+                  pi,
+                  sin,
+                  cos,
+                  asin,
+                  acos,
+                  atan)
 from typing import List
-
-import numpy as np
 
 from alcor.models.star import Star
 
 
+# TODO: find out the meaning of parameters
 def calculate_coordinates(stars: List[Star],
                           solar_galactocentric_distance: float,
-                          deltag: float = 0.478,  # TODO: what is deltag?
-                          theta: float = 2.147,  # TODO: what is theta?
-                          alphag: float = 3.35  # TODO: what is alphag
+                          deltag: float = 0.478,
+                          theta: float = 2.147,
+                          alphag: float = 3.35
                           ) -> None:
     for star in stars:
         # TODO: give shorter name
@@ -17,39 +23,39 @@ def calculate_coordinates(stars: List[Star],
             opposite_triangle_side(solar_galactocentric_distance,
                                    star.r_cylindric_coordinate,
                                    star.th_cylindric_coordinate))
-        star.galactic_distance = np.sqrt(
+        star.galactic_distance = sqrt(
             stellar_galactocentric_distance_plane_projection ** 2
             + star.z_coordinate ** 2)
 
         # TODO: implement function
-        star.galactic_longitude = np.arccos(
+        star.galactic_longitude = acos(
             (solar_galactocentric_distance ** 2
              + stellar_galactocentric_distance_plane_projection ** 2
              - star.r_cylindric_coordinate ** 2)
             / (2. * stellar_galactocentric_distance_plane_projection
                * solar_galactocentric_distance))
 
-        if (star.r_cylindric_coordinate * np.cos(star.th_cylindric_coordinate)
+        if (star.r_cylindric_coordinate * cos(star.th_cylindric_coordinate)
                 > solar_galactocentric_distance):
-            star.galactic_longitude = np.pi - star.galactic_longitude
-        elif np.sin(star.th_cylindric_coordinate) < 0.:
-            star.galactic_longitude += 2. * np.pi
+            star.galactic_longitude = pi - star.galactic_longitude
+        elif sin(star.th_cylindric_coordinate) < 0.:
+            star.galactic_longitude += 2. * pi
 
-        if star.galactic_longitude > 2. * np.pi:
-            star.galactic_longitude -= 2. * np.pi
+        if star.galactic_longitude > 2. * pi:
+            star.galactic_longitude -= 2. * pi
 
         # TODO: or use arctan2
-        star.galactic_latitude = np.arctan(
-            np.abs(star.z_coordinate
-                   / stellar_galactocentric_distance_plane_projection))
+        star.galactic_latitude = atan(
+            abs(star.z_coordinate
+                / stellar_galactocentric_distance_plane_projection))
 
         if star.z_coordinate < 0.:
             star.galactic_latitude = -star.galactic_latitude
 
-        sin_longitude = np.sin(star.galactic_longitude)
-        cos_longitude = np.cos(star.galactic_longitude)
-        sin_latitude = np.sin(star.galactic_latitude)
-        cos_latitude = np.cos(star.galactic_latitude)
+        sin_longitude = sin(star.galactic_longitude)
+        cos_longitude = cos(star.galactic_longitude)
+        sin_latitude = sin(star.galactic_latitude)
+        cos_latitude = cos(star.galactic_latitude)
 
         # TODO: what is this?
         zkri = 1. / (4.74E3 * star.galactic_distance)
@@ -66,37 +72,37 @@ def calculate_coordinates(stars: List[Star],
             (cos_latitude * cos_longitude * star.u_velocity)
             + (cos_latitude * sin_latitude * star.v_velocity)
             + (sin_latitude * star.w_velocity))
-        star.proper_motion = np.sqrt(star.proper_motion_component_l ** 2
-                                     + star.proper_motion_component_b ** 2)
+        star.proper_motion = sqrt(star.proper_motion_component_l ** 2
+                                  + star.proper_motion_component_b ** 2)
 
-        star.declination = (np.arcsin(np.sin(deltag) * sin_latitude
-                            + np.cos(deltag) * cos_latitude
-                              * np.cos(theta - star.galactic_longitude)))
+        star.declination = (asin(sin(deltag) * sin_latitude
+                            + cos(deltag) * cos_latitude
+                              * cos(theta - star.galactic_longitude)))
 
         # TODO: what is xs and xc?
-        xs = ((cos_latitude * np.sin(theta - star.galactic_longitude))
-              / np.cos(star.declination))
-        xc = ((np.cos(deltag) * sin_latitude - np.sin(deltag) * cos_latitude
-               * np.cos(theta - star.galactic_longitude))
-              / np.cos(star.declination))
+        xs = ((cos_latitude * sin(theta - star.galactic_longitude))
+              / cos(star.declination))
+        xc = ((cos(deltag) * sin_latitude - sin(deltag) * cos_latitude
+               * cos(theta - star.galactic_longitude))
+              / cos(star.declination))
 
         if xs >= 0.:
             if xc >= 0.:
-                star.right_ascension = np.arcsin(xs) + alphag
+                star.right_ascension = asin(xs) + alphag
             else:
-                star.right_ascension = np.arccos(xc) + alphag
+                star.right_ascension = acos(xc) + alphag
         else:
             if xc < 0.:
-                star.right_ascension = np.pi - np.arcsin(xs) + alphag
+                star.right_ascension = pi - asin(xs) + alphag
             else:
-                star.right_ascension = 2. * np.pi + np.arcsin(xs) + alphag
+                star.right_ascension = 2. * pi + asin(xs) + alphag
 
-        if star.right_ascension > 2. * np.pi:
-            star.right_ascension -= 2. * np.pi
+        if star.right_ascension > 2. * pi:
+            star.right_ascension -= 2. * pi
 
 
-def opposite_triangle_side(adjacent_1: float,
-                           adjacent_2: float,
+def opposite_triangle_side(adjacent: float,
+                           other_adjacent: float,
                            enclosed_angle: float) -> float:
-    return np.sqrt(adjacent_1 ** 2 + adjacent_2 ** 2
-                   - 2. * adjacent_1 * adjacent_2 * np.cos(enclosed_angle))
+    return sqrt(adjacent ** 2 + other_adjacent ** 2
+                - 2. * adjacent * other_adjacent * cos(enclosed_angle))
