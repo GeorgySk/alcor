@@ -37,11 +37,14 @@ def initialize_sequences(rows_count: int = 300
         for file_path in cooling_tables_files_paths]
 
     color_masses = [np.array([1.06, 1.10, 1.16, 1.20, 1.24, 1.28])]
+    color_pre_wd_lifetimes = [np.zeros(len(color_tables_files_paths))]
     cooling_masses = [np.array([1.06, 1.10, 1.16, 1.20, 1.28])]
+    cooling_pre_wd_lifetimes = [np.zeros(len(cooling_tables_files_paths))]
 
     files_count = len(color_tables_files_paths)
     shape = (files_count, rows_count)
     color_table = dict(mass=color_masses,
+                       pre_wd_lifetimes=color_pre_wd_lifetimes,
                        luminosity=nan_matrix(shape),
                        v_ubvri_absolute=nan_matrix(shape),
                        log_cooling_time=nan_matrix(shape),
@@ -59,6 +62,7 @@ def initialize_sequences(rows_count: int = 300
     files_count = len(cooling_tables_files_paths)
     shape = (files_count, rows_count)
     cooling_table = dict(mass=cooling_masses,
+                         pre_wd_lifetimes=cooling_pre_wd_lifetimes,
                          log_surface_gravity=nan_matrix(shape),
                          log_cooling_time=nan_matrix(shape),
                          rows_counts=np.empty(files_count, dtype='i'))
