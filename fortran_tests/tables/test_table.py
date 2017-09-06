@@ -2,21 +2,20 @@ from math import isclose
 from typing import (Union,
                     Tuple)
 
-import numpy as np
-
-from alcor.services.simulations.da_cooling import initialize_sequences
-import da_cooling
-
+from alcor.services.simulations import table
 from alcor.types import CoolingSequencesType
 
+import numpy as np
 
-def test_initialize_sequences() -> None:
-    cooling_sequences_by_python = initialize_sequences()
+import da_cooling
 
-    cooling_sequences_by_fortran = read_sequences_from_fortran()
 
-    assert values_are_close(cooling_sequences_by_python,
-                            cooling_sequences_by_fortran)
+def test_table() -> None:
+    da_cooling_table_by_python = table.read(table_name='da_cooling')
+    da_cooling_table_by_fortran = read_sequences_from_fortran()
+
+    assert values_are_close(da_cooling_table_by_python,
+                            da_cooling_table_by_fortran)
 
 
 def read_sequences_from_fortran(rows_count: int = 650

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+f2py -c ./fortran_tests/tables/da_cooling.f90 -m da_cooling
+cp ./fortran_tests/tables/fort_files/fort.* .
+
+python3 setup.py test
+
+rm *.so
+rm fort.*
