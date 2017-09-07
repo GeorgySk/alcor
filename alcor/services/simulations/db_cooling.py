@@ -46,7 +46,9 @@ FILL_TYPES_BY_METALLICITIES = {1: 0,
                                60: 0}
 
 
-def convert_effective_temperature(value: str) -> float:
+def convert_effective_temperature(value: str,
+                                  fill_type: int,
+                                  pre_wd_lifetime: float) -> float:
     return 10. ** float(value)
 
 
@@ -58,9 +60,9 @@ def convert_cooling_time(value: str,
     elif fill_type == 1:
         return float(value)
 
-SEQUENCE_FILL_RULES = {'luminosity': {'column': 0},
+SEQUENCE_FILL_RULES = {'luminosity': {'column': [0, 0]},
                        'effective_temperature': {
-                           'column': 1,
+                           'column': [1, 1],
                            'converting_method': convert_effective_temperature},
                        'cooling_time': {
                            'column': [8, 2],

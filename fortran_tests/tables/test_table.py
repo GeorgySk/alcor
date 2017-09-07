@@ -17,6 +17,8 @@ def test_table() -> None:
     assert values_are_close(da_cooling_table_by_python,
                             da_cooling_table_by_fortran)
 
+    db_cooling_table_by_python = table.read(table_name='db_cooling')
+
 
 def read_sequences_from_fortran(rows_count: int = 650
                                 ) -> CoolingSequencesType:
