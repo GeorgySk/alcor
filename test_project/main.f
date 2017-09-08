@@ -28,10 +28,6 @@ C     intrinsic and must be defined in program
       real ran
 
 C     ---  Variables description ---
-C     minimumSectorRadius - min radius of the sector of considered stars
-C     maximumSectorRadius - max radius of the sector of considered stars
-C     angleCoveringSector - angle in degrees, which covers the sector
-C     radiusOfSector: radius (kpc) of the sector centered at Sun
 C     galacticDiskAge (Gyr)
 C     parameterOfSFR (taus): Y=exp(-t/taus)
 C     solarGalactocentricDistance: distance from Sun to Galaxy center;
@@ -40,18 +36,11 @@ C     Initial-to-Final Mass Relation (IFMR) :
 C         mfinal_new=parameterIFMR*mfinal_old
       integer numberOfStars
       real galacticDiskAge,parameterOfSFR,
-     &                 minimumSectorRadius,
-     &                 maximumSectorRadius,angleCoveringSector,
-     &                 parameterIMF,radiusOfSector,scaleLength,
+     &                 parameterIMF,scaleLength,
      &                 areaOfSector,pi
       double precision :: solarGalactocentricDistance
       parameter (numberOfStars=6000000)
       parameter (solarGalactocentricDistance=8.5d0)
-      parameter (minimumSectorRadius=8.45)
-      parameter (maximumSectorRadius=8.55)
-      parameter (angleCoveringSector=0.674)
-C     TODO: find out if we need this variable or min/max sector radii
-      parameter (radiusOfSector=0.050)
       parameter (parameterOfSFR=25.0)
       parameter (scaleLength=3.5)
       integer i,j,k,ISEED1,ISEED2,iseed,numberOfStarsInSample
@@ -208,9 +197,7 @@ C           call get_command_argument(i, args(i))
       write(6,*) 'numberOfStars=    ',numberOfStars
       write(6,*) 'SFR: parameterOfSFR=',parameterOfSFR,'Gyr'
       write(6,*) 'galacticDiskAge=    ',galacticDiskAge,'Gyr'
-      write(6,*) 'minimumSectorRadius=',minimumSectorRadius,'kpc' 
-      write(6,*) 'maximumSectorRadius=',maximumSectorRadius,'kpc'
-      write(6,*) 'radiusOfSector=     ',radiusOfSector,'kpc'
+      write(6,*) 'area radius=        ',radius,'kpc'
       write(6,*) ' '
       write(6,*) '=========================================='
       write(6,*) ' '
@@ -250,7 +237,7 @@ C     ---  Calculating the area of the sector  ---
 C ======================================================================
 C     This style ensures maximum precision when assigning a value to PI.
       pi=4.0*atan(1.0)
-      areaOfSector=pi*radiusOfSector**2
+      areaOfSector=pi*radius**2
 
 C     ---  Program itself  ---
 C ======================================================================
@@ -370,9 +357,8 @@ C         converting cone height parameters from deg to rad
           ! if cone then we already calculated them
           if (geometry == 'sphere') then
               write(6,*) '4. Calculating polar coordinates (4/9)'
-              call polar(iseed,minimumSectorRadius,maximumSectorRadius,
-     &                   angleCoveringSector,radiusOfSector,
-     &                   solarGalactocentricDistance,scaleLength)
+              call polar(iseed, radius,
+     &                   solarGalactocentricDistance, scaleLength)
           end if
 
           write(6,*) '5. Generating heliocentric velocities (5/9)'

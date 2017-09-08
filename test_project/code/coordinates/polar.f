@@ -1,15 +1,7 @@
       subroutine polar(iseed,
-     &                 minimum_sector_radius,
-     &                 maximum_sector_radius,
-     &                 angle_covering_sector,
      &                 sector_radius,
      &                 solar_galactocentric_distance,
      &                 scale_length)
-C     minimum_sector_radius: minimum radius of the sector; in Kpc from 
-C                            the Galactic Center (GC)
-C     maximum_sector_radius: maximum radius
-C     angle_covering_sector: angle covering the sector in degrees;
-C                            from the GC
 C     solar_galactocentric_distance: galactocentric distance of the Sun
       implicit none
 
@@ -29,7 +21,6 @@ C     TODO: this is numberOfStars, take it up as const for all functions
      &        angle_covering_sector,
      &        sector_radius,
      &        scale_length,
-     &        angle_covering_sector_in_radians,
      &        squared_sector_radius,
      &        dist,
      &        squared_minimum_sector_radius,
@@ -62,13 +53,19 @@ C     TODO: find out what reference frame is used for x, y
      &               numberOfWDs,
      &               disk_belonging
 
+      minimum_sector_radius = real(solar_galactocentric_distance) 
+     &                        - sector_radius
+      maximum_sector_radius = real(solar_galactocentric_distance) 
+     &                        + sector_radius
+      angle_covering_sector = 2. * asin(
+     &    sector_radius / real(solar_galactocentric_distance))
+
+
       squared_sector_radius = sector_radius * sector_radius
       
 C     Calculating the angle in the sector
 C     -angle_covering_sector / 2 and +angle_covering_sector / 2 degrees
 C     and radius between minimum_sector_radius and maximum_sector_radius
-      angle_covering_sector_in_radians = angle_covering_sector 
-     &                                   * PI / 180.0
       squared_maximum_sector_radius = maximum_sector_radius 
      &                                * maximum_sector_radius
       squared_minimum_sector_radius = minimum_sector_radius 
@@ -80,8 +77,8 @@ C     and radius between minimum_sector_radius and maximum_sector_radius
       do wd_index = 1, numberOfWDs
           do
               coordinate_Theta(wd_index) = (
-     &            angle_covering_sector_in_radians
-     &            * ran(iseed) - angle_covering_sector_in_radians / 2)
+     &            angle_covering_sector * ran(iseed) 
+     &            - angle_covering_sector / 2)
               
               if (coordinate_Theta(wd_index) < 0.0) then
                   coordinate_Theta(wd_index) = (
