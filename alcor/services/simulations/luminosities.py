@@ -12,26 +12,27 @@ def get_white_dwarfs(stars: List[Star],
                      chandrasekhar_limit: float = 1.4,
                      max_mass: float = 10.5,
                      solar_metallicity: float = 0.01) -> Iterator[Star]:
-
     for star in stars:
-        if star.progenitor_mass <= max_mass:
-            end_evolution_star = Star()
+        if star.progenitor_mass > max_mass:
+            continue
 
-            end_evolution_star.metallicity = solar_metallicity
+        end_evolution_star = Star()
 
-            main_sequence_lifetime = get_main_sequence_life_time(
-                mass=star.progenitor_mass,
-                metallicity=end_evolution_star.metallicity)
-            # FIXME: this is only for thin disk stars
-            end_evolution_star.cooling_time = (thin_disk_age - star.birth_time
-                                               - main_sequence_lifetime)
+        end_evolution_star.metallicity = solar_metallicity
 
-            if end_evolution_star.cooling_time > 0.:
-                end_evolution_star.mass = (get_wd_mass(star.progenitor_mass)
-                                           * ifmr_parameter)
+        main_sequence_lifetime = get_main_sequence_life_time(
+            mass=star.progenitor_mass,
+            metallicity=end_evolution_star.metallicity)
+        # FIXME: this is only for thin disk stars
+        end_evolution_star.cooling_time = (thin_disk_age - star.birth_time
+                                           - main_sequence_lifetime)
 
-            if end_evolution_star.mass <= chandrasekhar_limit:
-                yield end_evolution_star
+        if end_evolution_star.cooling_time > 0.:
+            end_evolution_star.mass = (
+                get_white_dwarf_mass(star.progenitor_mass) * ifmr_parameter)
+
+        if end_evolution_star.mass <= chandrasekhar_limit:
+            yield end_evolution_star
 
 
 # According to model by Leandro & Renedo et al.(2010)
@@ -92,7 +93,7 @@ def get_main_sequence_life_time(mass: float,
     return tsub + ((tsol - tsub) / (0.01 - 0.001)) * (metallicity - 0.001)
 
 
-def get_wd_mass(progenitor_mass: float) -> float:
+def get_white_dwarf_mass(progenitor_mass: float) -> float:
     if progenitor_mass < 2.7:
         return 0.096 * progenitor_mass + 0.429
     elif 2.7 <= progenitor_mass <= 6.:
