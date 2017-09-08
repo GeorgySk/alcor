@@ -62,7 +62,9 @@ C     For terminal:
       character(len = 30) :: arg
       character(len = 30) :: temp_string
       real :: massReductionFactor
-      real :: thick_disk_stars_fraction
+      real :: thick_disk_stars_fraction, 
+     &        halo_stars_fraction,
+     &        radius
       character(len = 100) :: output_filename
       character(len = 6) :: geometry
       real :: cone_height_longitude,
@@ -129,6 +131,12 @@ C           call get_command_argument(i, args(i))
             case ("-tdsf")
               call getarg(i + 1, temp_string)
               read(temp_string, *) thick_disk_stars_fraction
+            case ("-hsf")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) halo_stars_fraction
+            case ("-rad")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) radius
             case ("-o")
               call getarg(i + 1, output_filename)
             case ('-geom')
