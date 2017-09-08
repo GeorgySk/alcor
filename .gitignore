@@ -46,3 +46,9 @@ main.e
 
 # plots
 *.ps
+
+# inputs
+*.trk
+*.seq
+*.dat
+*.out
