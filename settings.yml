@@ -12,9 +12,9 @@ grid:
     initial_mass_function_exponent: -2.35
     lifetime_mass_ratio: 1.0
     mass_reduction_factor: 0.03
-  cones:
-    thick_disk_stars_fraction: 0.8
-
+    thick_disk_stars_fraction: 0.15
+    halo_stars_fraction: 0.05
+    radius: 2  # kpc
 csv:
   cones:
     longitudes:

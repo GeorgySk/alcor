@@ -61,12 +61,13 @@ def run_simulation(*,
             '-ifr', parameters_values['lifetime_mass_ratio'],
             '-bt', parameters_values['burst_time'],
             '-mr', parameters_values['mass_reduction_factor'],
+            '-tdsf', parameters_values['thick_disk_stars_fraction'],
+            '-hsf', parameters_values['halo_stars_fraction'],
+            '-rad', parameters_values['radius'],
             '-o', output_file_name,
             '-geom', geometry]
 
     if geometry == 'cones':
-        args.extend(['-tdsf', parameters_values['thick_disk_stars_fraction']])
-
         try:
             args.extend(['-cl', parameters_values['longitudes']])
         except KeyError:
