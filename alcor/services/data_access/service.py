@@ -44,3 +44,9 @@ def fetch_group_by_id(*,
     query = (session.query(Group)
              .filter(Group.id == group_id))
     return query.one()
+
+
+def fetch_all_da_stars(session: Session) -> List[Star]:
+    query = (session.query(Star)
+             .filter(Star.spectral_type == 0))
+    return query.all()
