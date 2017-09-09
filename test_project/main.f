@@ -37,7 +37,7 @@ C         mfinal_new=parameterIFMR*mfinal_old
       integer numberOfStars
       real galacticDiskAge,parameterOfSFR,
      &                 parameterIMF,scaleLength,
-     &                 areaOfSector,pi
+     &                 pi
       double precision :: solarGalactocentricDistance
       parameter (numberOfStars=6000000)
       parameter (solarGalactocentricDistance=8.5d0)
@@ -237,7 +237,6 @@ C     ---  Calculating the area of the sector  ---
 C ======================================================================
 C     This style ensures maximum precision when assigning a value to PI.
       pi=4.0*atan(1.0)
-      areaOfSector=pi*radius**2
 
 C     ---  Program itself  ---
 C ======================================================================
@@ -333,10 +332,11 @@ C         converting cone height parameters from deg to rad
 
           write(6,*) '2. Calling the IMF and SFR (2/9)'
           if (geometry == 'sphere') then
-              call gen(iseed,parameterOfSFR,areaOfSector,
+              call gen(iseed,parameterOfSFR,radius,
      &                 numberOfStarsInSample,galacticDiskAge,
      &                 timeOfBurst,massReductionFactor,
-     &                 thick_disk_stars_fraction)
+     &                 thick_disk_stars_fraction,
+     &                 halo_stars_fraction)
           else if (geometry == 'cones') then
               call generate_cone_stars(cone_height_longitudes(i),
      &                                 cone_height_latitudes(i),
