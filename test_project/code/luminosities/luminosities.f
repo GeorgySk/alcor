@@ -58,8 +58,11 @@ C         Deciding if the star is a WD
 C             Progenitor star that generates a ONe WD: 8.5 <M_MS < 10.5
 C             WD of CO: m_WD <1.14; of ONe: m_wd>1.14
               if (m(i) <= 10.5) then
-C                 Attributing a solar metallicity to all the stars
-                  metallicityOfWD(i) = 0.01
+                  if (disk_belonging(i) == 3) then
+                      metallicityOfWD(i) = 0.001
+                  else
+                      metallicityOfWD(i) = 0.01
+                  end if
 C                 Calculating the lifetime in the main sequence
                   call tsp(m(i), 
      &                     metallicityOfWD(i), 
