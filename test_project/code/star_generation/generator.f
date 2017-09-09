@@ -168,13 +168,7 @@ C             Calculating z
                   scale_height = THICK_DISK_SCALE_HEIGHT_KPC
               end if
 
-              if (disk_belonging(stars_count) == 3) then
-                xx = ran(iseed) * atan(radius / HALO_DISTANCE_PARAM) 
-     &               / HALO_DISTANCE_PARAM
-                in = int(2.0 * ran(iseed))
-                coordinate_Zcylindr(stars_count) = HALO_DISTANCE_PARAM
-     &              * tan(HALO_DISTANCE_PARAM * xx) * dfloat(1 - 2*in)
-              else
+              if (disk_belonging(stars_count) /= 3) then
 C               TODO: find out what is going on here
                 do
                   xx = Z_DISTRIBUTION_ZO * scale_height * ran(iseed)
