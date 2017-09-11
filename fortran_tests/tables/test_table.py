@@ -1,6 +1,8 @@
 from math import isclose
 from typing import (Union,
-                    Tuple)
+                    Callable,
+                    Tuple,
+                    List)
 
 from alcor.services.simulations import table
 from alcor.types import CoolingSequencesType
@@ -13,72 +15,38 @@ import db_cooling
 
 def test_table() -> None:
     da_cooling_table_by_python = table.read(table_name='da_cooling')
-    da_cooling_table_by_fortran = read_sequences_from_fortran()
+    da_cooling_table_by_fortran = read_sequences_from_fortran(
+        rows_count=650,
+        files_counts_per_metallicity=[7, 10, 8, 8],
+        fill_types=[1, 2, 3, 3],
+        fort_files_initial_units=[10, 20, 30, 40],
+        metallicities_by_thousand=[1, 10, 30, 60],
+        get_from_fortran=da_cooling.incoolda)
 
     assert values_are_close(da_cooling_table_by_python,
                             da_cooling_table_by_fortran)
 
     db_cooling_table_by_python = table.read(table_name='db_cooling')
-    db_cooling_table_by_fortran = read_db_sequences_from_fortran()
+    db_cooling_table_by_fortran = read_sequences_from_fortran(
+        rows_count=400,
+        files_counts_per_metallicity=[7, 9, 9],
+        fill_types=[1, 2, 3],
+        fort_files_initial_units=[90, 100, 110],
+        metallicities_by_thousand=[1, 10, 60],
+        get_from_fortran=db_cooling.incooldb)
 
     assert values_are_close(db_cooling_table_by_python,
                             db_cooling_table_by_fortran)
 
 
-def read_db_sequences_from_fortran(rows_count: int = 400
-                                   ) -> CoolingSequencesType:
-    files_counts_per_metallicity = [7, 9, 9]
-    fill_types = [1, 2, 3]
-    fort_files_initial_units = [90, 100, 110]
-    rows_counts = [nan_matrix(shape=files_count, dtype='i')
-                   for files_count in files_counts_per_metallicity]
-    masses = [nan_matrix(shape=files_count)
-              for files_count in files_counts_per_metallicity]
-    cooling_times = [nan_matrix(shape=(files_count, rows_count), order='F')
-                     for files_count in files_counts_per_metallicity]
-    pre_wd_lifetimes = [nan_matrix(shape=files_count)
-                        for files_count in files_counts_per_metallicity]
-    luminosities = [nan_matrix(shape=(files_count, rows_count), order='F')
-                    for files_count in files_counts_per_metallicity]
-    effective_temperatures = [
-        nan_matrix(shape=(files_count, rows_count), order='F')
-        for files_count in files_counts_per_metallicity]
-    surface_gravities = [
-        nan_matrix(shape=(files_count, rows_count), order='F')
-        for files_count in files_counts_per_metallicity]
-
-    for index in range(3):
-        db_cooling.incooldb(flag=fill_types[index],
-                            initlink=fort_files_initial_units[index],
-                            ntrk=rows_counts[index],
-                            mass=masses[index],
-                            coolingtime=cooling_times[index],
-                            prevtime=pre_wd_lifetimes[index],
-                            luminosity=luminosities[index],
-                            efftemp=effective_temperatures[index],
-                            gravacc=surface_gravities[index])
-
-    metallicities_by_thousand = [1, 10, 60]
-
-    cooling_sequences_by_metallicities = {
-        metallicities_by_thousand[index]: dict(
-            mass=masses[index],
-            pre_wd_lifetime=pre_wd_lifetimes[index],
-            cooling_time=cooling_times[index],
-            effective_temperature=effective_temperatures[index],
-            surface_gravity=surface_gravities[index],
-            luminosity=luminosities[index],
-            rows_counts=rows_counts[index])
-        for index in range(3)}
-
-    return cooling_sequences_by_metallicities
-
-
-def read_sequences_from_fortran(rows_count: int = 650
+def read_sequences_from_fortran(rows_count: int,
+                                files_counts_per_metallicity: List[int],
+                                fill_types: List[int],
+                                fort_files_initial_units: List[int],
+                                metallicities_by_thousand: List[int],
+                                get_from_fortran: Callable,
                                 ) -> CoolingSequencesType:
-    files_counts_per_metallicity = [7, 10, 8, 8]
-    fill_types = [1, 2, 3, 3]
-    fort_files_initial_units = [10, 20, 30, 40]
+    metallicities_count = len(files_counts_per_metallicity)
     rows_counts = [nan_matrix(shape=files_count, dtype='i')
                    for files_count in files_counts_per_metallicity]
     masses = [nan_matrix(shape=files_count)
@@ -96,18 +64,16 @@ def read_sequences_from_fortran(rows_count: int = 650
         nan_matrix(shape=(files_count, rows_count), order='F')
         for files_count in files_counts_per_metallicity]
 
-    for index in range(4):
-        da_cooling.incoolda(flag=fill_types[index],
-                            initlink=fort_files_initial_units[index],
-                            ntrk=rows_counts[index],
-                            mass=masses[index],
-                            coolingtime=cooling_times[index],
-                            prevtime=pre_wd_lifetimes[index],
-                            luminosity=luminosities[index],
-                            efftemp=effective_temperatures[index],
-                            gravacc=surface_gravities[index])
-
-    metallicities_by_thousand = [1, 10, 30, 60]
+    for index in range(metallicities_count):
+        get_from_fortran(flag=fill_types[index],
+                         initlink=fort_files_initial_units[index],
+                         ntrk=rows_counts[index],
+                         mass=masses[index],
+                         coolingtime=cooling_times[index],
+                         prevtime=pre_wd_lifetimes[index],
+                         luminosity=luminosities[index],
+                         efftemp=effective_temperatures[index],
+                         gravacc=surface_gravities[index])
 
     cooling_sequences_by_metallicities = {
         metallicities_by_thousand[index]: dict(
@@ -118,7 +84,7 @@ def read_sequences_from_fortran(rows_count: int = 650
             surface_gravity=surface_gravities[index],
             luminosity=luminosities[index],
             rows_counts=rows_counts[index])
-        for index in range(4)}
+        for index in range(metallicities_count)}
 
     return cooling_sequences_by_metallicities
 
