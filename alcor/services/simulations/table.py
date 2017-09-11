@@ -1,4 +1,3 @@
-import csv
 import logging
 import os
 import sys
@@ -159,10 +158,8 @@ def read_files(files_paths: List[str],
 
     for file_path_index, file_path in enumerate(files_paths):
         with open(file_path, 'r') as file:
-            csv_reader = csv.reader(file,
-                                    delimiter=' ',
-                                    skipinitialspace=True)
-            for row_index, row in enumerate(csv_reader):
+            lines = [line.split() for line in file]
+            for row_index, row in enumerate(lines):
                 if row_index == max_rows:
                     break
                 # In Fortran indexation starts from 1
