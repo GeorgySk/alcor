@@ -27,17 +27,20 @@ C     intrinsic and must be defined in program
       external ran
       real ran
 
-C     ---  Variables description ---
-C     galacticDiskAge (Gyr)
+C     thin_disk_age (Gyr)
 C     parameterOfSFR (taus): Y=exp(-t/taus)
 C     solarGalactocentricDistance: distance from Sun to Galaxy center;
 C     parameterIMF (alpha): M^{alpha}
 C     Initial-to-Final Mass Relation (IFMR) : 
 C         mfinal_new=parameterIFMR*mfinal_old
       integer numberOfStars
-      real galacticDiskAge,parameterOfSFR,
-     &                 parameterIMF,scaleLength,
-     &                 pi
+      real :: thin_disk_age,
+     &        parameterOfSFR,
+     &        parameterIMF,
+     &        scaleLength,
+     &        pi,
+     &        thick_disk_age,
+     &        thick_disk_sfr_param
       double precision :: solarGalactocentricDistance
       parameter (numberOfStars=6000000)
       parameter (solarGalactocentricDistance=8.5d0)
@@ -45,7 +48,7 @@ C         mfinal_new=parameterIFMR*mfinal_old
       parameter (scaleLength=3.5)
       integer i,j,k,ISEED1,ISEED2,iseed,numberOfStarsInSample
       real randomNumber,fractionOfDB
-      real parameterIFMR
+      real parameterIFMR, burst_age
 C     For terminal:
       integer :: num_args
       character(len = 30) :: arg
@@ -78,8 +81,8 @@ C     For terminal:
 
 C     NOTE: use of commons is strongly discouraged!
       common /RSEED/ ISEED1,ISEED2
-      common /param/ fractionOfDB,galacticDiskAge,parameterIMF,
-     &               parameterIFMR,timeOfBurst
+      common /param/ fractionOfDB,thin_disk_age,parameterIMF,
+     &               parameterIFMR,burst_age
 
 C     --- Filling info about groups of files (cooling, color tables) ---    
 C ======================================================================
@@ -90,10 +93,10 @@ C     Terminal reading:
 
       if (num_args .eq. 0) then
         fractionOfDB = 0.20 
-        galacticDiskAge = 8.9
+        thin_disk_age = 9.2
         parameterIMF = -2.35
         parameterIFMR = 1.0
-        timeOfBurst = 0.6 
+        burst_age = 0.6 
       else
         do i = 1, num_args
 C           call get_command_argument(i, args(i))
@@ -104,7 +107,13 @@ C           call get_command_argument(i, args(i))
               read(temp_string, *) fractionOfDB 
             case ("-g")
               call getarg(i + 1, temp_string)
-              read(temp_string, *) galacticDiskAge 
+              read(temp_string, *) thin_disk_age
+            case ("-tda")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) thick_disk_age
+            case ("-tde")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) thick_disk_sfr_param
             case ("-mf")
               call getarg(i + 1, temp_string)
               read(temp_string, *) parameterIMF
@@ -113,7 +122,7 @@ C           call get_command_argument(i, args(i))
               read(temp_string, *) parameterIFMR
             case ("-bt")
               call getarg(i + 1, temp_string)
-              read(temp_string, *) timeOfBurst
+              read(temp_string, *) burst_age
             case ("-mr")
               call getarg(i + 1, temp_string)
               read(temp_string, *) massReductionFactor
@@ -196,7 +205,7 @@ C           call get_command_argument(i, args(i))
       write(6,*) '            Used parameters:'
       write(6,*) 'numberOfStars=    ',numberOfStars
       write(6,*) 'SFR: parameterOfSFR=',parameterOfSFR,'Gyr'
-      write(6,*) 'galacticDiskAge=    ',galacticDiskAge,'Gyr'
+      write(6,*) 'thin disk age=    ',thin_disk_age,'Gyr'
       write(6,*) 'area radius=        ',radius,'kpc'
       write(6,*) ' '
       write(6,*) '=========================================='
@@ -333,16 +342,17 @@ C         converting cone height parameters from deg to rad
           write(6,*) '2. Calling the IMF and SFR (2/9)'
           if (geometry == 'sphere') then
               call gen(iseed,parameterOfSFR,radius,
-     &                 numberOfStarsInSample,galacticDiskAge,
-     &                 timeOfBurst,massReductionFactor,
+     &                 numberOfStarsInSample,thin_disk_age,
+     &                 burst_age,massReductionFactor,
      &                 thick_disk_stars_fraction,
-     &                 halo_stars_fraction)
+     &                 halo_stars_fraction, thick_disk_age,
+     &                 thick_disk_sfr_param)
           else if (geometry == 'cones') then
               call generate_cone_stars(cone_height_longitudes(i),
      &                                 cone_height_latitudes(i),
      &                                 numberOfStarsInSample,iseed,
      &                                 thick_disk_stars_fraction,
-     &                                 galacticDiskAge,
+     &                                 thin_disk_age,
      &                                 min_longitude, max_longitude,
      &                                 min_latitude, max_latitude,
      &                                 massReductionFactor)
@@ -352,7 +362,7 @@ C         converting cone height parameters from deg to rad
           write(6,*) "numberOfStarsInSample=", numberOfStarsInSample
       
           write(6,*) '3. Calculating luminosities (3/9)'
-          call lumx(numberOfStarsInSample)      
+          call lumx(numberOfStarsInSample, thick_disk_age)      
 
           ! if cone then we already calculated them
           if (geometry == 'sphere') then
@@ -368,7 +378,7 @@ C         TODO: find out why we are missing the next step
           goto 7
 C         Calculating the trajectories according to/along z-coordinate
           write(6,*) '6. Integrating trajectories (6/9)'
-          call traject(galacticDiskAge)
+          call traject(thin_disk_age)
 
 7         write(6,*) '7. Calculating coordinates (7/9)'
           call coor(solarGalactocentricDistance)

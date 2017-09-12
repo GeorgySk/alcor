@@ -1,3 +1,4 @@
+C     FIXME: timelines for thin/thick disks shouldn't start at one point
 C     Generates stars population inside a square pyramid (pencil/cone) 
 C     with its height direction set by longitude and latitude
       subroutine generate_cone_stars(cone_height_longitude,
@@ -5,7 +6,7 @@ C     with its height direction set by longitude and latitude
      &                               numberOfStarsInSample,
      &                               iseed,
      &                               thick_disk_stars_fraction,
-     &                               galacticDiskAge,
+     &                               thin_disk_age,
      &                               min_longitude,
      &                               max_longitude,
      &                               min_latitude,
@@ -18,7 +19,7 @@ C     with its height direction set by longitude and latitude
 
           real :: cone_height_longitude,
      &            cone_height_latitude,
-     &            galacticDiskAge,
+     &            thin_disk_age,
      &            thick_disk_stars_fraction,
      &            thin_disk_stars_fraction,
      &            massReductionFactor
@@ -151,7 +152,7 @@ C                 converting from galactic to cyl.galactocentric
                   if (total_mass >= normalization_cone_mass) exit
           
                   ! Assuming constant star formation rate
-                  starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
+                  starBirthTime(stars_count) =thin_disk_age*ran(iseed)
               end do outer_do2
 
               total_mass = 0.0
@@ -213,7 +214,7 @@ C                 converting from galactic to cyl.galactocentric
                   if (total_mass >= normalization_cone_mass) exit
           
                   ! Assuming constant star formation rate
-                  starBirthTime(stars_count) =galacticDiskAge*ran(iseed)
+                  starBirthTime(stars_count) =thin_disk_age*ran(iseed)
                   tmax = tmdisk * exp(-tmdisk/tau)
  33               ttry = ttdisk * ran(iseed)
                   ft = ttry * exp(-ttry/tau)
