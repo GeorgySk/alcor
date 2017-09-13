@@ -63,8 +63,14 @@ C     For terminal:
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: min_longitude, max_longitude, min_latitude,
-     &                    max_latitude
+      real :: min_longitude, max_longitude, 
+     &        min_latitude, max_latitude
+      real :: u_ubvrij(numberOfStars),
+     &        b_ubvrij(numberOfStars),
+     &        v_ubvrij(numberOfStars),
+     &        r_ubvrij(numberOfStars),
+     &        i_ubvrij(numberOfStars),
+     &        j_ubvrij(numberOfStars)
       logical :: is_numeric, longitudes_from_csv, latitudes_from_csv
       integer :: iterations_count, getNumberOfLines
 
@@ -281,27 +287,19 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
 C     TODO: add choosing what output we want to get
       open(421, file = output_filename)
       if (geometry == 'sphere') then
-          write(421, *) 'luminosity ',
-     &                  'proper_motion ',
-     &                  'proper_motion_component_b ',
-     &                  'proper_motion_component_l ',
-     &                  'proper_motion_component_vr ',
-     &                  'right_ascension ',
-     &                  'declination ',
-     &                  'distance ',
-     &                  'galactic_latitude ',
-     &                  'galactic_longitude ',
-     &                  'ugriz_g_apparent ',
-     &                  'ugriz_ug ',    
-     &                  'ugriz_gr ',    
-     &                  'ugriz_ri ',
-     &                  'ugriz_iz ',
-     &                  'v_photometry ',
-     &                  'u_velocity ',
-     &                  'v_velocity ',
-     &                  'w_velocity ',
-     &                  'spectral_type ',
-     &                  'galactic_disk_type'
+          write(421, *) 'massOfWD',
+     &                  'rightAscension',
+     &                  'declination',
+     &                  'j_ubvrij',
+     &                  'r_ubvrij',
+     &                  'v_ubvrij',
+     &                  'i_ubvrij',
+     &                  'right_ascension_prop_motion',
+     &                  'declination_prop_motion',
+     &                  'total_prop_motion',
+     &                  'rgac',
+     &                  'typeOfWD',
+     &                  'disk_str'
       else if (geometry == 'cones') then
           write(421, *) 'u_velocity ',
      &                  'v_velocity ',
@@ -374,13 +372,22 @@ C         Calculating the trajectories according to/along z-coordinate
           call coor(solarGalactocentricDistance)
 
           write(6,*) '8. Determinating visual magnitudes (8/9)'
-          call magi(fractionOfDB,table) 
+          call magi(fractionOfDB,
+     &              table,
+     &              u_ubvrij,
+     &              b_ubvrij,
+     &              v_ubvrij,
+     &              r_ubvrij,
+     &              i_ubvrij,
+     &              j_ubvrij) 
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
      &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
-     &         cone_height_latitudes(i))
+     &         cone_height_latitudes(i),
+     &         u_ubvrij, b_ubvrij, v_ubvrij, r_ubvrij, i_ubvrij,
+     &         j_ubvrij)
           open(765, file='processed_cones.txt')
           write(unit=765,fmt=*) cone_height_longitudes(i),
      &                          cone_height_latitudes(i)
@@ -448,7 +455,8 @@ C***********************************************************************
       subroutine printForProcessing(output_filename, geometry, iseed,
      &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitude,
-     &         cone_height_latitude)
+     &         cone_height_latitude, u_ubvrij, b_ubvrij, v_ubvrij,
+     &         r_ubvrij, i_ubvrij, j_ubvrij)
       implicit none
       external ran
       real ran
@@ -482,7 +490,13 @@ C     Binning of Luminosity Function
 C     Minimum proper motion
       parameter (minimumProperMotion=0.04)
 C     Parameters of mass histograms
-
+      
+      real :: u_ubvrij(numberOfStars),
+     &        b_ubvrij(numberOfStars),
+     &        v_ubvrij(numberOfStars),
+     &        r_ubvrij(numberOfStars),
+     &        i_ubvrij(numberOfStars),
+     &        j_ubvrij(numberOfStars)
       double precision :: properMotion(numberOfStars),
      &                    rightAscension(numberOfStars),
      &                    declination(numberOfStars)
@@ -507,8 +521,6 @@ C     NOTE: this 70 comes from nowhere
      &     latitude_proper_motion(numberOfStars),
      &     radial_velocity(numberOfStars)
       real errora(70),ndfa(70)
-C     ugriz-color system and V-band from Johnson system
-      real v(numberOfStars)
       real massInBin(70)
       integer :: typeOfWD(numberOfStars)
 C     values of LF in each bin. o-observational
@@ -557,11 +569,6 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real latitude, longitude,zzx,cone_height_longitude
       double precision :: ros
       real cone_height_latitude
-      real :: ugriz_ug(numberOfStars),
-     &        ugriz_gr(numberOfStars),
-     &        ugriz_ri(numberOfStars),
-     &        ugriz_iz(numberOfStars),
-     &        ugriz_g_apparent(numberOfStars)
       logical :: with_overlapping_checking = .true.
       integer processed_cones_count, overlappings, stars_counter,
      & eliminations_counter
@@ -569,9 +576,11 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real prev_cone_longitude
       logical longitude_overlapping, latitude_overlapping,
      &  star_in_intersection
-      real :: UB(numberOfStars), BV(numberOfStars), 
-     &                    VRR(numberOfStars), RI(numberOfStars)
       character(len=:), allocatable :: disk_str
+      real :: gal_to_equat_angle = 2.147
+      real :: right_ascension_prop_motion,
+     &        declination_prop_motion,
+     &        total_prop_motion
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -583,12 +592,8 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
-      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
-     &               ugriz_g_apparent
       common /indexdb/ typeOfWD
-      common /johnson/ V
       common /vel/ uu,vv,ww
-      common /ubvri/ UB, BV, VRR, RI
 
       pi = 4.0 * atan(1.0)
       DELTA_LATITUDE = 2.64 * pi / 180.0
@@ -604,26 +609,31 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
               else if (disk_belonging(i) == 2) then
                   disk_str = 'thick'
               end if
+
+              right_ascension_prop_motion = (
+     &            sin(gal_to_equat_angle)
+     &            * longitude_proper_motion(i)
+     &            - cos(gal_to_equat_angle) 
+     &              * latitude_proper_motion(i))
+              declination_prop_motion = (cos(gal_to_equat_angle) 
+     &                                   * longitude_proper_motion(i)
+     &                                   + sin(gal_to_equat_angle)
+     &                                     * latitude_proper_motion(i))
+              total_prop_motion = sqrt(right_ascension_prop_motion ** 2
+     &                                 * cos(declination(i)) ** 2
+     &                                 + declination_prop_motion ** 2)
+
               write(421, *) massOfWD(i),
      &                      rightAscension(i),
      &                      declination(i),
-     &                      properMotion(i),
-     &                      latitude_proper_motion(i),
-     &                      longitude_proper_motion(i),
-     &                      radial_velocity(i),
+     &                      j_ubvrij(i),
+     &                      r_ubvrij(i),
+     &                      v_ubvrij(i),
+     &                      i_ubvrij(i),
+     &                      right_ascension_prop_motion,
+     &                      declination_prop_motion,
+     &                      total_prop_motion,
      &                      rgac(i),
-     &                      bgac(i),
-     &                      lgac(i),
-     &                      ugriz_g_apparent(i),
-C                           TODO: better save ubvri, ugriz is derivative
-     &                      ugriz_ug(i),
-     &                      ugriz_gr(i),
-     &                      ugriz_ri(i),
-     &                      ugriz_iz(i),
-     &                      V(i),
-     &                      uu(i),
-     &                      vv(i),
-     &                      ww(i),
      &                      typeOfWD(i),
      &                      disk_str
           end do

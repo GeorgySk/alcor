@@ -146,6 +146,7 @@ C         Calculating the components of the proper motion
      &        (cos_bgac * cos_lgac * uu(wd_index))
      &        + (cos_bgac * sin_lgac * vv(wd_index))
      &        + (sin_bgac * ww(wd_index)))
+C         FIXME: Looks like this formula is wrong
           properMotion(wd_index) = sqrt(
      &        longitude_proper_motion(wd_index) 
      &        * longitude_proper_motion(wd_index)
