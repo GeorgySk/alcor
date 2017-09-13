@@ -36,6 +36,7 @@ C             Reading cooling curves
                   table%color_V(i, j) = a7
                   table%color_R(i, j) = a8
                   table%color_I(i, j) = a9
+                  table%color_J(i, j) = a10
               end do
 2             table%ntrk(i) = j - 1    
           end do

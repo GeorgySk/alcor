@@ -79,16 +79,14 @@ C     For terminal:
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
-C     NOTE: use of commons is strongly discouraged!
       common /RSEED/ ISEED1,ISEED2
       common /param/ fractionOfDB,thin_disk_age,parameterIMF,
      &               parameterIFMR,burst_age
 
-C     --- Filling info about groups of files (cooling, color tables) ---    
-C ======================================================================
+C     Filling info about groups of files (cooling, color tables)
       call fillTable(table) 
 
-C     Terminal reading:
+C     Terminal reading
       num_args = iargc()
 
       if (num_args .eq. 0) then
@@ -216,39 +214,31 @@ C           call get_command_argument(i, args(i))
      &eeds'
       write(6,*) ' '
 
-C     ---Reading seeds line from $temporary_files/seeds_line.in
-C ======================================================================
-      iseed=-9
-C       read(72,100) iseed1,iseed2
+C     Reading seeds line from $temporary_files/seeds_line.in
+      iseed = -9
 C     This is done for cone geometry and 5000 plates as we don't want 
 C     the sequence of RNs to repeat itself(init:805577 133547):
-      open(unit=772,file='input_data/seeds_line.in')
-      read(unit=772,fmt=*) iseed1, iseed2
+      open(unit=772, file='input_data/seeds_line.in')
+      read(unit=772, fmt=*) iseed1, iseed2
       close(unit=772)
       if (geometry == 'cones') then
           iseed1 = iseed1 - 1
           iseed2 = iseed2 + 1
       end if
-      open(unit=772,file='input_data/seeds_line.in',status='replace')
-      write(unit=772,fmt=100) iseed1,iseed2
+      open(unit=772, file='input_data/seeds_line.in', status='replace')
+      write(unit=772, fmt=100) iseed1,iseed2
       close(unit=772)
-C    finished rewriting seeds here
- 100   format(I6,2x,I6)  
-      write(6,*) 'iseed1=',iseed1
-      write(6,*) 'iseed2=',iseed2
+ 100  format(I6,2x,I6)  
+      write(6,*) 'iseed1=', iseed1
+      write(6,*) 'iseed2=', iseed2
 C     QUESTION: why do we need this part?      
       do i=1,10
         randomNumber=ran(iseed)
         write (6,*) i,randomNumber
       end do  
 
-C     ---  Calculating the area of the sector  ---
-C ======================================================================
-C     This style ensures maximum precision when assigning a value to PI.
       pi=4.0*atan(1.0)
 
-C     ---  Program itself  ---
-C ======================================================================
       write(6,*) '1. Reading the cooling tables (1/9)'
 
       write(6,*) '   1.1 Tracks of CO DA WD Z=0.001;0.01;0.03;0.06'
@@ -549,7 +539,6 @@ C     SD for velocities in each bin
 C     2D-array of velocities (nº of bin; newly assigned to WD nº in bin)
 C     needed to calculate Standart Deviation (SD) for velocities in each 
 C     bin
-C     TODO: make dynamic array or linked list
       real arrayOfVelocitiesForSD_u(25,50000)
       real arrayOfVelocitiesForSD_v(25,50000)
       real arrayOfVelocitiesForSD_w(25,50000)
@@ -568,12 +557,11 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real latitude, longitude,zzx,cone_height_longitude
       double precision :: ros
       real cone_height_latitude
-C       TODO: no need to keep these
       real :: ugriz_ug(numberOfStars),
-     &                    ugriz_gr(numberOfStars),
-     &                    ugriz_ri(numberOfStars),
-     &                    ugriz_iz(numberOfStars),
-     &                    ugriz_g_apparent(numberOfStars)
+     &        ugriz_gr(numberOfStars),
+     &        ugriz_ri(numberOfStars),
+     &        ugriz_iz(numberOfStars),
+     &        ugriz_g_apparent(numberOfStars)
       logical :: with_overlapping_checking = .true.
       integer processed_cones_count, overlappings, stars_counter,
      & eliminations_counter
@@ -583,7 +571,6 @@ C       TODO: no need to keep these
      &  star_in_intersection
       real :: UB(numberOfStars), BV(numberOfStars), 
      &                    VRR(numberOfStars), RI(numberOfStars)
-C      &                    ugriz_g_apparent(numberOfStars)
       character(len=:), allocatable :: disk_str
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
@@ -596,14 +583,13 @@ C      &                    ugriz_g_apparent(numberOfStars)
       common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
-C       TODO: no need to keep these
       common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
      &               ugriz_g_apparent
       common /indexdb/ typeOfWD
       common /johnson/ V
       common /vel/ uu,vv,ww
       common /ubvri/ UB, BV, VRR, RI
-C      &, ugriz_g_apparent
+
       pi = 4.0 * atan(1.0)
       DELTA_LATITUDE = 2.64 * pi / 180.0
       overlappings = 0
@@ -618,13 +604,13 @@ C      &, ugriz_g_apparent
               else if (disk_belonging(i) == 2) then
                   disk_str = 'thick'
               end if
-              write(421, *) luminosityOfWD(i),
+              write(421, *) massOfWD(i),
+     &                      rightAscension(i),
+     &                      declination(i),
      &                      properMotion(i),
      &                      latitude_proper_motion(i),
      &                      longitude_proper_motion(i),
      &                      radial_velocity(i),
-     &                      rightAscension(i),
-     &                      declination(i),
      &                      rgac(i),
      &                      bgac(i),
      &                      lgac(i),

@@ -54,6 +54,7 @@ C     TODO: find out the meaning of following constants
      &        vitabone(NCOL,NROW),
      &        vrtabone(NCOL,NROW),
      &        uvtabone(NCOL,NROW),
+     &        jone(NCOL,NROW),
      &        lgrtabone(NCOL2,NROW),
      &        lgt2tabone(NCOL2,NROW),
      &        tprewd1(NCOL),
@@ -61,7 +62,7 @@ C     TODO: find out the meaning of following constants
  
       common /fredone/ lgtabone, ltabone, mvtabone, lgtetabone
       common /fredone2/ mtabone, ndatsone
-      common /colorsone/ bvtabone, vitabone, vrtabone, uvtabone
+      common /colorsone/ bvtabone, vitabone, vrtabone, uvtabone, jone
       common /newone/ lgrtabone, lgt2tabone
       common /newone2/ mtabone2, ndatsone2
       

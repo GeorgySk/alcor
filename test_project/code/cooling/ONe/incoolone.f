@@ -28,12 +28,13 @@ C     TODO: find out the meaning of following constants
      &        vitabone(NCOL, NROW),
      &        vrtabone(NCOL, NROW),
      &        uvtabone(NCOL, NROW),
+     &        jone(NCOL, NROW),
      &        lgrtabone(NCOL2, NROW),
      &        lgt2tabone(NCOL2, NROW)
 
       common /fredone/ lgtabone, ltabone, mvtabone, lgtetabone
       common /fredone2/ mtabone, ndatsone
-      common /colorsone/ bvtabone, vitabone, vrtabone, uvtabone
+      common /colorsone/ bvtabone, vitabone, vrtabone, uvtabone, jone
       common /newone/ lgrtabone, lgt2tabone
       common /newone2/ mtabone2, ndatsone2
  
@@ -55,7 +56,6 @@ C     Masses of each archive ---
 C     Reading the files
       do i = 1, NCOL
         do j = 1, NROW
-C         TODO: find out the way to avoid using end-goto
           read(file_unit, *, end=2) a1, a2, a3, a4, a5, a6, a7, a8, a9,
      &                              a10, a11, a12, a13
           ltabone(i, j) = a1
@@ -66,6 +66,7 @@ C         TODO: find out the way to avoid using end-goto
           vitabone(i, j) = a9
           vrtabone(i, j) = a4
           uvtabone(i, j) = a10
+          jone(i, j) = a7 + a8 - a5 + a12
         end do      
 2       ndatsONE(i) = j - 1  
         file_unit = file_unit + 1
@@ -75,7 +76,6 @@ C     Reading the data of log Teff and log g
       file_unit = 127      
       do i = 1, NCOL2
         do j = 1, NROW
-C         TODO: find out the way to avoid using end-goto
           read(file_unit, *, end=3) a1, a2, a3, a4, a5, a6
 C         Converting radii in cm to radii in solar radius
           a3 = 10.0 ** a3
