@@ -53,7 +53,7 @@ C     cylindrical z-coordinate are determined.
       double precision :: coordinate_Theta(MAX_STARS_COUNT),
      &                    coordinate_R(MAX_STARS_COUNT),
      &                    coordinate_Zcylindr(MAX_STARS_COUNT)
-C     TODO: find out what is m. massInMainSequence? 
+C     TODO: rename this to main_sequence_mass? 
       real :: m(MAX_STARS_COUNT), 
      &        starBirthTime(MAX_STARS_COUNT),
      &        scale_height
@@ -141,7 +141,6 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
      &                total_generated_mass_in_bin + star_mass
               end if
 
-C             Calculating z
               if (disk_belonging(stars_count) == 1) then
                   scale_height = THIN_DISK_SCALE_HEIGHT_KPC
               else if (disk_belonging(stars_count) == 2) then

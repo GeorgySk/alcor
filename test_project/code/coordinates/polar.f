@@ -11,7 +11,8 @@ C     solar_galactocentric_distance: galactocentric distance of the Sun
 C     TODO: this is numberOfStars, take it up as const for all functions
       integer, parameter ::  MAX_STARS_COUNT = 6000000
       real, parameter :: PI = 4.0 * atan(1.0),
-     &                   TAU = 2.0 * PI
+     &                   TAU = 2.0 * PI,
+     &                   ALPHA_CENTAURI_DISTANCE = 1.5e-6
 
       integer :: numberOfWDs,
      &           iseed,
@@ -25,15 +26,15 @@ C     TODO: this is numberOfStars, take it up as const for all functions
      &        dist,
      &        squared_minimum_sector_radius,
      &        squared_maximum_sector_radius,
-     &        random_valid_radius,
-     &        zzr,
-     &        zzy,
-     &        zz,
-     &        xx,
+     &        radius_try,
+     &        radius_try_distrib,
+     &        radial_distrib_random,
+     &        random_value,
      &        xc,
      &        yc,
      &        squared_radii_difference,
-     &        sector_diameter
+     &        sector_diameter,
+     &        radial_distrib_max
       double precision :: solar_galactocentric_distance
 
       double precision :: coordinate_R(MAX_STARS_COUNT),
@@ -53,26 +54,21 @@ C     TODO: find out what reference frame is used for x, y
      &               numberOfWDs,
      &               disk_belonging
 
+      squared_sector_radius = sector_radius * sector_radius
       minimum_sector_radius = real(solar_galactocentric_distance) 
      &                        - sector_radius
       maximum_sector_radius = real(solar_galactocentric_distance) 
      &                        + sector_radius
-      angle_covering_sector = 2. * asin(
-     &    sector_radius / real(solar_galactocentric_distance))
-
-
-      squared_sector_radius = sector_radius * sector_radius
-      
-C     Calculating the angle in the sector
-C     -angle_covering_sector / 2 and +angle_covering_sector / 2 degrees
-C     and radius between minimum_sector_radius and maximum_sector_radius
+      sector_diameter = maximum_sector_radius - minimum_sector_radius
       squared_maximum_sector_radius = maximum_sector_radius 
      &                                * maximum_sector_radius
       squared_minimum_sector_radius = minimum_sector_radius 
      &                                * minimum_sector_radius
       squared_radii_difference = squared_maximum_sector_radius 
      &                           - squared_minimum_sector_radius
-      sector_diameter = maximum_sector_radius - minimum_sector_radius
+      angle_covering_sector = 2. * asin(
+     &    sector_radius / real(solar_galactocentric_distance))
+      radial_distrib_max = exp(-minimum_sector_radius / scale_length)
                 
       do wd_index = 1, numberOfWDs
           do
@@ -85,26 +81,25 @@ C     and radius between minimum_sector_radius and maximum_sector_radius
      &                coordinate_Theta(wd_index) + TAU)
               end if
               
+C             Accepting-rejecting method
               do 
-                  random_valid_radius = minimum_sector_radius 
-     &                                  + sector_diameter * ran(iseed)
-C                 TODO: find out the meaning of zzy and 0.16
-                  zzy = 0.16 * ran(iseed)
-C                 TODO: find out the meaning of zzr
-                  zzr = exp(-random_valid_radius / scale_length)
-                  if (zzy <= zzr) then
+                  radius_try = minimum_sector_radius + sector_diameter 
+     &                                                 * ran(iseed)
+                  radius_try_distrib = exp(-radius_try / scale_length)
+                  radial_distrib_random = radial_distrib_max 
+     &                                    * ran(iseed)
+                  if (radial_distrib_random <= radius_try_distrib) then
                       exit
                   end if
               end do
-    
-C             TODO: give a good name for zz
-              zz = (random_valid_radius - minimum_sector_radius) 
-     &             / sector_diameter
-C             TODO: find out the meaning of xx
-              xx = squared_minimum_sector_radius 
-     &             + squared_radii_difference 
-     &               * zz
-              coordinate_R(wd_index) = sqrt(xx)
+
+C             Inverse transform sampling method for generating stars
+C             uniformly in a circle sector in polar coordinates
+              random_value = (radius_try - minimum_sector_radius) 
+     &                       / sector_diameter
+              coordinate_R(wd_index) = sqrt(
+     &            squared_minimum_sector_radius 
+     &            + squared_radii_difference * random_value)
               xc = real(coordinate_R(wd_index) 
      &                  * cos(coordinate_Theta(wd_index)))
               yc = real(coordinate_R(wd_index) 
@@ -114,9 +109,8 @@ C             TODO: find out the meanng of dist
      &                    * (xc - solar_galactocentric_distance) 
      &                    + yc * yc)
 
-C             TODO: find out the meaning of 0.0000015 const
               if (dist <= squared_sector_radius 
-     &                .and. dist >= 0.0000015) then 
+     &                .and. dist >= ALPHA_CENTAURI_DISTANCE) then 
                   exit
               end if
           end do
