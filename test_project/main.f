@@ -209,7 +209,7 @@ C           call get_command_argument(i, args(i))
       write(6,*) '            Used parameters:'
       write(6,*) 'numberOfStars=    ',numberOfStars
       write(6,*) 'SFR: parameterOfSFR=',parameterOfSFR,'Gyr'
-      write(6,*) 'thin disk age=    ',thin_disk_age,'Gyr'
+      write(6,*) 'thin disk age=      ',thin_disk_age,'Gyr'
       write(6,*) 'area radius=        ',radius,'kpc'
       write(6,*) ' '
       write(6,*) '=========================================='
@@ -287,19 +287,19 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
 C     TODO: add choosing what output we want to get
       open(421, file = output_filename)
       if (geometry == 'sphere') then
-          write(421, *) 'massOfWD',
-     &                  'rightAscension',
-     &                  'declination',
-     &                  'j_ubvrij',
-     &                  'r_ubvrij',
-     &                  'v_ubvrij',
-     &                  'i_ubvrij',
-     &                  'right_ascension_prop_motion',
-     &                  'declination_prop_motion',
-     &                  'total_prop_motion',
-     &                  'rgac',
-     &                  'typeOfWD',
-     &                  'disk_str'
+          write(421, *) 'mass ',
+     &                  'right_ascension ',
+     &                  'declination ',
+     &                  'j_abs_magnitude ',
+     &                  'r_abs_magnitude ',
+     &                  'v_abs_magnitude ',
+     &                  'i_abs_magnitude ',
+     &                  'right_ascension_proper_motion ',
+     &                  'declination_proper_motion ',
+     &                  'proper_motion ',
+     &                  'galactocentric_distance ',
+     &                  'spectral_type ',
+     &                  'disk_belonging '
       else if (geometry == 'cones') then
           write(421, *) 'u_velocity ',
      &                  'v_velocity ',
@@ -619,9 +619,10 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                                   * longitude_proper_motion(i)
      &                                   + sin(gal_to_equat_angle)
      &                                     * latitude_proper_motion(i))
-              total_prop_motion = sqrt(right_ascension_prop_motion ** 2
-     &                                 * cos(declination(i)) ** 2
-     &                                 + declination_prop_motion ** 2)
+              total_prop_motion = real(
+     &            sqrt(right_ascension_prop_motion ** 2
+     &                 * cos(declination(i)) ** 2
+     &                 + declination_prop_motion ** 2))
 
               write(421, *) massOfWD(i),
      &                      rightAscension(i),
@@ -738,14 +739,13 @@ C                TODO: figure out what to do with ill-conditioned cases
      &           then
                      longitude = 0.0
                  else
-                     longitude = dacos((solarGalactocentricDistance ** 2
-     &                                  + ros**2
-     &                                  - coordinate_R(i) ** 2)
-     &                                 / (2.0d0 
-     &                                    * solarGalactocentricDistance 
-     &                                    * ros))
+                     longitude = real(
+     &                   dacos((solarGalactocentricDistance ** 2
+     &                          + ros**2 - coordinate_R(i) ** 2)
+     &                         / (2.0d0 * solarGalactocentricDistance 
+     &                            * ros)))
                  end if
-                 zzx=coordinate_Zcylindr(i)/ros
+                 zzx = real(coordinate_Zcylindr(i) / ros)
                  latitude = atan(zzx)
 C                TODO: i am confused about how all this works now.
 C                the reason for these conditions is that for angles > pi
@@ -799,11 +799,6 @@ C                if cone crosses 2pi, move it -2pi
      &                            rgac(i),
      &                            longitude,
      &                            latitude,
-     &                            ugriz_g_apparent(i),
-     &                            ugriz_ug(i),
-     &                            ugriz_gr(i),
-     &                            ugriz_ri(i),
-     &                            ugriz_iz(i),
      &                            disk_str,
      &                            typeOfWD(i)
                  else
@@ -880,12 +875,6 @@ C           if cone crosses 2pi, move it -2pi
      &                   rgac(i),
      &                   longitude,
      &                   latitude,
-C     TODO: we need to save u g r i z, not u-g, g-r etc..
-     &                   ugriz_g_apparent(i),
-     &                   ugriz_ug(i),
-     &                   ugriz_gr(i),
-     &                   ugriz_ri(i),
-     &                   ugriz_iz(i),
      &                   disk_str,
      &                   typeOfWD(i)
          end do

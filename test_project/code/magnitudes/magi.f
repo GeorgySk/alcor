@@ -81,7 +81,7 @@ C           ---  IF DA ---
               typeOfWD(i)=0
               n1=n1+1
               call interlumda(coolingTime(i),massOfWD(i),
-     &             metallicityOfWD(i),lum,teff,xlog,c1,c2,c3,c4,c5,c6
+     &             metallicityOfWD(i),lum,teff,xlog,c1,c2,c3,c4,c5,c6,
      &             table)
 C           ---  ELSE DB  ---
             else

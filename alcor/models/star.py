@@ -33,22 +33,23 @@ SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 
 # Description of ugriz color scheme:
 # https://en.wikipedia.org/wiki/Photometric_system
-STAR_PARAMETERS_NAMES = ['luminosity',
+STAR_PARAMETERS_NAMES = ['mass',
+                         'luminosity',
                          'proper_motion',
                          'proper_motion_component_b',
                          'proper_motion_component_l',
                          'proper_motion_component_vr',
                          'right_ascension',
                          'declination',
-                         'distance',
+                         'right_ascension_proper_motion',
+                         'declination_proper_motion',
+                         'galactocentric_distance',
                          'galactic_latitude',
                          'galactic_longitude',
-                         'ugriz_g_apparent',
-                         'ugriz_ug',
-                         'ugriz_gr',
-                         'ugriz_ri',
-                         'ugriz_iz',
-                         'v_photometry',
+                         'j_abs_magnitude',
+                         'v_abs_magnitude',
+                         'r_abs_magnitude',
+                         'i_abs_magnitude',
                          'u_velocity',
                          'v_velocity',
                          'w_velocity',
@@ -69,6 +70,8 @@ class Star(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
+    mass = Column(Float(asdecimal=True),
+                  nullable=True)
     luminosity = Column(Float(asdecimal=True),
                         nullable=True)
     proper_motion = Column(Float(asdecimal=True),
@@ -83,24 +86,24 @@ class Star(Base):
                              nullable=True)
     declination = Column(Float(asdecimal=True),
                          nullable=True)
-    distance = Column(Float(asdecimal=True),
-                      nullable=True)
+    right_ascension_proper_motion = Column(Float(asdecimal=True),
+                                           nullable=True)
+    declination_proper_motion = Column(Float(asdecimal=True),
+                                       nullable=True)
+    galactocentric_distance = Column(Float(asdecimal=True),
+                                     nullable=True)
     galactic_latitude = Column(Float(asdecimal=True),
                                nullable=True)
     galactic_longitude = Column(Float(asdecimal=True),
                                 nullable=True)
-    ugriz_g_apparent = Column(Float(asdecimal=True),
-                              nullable=True)
-    ugriz_ug = Column(Float(asdecimal=True),
-                      nullable=True)
-    ugriz_gr = Column(Float(asdecimal=True),
-                      nullable=True)
-    ugriz_ri = Column(Float(asdecimal=True),
-                      nullable=True)
-    ugriz_iz = Column(Float(asdecimal=True),
-                      nullable=True)
-    v_photometry = Column(Float(asdecimal=True),
-                          nullable=True)
+    j_abs_magnitude = Column(Float(asdecimal=True),
+                             nullable=True)
+    r_abs_magnitude = Column(Float(asdecimal=True),
+                             nullable=True)
+    v_abs_magnitude = Column(Float(asdecimal=True),
+                             nullable=True)
+    i_abs_magnitude = Column(Float(asdecimal=True),
+                             nullable=True)
     u_velocity = Column(Float(asdecimal=True),
                         nullable=True)
     v_velocity = Column(Float(asdecimal=True),
@@ -117,6 +120,7 @@ class Star(Base):
 
     def __init__(self,
                  group_id: uuid.UUID,
+                 mass: float = None,
                  luminosity: float = None,
                  proper_motion: float = None,
                  proper_motion_component_b: float = None,
@@ -124,15 +128,15 @@ class Star(Base):
                  proper_motion_component_vr: float = None,
                  right_ascension: float = None,
                  declination: float = None,
-                 distance: float = None,
+                 right_ascension_proper_motion: float = None,
+                 declination_proper_motion: float = None,
+                 galactocentric_distance: float = None,
                  galactic_latitude: float = None,
                  galactic_longitude: float = None,
-                 ugriz_g_apparent: float = None,
-                 ugriz_ug: float = None,
-                 ugriz_gr: float = None,
-                 ugriz_ri: float = None,
-                 ugriz_iz: float = None,
-                 v_photometry: float = None,
+                 j_abs_magnitude: float = None,
+                 r_abs_magnitude: float = None,
+                 v_abs_magnitude: float = None,
+                 i_abs_magnitude: float = None,
                  u_velocity: float = None,
                  v_velocity: float = None,
                  w_velocity: float = None,
@@ -140,6 +144,7 @@ class Star(Base):
                  galactic_disk_type: GalacticDiskType = None):
         self.id = None
         self.group_id = group_id
+        self.mass = mass
         self.luminosity = luminosity
         self.proper_motion = proper_motion
         self.proper_motion_component_b = proper_motion_component_b
@@ -147,15 +152,15 @@ class Star(Base):
         self.proper_motion_component_vr = proper_motion_component_vr
         self.right_ascension = right_ascension
         self.declination = declination
-        self.distance = distance
+        self.right_ascension_proper_motion = right_ascension_proper_motion
+        self.declination_proper_motion = declination_proper_motion
+        self.galactocentric_distance = galactocentric_distance
         self.galactic_latitude = galactic_latitude
         self.galactic_longitude = galactic_longitude
-        self.ugriz_g_apparent = ugriz_g_apparent
-        self.ugriz_ug = ugriz_ug
-        self.ugriz_gr = ugriz_gr
-        self.ugriz_ri = ugriz_ri
-        self.ugriz_iz = ugriz_iz
-        self.v_photometry = v_photometry
+        self.j_abs_magnitude = j_abs_magnitude
+        self.r_abs_magnitude = r_abs_magnitude
+        self.v_abs_magnitude = v_abs_magnitude
+        self.i_abs_magnitude = i_abs_magnitude
         self.u_velocity = u_velocity
         self.v_velocity = v_velocity
         self.w_velocity = w_velocity
