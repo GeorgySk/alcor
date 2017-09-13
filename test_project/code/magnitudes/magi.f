@@ -12,7 +12,7 @@ C=======================================================================
       implicit real (a-h,m,o-z)
 
       integer numberOfStars,iseed,i,numberOfWDs,in
-      real lum,teff,xlog,c1,c2,c3,c4,c5,n1,n2,n3,n4,n5
+      real lum,teff,xlog,c1,c2,c3,c4,c5,c6,n1,n2,n3,n4,n5
       real xg,xug,xgr,xri,xiz,xgi,fractionOfDB
       real mone
 
@@ -103,14 +103,14 @@ C           ---  IF DA ---
               typeOfWD(i)=0
               n1=n1+1
               call interlumda(coolingTime(i),massOfWD(i),
-     &             metallicityOfWD(i),lum,teff,xlog,c1,c2,c3,c4,c5,
+     &             metallicityOfWD(i),lum,teff,xlog,c1,c2,c3,c4,c5,c6
      &             table)
 C           ---  ELSE DB  ---
             else
               n3=n3+1
               typeOfWD(i)=1    
               call interlumdb(coolingTime(i),massOfWD(i),
-     &             metallicityOfWD(i),lum,c1,c2,c3,c4,c5,teff,xlog,
+     &             metallicityOfWD(i),lum,c1,c2,c3,c4,c5,c6,teff,xlog,
      &             table)
               if(teff.lt.6000) n5=n5+1
             end if
@@ -120,7 +120,7 @@ C         ---  ELSE ONe ---
             n2=n2+1
             typeOfWD(i)=2
             call interlumone(coolingTime(i),massOfWD(i),lum,c1,c2,c3,c4,
-     &           c5,teff,xlog)
+     &           c5,c6,teff,xlog)
           end if
 C         ---  END IF CO/ONe ---
           if (teff .lt. 6000) n4 = n4 + 1

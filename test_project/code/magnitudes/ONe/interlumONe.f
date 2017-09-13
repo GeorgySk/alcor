@@ -1,4 +1,4 @@
-      subroutine interlumONe(cooling_time,
+      subroutine interlumone(cooling_time,
      &                       wd_mass,
      &                       luminosity,
      &                       ubvri_u,
@@ -6,6 +6,7 @@
      &                       ubvri_v,
      &                       ubvri_r,
      &                       ubvri_i,
+     &                       ubvri_j,
      &                       effective_temperature,
      &                       surface_gravity_logarithm)
 C     This subroutine interpolates luminosity of the DA ONe WD
@@ -27,6 +28,7 @@ C     TODO: find out the meaning of following constants
      &        cooling_time,
      &        y,
      &        mv,
+     &        mj,
      &        cbv,
      &        cvi,
      &        cvr,
@@ -39,6 +41,7 @@ C     TODO: find out the meaning of following constants
      &        ubvri_v,
      &        ubvri_r,
      &        ubvri_i,
+     &        ubvri_j,
      &        effective_temperature,
      &        surface_gravity_logarithm
 
@@ -98,6 +101,8 @@ C     TODO: find out what is going on here
      &     mtabone,lgtetabone,zlte)
       call interp(model,modlog,y,wd_mass,NCOL2,ndatsone2,lgt2tabone,
      &     tprewd2,mtabone2,lgrtabone,zlr)
+      call interp(model,modlog,y,wd_mass,NCOL,ndatsone,lgtabone,tprewd1,
+     &     mtabone,jone,mj)
 
       effective_temperature = 10.0 ** zlte
 
@@ -110,5 +115,6 @@ C     TODO: find out the meaning of 6.696e10 constant
       ubvri_v = mv
       ubvri_r = mv - cvr
       ubvri_i = mv - cvi
+      ubvri_j = mj
 
       end subroutine
