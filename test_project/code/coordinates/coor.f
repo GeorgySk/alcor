@@ -7,22 +7,21 @@ C     Distances in Kpc
 C     Velocities in Km/s
 C     Proper motions in  arcsec/yr
       implicit none
-      
-C     TODO: this is numberOfStars, take it up as const for all functions
+
       integer, parameter :: MAX_STARS_COUNT = 6000000
-C     TODO: find out the meaning of k(K_CONST) 
 C     TODO: find out the meaning of alfag(ALPHA_G)
-      real, parameter :: K_CONST = 4.74d+3,
+C     transverse_velocity = KAPPA * proper_motion * distance
+C     4.74 km/sec is one au/year
+      real, parameter :: KAPPA = 4.74,
      &                   ALPHA_G = 3.35,
      &                   PI = 4.0 * atan(1.0),
-     &                   FI = 180.0 / PI
-C     TODO: find out the meaning of deltag(DELTA_G) 
-C     TODO: find out the meaning of theta(THETA)
+     &                   FI = 180.0 / PI,
+     &                   PC_PER_KPC = 1e3
+C     TODO: find out the meaning of deltag(DELTA_G) and theta(THETA)
       double precision, parameter :: DELTA_G = 0.478d0, 
      &                               THETA = 2.147d0,
      &                               SIN_DELTA_G = dsin(DELTA_G),
      &                               COS_DELTA_G = dcos(DELTA_G)
-
       integer :: wd_index,
      &           numberOfWDs
       real :: sin_lgac,
@@ -30,7 +29,8 @@ C     TODO: find out the meaning of theta(THETA)
      &        zkr,
      &        zkri,
      &        xc,
-     &        xs
+     &        xs,
+     &        velocity_by_prop_motion
       double precision :: solarGalactocentricDistance,
      &                    ros,
      &                    cos_bgac,
@@ -71,10 +71,9 @@ C     TODO: find out the meaning of theta(THETA)
      &               radial_velocity
       common /lb/ lgac, bgac
 
-C     Calculating galactocentric coordinates (r,l,b)
       do wd_index = 1, numberOfWDs
-C         Galactic coordinate r (Kpc)
-C         TODO: find out the meaning of ros
+C         TODO: rename ros to projection of distance from Sun to WD on
+C               galactic plane 
           ros = solarGalactocentricDistance 
      &          * solarGalactocentricDistance
      &          + coordinate_R(wd_index) * coordinate_R(wd_index) 
@@ -129,23 +128,26 @@ C         Calculating the proper motions in galactic coordinates
           cos_lgac = real(cos(lgac(wd_index)))
           sin_bgac = dsin(bgac(wd_index))
           cos_bgac = dcos(bgac(wd_index))
-C         TODO: find out the meaning of zkr
-          zkr = K_CONST * rgac(wd_index)
-C         TODO: find out the meaning of zkr
-          zkri = 1.0 / zkr
 
-C         Calculating the components of the proper motion
+          zkr = KAPPA * rgac(wd_index) * PC_PER_KPC
+          zkri = 1.0 / zkr
+          velocity_by_prop_motion = 1.0 / (KAPPA * rgac(wd_index) 
+     &                                     * PC_PER_KPC)
+
+C         TODO: find out why dividing by cos_bgac
           longitude_proper_motion(wd_index) = real(
-     &        (-zkri * (sin_lgac / cos_bgac) * uu(wd_index))
-     &        + (zkri * (cos_lgac / cos_bgac) * vv(wd_index)))
+     &        velocity_by_prop_motion
+     &        * (-uu(wd_index) * sin_lgac / cos_bgac
+     &           + vv(wd_index) * cos_lgac / cos_bgac))
           latitude_proper_motion(wd_index) = real(
-     &        (-zkri * cos_lgac * sin_bgac * uu(wd_index))
-     &        + (-zkri * sin_bgac * sin_lgac * vv(wd_index))
-     &        + (zkri * cos_bgac * ww(wd_index)))
+     &        velocity_by_prop_motion
+     &        * (-uu(wd_index) * cos_lgac * sin_bgac
+     &           -vv(wd_index) * sin_bgac * sin_lgac
+     &           + ww(wd_index) * cos_bgac))
           radial_velocity(wd_index) = real(
-     &        (cos_bgac * cos_lgac * uu(wd_index))
-     &        + (cos_bgac * sin_lgac * vv(wd_index))
-     &        + (sin_bgac * ww(wd_index)))
+     &        uu(wd_index) * cos_bgac * cos_lgac
+     &        + vv(wd_index) * cos_bgac * sin_lgac
+     &        + ww(wd_index) * sin_bgac)
 C         FIXME: Looks like this formula is wrong
           properMotion(wd_index) = sqrt(
      &        longitude_proper_motion(wd_index) 
