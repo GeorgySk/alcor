@@ -9,7 +9,7 @@ FILES_PATHS = ['color_106.out',
                'color_120.out',
                'color_124.out',
                'color_128.out']
-FILES_FOLDER = 'one_color_tables'
+FILES_DIR = 'one_color_tables'
 MASSES = [np.array([1.06, 1.10, 1.16, 1.20, 1.24, 1.28])]
 SEQUENCE_FILL_RULES = {'luminosity': {'column': 0},
                        'v_ubvri_absolute': {'column': 11},

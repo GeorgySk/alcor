@@ -40,7 +40,7 @@ def read(table_name: str) -> Union[CoolingSequencesType,
 
     if split_table_by_metallicities:
         return filled_table_split_by_metallicity(
-            folders=table.FILES_FOLDER,
+            directories=table.FILES_DIR,
             files_paths_by_metallicities=table.FILES_PATHS,
             metallicities_per_thousand=table.METALLICITIES_PER_THOUSAND,
             masses=table.MASSES,
@@ -49,21 +49,21 @@ def read(table_name: str) -> Union[CoolingSequencesType,
             fill_types_by_metallicities=table.FILL_TYPES_BY_METALLICITIES,
             fill_rules=table.SEQUENCE_FILL_RULES)
     else:
-        return filled_table(folder=table.FILES_FOLDER,
+        return filled_table(directory=table.FILES_DIR,
                             files_paths=table.FILES_PATHS,
                             rows_count=table.ROWS_COUNT,
                             masses=table.MASSES,
                             fill_rules=table.SEQUENCE_FILL_RULES)
 
 
-def filled_table(folder: str,
+def filled_table(directory: str,
                  files_paths: List[str],
                  rows_count: int,
                  masses: np.ndarray,
                  fill_rules: Dict[str, Dict[str, int]]
                  ) -> Dict[str, np.ndarray]:
     files_paths = [
-        os.path.join(folder, file_path)
+        os.path.join(directory, file_path)
         for file_path in files_paths]
 
     files_count = len(files_paths)
@@ -83,7 +83,7 @@ def filled_table(folder: str,
 
 
 def filled_table_split_by_metallicity(
-        folders: Dict[int, str],
+        directories: Dict[int, str],
         files_paths_by_metallicities: Dict[int, List[str]],
         metallicities_per_thousand: List[int],
         masses: List[np.ndarray],
@@ -92,10 +92,10 @@ def filled_table_split_by_metallicity(
         fill_types_by_metallicities: Dict[int, int],
         fill_rules: Dict[str, Dict[str, Union[int, List[int], Callable]]]
         ) -> CoolingSequencesType:
-    for metallicity, folder_path in folders.items():
+    for metallicity, dir_path in directories.items():
         files_paths = files_paths_by_metallicities[metallicity]
         files_paths_by_metallicities[metallicity] = [
-            os.path.join(folder_path, file_path)
+            os.path.join(dir_path, file_path)
             for file_path in files_paths]
 
     table = dict(metallicities_cooling_sequences(

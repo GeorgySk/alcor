@@ -14,7 +14,7 @@ FILES_PATHS = ['cox_0524.dat',
                'cox_0767.dat',
                'cox_0837.dat',
                'cox_0877.dat']
-FILES_FOLDER = 'da_color_tables'
+FILES_DIR = 'da_color_tables'
 MASSES = [np.array([0.524, 0.570, 0.593, 0.610, 0.632,
                     0.659, 0.705, 0.767, 0.837, 0.877])]
 SEQUENCE_FILL_RULES = {'luminosity': {'column': 2},

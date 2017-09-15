@@ -38,11 +38,11 @@ FILES_PATHS = dict(zip(METALLICITIES_PER_THOUSAND,
                          '0659_006_sflhdiff.trk',
                          '0705_006_sflhdiff.trk',
                          '1000_006_sflhdiff.trk']]))
-FILES_FOLDER = dict(zip(METALLICITIES_PER_THOUSAND,
-                        ['da_cooling_tables/Z0001',
-                         'da_cooling_tables/Z001',
-                         'da_cooling_tables/Z003',
-                         'da_cooling_tables/Z006']))
+FILES_DIR = dict(zip(METALLICITIES_PER_THOUSAND,
+                     ['da_cooling_tables/Z0001',
+                      'da_cooling_tables/Z001',
+                      'da_cooling_tables/Z003',
+                      'da_cooling_tables/Z006']))
 MASSES = [np.array([0.505, 0.553, 0.593, 0.627, 0.660, 0.692, 0.863]),
           np.array([0.524, 0.570, 0.593, 0.609, 0.632,
                     0.659, 0.705, 0.767, 0.837, 0.877]),
