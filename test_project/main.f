@@ -288,16 +288,25 @@ C     TODO: add choosing what output we want to get
       open(421, file = output_filename)
       if (geometry == 'sphere') then
           write(421, *) 'mass ',
+     &                  'r_galactocentric ',
+     &                  'th_galactocentric ',
+     &                  'z_coordinate ',
+     &                  'galactic_longitude ',
+     &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
      &                  'j_abs_magnitude ',
      &                  'r_abs_magnitude ',
      &                  'v_abs_magnitude ',
      &                  'i_abs_magnitude ',
+     &                  'u_velocity ',
+     &                  'v_velocity ',
+     &                  'w_velocity ',
      &                  'right_ascension_proper_motion ',
      &                  'declination_proper_motion ',
      &                  'proper_motion ',
-     &                  'galactocentric_distance ',
+     &                  'distance ',
+     &                  'birth_time ',
      &                  'spectral_type ',
      &                  'disk_belonging '
       else if (geometry == 'cones') then
@@ -581,6 +590,8 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real :: right_ascension_prop_motion,
      &        declination_prop_motion,
      &        total_prop_motion
+      real :: m(numberOfStars), 
+     &        starBirthTime(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -594,6 +605,8 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       common /cool/ coolingTime
       common /indexdb/ typeOfWD
       common /vel/ uu,vv,ww
+      common /tm/ starBirthTime, 
+     &            m
 
       pi = 4.0 * atan(1.0)
       DELTA_LATITUDE = 2.64 * pi / 180.0
@@ -625,16 +638,25 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                 + declination_prop_motion ** 2))
 
               write(421, *) massOfWD(i),
+     &                      coordinate_R(i),
+     &                      coordinate_Theta(i),
+     &                      coordinate_Zcylindr(i),
+     &                      lgac(i),
+     &                      bgac(i),
      &                      rightAscension(i),
      &                      declination(i),
      &                      j_ubvrij(i),
      &                      r_ubvrij(i),
      &                      v_ubvrij(i),
      &                      i_ubvrij(i),
+     &                      uu(i),
+     &                      vv(i),
+     &                      ww(i),
      &                      right_ascension_prop_motion,
      &                      declination_prop_motion,
      &                      total_prop_motion,
      &                      rgac(i),
+     &                      starBirthTime(i),
      &                      typeOfWD(i),
      &                      disk_str
           end do

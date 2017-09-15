@@ -101,18 +101,9 @@ C         TODO: check if precision can be lost here
      &                                  * solarGalactocentricDistance))
           end if
 
-          if (coordinate_R(wd_index) * cos(coordinate_Theta(wd_index))
-     &            > solarGalactocentricDistance) then 
-              lgac(wd_index) = PI - lgac(wd_index)
-          else
-              if (sin(coordinate_Theta(wd_index)) < 0.0) then
-                  lgac(wd_index)=2.0*PI+lgac(wd_index)
-              end if
-              continue
-          end if
-
-          if (lgac(wd_index) > 2.0 * PI) then
-              lgac(wd_index) = lgac(wd_index) - 2.0 * PI
+C         Unfolding from 0-180 to 0-360
+          if (coordinate_Theta(wd_index) > PI) then 
+              lgac(wd_index) = 2.0 * PI - lgac(wd_index)
           end if
 
 C         Galactic coordinate bgac ---
