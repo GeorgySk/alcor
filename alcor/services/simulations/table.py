@@ -62,10 +62,8 @@ def filled_table(folder: str,
                  masses: np.ndarray,
                  fill_rules: Dict[str, Dict[str, int]]
                  ) -> Dict[str, np.ndarray]:
-    base_dir = os.path.dirname(__file__)
-
     files_paths = [
-        os.path.join(base_dir, folder, file_path)
+        os.path.join(folder, file_path)
         for file_path in files_paths]
 
     files_count = len(files_paths)
@@ -94,12 +92,10 @@ def filled_table_split_by_metallicity(
         fill_types_by_metallicities: Dict[int, int],
         fill_rules: Dict[str, Dict[str, Union[int, List[int], Callable]]]
         ) -> CoolingSequencesType:
-    base_dir = os.path.dirname(__file__)
-
     for metallicity, folder_path in folders.items():
         files_paths = files_paths_by_metallicities[metallicity]
         files_paths_by_metallicities[metallicity] = [
-            os.path.join(base_dir, folder_path, file_path)
+            os.path.join(folder_path, file_path)
             for file_path in files_paths]
 
     table = dict(metallicities_cooling_sequences(
