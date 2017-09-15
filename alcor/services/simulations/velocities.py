@@ -1,3 +1,4 @@
+from copy import deepcopy
 from functools import partial
 from typing import List
 
@@ -23,7 +24,7 @@ def generate_velocities(*,
                         solar_galactocentric_distance: float,
                         oort_a_const: float,
                         oort_b_const: float
-                        ) -> None:
+                        ) -> List[Star]:
     thin_disk_stars = [star
                        for star in stars
                        if star.disk_belonging == GalacticDiskEnum.thin]
@@ -40,18 +41,20 @@ def generate_velocities(*,
         v_peculiar_solar_velocity=v_peculiar_solar_velocity,
         w_peculiar_solar_velocity=w_peculiar_solar_velocity)
 
-    for star in thin_disk_stars:
-        update_velocities(
+    new_thin_disk_stars = [update_velocities(
             star,
             u_velocity_dispersion=thin_disk_u_velocity_dispersion,
             v_velocity_dispersion=thin_disk_v_velocity_dispersion,
             w_velocity_dispersion=thin_disk_w_velocity_dispersion)
-    for star in thick_disk_stars:
-        update_velocities(
+        for star in thin_disk_stars]
+    new_thick_disk_stars = [update_velocities(
             star,
             u_velocity_dispersion=thick_disk_u_velocity_dispersion,
             v_velocity_dispersion=thick_disk_v_velocity_dispersion,
             w_velocity_dispersion=thick_disk_w_velocity_dispersion)
+        for star in thick_disk_stars]
+
+    return new_thin_disk_stars + new_thick_disk_stars
 
 
 def update_star_velocities(star: Star,
@@ -64,24 +67,28 @@ def update_star_velocities(star: Star,
                            w_peculiar_solar_velocity: float,
                            u_velocity_dispersion: float,
                            v_velocity_dispersion: float,
-                           w_velocity_dispersion: float) -> None:
+                           w_velocity_dispersion: float) -> Star:
+    new_star = deepcopy(star)
+
     uop = uom(u_peculiar_solar_velocity,
               star.r_cylindric_coordinate,
               star.th_cylindric_coordinate,
               solar_galactocentric_distance,
               oort_a_const,
               oort_b_const)
-    star.u_velocity = uop + u_velocity_dispersion * np.random.normal()
+    new_star.u_velocity = uop + u_velocity_dispersion * np.random.normal()
     vop = vom(v_peculiar_solar_velocity,
               star.r_cylindric_coordinate,
               star.th_cylindric_coordinate,
               solar_galactocentric_distance,
               oort_a_const,
               oort_b_const)
-    star.v_velocity = (vop + v_velocity_dispersion * np.random.normal()
-                       - u_velocity_dispersion ** 2 / 120.)
-    star.w_velocity = (w_peculiar_solar_velocity
-                       + w_velocity_dispersion * np.random.normal())
+    new_star.v_velocity = (vop + v_velocity_dispersion * np.random.normal()
+                           - u_velocity_dispersion ** 2 / 120.)
+    new_star.w_velocity = (w_peculiar_solar_velocity
+                           + w_velocity_dispersion * np.random.normal())
+
+    return new_star
 
 
 def uom(u_peculiar_solar_velocity: float,
