@@ -6,6 +6,7 @@ C     Galactic coordinates in radians
 C     Distances in Kpc
 C     Velocities in Km/s
 C     Proper motions in  arcsec/yr
+C     More info on conversions at: https://physics.stackexchange.com/questions/88663/converting-between-galactic-and-ecliptic-coordinates
       implicit none
 
       integer, parameter :: MAX_STARS_COUNT = 6000000
@@ -17,7 +18,9 @@ C     4.74 km/sec is one au/year
      &                   PI = 4.0 * atan(1.0),
      &                   FI = 180.0 / PI,
      &                   PC_PER_KPC = 1e3
-C     TODO: find out the meaning of deltag(DELTA_G) and theta(THETA)
+C     THETA - see BK angle at the link above
+C     DELTA_G - declination of NGP 
+C     TODO: find out why we use NGP declination for J1950 and not J2000 
       double precision, parameter :: DELTA_G = 0.478d0, 
      &                               THETA = 2.147d0,
      &                               SIN_DELTA_G = dsin(DELTA_G),
@@ -34,7 +37,6 @@ C     TODO: find out the meaning of deltag(DELTA_G) and theta(THETA)
       double precision :: solarGalactocentricDistance,
      &                    ros,
      &                    cos_bgac,
-     &                    zz,
      &                    sin_bgac,
      &                    zzx
       double precision :: coordinate_R(MAX_STARS_COUNT),
@@ -155,24 +157,23 @@ C         FIXME: Looks like this formula is wrong
      &        + latitude_proper_motion(wd_index) 
      &          * latitude_proper_motion(wd_index))
 
-C         Calculating right ascension and the declination      
-C         Calculating the declination
-C         TODO: find out the meaning of zz
-          zz = SIN_DELTA_G * sin_bgac 
-     &         + COS_DELTA_G * cos_bgac * dcos(THETA - lgac(wd_index))
-          declination(wd_index) = dasin(zz)
+C         More info at the link above
+          declination(wd_index) = dasin(
+     &        SIN_DELTA_G * sin_bgac + COS_DELTA_G * cos_bgac 
+     &                                 * dcos(THETA - lgac(wd_index)))
 
-C         Calculating the right ascension
-C         TODO: find out the meaning of xs
+C         TODO: give better names for xs and xc
+C         These vars are used for conversion from galactic to equatorial 
+C         coordinates. More info at the link above
           xs = real((cos_bgac * dsin(THETA - lgac(wd_index))) 
      &              / dcos(declination(wd_index)))
-C         TODO: find out the meaning of xc
           xc =  real((COS_DELTA_G * sin_bgac 
      &                - SIN_DELTA_G * cos_bgac 
      &                  * cos(THETA - lgac(wd_index)))
      &               / cos(declination(wd_index)))
 
 C         Looking at the sign that corresponds to the right ascension
+C         TODO: find out what is going on here
           if (xs >= 0.0) then
               if (xc >= 0.0) then 
                   rightAscension(wd_index) = asin(xs) + ALPHA_G
