@@ -1,6 +1,8 @@
 import numpy as np
 
 
+split_by_metallicities = False
+
 ROWS_COUNT = 650
 FILES_PATHS = ['cox_0524.dat',
                'cox_0570.dat',

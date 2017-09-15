@@ -1,5 +1,7 @@
 import numpy as np
 
+split_by_metallicities = True
+
 ROWS_COUNT = 650
 METALLICITIES_PER_THOUSAND = [1, 10, 30, 60]
 FILES_PATHS = dict(zip(METALLICITIES_PER_THOUSAND,

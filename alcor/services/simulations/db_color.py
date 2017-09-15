@@ -4,6 +4,7 @@ import numpy as np
 def convert_luminosity(luminosity: str) -> float:
     return -(float(luminosity) - 4.72) / 2.5
 
+split_by_metallicities = False
 
 ROWS_COUNT = 60
 FILES_PATHS = ['Table_Mass_05_DB_sort.trk',

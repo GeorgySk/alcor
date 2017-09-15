@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 from typing import (Union,
                     Callable,
                     Iterator,
@@ -10,6 +9,11 @@ from typing import (Union,
 
 import numpy as np
 
+from alcor.services.simulations import (da_color,
+                                        db_color,
+                                        one_table,
+                                        da_cooling,
+                                        db_cooling)
 from alcor.types import CoolingSequencesType
 
 logger = logging.getLogger(__name__)
@@ -21,25 +25,20 @@ def read(table_name: str) -> Union[CoolingSequencesType,
                                '%(levelname)s: %(message)s',
                         level=logging.DEBUG)
 
-    table_split_by_metallicities = False
+    tables = {'da_color': da_color,
+              'db_color': db_color,
+              'one_table': one_table,
+              'da_cooling': da_cooling,
+              'db_cooling': db_cooling}
 
-    if table_name == 'da_color':
-        import alcor.services.simulations.da_color as table
-    elif table_name == 'db_color':
-        import alcor.services.simulations.db_color as table
-    elif table_name == 'one_table':
-        import alcor.services.simulations.one_table as table
-    elif table_name == 'da_cooling':
-        import alcor.services.simulations.da_cooling as table
-        table_split_by_metallicities = True
-    elif table_name == 'db_cooling':
-        import alcor.services.simulations.db_cooling as table
-        table_split_by_metallicities = True
-    else:
-        logger.error(f'There is no table {table_name}')
-        sys.exit()
+    try:
+        table = tables[table_name]
+    except KeyError as err:
+        err_msg = f'Invalid table name: "{table_name}", not found'
+        raise ValueError(err_msg) from err
+    split_table_by_metallicities = table.split_by_metallicities
 
-    if table_split_by_metallicities:
+    if split_table_by_metallicities:
         return filled_table_split_by_metallicity(
             folders=table.FILES_FOLDER,
             files_paths_by_metallicities=table.FILES_PATHS,

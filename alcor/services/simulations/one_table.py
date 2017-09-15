@@ -1,5 +1,7 @@
 import numpy as np
 
+split_by_metallicities = False
+
 ROWS_COUNT = 300
 FILES_PATHS = ['color_106.out',
                'color_110.out',
