@@ -34,10 +34,10 @@ FILES_PATHS = {1: ['wd0505_z0001.trk',
                     '0659_006_sflhdiff.trk',
                     '0705_006_sflhdiff.trk',
                     '1000_006_sflhdiff.trk']}
-FILES_FOLDER = {1:  './da_cooling_tables/Z0001',
-                10: './da_cooling_tables/Z001',
-                30: './da_cooling_tables/Z003',
-                60: './da_cooling_tables/Z006'}
+FILES_FOLDER = {1:  'da_cooling_tables/Z0001',
+                10: 'da_cooling_tables/Z001',
+                30: 'da_cooling_tables/Z003',
+                60: 'da_cooling_tables/Z006'}
 MASSES = [np.array([0.505, 0.553, 0.593, 0.627, 0.660, 0.692, 0.863]),
           np.array([0.524, 0.570, 0.593, 0.609, 0.632,
                     0.659, 0.705, 0.767, 0.837, 0.877]),

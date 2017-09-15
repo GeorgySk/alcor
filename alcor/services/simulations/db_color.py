@@ -13,7 +13,7 @@ FILES_PATHS = ['Table_Mass_05_DB_sort.trk',
                'Table_Mass_09_DB_sort.trk',
                'Table_Mass_10_DB_sort.trk',
                'Table_Mass_12_DB_sort.trk']
-FILES_FOLDER = './db_color_tables'
+FILES_FOLDER = 'db_color_tables'
 MASSES = [np.array([0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2])]
 SEQUENCE_FILL_RULES = {'luminosity': {'column': 2,
                             'converting_method': convert_luminosity},
