@@ -169,7 +169,7 @@ def read_files(files_paths: List[str],
                         if 'converting_method' in fill_rule:
                             table[sequence][file_path_index, row_index] = (
                                 fill_rule['converting_method'](
-                                    row[fill_rule['column']]))
+                                    float(row[fill_rule['column']])))
                         else:
                             table[sequence][file_path_index, row_index] = (
                                 float(row[fill_rule['column']]))
@@ -177,7 +177,7 @@ def read_files(files_paths: List[str],
                         if 'converting_method' in fill_rule:
                             table[sequence][file_path_index, row_index] = (
                                 fill_rule['converting_method'](
-                                    row[fill_rule['column'][fill_type]],
+                                    float(row[fill_rule['column'][fill_type]]),
                                     fill_type=fill_type,
                                     pre_wd_lifetime=table['pre_wd_lifetime'][
                                         file_path_index]))
