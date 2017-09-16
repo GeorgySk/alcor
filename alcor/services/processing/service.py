@@ -1,15 +1,12 @@
-import logging
 import uuid
 from typing import Optional
 
 from sqlalchemy.orm.session import Session
 
+from alcor.services import stars_group
 from alcor.services.data_access import (fetch_unprocessed_groups,
                                         fetch_last_groups,
                                         fetch_group_by_id)
-from alcor.services import stars_group
-
-logger = logging.getLogger(__name__)
 
 
 def run(*,
