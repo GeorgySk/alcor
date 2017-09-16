@@ -1,23 +1,22 @@
-import logging
 import uuid
 from collections import Counter
 from functools import partial
 from itertools import filterfalse
+from typing import (Iterator,
+                    List)
 
 from sqlalchemy.orm.session import Session
 
 from alcor.models import (Group,
-                          Star)
-from alcor.models.eliminations import StarsCounter
-from alcor.models.processed_star_association import ProcessedStarsAssociation
+                          Star,
+                          eliminations,
+                          associations)
 from alcor.services import (luminosity_function,
                             velocities,
                             velocities_vs_magnitudes)
 from alcor.services.data_access import fetch_group_stars
 from . import elimination
 from .utils import copy_velocities
-
-logger = logging.getLogger(__name__)
 
 
 def process(*,
@@ -40,9 +39,9 @@ def process(*,
                                 filtration_method=filtration_method)
         stars = list(filterfalse(is_eliminated, stars))
 
-    counter = StarsCounter(group_id=group.id,
-                           raw=stars_count,
-                           **eliminations_counter)
+    counter = eliminations.StarsCounter(group_id=group.id,
+                                        raw=stars_count,
+                                        **eliminations_counter)
 
     session.add(counter)
 
@@ -84,10 +83,17 @@ def process(*,
 
     session.commit()
 
-    for star, processed_star in zip(stars, processed_stars):
-        processed_star_association = ProcessedStarsAssociation(
-            original_star_id=star.id,
-            processed_star_id=processed_star.id)
-        session.add(processed_star_association)
+    stars_associations = processed_stars_associations(stars, processed_stars)
+    session.add_all(stars_associations)
 
     session.commit()
+
+
+def processed_stars_associations(original_stars: List[Star],
+                                 processed_stars: List[Star]
+                                 ) -> Iterator[associations.ProcessedStars]:
+    for original_star, processed_star in zip(original_stars,
+                                             processed_stars):
+        yield associations.ProcessedStars(
+            original_id=original_star.id,
+            processed_id=processed_star.id)
