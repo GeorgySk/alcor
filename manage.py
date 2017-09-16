@@ -2,6 +2,7 @@
 import logging
 import os
 import uuid
+from typing import Optional
 
 import click
 from sqlalchemy.engine.url import make_url
@@ -14,10 +15,10 @@ from sqlalchemy_utils import (database_exists,
                               drop_database)
 
 from alcor.models.base import Base
-from alcor.services import plots
+from alcor.services import (simulations,
+                            processing,
+                            plots)
 from alcor.services.common import FILTRATION_METHODS
-from alcor.services.processing import run_processing
-from alcor.services.simulations import run_simulations
 from alcor.utils import load_settings
 
 logger = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ def simulate(ctx: click.Context,
         grid_parameters_info = {**grid_parameters_settings.get('common', {}),
                                 **grid_parameters_settings.get(geometry, {})}
 
-        run_simulations(geometry=geometry,
+        simulations.run(geometry=geometry,
                         precision=precision,
                         grid_parameters_info=grid_parameters_info,
                         csv_parameters_info=csv_parameters_info,
@@ -104,7 +105,7 @@ def simulate(ctx: click.Context,
                    '"full" - only declination '
                    'and parallax selection criteria, '
                    '"restricted" - apply all criteria (default)')
-@click.option('--nullify-radial-velocity', '-nrf',
+@click.option('--nullify-radial-velocity', '-nrv',
               is_flag=True,
               help='Sets radial velocities to zero.')
 @click.option('--w-luminosity-function', '-lf',
@@ -123,7 +124,7 @@ def simulate(ctx: click.Context,
 def process(ctx: click.Context,
             unprocessed: bool,
             last: int,
-            group_id: uuid.UUID,
+            group_id: Optional[uuid.UUID],
             filtration_method: str,
             nullify_radial_velocity: bool,
             w_luminosity_function: bool,
@@ -145,7 +146,7 @@ def process(ctx: click.Context,
         if last is not None or group_id is not None:
             unprocessed = None
 
-        run_processing(filtration_method=filtration_method,
+        processing.run(filtration_method=filtration_method,
                        nullify_radial_velocity=nullify_radial_velocity,
                        w_luminosity_function=w_luminosity_function,
                        w_velocities_clouds=w_velocities_clouds,
@@ -188,7 +189,7 @@ def process(ctx: click.Context,
               help='Plot color-color diagrams for ugriz photometry.')
 @click.pass_context
 def plot(ctx: click.Context,
-         group_id: uuid.UUID,
+         group_id: Optional[uuid.UUID],
          luminosity_function: bool,
          velocities_vs_magnitude: bool,
          velocity_clouds: bool,

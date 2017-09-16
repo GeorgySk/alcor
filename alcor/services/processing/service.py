@@ -12,17 +12,17 @@ from alcor.services import stars_group
 logger = logging.getLogger(__name__)
 
 
-def run_processing(*,
-                   filtration_method: str,
-                   nullify_radial_velocity: bool,
-                   w_luminosity_function: bool,
-                   w_velocities_clouds: bool,
-                   w_velocities_vs_magnitude: bool,
-                   w_lepine_criterion: bool,
-                   last_groups_count: Optional[int],
-                   unprocessed_groups: bool,
-                   group_id: Optional[uuid.UUID],
-                   session: Session) -> None:
+def run(*,
+        filtration_method: str,
+        nullify_radial_velocity: bool,
+        w_luminosity_function: bool,
+        w_velocities_clouds: bool,
+        w_velocities_vs_magnitude: bool,
+        w_lepine_criterion: bool,
+        last_groups_count: Optional[int],
+        unprocessed_groups: bool,
+        group_id: Optional[uuid.UUID],
+        session: Session) -> None:
     if unprocessed_groups:
         groups = fetch_unprocessed_groups(session=session)
     elif last_groups_count:

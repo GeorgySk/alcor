@@ -17,12 +17,12 @@ from . import grid
 logger = logging.getLogger(__name__)
 
 
-def run_simulations(*,
-                    geometry: str,
-                    precision: int,
-                    grid_parameters_info: GridParametersInfoType,
-                    csv_parameters_info: CSVParametersInfoType,
-                    session: Session) -> None:
+def run(*,
+        geometry: str,
+        precision: int,
+        grid_parameters_info: GridParametersInfoType,
+        csv_parameters_info: CSVParametersInfoType,
+        session: Session) -> None:
     for parameters_values in grid.parameters_values(
             parameters_info=grid_parameters_info,
             precision=precision):
