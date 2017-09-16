@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Iterable
 
 import numpy as np
 
@@ -96,7 +96,7 @@ def generate(cone_height_longitude: float,
              solar_galactocentric_distance: float,
              thick_disk_scale_length: float,
              initial_mass_function_param: float
-             ) -> List[Star]:
+             ) -> Iterable[Star]:
     normalization_cone_mass = (cone_mass(latitude=cone_height_longitude,
                                          delta_latitude=delta_latitude,
                                          density=density,
@@ -112,8 +112,6 @@ def generate(cone_height_longitude: float,
         thick_disk_scale_length=thick_disk_scale_length)
 
     normalization_mass = 0.
-
-    stars = []
 
     while True:
         star = Star()
@@ -153,9 +151,7 @@ def generate(cone_height_longitude: float,
         if normalization_mass > normalization_cone_mass:
             break
 
-        stars.append(star)
-
-    return stars
+        yield star
 
 
 def cone_mass(latitude: float,
