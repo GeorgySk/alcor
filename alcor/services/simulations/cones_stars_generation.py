@@ -172,9 +172,9 @@ def cone_mass(latitude: float,
     max_latitude = latitude + delta_latitude / 2.
 
     # Next, we consider 3 cases:
-    #     1) Both min_latitude and max_latitude are in [0; PI/2]
-    #     2) min_latitude is negative and max_latitude is in [0; PI/2]
-    #     3) min_latitude is in [0; PI/2] and max_latitude > PI/2
+    #     1) both min_latitude and max_latitude are in [0; pi/2]
+    #     2) `min_latitude` is negative and `max_latitude` is in [0; pi/2]
+    #     3) `min_latitude` is in [0; pi/2] and `max_latitude` > pi/2
 
     # case 1
     if min_latitude >= 0. and max_latitude <= np.pi / 2.:
