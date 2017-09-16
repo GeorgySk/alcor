@@ -142,7 +142,7 @@ def generate(cone_height_longitude: float,
                 break
 
         # TODO: this get_mass is also in another PR
-        star.progenitor_mass = get_mass(initial_mass_function_param)
+        star.progenitor_mass = progenitor_mass(initial_mass_function_param)
         # TODO: I am not sure if I need these
         star.r_cylindric_coordinate = opposite_triangle_side(
             solar_galactocentric_distance,
@@ -287,9 +287,9 @@ def opposite_triangle_side(side: float,
                 - 2. * side * other_side * cos(enclosed_angle))
 
 
-def get_mass(initial_mass_function_param: float,
-             min_mass: float = 0.4,
-             max_mass: float = 50.) -> float:
+def progenitor_mass(initial_mass_function_param: float,
+                    min_mass: float = 0.4,
+                    max_mass: float = 50.) -> float:
     mass_range = max_mass - min_mass
     y_max = min_mass ** initial_mass_function_param
 
