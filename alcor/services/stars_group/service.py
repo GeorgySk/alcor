@@ -20,15 +20,15 @@ from .utils import copy_velocities
 logger = logging.getLogger(__name__)
 
 
-def process_stars_group(*,
-                        group: Group,
-                        filtration_method: str,
-                        nullify_radial_velocity: bool,
-                        w_luminosity_function: bool,
-                        w_velocities_clouds: bool,
-                        w_velocities_vs_magnitude: bool,
-                        w_lepine_criterion: bool,
-                        session: Session) -> None:
+def process(*,
+            group: Group,
+            filtration_method: str,
+            nullify_radial_velocity: bool,
+            w_luminosity_function: bool,
+            w_velocities_clouds: bool,
+            w_velocities_vs_magnitude: bool,
+            w_lepine_criterion: bool,
+            session: Session) -> None:
     stars = fetch_group_stars(group_id=group.id,
                               session=session)
     stars_count = len(stars)

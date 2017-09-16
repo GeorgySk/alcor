@@ -7,7 +7,7 @@ from sqlalchemy.orm.session import Session
 from alcor.services.data_access import (fetch_unprocessed_groups,
                                         fetch_last_groups,
                                         fetch_group_by_id)
-from alcor.services.group_processing import process_stars_group
+from alcor.services import stars_group
 
 logger = logging.getLogger(__name__)
 
@@ -32,12 +32,12 @@ def run_processing(*,
         groups = [fetch_group_by_id(group_id=group_id,
                                     session=session)]
     for group in groups:
-        process_stars_group(
-                group=group,
-                filtration_method=filtration_method,
-                nullify_radial_velocity=nullify_radial_velocity,
-                w_luminosity_function=w_luminosity_function,
-                w_velocities_clouds=w_velocities_clouds,
-                w_velocities_vs_magnitude=w_velocities_vs_magnitude,
-                w_lepine_criterion=w_lepine_criterion,
-                session=session)
+        stars_group.process(
+            group=group,
+            filtration_method=filtration_method,
+            nullify_radial_velocity=nullify_radial_velocity,
+            w_luminosity_function=w_luminosity_function,
+            w_velocities_clouds=w_velocities_clouds,
+            w_velocities_vs_magnitude=w_velocities_vs_magnitude,
+            w_lepine_criterion=w_lepine_criterion,
+            session=session)

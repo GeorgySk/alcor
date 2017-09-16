@@ -1,7 +1,7 @@
 from typing import List
 
 from alcor.models import Star
-from alcor.services.group_processing.utils import copy_velocities
+from alcor.services.stars_group.utils import copy_velocities
 
 
 def test_copy_velocities(src_stars: List[Star],

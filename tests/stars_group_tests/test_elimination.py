@@ -1,7 +1,7 @@
 from collections import Counter
 
 from alcor.models import Star
-from alcor.services.group_processing.elimination import check
+from alcor.services.stars_group.elimination import check
 
 
 def test_check(star: Star,
