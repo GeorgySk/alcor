@@ -35,15 +35,16 @@ SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 # https://en.wikipedia.org/wiki/Photometric_system
 STAR_PARAMETERS_NAMES = ['mass',
                          'luminosity',
+                         'progenitor_mass',
+                         'r_cylindrical_coordinate',
+                         'th_cylindrical_coordinate',
+                         'z_coordinate',
                          'proper_motion',
                          'proper_motion_component_b',
                          'proper_motion_component_l',
                          'proper_motion_component_vr',
                          'right_ascension',
                          'declination',
-                         'r_galactocentric',
-                         'th_galactocentric',
-                         'z_coordinate',
                          'right_ascension_proper_motion',
                          'declination_proper_motion',
                          'distance',
@@ -80,10 +81,12 @@ class Star(Base):
                   nullable=True)
     luminosity = Column(Float(asdecimal=True),
                         nullable=True)
-    r_galactocentric = Column(Float(asdecimal=True),
-                              nullable=True)
-    th_galactocentric = Column(Float(asdecimal=True),
-                               nullable=True)
+    progenitor_mass = Column(Float(asdecimal=True),
+                             nullable=True)
+    r_cylindrical_coordinate = Column(Float(asdecimal=True),
+                                      nullable=True)
+    th_cylindrical_coordinate = Column(Float(asdecimal=True),
+                                       nullable=True)
     z_coordinate = Column(Float(asdecimal=True),
                           nullable=True)
     proper_motion = Column(Float(asdecimal=True),
@@ -138,10 +141,11 @@ class Star(Base):
                  group_id: uuid.UUID = None,
                  mass: float = None,
                  luminosity: float = None,
-                 proper_motion: float = None,
-                 r_galactocentric: float = None,
-                 th_galactocentric: float = None,
+                 progenitor_mass: float = None,
+                 r_cylindrical_coordinate: float = None,
+                 th_cylindrical_coordinate: float = None,
                  z_coordinate: float = None,
+                 proper_motion: float = None,
                  proper_motion_component_b: float = None,
                  proper_motion_component_l: float = None,
                  proper_motion_component_vr: float = None,
@@ -167,10 +171,11 @@ class Star(Base):
         self.group_id = group_id
         self.mass = mass
         self.luminosity = luminosity
-        self.proper_motion = proper_motion
-        self.r_galactocentric = r_galactocentric
-        self.th_galactocentric = th_galactocentric
+        self.progenitor_mass = progenitor_mass
+        self.r_cylindrical_coordinate = r_cylindrical_coordinate
+        self.th_cylindrical_coordinate = th_cylindrical_coordinate
         self.z_coordinate = z_coordinate
+        self.proper_motion = proper_motion
         self.proper_motion_component_b = proper_motion_component_b
         self.proper_motion_component_l = proper_motion_component_l
         self.proper_motion_component_vr = proper_motion_component_vr
