@@ -1,12 +1,12 @@
 import enum
-import math
 import uuid
-from math import (cos,
+from math import (radians,
+                  cos,
                   sin,
                   pi,
                   asin,
                   atan)
-from typing import Tuple
+from typing import (Tuple)
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
@@ -18,11 +18,12 @@ from sqlalchemy.sql.sqltypes import (BigInteger,
                                      Enum)
 
 from .base import Base
+from .utils import memoize_properties
 
 ASTRONOMICAL_UNIT = 4.74
-DEC_GPOLE = math.radians(27.128336)
-RA_GPOLE = math.radians(192.859508)
-AUX_ANGLE = math.radians(122.932)
+DEC_GPOLE = radians(27.128336)
+RA_GPOLE = radians(192.859508)
+AUX_ANGLE = radians(122.932)
 
 SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 
@@ -51,11 +52,12 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'galactic_disk_type']
 
 
-class GalacticDiskType(enum.Enum):
+class GalacticDiskType(enum.IntEnum):
     thin = 1
     thick = 2
 
 
+@memoize_properties
 class Star(Base):
     __tablename__ = 'stars'
 
@@ -164,17 +166,16 @@ class Star(Base):
 
     @property
     def x_coordinate(self) -> float:
-        return float(self.to_cartesian_from_equatorial()[0])
+        return float(self.cartesian_coordinates[0])
 
     @property
     def y_coordinate(self) -> float:
-        return float(self.to_cartesian_from_equatorial()[1])
+        return float(self.cartesian_coordinates[1])
 
     @property
     def z_coordinate(self) -> float:
-        return float(self.to_cartesian_from_equatorial()[2])
+        return float(self.cartesian_coordinates[2])
 
-    # TODO: make memoized property
     @property
     def max_coordinates_modulus(self) -> float:
         return max(abs(self.x_coordinate),
@@ -185,12 +186,13 @@ class Star(Base):
     def ugriz_rz(self) -> float:
         return float(self.ugriz_ri) + float(self.ugriz_iz)
 
-    def to_cartesian_from_equatorial(self) -> Tuple[float,
-                                                    float,
-                                                    float]:
+    @property
+    def cartesian_coordinates(self) -> Tuple[float,
+                                             float,
+                                             float]:
         right_ascension = float(self.right_ascension)
         declination = float(self.declination)
-        distance = float(self.galactic_distance)
+        galactic_distance = float(self.galactic_distance)
 
         latitude = (asin(cos(declination) * cos(DEC_GPOLE)
                          * cos(right_ascension - RA_GPOLE)
@@ -200,12 +202,11 @@ class Star(Base):
         longitude = atan(x / y) + AUX_ANGLE - pi / 2.
         if x > 0. and 0. > y or x <= 0. and y <= 0.:
             longitude += pi
-        x_coordinate = distance * cos(latitude) * cos(longitude)
-        y_coordinate = distance * cos(latitude) * sin(longitude)
-        z_coordinate = distance * sin(latitude)
-        return (x_coordinate,
-                y_coordinate,
-                z_coordinate)
+
+        x_coordinate = galactic_distance * cos(latitude) * cos(longitude)
+        y_coordinate = galactic_distance * cos(latitude) * sin(longitude)
+        z_coordinate = galactic_distance * sin(latitude)
+        return x_coordinate, y_coordinate, z_coordinate
 
     def set_radial_velocity_to_zero(self) -> None:
         # TODO: implement pc/kpc units
@@ -215,7 +216,7 @@ class Star(Base):
         proper_motion_component_b = float(self.proper_motion_component_b)
         proper_motion_component_l = float(self.proper_motion_component_l)
 
-        distance_in_pc = galactic_distance * 1e3
+        galactic_distance_in_pc = galactic_distance * 1e3
 
         a1 = (-ASTRONOMICAL_UNIT * cos(galactic_latitude)
               * sin(galactic_longitude))
@@ -223,7 +224,7 @@ class Star(Base):
               * cos(galactic_longitude))
         self.u_velocity = ((a1 * proper_motion_component_l
                             + b1 * proper_motion_component_b)
-                           * distance_in_pc)
+                           * galactic_distance_in_pc)
 
         a2 = (ASTRONOMICAL_UNIT * cos(galactic_latitude)
               * cos(galactic_longitude))
@@ -231,8 +232,8 @@ class Star(Base):
               * sin(galactic_longitude))
         self.v_velocity = ((a2 * proper_motion_component_l
                             + b2 * proper_motion_component_b)
-                           * distance_in_pc)
+                           * galactic_distance_in_pc)
 
         b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
         self.w_velocity = (b3 * proper_motion_component_b
-                           * distance_in_pc)
+                           * galactic_distance_in_pc)
