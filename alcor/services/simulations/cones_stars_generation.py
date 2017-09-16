@@ -122,7 +122,6 @@ def generate(cone_height_longitude: float,
     normalization_mass = 0.
 
     while True:
-        star = Star()
         longitude = (min_longitude + delta_longitude * random.random())
         latitude = (min_latitude + delta_latitude * random.random())
 
@@ -150,7 +149,7 @@ def generate(cone_height_longitude: float,
             longitude)
         th_cylindrical_coordinate = (asin(distance * abs(cos(latitude)))
                                      * sin(longitude)
-                                     / star.r_cylindric_coordinate)
+                                     / r_cylindrical_coordinate)
         z_coordinate = distance * sin(latitude)
 
         if distance < normalization_cone_height:
