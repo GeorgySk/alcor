@@ -1,4 +1,4 @@
-from copy import deepcopy
+import copy
 from functools import partial
 from typing import List
 
@@ -6,32 +6,21 @@ import numpy as np
 from math import (sin,
                   cos)
 
-from alcor.models.star import (Star,
-                               GalacticDiskEnum)
+from alcor.models import Star
 
 
-def generate_velocities(*,
-                        stars: List[Star],
-                        u_peculiar_solar_velocity: float = -11.,
-                        v_peculiar_solar_velocity: float = -12.,
-                        w_peculiar_solar_velocity: float = -7.,
-                        thin_disk_u_velocity_dispersion: float = 32.4,
-                        thin_disk_v_velocity_dispersion: float = 23.,
-                        thin_disk_w_velocity_dispersion: float = 18.1,
-                        thick_disk_u_velocity_dispersion: float = 50.,
-                        thick_disk_v_velocity_dispersion: float = 56.,
-                        thick_disk_w_velocity_dispersion: float = 34.,
-                        solar_galactocentric_distance: float,
-                        oort_a_const: float,
-                        oort_b_const: float
-                        ) -> List[Star]:
-    thin_disk_stars = [star
-                       for star in stars
-                       if star.disk_belonging == GalacticDiskEnum.thin]
-    thick_disk_stars = [star
-                        for star in stars
-                        if star.disk_belonging == GalacticDiskEnum.thick]
-
+def modify(*,
+           stars: List[Star],
+           u_velocity_dispersion: float,
+           v_velocity_dispersion: float,
+           w_velocity_dispersion: float,
+           u_peculiar_solar_velocity: float = -11.,
+           v_peculiar_solar_velocity: float = -12.,
+           w_peculiar_solar_velocity: float = -7.,
+           solar_galactocentric_distance: float,
+           oort_a_const: float,
+           oort_b_const: float
+           ) -> List[Star]:
     update_velocities = partial(
         update_star_velocities,
         oort_a_const=oort_a_const,
@@ -41,20 +30,11 @@ def generate_velocities(*,
         v_peculiar_solar_velocity=v_peculiar_solar_velocity,
         w_peculiar_solar_velocity=w_peculiar_solar_velocity)
 
-    new_thin_disk_stars = [update_velocities(
-            star,
-            u_velocity_dispersion=thin_disk_u_velocity_dispersion,
-            v_velocity_dispersion=thin_disk_v_velocity_dispersion,
-            w_velocity_dispersion=thin_disk_w_velocity_dispersion)
-        for star in thin_disk_stars]
-    new_thick_disk_stars = [update_velocities(
-            star,
-            u_velocity_dispersion=thick_disk_u_velocity_dispersion,
-            v_velocity_dispersion=thick_disk_v_velocity_dispersion,
-            w_velocity_dispersion=thick_disk_w_velocity_dispersion)
-        for star in thick_disk_stars]
-
-    return new_thin_disk_stars + new_thick_disk_stars
+    return [update_velocities(star,
+                              u_velocity_dispersion=u_velocity_dispersion,
+                              v_velocity_dispersion=v_velocity_dispersion,
+                              w_velocity_dispersion=w_velocity_dispersion)
+            for star in stars]
 
 
 def update_star_velocities(star: Star,
@@ -68,7 +48,7 @@ def update_star_velocities(star: Star,
                            u_velocity_dispersion: float,
                            v_velocity_dispersion: float,
                            w_velocity_dispersion: float) -> Star:
-    new_star = deepcopy(star)
+    new_star = copy.deepcopy(star)
 
     uop = uom(u_peculiar_solar_velocity,
               star.r_cylindric_coordinate,
