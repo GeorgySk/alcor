@@ -16,7 +16,7 @@ grid:
     thick_disk_stars_fraction: 0.8
 
 csv:
-  sphere:
+  cones:
     longitudes:
       path: ../test_angles.csv
       column: 8
