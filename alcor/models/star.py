@@ -17,7 +17,7 @@ from sqlalchemy.sql.sqltypes import (BigInteger,
                                      DateTime,
                                      Enum)
 
-from alcor.models.base import Base
+from .base import Base
 
 ASTRONOMICAL_UNIT = 4.74
 DEC_GPOLE = math.radians(27.128336)
