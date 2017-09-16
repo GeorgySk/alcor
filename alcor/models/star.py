@@ -1,12 +1,16 @@
 import enum
+import inspect
 import uuid
+from collections import OrderedDict
 from math import (radians,
                   cos,
                   sin,
                   pi,
                   asin,
                   atan)
-from typing import (Tuple)
+from typing import (Any,
+                    Dict,
+                    Tuple)
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
@@ -133,7 +137,7 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  spectral_type: int = None,
-                 galactic_disk_type: str = None):
+                 galactic_disk_type: GalacticDiskType = None):
         self.group_id = group_id
         self.luminosity = luminosity
         self.proper_motion = proper_motion
@@ -237,3 +241,27 @@ class Star(Base):
         b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
         self.w_velocity = (b3 * proper_motion_component_b
                            * galactic_distance_in_pc)
+
+    def modify(self, **fields: Any) -> 'Star':
+        serialized_star = self.serialize()
+        serialized_star.update(fields)
+        return self.deserialize(serialized_star)
+
+    def serialize(self) -> Dict[str, Any]:
+        return OrderedDict((field_name, getattr(self, field_name))
+                           for field_name in self.fields_to_copy())
+
+    @classmethod
+    def deserialize(cls, serialized: Dict[str, Any]) -> 'Star':
+        star_id = serialized.pop('id')
+        star = cls(**serialized)
+        star.id = star_id
+        return star
+
+    # TODO: memoize this
+    @classmethod
+    def fields_to_copy(cls):
+        initializer_signature = inspect.signature(cls.__init__)
+        parameters = dict(initializer_signature.parameters)
+        parameters.pop('self')
+        return ('id',) + tuple(parameters)
