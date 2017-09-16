@@ -11,12 +11,12 @@ from alcor.models import (Group,
                           Star,
                           eliminations,
                           associations)
+from alcor.models.star import set_radial_velocity_to_zero
 from alcor.services import (luminosity_function,
                             velocities,
                             velocities_vs_magnitudes)
-from alcor.services.data_access import fetch_group_stars
+from alcor.services.data_access import fetch_unprocessed_stars
 from . import elimination
-from .utils import copy_velocities
 
 
 def process(*,
@@ -28,8 +28,8 @@ def process(*,
             w_velocities_vs_magnitude: bool,
             w_lepine_criterion: bool,
             session: Session) -> None:
-    stars = fetch_group_stars(group_id=group.id,
-                              session=session)
+    stars = fetch_unprocessed_stars(group_id=group.id,
+                                    session=session)
     stars_count = len(stars)
 
     eliminations_counter = Counter()
@@ -42,12 +42,10 @@ def process(*,
     counter = eliminations.StarsCounter(group_id=group.id,
                                         raw=stars_count,
                                         **eliminations_counter)
-
     session.add(counter)
 
     if nullify_radial_velocity:
-        for star in stars:
-            star.set_radial_velocity_to_zero()
+        stars = list(map(set_radial_velocity_to_zero, stars))
 
     if w_luminosity_function:
         luminosity_function.process_stars_group(
@@ -75,10 +73,17 @@ def process(*,
                             original_id=original_id)
     session.add(processed_group)
 
-    processed_stars = [Star(group_id=processed_group_id)
-                       for _ in range(len(stars))]
     if nullify_radial_velocity:
-        copy_velocities(stars, processed_stars)
+        processed_stars = [Star(group_id=processed_group_id,
+                                u_velocity=star.u_velocity,
+                                v_velocity=star.v_velocity,
+                                w_velocity=star.w_velocity)
+                           for star in stars]
+    else:
+        # FIXME: why do we save empty stars only with new `id` and `group_id`?
+        processed_stars = [Star(group_id=processed_group_id)
+                           for _ in range(len(stars))]
+
     session.add_all(processed_stars)
 
     # We are flushing to set ids

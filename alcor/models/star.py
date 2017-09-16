@@ -1,7 +1,9 @@
 import enum
 import inspect
+import logging
 import uuid
 from collections import OrderedDict
+from functools import wraps
 from math import (radians,
                   cos,
                   sin,
@@ -191,9 +193,7 @@ class Star(Base):
         return float(self.ugriz_ri) + float(self.ugriz_iz)
 
     @property
-    def cartesian_coordinates(self) -> Tuple[float,
-                                             float,
-                                             float]:
+    def cartesian_coordinates(self) -> Tuple[float, float, float]:
         right_ascension = float(self.right_ascension)
         declination = float(self.declination)
         galactic_distance = float(self.galactic_distance)
@@ -211,36 +211,6 @@ class Star(Base):
         y_coordinate = galactic_distance * cos(latitude) * sin(longitude)
         z_coordinate = galactic_distance * sin(latitude)
         return x_coordinate, y_coordinate, z_coordinate
-
-    def set_radial_velocity_to_zero(self) -> None:
-        # TODO: implement pc/kpc units
-        galactic_distance = float(self.galactic_distance)
-        galactic_latitude = float(self.galactic_latitude)
-        galactic_longitude = float(self.galactic_longitude)
-        proper_motion_component_b = float(self.proper_motion_component_b)
-        proper_motion_component_l = float(self.proper_motion_component_l)
-
-        galactic_distance_in_pc = galactic_distance * 1e3
-
-        a1 = (-ASTRONOMICAL_UNIT * cos(galactic_latitude)
-              * sin(galactic_longitude))
-        b1 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
-              * cos(galactic_longitude))
-        self.u_velocity = ((a1 * proper_motion_component_l
-                            + b1 * proper_motion_component_b)
-                           * galactic_distance_in_pc)
-
-        a2 = (ASTRONOMICAL_UNIT * cos(galactic_latitude)
-              * cos(galactic_longitude))
-        b2 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
-              * sin(galactic_longitude))
-        self.v_velocity = ((a2 * proper_motion_component_l
-                            + b2 * proper_motion_component_b)
-                           * galactic_distance_in_pc)
-
-        b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
-        self.w_velocity = (b3 * proper_motion_component_b
-                           * galactic_distance_in_pc)
 
     def modify(self, **fields: Any) -> 'Star':
         serialized_star = self.serialize()
@@ -260,8 +230,42 @@ class Star(Base):
 
     # TODO: memoize this
     @classmethod
-    def fields_to_copy(cls):
+    def fields_to_copy(cls) -> Tuple[str, ...]:
         initializer_signature = inspect.signature(cls.__init__)
         parameters = dict(initializer_signature.parameters)
         parameters.pop('self')
         return ('id',) + tuple(parameters)
+
+
+def set_radial_velocity_to_zero(star: Star) -> Star:
+    # TODO: implement pc/kpc units
+    galactic_distance = float(star.galactic_distance)
+    galactic_latitude = float(star.galactic_latitude)
+    galactic_longitude = float(star.galactic_longitude)
+    proper_motion_component_b = float(star.proper_motion_component_b)
+    proper_motion_component_l = float(star.proper_motion_component_l)
+
+    galactic_distance_in_pc = galactic_distance * 1e3
+
+    a1 = (-ASTRONOMICAL_UNIT * cos(galactic_latitude)
+          * sin(galactic_longitude))
+    b1 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
+          * cos(galactic_longitude))
+    u_velocity = ((a1 * proper_motion_component_l
+                   + b1 * proper_motion_component_b)
+                  * galactic_distance_in_pc)
+
+    a2 = (ASTRONOMICAL_UNIT * cos(galactic_latitude)
+          * cos(galactic_longitude))
+    b2 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
+          * sin(galactic_longitude))
+    v_velocity = ((a2 * proper_motion_component_l
+                   + b2 * proper_motion_component_b)
+                  * galactic_distance_in_pc)
+
+    b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
+    w_velocity = (b3 * proper_motion_component_b
+                  * galactic_distance_in_pc)
+    return star.modify(u_velocity=u_velocity,
+                       v_velocity=v_velocity,
+                       w_velocity=w_velocity)
