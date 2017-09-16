@@ -83,9 +83,9 @@ def generate_stars(*,
 
         for star in thick_disk_stars:
             star.disk_belonging = GalacticDiskEnum.thick
-            star.birth_time = get_thick_disk_star_birth_time(tmdisk=tmdisk,
-                                                             ttdisk=ttdisk,
-                                                             tau=tau)
+            star.birth_time = thick_disk_star_birth_time(tmdisk=tmdisk,
+                                                         ttdisk=ttdisk,
+                                                         tau=tau)
 
     return thin_disk_stars + thick_disk_stars
 
@@ -304,9 +304,9 @@ def progenitor_mass(initial_mass_function_param: float,
     return mass
 
 
-def get_thick_disk_star_birth_time(tmdisk: float,
-                                   ttdisk: float,
-                                   tau: float) -> float:
+def thick_disk_star_birth_time(tmdisk: float,
+                               ttdisk: float,
+                               tau: float) -> float:
     max_t = tmdisk * exp(-tmdisk / tau)
     while True:
         ttry = ttdisk * random.random()
