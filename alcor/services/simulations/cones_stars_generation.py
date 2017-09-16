@@ -6,7 +6,8 @@ from math import (radians,
                   pi,
                   exp,
                   sqrt)
-from typing import (Iterable,
+from typing import (Callable,
+                    Iterable,
                     List)
 
 from alcor.models.star import (Star,
@@ -57,10 +58,11 @@ def generate_stars(*,
             mass_reduction_factor=mass_reduction_factor,
             solar_galactocentric_distance=solar_galactocentric_distance_kpc,
             thick_disk_scale_length=thick_disk_scale_length_kpc,
-            initial_mass_function_param=initial_mass_function_param)
+            initial_mass_function_param=initial_mass_function_param,
+            disk_belonging=GalacticDiskEnum.thin)
 
+        # TODO: find a way to include this in `generate`
         for star in thin_disk_stars:
-            star.disk_belonging = GalacticDiskEnum.thin
             star.birth_time = thin_disk_age * random.random()
 
     if thick_disk_stars_fraction > 0.:
@@ -79,10 +81,10 @@ def generate_stars(*,
             mass_reduction_factor=mass_reduction_factor,
             solar_galactocentric_distance=solar_galactocentric_distance_kpc,
             thick_disk_scale_length=thick_disk_scale_length_kpc,
-            initial_mass_function_param=initial_mass_function_param)
+            initial_mass_function_param=initial_mass_function_param,
+            disk_belonging=GalacticDiskEnum.thick)
 
         for star in thick_disk_stars:
-            star.disk_belonging = GalacticDiskEnum.thick
             star.birth_time = thick_disk_star_birth_time(tmdisk=tmdisk,
                                                          ttdisk=ttdisk,
                                                          tau=tau)
@@ -103,7 +105,8 @@ def generate(cone_height_longitude: float,
              mass_reduction_factor: float,
              solar_galactocentric_distance: float,
              thick_disk_scale_length: float,
-             initial_mass_function_param: float
+             initial_mass_function_param: float,
+             disk_belonging: GalacticDiskEnum
              ) -> Iterable[Star]:
     normalization_cone_mass = (cone_mass(latitude=cone_height_longitude,
                                          delta_latitude=delta_latitude,
@@ -161,7 +164,8 @@ def generate(cone_height_longitude: float,
         yield Star(progenitor_mass=star_mass,
                    r_cylindrical_coordinate=r_cylindrical_coordinate,
                    th_cylindrical_coordinate=th_cylindrical_coordinate,
-                   z_coordinate=z_coordinate)
+                   z_coordinate=z_coordinate,
+                   disk_belonging=disk_belonging)
 
 
 def cone_mass(latitude: float,
