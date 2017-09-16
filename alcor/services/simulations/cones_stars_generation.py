@@ -1,13 +1,21 @@
-from typing import List, Iterable
+import random
+from math import (radians,
+                  cos,
+                  asin,
+                  sin,
+                  pi,
+                  exp,
+                  sqrt)
+from typing import (Iterable,
+                    List)
 
-import numpy as np
-
-from alcor.models.star import Star, GalacticDiskEnum
+from alcor.models.star import (Star,
+                               GalacticDiskEnum)
 
 
 # TODO: take all consts to settings file
 def generate_stars(*,
-                   delta_latitude: float = np.deg2rad(2.64),
+                   delta_latitude: float = radians(2.64),
                    normalization_cone_height_kpc: float = 0.2,
                    cone_height_kpc: float = 2.,
                    thin_disk_density: float = 0.095 * 1E9,
@@ -24,7 +32,7 @@ def generate_stars(*,
                    cone_height_longitude: float,
                    cone_height_latitude: float,
                    initial_mass_function_param: float = -2.35) -> List[Star]:
-    delta_longitude = delta_latitude / np.cos(cone_height_latitude)
+    delta_longitude = delta_latitude / cos(cone_height_latitude)
     min_longitude = cone_height_longitude - delta_longitude / 2.
     min_latitude = cone_height_latitude - delta_latitude / 2.
 
@@ -53,7 +61,7 @@ def generate_stars(*,
 
         for star in thin_disk_stars:
             star.disk_belonging = GalacticDiskEnum.thin
-            star.birth_time = thin_disk_age * np.random.rand()[0]
+            star.birth_time = thin_disk_age * random.random()
 
     if thick_disk_stars_fraction > 0.:
         density = thin_disk_density * thick_disk_stars_fraction
@@ -115,11 +123,11 @@ def generate(cone_height_longitude: float,
 
     while True:
         star = Star()
-        longitude = (min_longitude + delta_longitude * np.random.rand()[0])
-        latitude = (min_latitude + delta_latitude * np.random.rand()[0])
+        longitude = (min_longitude + delta_longitude * random.random())
+        latitude = (min_latitude + delta_latitude * random.random())
 
         while True:
-            distance = cone_height * np.random.rand()[0]
+            distance = cone_height * random.random()
             density = get_density(
                 distance=distance,
                 longitude=longitude,
@@ -129,7 +137,7 @@ def generate(cone_height_longitude: float,
                 thick_disk_scale_length=thick_disk_scale_length)
 
             # Monte-Carlo accept/reject method
-            random_valid_density = max_density * np.random.rand()[0]
+            random_valid_density = max_density * random.random()
             if random_valid_density <= density:
                 break
 
@@ -138,12 +146,12 @@ def generate(cone_height_longitude: float,
         # TODO: I am not sure if I need these
         star.r_cylindric_coordinate = opposite_triangle_side(
             solar_galactocentric_distance,
-            distance * np.abs(np.cos(latitude)),
+            distance * abs(cos(latitude)),
             longitude)
         star.th_cylindric_coordinate = (
-            np.arcsin(distance * np.abs(np.cos(latitude)))
-            * np.sin(longitude) / star.r_cylindric_coordinate)
-        star.z_cylindric_coordinate = distance * np.sin(latitude)
+            asin(distance * abs(cos(latitude)))
+            * sin(longitude) / star.r_cylindric_coordinate)
+        star.z_cylindric_coordinate = distance * sin(latitude)
 
         if distance < normalization_cone_height:
             normalization_mass += star.progenitor_mass
@@ -159,14 +167,14 @@ def cone_mass(latitude: float,
               density: float,
               scale_height: float,
               cone_height: float,
-              max_safe_latitude: float = np.deg2rad(85.)) -> float:
+              max_safe_latitude: float = radians(85.)) -> float:
     # Stars distribution is symmetrical with respect to the galactic plane
-    latitude = np.abs(latitude)
+    latitude = abs(latitude)
 
     # To prevent problems with spherical coordinates near poles
     latitude = min(latitude, max_safe_latitude)
 
-    delta_longitude = delta_latitude / np.cos(latitude)
+    delta_longitude = delta_latitude / cos(latitude)
     min_latitude = latitude - delta_latitude / 2.
     max_latitude = latitude + delta_latitude / 2.
 
@@ -174,20 +182,20 @@ def cone_mass(latitude: float,
     #     1) both min_latitude and max_latitude are in [0; pi/2]
     #     2) `min_latitude` is negative and `max_latitude` is in [0; pi/2]
     #     3) `min_latitude` is in [0; pi/2] and `max_latitude` > pi/2
-    
+
     # case 2
     if min_latitude < 0.:
         mass = (density * delta_longitude
-                * (iota_integral(np.abs(min_latitude),
+                * (iota_integral(abs(min_latitude),
                                  scale_height,
                                  cone_height)
                    - iota_integral(max_latitude,
                                    scale_height,
                                    cone_height)))
     # case 3
-    elif max_latitude > np.pi / 2.:
+    elif max_latitude > pi / 2.:
         mass = (density * delta_longitude
-                * (lambda_integral(np.pi - max_latitude,
+                * (lambda_integral(pi - max_latitude,
                                    scale_height,
                                    cone_height)
                    + lambda_integral(min_latitude,
@@ -205,8 +213,8 @@ def kappa_integral(latitude: float,
                    scale_height: float,
                    height: float) -> float:
     # Next var is used just to simplify the following expression
-    gamma = scale_height / np.sin(latitude)
-    return gamma * (gamma - np.exp(-height / gamma) * (gamma + height))
+    gamma = scale_height / sin(latitude)
+    return gamma * (gamma - exp(-height / gamma) * (gamma + height))
 
 
 def iota_integral(latitude: float,
@@ -219,7 +227,7 @@ def iota_integral(latitude: float,
 def lambda_integral(latitude: float,
                     scale_height: float,
                     height: float) -> float:
-    return (-scale_height * (kappa_integral(np.pi / 2., scale_height, height)
+    return (-scale_height * (kappa_integral(pi / 2., scale_height, height)
                              - kappa_integral(latitude, scale_height, height)))
 
 
@@ -246,7 +254,7 @@ def get_max_density(*,
             scale_height=scale_height,
             solar_galactocentric_distance=solar_galactocentric_distance,
             thick_disk_scale_length=thick_disk_scale_length)
-        max_density = np.maximum(max_density, density)
+        max_density = max(max_density, density)
 
     max_density *= monte_carlo_shift_factor
     return max_density
@@ -258,25 +266,25 @@ def get_density(distance: float,
                 scale_height: float,
                 solar_galactocentric_distance: float,
                 thick_disk_scale_length: float) -> float:
-    pole_projection = distance * np.abs(np.sin(latitude))
-    plane_projection = distance * np.abs(np.cos(latitude))
+    pole_projection = distance * abs(sin(latitude))
+    plane_projection = distance * abs(cos(latitude))
 
     galactocentric_distance = opposite_triangle_side(
         plane_projection,
         solar_galactocentric_distance,
         longitude)
 
-    density = (distance ** 2 * np.exp(-np.abs(pole_projection) / scale_height)
-               * np.exp(-np.abs(galactocentric_distance)
-                        / thick_disk_scale_length))
+    density = (distance ** 2 * exp(-abs(pole_projection) / scale_height)
+               * exp(-abs(galactocentric_distance)
+                     / thick_disk_scale_length))
     return density
 
 
 def opposite_triangle_side(adjacent_1: float,
                            adjacent_2: float,
                            enclosed_angle: float) -> float:
-    return np.sqrt(adjacent_1 ** 2 + adjacent_2 ** 2
-                   - 2. * adjacent_1 * adjacent_2 * np.cos(enclosed_angle))
+    return sqrt(adjacent_1 ** 2 + adjacent_2 ** 2
+                - 2. * adjacent_1 * adjacent_2 * cos(enclosed_angle))
 
 
 def get_mass(initial_mass_function_param: float,
@@ -286,8 +294,8 @@ def get_mass(initial_mass_function_param: float,
     y_max = min_mass ** initial_mass_function_param
 
     while True:
-        y = y_max * np.random.rand()[0]
-        mass = min_mass + mass_range * np.random.rand()[0]
+        y = y_max * random.random()
+        mass = min_mass + mass_range * random.random()
         y_imf = mass ** initial_mass_function_param
 
         if y <= y_imf:
@@ -299,10 +307,10 @@ def get_mass(initial_mass_function_param: float,
 def get_thick_disk_star_birth_time(tmdisk: float,
                                    ttdisk: float,
                                    tau: float) -> float:
-    max_t = tmdisk * np.exp(-tmdisk / tau)
+    max_t = tmdisk * exp(-tmdisk / tau)
     while True:
-        ttry = ttdisk * np.random.rand()[0]
-        ft = ttry * np.exp(-ttry / tau)
-        fz = max_t * np.random.rand()[0]
+        ttry = ttdisk * random.random()
+        ft = ttry * exp(-ttry / tau)
+        fz = max_t * random.random()
         if fz <= ft:
             return ttry
