@@ -280,11 +280,11 @@ def get_density(distance: float,
     return density
 
 
-def opposite_triangle_side(adjacent_1: float,
-                           adjacent_2: float,
+def opposite_triangle_side(side: float,
+                           other_side: float,
                            enclosed_angle: float) -> float:
-    return sqrt(adjacent_1 ** 2 + adjacent_2 ** 2
-                - 2. * adjacent_1 * adjacent_2 * cos(enclosed_angle))
+    return sqrt(side ** 2 + other_side ** 2
+                - 2. * side * other_side * cos(enclosed_angle))
 
 
 def get_mass(initial_mass_function_param: float,
