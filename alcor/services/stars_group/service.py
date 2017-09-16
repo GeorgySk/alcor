@@ -81,7 +81,10 @@ def process(*,
         copy_velocities(stars, processed_stars)
     session.add_all(processed_stars)
 
-    session.commit()
+    # We are flushing to set ids
+    # more at
+    # https://stackoverflow.com/questions/4201455/sqlalchemy-whats-the-difference-between-flush-and-commit
+    session.flush(processed_stars)
 
     stars_associations = processed_stars_associations(stars, processed_stars)
     session.add_all(stars_associations)
