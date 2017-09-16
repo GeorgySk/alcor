@@ -164,8 +164,7 @@ def cone_mass(latitude: float,
     latitude = np.abs(latitude)
 
     # To prevent problems with spherical coordinates near poles
-    if latitude > max_safe_latitude:
-        latitude = max_safe_latitude
+    latitude = min(latitude, max_safe_latitude)
 
     delta_longitude = delta_latitude / np.cos(latitude)
     min_latitude = latitude - delta_latitude / 2.
