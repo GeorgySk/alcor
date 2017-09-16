@@ -141,25 +141,28 @@ def generate(cone_height_longitude: float,
             if random_valid_density <= density:
                 break
 
-        # TODO: this get_mass is also in another PR
-        star.progenitor_mass = progenitor_mass(initial_mass_function_param)
+        # TODO: This function also presents in another PR
+        star_mass = progenitor_mass(initial_mass_function_param)
         # TODO: I am not sure if I need these
-        star.r_cylindric_coordinate = opposite_triangle_side(
+        r_cylindrical_coordinate = opposite_triangle_side(
             solar_galactocentric_distance,
             distance * abs(cos(latitude)),
             longitude)
-        star.th_cylindric_coordinate = (
-            asin(distance * abs(cos(latitude)))
-            * sin(longitude) / star.r_cylindric_coordinate)
-        star.z_cylindric_coordinate = distance * sin(latitude)
+        th_cylindrical_coordinate = (asin(distance * abs(cos(latitude)))
+                                     * sin(longitude)
+                                     / star.r_cylindric_coordinate)
+        z_coordinate = distance * sin(latitude)
 
         if distance < normalization_cone_height:
-            normalization_mass += star.progenitor_mass
+            normalization_mass += star_mass
 
         if normalization_mass > normalization_cone_mass:
             break
 
-        yield star
+        yield Star(progenitor_mass=star_mass,
+                   r_cylindrical_coordinate=r_cylindrical_coordinate,
+                   th_cylindrical_coordinate=th_cylindrical_coordinate,
+                   z_coordinate=z_coordinate)
 
 
 def cone_mass(latitude: float,
