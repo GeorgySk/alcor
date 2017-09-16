@@ -1,4 +1,5 @@
 import enum
+import math
 import uuid
 from math import (cos,
                   sin,
@@ -16,12 +17,12 @@ from sqlalchemy.sql.sqltypes import (BigInteger,
                                      DateTime,
                                      Enum)
 
-from .base import Base
+from alcor.models.base import Base
 
 ASTRONOMICAL_UNIT = 4.74
-DEC_GPOLE = 27.128336 * pi / 180.
-RA_GPOLE = 192.859508 * pi / 180.
-AUX_ANGLE = 122.932 * pi / 180.
+DEC_GPOLE = math.radians(27.128336)
+RA_GPOLE = math.radians(192.859508)
+AUX_ANGLE = math.radians(122.932)
 
 SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 
