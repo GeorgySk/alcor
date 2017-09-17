@@ -68,6 +68,8 @@ def calculate_coordinates(stars: List[Star],
             (cos_latitude * cos_longitude * star.u_velocity)
             + (cos_latitude * sin_latitude * star.v_velocity)
             + (sin_latitude * star.w_velocity))
+
+        # TODO: find out if we need to multiply l-component by cos(b)
         star.proper_motion = sqrt(star.proper_motion_component_l ** 2
                                   + star.proper_motion_component_b ** 2)
 
@@ -75,7 +77,9 @@ def calculate_coordinates(stars: List[Star],
                                  + cos(ngp_declination) * cos_latitude
                                    * cos(theta - star.galactic_longitude)))
 
-        # TODO: what is xs and xc?
+        # TODO: give better names
+        # These variables are for conversion from galactic to equatorial
+        # coordinates. More info at the link above
         xs = ((cos_latitude * sin(theta - star.galactic_longitude))
               / cos(star.declination))
         xc = ((cos(ngp_declination) * sin_latitude
@@ -83,17 +87,18 @@ def calculate_coordinates(stars: List[Star],
                  * cos(theta - star.galactic_longitude))
               / cos(star.declination))
 
+        # TODO: find out what is going on here
         if xs >= 0.:
             if xc >= 0.:
                 star.right_ascension = asin(xs) + ngp_right_ascension
             else:
                 star.right_ascension = acos(xc) + ngp_right_ascension
         else:
-            if xc < 0.:
-                star.right_ascension = pi - asin(xs) + ngp_right_ascension
-            else:
+            if xc >= 0.:
                 star.right_ascension = 2. * pi + asin(xs) + ngp_right_ascension
-
+            else:
+                star.right_ascension = pi - asin(xs) + ngp_right_ascension
+                
         if star.right_ascension > 2. * pi:
             star.right_ascension -= 2. * pi
 
