@@ -368,7 +368,7 @@ C         converting cone height parameters from deg to rad
           write(6,*) "numberOfStarsInSample=", numberOfStarsInSample
       
           write(6,*) '3. Calculating luminosities (3/9)'
-          call lumx(numberOfStarsInSample, thick_disk_age)      
+          call lumx(numberOfStarsInSample, thick_disk_age, halo_age)      
 
           ! if cone then we already calculated them
           if (geometry == 'sphere') then

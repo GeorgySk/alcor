@@ -1,5 +1,6 @@
       subroutine lumx(numberOfStarsInSample,
-     &                thick_disk_age)
+     &                thick_disk_age,
+     &                halo_age)
 C         Determining what stars are WDs and calculating cooling time 
 C         and luminosity for it
           implicit none
@@ -18,7 +19,9 @@ C                    Number of WDs of Oxygen-Neon type
      &            fractionOfDB,
      &            parameterIMF,
      &            burst_age,
-     &            thick_disk_age
+     &            thick_disk_age,
+     &            halo_age,
+     &            max_age
 
 C       TODO: change to logical - is_WD
 C       flagOfWD: 0 - it's not WD, 1 - it's a WD
@@ -51,6 +54,8 @@ C         TODO: give names with one style
      &                   parameterIFMR,
      &                   burst_age
 
+          max_age = max(thin_disk_age, thick_disk_age, halo_age)
+
           numberOfWDs = 0
           wd_ONe_count = 0
 
@@ -66,10 +71,11 @@ C             WD of CO: m_WD <1.14; of ONe: m_wd>1.14
                       metallicityOfWD(i) = 0.01
                   end if
 C                 Calculating the lifetime in the main sequence
+C                 TODO: resolve the problem with halo stars
                   call tsp(m(i), 
      &                     metallicityOfWD(i), 
      &                     main_sequence_lifetime(i))
-                  coolingTime(i) = thick_disk_age - starBirthTime(i) 
+                  coolingTime(i) = max_age - starBirthTime(i) 
      &                             - main_sequence_lifetime(i)
                   if (coolingTime(i) > 0.0) then
 C                     Initial-to-Final Mass Relation (IFMR)

@@ -91,7 +91,7 @@ C     TODO: find out the meaning of psi, mrep and 1.0e6
       halo_birth_init_time = max_age - halo_age
 C     This can be easily proved by taking derivative from
 C     y = t * exp(-t / tau)
-      thick_disk_max_sfr_relative_time = thick_disk_sfr_param
+      thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
       thick_disk_max_sfr = (thick_disk_max_sfr_relative_time 
      &                      * exp(-thick_disk_max_sfr_relative_time 
      &                              / thick_disk_sfr_param))
@@ -156,26 +156,27 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
      &                total_generated_mass_in_bin + star_mass
               end if
 
-C             TODO: add halo stars here
               if (disk_belonging(stars_count) == 1) then
                   scale_height = THIN_DISK_SCALE_HEIGHT_KPC
               else if (disk_belonging(stars_count) == 2) then
                   scale_height = THICK_DISK_SCALE_HEIGHT_KPC
               end if
 
-C             Inverse transform sampling for y = exp(-z / H)
-              do
-                  random_value = ran(iseed)
-                  if (random_value /= 0.0) then
-                      exit
-                  end if
-              end do
-              z_coordinate = -scale_height * log(random_value)
-C             Assigning random sign
-              in = int(2.0 * ran(iseed))
-              coordinate_Zcylindr(stars_count) = z_coordinate 
-     &                                           * dfloat(1 - 2 * in)
-
+C             Coordinates of halo stars will be generated in other place
+              if (disk_belonging(stars_count) /= 3) then
+C                 Inverse transform sampling for y = exp(-z / H)
+                  do
+                      random_value = ran(iseed)
+                      if (random_value /= 0.0) then
+                          exit
+                      end if
+                  end do
+                  z_coordinate = -scale_height * log(random_value)
+C                 Assigning random sign
+                  in = int(2.0 * ran(iseed))
+                  coordinate_Zcylindr(stars_count) = z_coordinate 
+     &                                              * dfloat(1 - 2 * in)
+              end if
               if (total_generated_mass_in_bin >= mrep) then
                   exit
               end if
