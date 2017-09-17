@@ -40,12 +40,10 @@ def modify(star: Star,
         th_cylindrical_coordinate))
     distance = sqrt(distance_plane_projection ** 2 + z_coordinate ** 2)
 
-    # TODO: implement function
-    galactic_longitude = acos((solar_galactocentric_distance ** 2
-                               + distance_plane_projection ** 2
-                               - r_cylindrical_coordinate ** 2)
-                              / (2. * distance_plane_projection
-                                 * solar_galactocentric_distance))
+    galactic_longitude = triangle_angle(
+        adjacent=solar_galactocentric_distance,
+        other_adjacent=distance_plane_projection,
+        opposite=r_cylindrical_coordinate)
     # Unfolding from 0-180 to 0-360
     if th_cylindrical_coordinate > pi:
         galactic_longitude = 2. * pi - galactic_longitude
@@ -125,3 +123,10 @@ def opposite_triangle_side(adjacent: float,
                            enclosed_angle: float) -> float:
     return sqrt(adjacent ** 2 + other_adjacent ** 2
                 - 2. * adjacent * other_adjacent * cos(enclosed_angle))
+
+
+def triangle_angle(adjacent: float,
+                   other_adjacent: float,
+                   opposite: float) -> float:
+    return acos((adjacent ** 2 + other_adjacent ** 2 - opposite ** 2)
+                / (2. * adjacent * other_adjacent))
