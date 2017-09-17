@@ -10,14 +10,20 @@ from typing import List
 from alcor.models.star import Star
 
 
+PC_PER_KPC = 1e3
+
+
 # More info on conversions at: https://goo.gl/e7uiiZ
 # ngp - North Galactic Pole
 # theta - see BK angle at the link above
+# kappa - km/sec in one au/year:
+# transverse_velocity = KAPPA * proper_motion * distance
 def calculate_coordinates(stars: List[Star],
                           solar_galactocentric_distance: float,
                           ngp_declination: float = 0.478,
                           theta: float = 2.147,
-                          ngp_right_ascension: float = 3.35
+                          ngp_right_ascension: float = 3.35,
+                          kappa: float = 4.74
                           ) -> None:
     for star in stars:
         distance_plane_projection = (opposite_triangle_side(
@@ -48,16 +54,16 @@ def calculate_coordinates(stars: List[Star],
         sin_latitude = sin(star.galactic_latitude)
         cos_latitude = cos(star.galactic_latitude)
 
-        # TODO: what is this?
-        zkri = 1. / (4.74E3 * star.galactic_distance)
+        velocity_by_prop_motion = 1. / (kappa * star.distance * PC_PER_KPC)
 
-        star.proper_motion_component_l = (
-            (-zkri * (sin_longitude / cos_latitude) * star.u_velocity)
-            + (zkri * (cos_longitude / cos_latitude) * star.v_velocity))
-        star.proper_motion_component_b = (
-            (-zkri * cos_longitude * sin_latitude * star.u_velocity)
-            + (-zkri * sin_latitude * sin_longitude * star.v_velocity)
-            + (zkri * cos_latitude * star.w_velocity))
+        # TODO: find out if we need to divide by `cos_latitude`
+        star.proper_motion_component_l = velocity_by_prop_motion * (
+            -star.u_velocity * sin_longitude
+            + star.v_velocity * cos_longitude) / cos_latitude
+        star.proper_motion_component_b = velocity_by_prop_motion * (
+            -star.u_velocity * cos_longitude * sin_latitude
+            - star.v_velocity * sin_latitude * sin_longitude
+            + star.w_velocity * cos_latitude)
         # TODO: rename as radial velocity
         star.proper_motion_component_vr = (
             (cos_latitude * cos_longitude * star.u_velocity)
