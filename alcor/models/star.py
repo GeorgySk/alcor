@@ -140,6 +140,7 @@ class Star(Base):
                  w_velocity: float = None,
                  spectral_type: int = None,
                  galactic_disk_type: GalacticDiskType = None):
+        self.id = None
         self.group_id = group_id
         self.luminosity = luminosity
         self.proper_motion = proper_motion
@@ -223,6 +224,7 @@ class Star(Base):
 
     @classmethod
     def deserialize(cls, serialized: Dict[str, Any]) -> 'Star':
+        serialized = dict(serialized)
         star_id = serialized.pop('id')
         star = cls(**serialized)
         star.id = star_id
