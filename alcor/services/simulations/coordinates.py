@@ -11,12 +11,14 @@ from alcor.models.star import Star
 
 
 # TODO: find out the meaning of parameters
+# More info on conversions at: https://goo.gl/e7uiiZ
 # ngp - North Galactic Pole
+# theta - see BK angle at the link above
 def calculate_coordinates(stars: List[Star],
                           solar_galactocentric_distance: float,
                           ngp_declination: float = 0.478,
                           theta: float = 2.147,
-                          alphag: float = 3.35
+                          ngp_right_ascension: float = 3.35
                           ) -> None:
     for star in stars:
         # TODO: give shorter name
@@ -90,14 +92,14 @@ def calculate_coordinates(stars: List[Star],
 
         if xs >= 0.:
             if xc >= 0.:
-                star.right_ascension = asin(xs) + alphag
+                star.right_ascension = asin(xs) + ngp_right_ascension
             else:
-                star.right_ascension = acos(xc) + alphag
+                star.right_ascension = acos(xc) + ngp_right_ascension
         else:
             if xc < 0.:
-                star.right_ascension = pi - asin(xs) + alphag
+                star.right_ascension = pi - asin(xs) + ngp_right_ascension
             else:
-                star.right_ascension = 2. * pi + asin(xs) + alphag
+                star.right_ascension = 2. * pi + asin(xs) + ngp_right_ascension
 
         if star.right_ascension > 2. * pi:
             star.right_ascension -= 2. * pi
