@@ -9,6 +9,8 @@ grid:
     DB_fraction: 0.2
     thin_disk_age: 9.2
     thick_disk_age: 12.0
+    halo_age: 13.5
+    halo_stars_formation_time: 1.0
     thick_disk_star_formation_exponent: 2.0
     initial_mass_function_exponent: -2.35
     lifetime_mass_ratio: 1.0
