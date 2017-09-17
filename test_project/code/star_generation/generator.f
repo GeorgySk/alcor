@@ -8,7 +8,9 @@
      &               thick_disk_stars_fraction,
      &               halo_stars_fraction,
      &               thick_disk_age,
-     &               thick_disk_sfr_param)
+     &               thick_disk_sfr_param,
+     &               halo_age,
+     &               halo_stars_formation_time)
 C     Divides the SFR in intervals of time. In each interval, the total 
 C     mass of stars is distributed. The mass of each star follows the 
 C     distribution law given by Initial Mass Function (IMF). The birth 
@@ -47,7 +49,8 @@ C     cylindrical z-coordinate are determined.
      &        halo_stars_fraction,         burst_mrep,
      &        normal_mrep,                 thick_disk_max_sfr,
      &        thin_disk_birth_init_time,   thick_disk_age,
-     &        thick_disk_max_sfr_time,     thick_disk_sfr_param
+     &        thick_disk_max_sfr_time,     thick_disk_sfr_param,
+     &        halo_age,                    halo_stars_formation_time
       real :: mass_from_Salpeter_IMF, 
      &        get_normalization_const
       double precision :: coordinate_Theta(MAX_STARS_COUNT),

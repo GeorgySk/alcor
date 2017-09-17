@@ -40,6 +40,8 @@ C         mfinal_new=parameterIFMR*mfinal_old
      &        scaleLength,
      &        pi,
      &        thick_disk_age,
+     &        halo_age,
+     &        halo_stars_formation_time,
      &        thick_disk_sfr_param
       double precision :: solarGalactocentricDistance
       parameter (numberOfStars=6000000)
@@ -115,6 +117,12 @@ C           call get_command_argument(i, args(i))
             case ("-tda")
               call getarg(i + 1, temp_string)
               read(temp_string, *) thick_disk_age
+            case ("-ha")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) halo_age
+            case ("-hsft")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) halo_stars_formation_time
             case ("-tde")
               call getarg(i + 1, temp_string)
               read(temp_string, *) thick_disk_sfr_param
@@ -343,7 +351,8 @@ C         converting cone height parameters from deg to rad
      &                 burst_age,massReductionFactor,
      &                 thick_disk_stars_fraction,
      &                 halo_stars_fraction, thick_disk_age,
-     &                 thick_disk_sfr_param)
+     &                 thick_disk_sfr_param,
+     &                 halo_age, halo_stars_formation_time)
           else if (geometry == 'cones') then
               call generate_cone_stars(cone_height_longitudes(i),
      &                                 cone_height_latitudes(i),
