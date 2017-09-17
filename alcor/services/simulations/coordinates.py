@@ -5,7 +5,8 @@ from math import (sqrt,
                   cos,
                   asin,
                   acos,
-                  atan)
+                  atan,
+                  copysign)
 
 from alcor.models import Star
 
@@ -50,9 +51,7 @@ def modify(star: Star,
 
     # TODO: or use arctan2
     galactic_latitude = atan(abs(z_coordinate / distance_plane_projection))
-    # TODO: use sign
-    if z_coordinate < 0.:
-        galactic_latitude = -galactic_latitude
+    galactic_latitude = copysign(galactic_latitude, z_coordinate)
 
     sin_longitude = sin(galactic_longitude)
     cos_longitude = cos(galactic_longitude)
