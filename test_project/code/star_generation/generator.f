@@ -49,8 +49,10 @@ C     cylindrical z-coordinate are determined.
      &        halo_stars_fraction,         burst_mrep,
      &        normal_mrep,                 thick_disk_max_sfr,
      &        thin_disk_birth_init_time,   thick_disk_age,
-     &        thick_disk_max_sfr_time,     thick_disk_sfr_param,
-     &        halo_age,                    halo_stars_formation_time
+     &        thick_disk_max_sfr_relative_time,    thick_disk_sfr_param,
+     &        halo_age,                    halo_stars_formation_time,
+     &        thick_disk_birth_init_time,  max_age,
+     &        halo_birth_init_time
       real :: mass_from_Salpeter_IMF, 
      &        get_normalization_const
       double precision :: coordinate_Theta(MAX_STARS_COUNT),
@@ -81,14 +83,17 @@ C     TODO: find out the meaning of psi, mrep and 1.0e6
       mrep = mrep * massReductionFactor
       normal_mrep = mrep
       burst_mrep = mrep * BURST_FORMATION_FACTOR
-      burst_init_time = thick_disk_age - burst_age
 
-      thin_disk_birth_init_time = thick_disk_age - thin_disk_age
+      max_age = max(thin_disk_age, thick_disk_age, halo_age)
+      burst_init_time = max_age - burst_age
+      thin_disk_birth_init_time = max_age - thin_disk_age
+      thick_disk_birth_init_time = max_age - thick_disk_age
+      halo_birth_init_time = max_age - halo_age
 C     This can be easily proved by taking derivative from
 C     y = t * exp(-t / tau)
-      thick_disk_max_sfr_time = thick_disk_sfr_param
-      thick_disk_max_sfr = (thick_disk_max_sfr_time 
-     &                      * exp(-thick_disk_max_sfr_time 
+      thick_disk_max_sfr_relative_time = thick_disk_sfr_param
+      thick_disk_max_sfr = (thick_disk_max_sfr_relative_time 
+     &                      * exp(-thick_disk_max_sfr_relative_time 
      &                              / thick_disk_sfr_param))
 
       write(6,*) '      Mass reduction factor = ', massReductionFactor
@@ -131,10 +136,17 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
      &                                      / thick_disk_sfr_param)
                       sfr_try = thick_disk_max_sfr * ran(iseed)
                       if (sfr_try <= time_try_sfr) then
-                          starBirthTime(stars_count) = time_try
+                          starBirthTime(stars_count) = (
+     &                        time_try + thick_disk_birth_init_time)
                           exit
                       end if
                   end do
+              else if (random_value > thick_disk_stars_fraction 
+     &                 .and. random_value <= thick_disk_stars_fraction 
+     &                                       + halo_stars_fraction) then
+                  disk_belonging(stars_count) = 3
+                  starBirthTime(stars_count) = halo_birth_init_time
+     &                + halo_stars_formation_time * ran(iseed)
               else
                   disk_belonging(stars_count) = 1
                   starBirthTime(stars_count) = thin_disk_birth_init_time 
@@ -144,6 +156,7 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
      &                total_generated_mass_in_bin + star_mass
               end if
 
+C             TODO: add halo stars here
               if (disk_belonging(stars_count) == 1) then
                   scale_height = THIN_DISK_SCALE_HEIGHT_KPC
               else if (disk_belonging(stars_count) == 2) then
