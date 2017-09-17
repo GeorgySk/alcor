@@ -10,7 +10,6 @@ from typing import List
 from alcor.models.star import Star
 
 
-# TODO: find out the meaning of parameters
 # More info on conversions at: https://goo.gl/e7uiiZ
 # ngp - North Galactic Pole
 # theta - see BK angle at the link above
@@ -21,22 +20,19 @@ def calculate_coordinates(stars: List[Star],
                           ngp_right_ascension: float = 3.35
                           ) -> None:
     for star in stars:
-        # TODO: give shorter name
-        stellar_galactocentric_distance_plane_projection = (
-            opposite_triangle_side(solar_galactocentric_distance,
-                                   star.r_cylindric_coordinate,
-                                   star.th_cylindric_coordinate))
-        star.galactic_distance = sqrt(
-            stellar_galactocentric_distance_plane_projection ** 2
-            + star.z_coordinate ** 2)
+        distance_plane_projection = (opposite_triangle_side(
+            solar_galactocentric_distance,
+            star.r_cylindric_coordinate,
+            star.th_cylindric_coordinate))
+        star.distance = sqrt(distance_plane_projection ** 2
+                             + star.z_coordinate ** 2)
 
         # TODO: implement function
-        star.galactic_longitude = acos(
-            (solar_galactocentric_distance ** 2
-             + stellar_galactocentric_distance_plane_projection ** 2
-             - star.r_cylindric_coordinate ** 2)
-            / (2. * stellar_galactocentric_distance_plane_projection
-               * solar_galactocentric_distance))
+        star.galactic_longitude = acos((solar_galactocentric_distance ** 2
+                                        + distance_plane_projection ** 2
+                                        - star.r_cylindric_coordinate ** 2)
+                                       / (2. * distance_plane_projection
+                                          * solar_galactocentric_distance))
 
         if (star.r_cylindric_coordinate * cos(star.th_cylindric_coordinate)
                 > solar_galactocentric_distance):
@@ -48,9 +44,8 @@ def calculate_coordinates(stars: List[Star],
             star.galactic_longitude -= 2. * pi
 
         # TODO: or use arctan2
-        star.galactic_latitude = atan(
-            abs(star.z_coordinate
-                / stellar_galactocentric_distance_plane_projection))
+        star.galactic_latitude = atan(abs(star.z_coordinate
+                                          / distance_plane_projection))
 
         if star.z_coordinate < 0.:
             star.galactic_latitude = -star.galactic_latitude
