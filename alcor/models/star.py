@@ -42,7 +42,7 @@ STAR_PARAMETERS_NAMES = ['luminosity',
                          'proper_motion_component_vr',
                          'right_ascension',
                          'declination',
-                         'galactic_distance',
+                         'galactocentric_distance',
                          'galactic_latitude',
                          'galactic_longitude',
                          'ugriz_g_apparent',
@@ -85,8 +85,8 @@ class Star(Base):
                              nullable=True)
     declination = Column(Float(asdecimal=True),
                          nullable=True)
-    galactic_distance = Column(Float(asdecimal=True),
-                               nullable=True)
+    galactocentric_distance = Column(Float(asdecimal=True),
+                                     nullable=True)
     galactic_latitude = Column(Float(asdecimal=True),
                                nullable=True)
     galactic_longitude = Column(Float(asdecimal=True),
@@ -126,7 +126,7 @@ class Star(Base):
                  proper_motion_component_vr: float = None,
                  right_ascension: float = None,
                  declination: float = None,
-                 galactic_distance: float = None,
+                 galactocentric_distance: float = None,
                  galactic_latitude: float = None,
                  galactic_longitude: float = None,
                  ugriz_g_apparent: float = None,
@@ -149,7 +149,7 @@ class Star(Base):
         self.proper_motion_component_vr = proper_motion_component_vr
         self.right_ascension = right_ascension
         self.declination = declination
-        self.galactic_distance = galactic_distance
+        self.galactocentric_distance = galactocentric_distance
         self.galactic_latitude = galactic_latitude
         self.galactic_longitude = galactic_longitude
         self.ugriz_g_apparent = ugriz_g_apparent
@@ -197,7 +197,7 @@ class Star(Base):
     def cartesian_coordinates(self) -> Tuple[float, float, float]:
         right_ascension = float(self.right_ascension)
         declination = float(self.declination)
-        galactic_distance = float(self.galactic_distance)
+        galactocentric_distance = float(self.galactocentric_distance)
 
         latitude = (asin(cos(declination) * cos(DEC_GPOLE)
                          * cos(right_ascension - RA_GPOLE)
@@ -208,9 +208,9 @@ class Star(Base):
         if x > 0. and 0. > y or x <= 0. and y <= 0.:
             longitude += pi
 
-        x_coordinate = galactic_distance * cos(latitude) * cos(longitude)
-        y_coordinate = galactic_distance * cos(latitude) * sin(longitude)
-        z_coordinate = galactic_distance * sin(latitude)
+        x_coordinate = galactocentric_distance * cos(latitude) * cos(longitude)
+        y_coordinate = galactocentric_distance * cos(latitude) * sin(longitude)
+        z_coordinate = galactocentric_distance * sin(latitude)
         return x_coordinate, y_coordinate, z_coordinate
 
     def modify(self, **fields: Any) -> 'Star':
@@ -241,13 +241,13 @@ class Star(Base):
 
 def set_radial_velocity_to_zero(star: Star) -> Star:
     # TODO: implement pc/kpc units
-    galactic_distance = float(star.galactic_distance)
+    galactocentric_distance = float(star.galactocentric_distance)
     galactic_latitude = float(star.galactic_latitude)
     galactic_longitude = float(star.galactic_longitude)
     proper_motion_component_b = float(star.proper_motion_component_b)
     proper_motion_component_l = float(star.proper_motion_component_l)
 
-    galactic_distance_in_pc = galactic_distance * 1e3
+    galactocentric_distance_in_pc = galactocentric_distance * 1e3
 
     a1 = (-ASTRONOMICAL_UNIT * cos(galactic_latitude)
           * sin(galactic_longitude))
@@ -255,7 +255,7 @@ def set_radial_velocity_to_zero(star: Star) -> Star:
           * cos(galactic_longitude))
     u_velocity = ((a1 * proper_motion_component_l
                    + b1 * proper_motion_component_b)
-                  * galactic_distance_in_pc)
+                  * galactocentric_distance_in_pc)
 
     a2 = (ASTRONOMICAL_UNIT * cos(galactic_latitude)
           * cos(galactic_longitude))
@@ -263,11 +263,11 @@ def set_radial_velocity_to_zero(star: Star) -> Star:
           * sin(galactic_longitude))
     v_velocity = ((a2 * proper_motion_component_l
                    + b2 * proper_motion_component_b)
-                  * galactic_distance_in_pc)
+                  * galactocentric_distance_in_pc)
 
     b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
     w_velocity = (b3 * proper_motion_component_b
-                  * galactic_distance_in_pc)
+                  * galactocentric_distance_in_pc)
     return star.modify(u_velocity=u_velocity,
                        v_velocity=v_velocity,
                        w_velocity=w_velocity)

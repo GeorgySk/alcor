@@ -39,7 +39,7 @@ def stars_factory(nullable: bool) -> MappedSearchStrategy:
         decimals,
         # declination
         decimals,
-        # galactic_distance
+        # galactocentric_distance
         decimals,
         # galactic_latitude
         decimals,

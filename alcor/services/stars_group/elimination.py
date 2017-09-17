@@ -19,8 +19,8 @@ def check(star: Star,
           max_velocity: float = 500.,
           min_proper_motion: float = 0.04) -> bool:
     # TODO: implement pc/kpc units
-    galactic_distance = star.galactic_distance * Decimal(1e3)
-    parallax = Fraction(1, Fraction(galactic_distance))
+    galactocentric_distance = star.galactocentric_distance * Decimal(1e3)
+    parallax = Fraction(1, Fraction(galactocentric_distance))
     # TODO: find out the meaning of the following constants
     hrm = star.ugriz_g_apparent + Decimal(5. * log10(star.proper_motion) + 5.)
     gz = float(star.ugriz_gr) + float(star.ugriz_rz)
