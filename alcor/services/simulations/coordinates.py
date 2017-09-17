@@ -33,20 +33,13 @@ def calculate_coordinates(stars: List[Star],
                                         - star.r_cylindric_coordinate ** 2)
                                        / (2. * distance_plane_projection
                                           * solar_galactocentric_distance))
-
-        if (star.r_cylindric_coordinate * cos(star.th_cylindric_coordinate)
-                > solar_galactocentric_distance):
-            star.galactic_longitude = pi - star.galactic_longitude
-        elif sin(star.th_cylindric_coordinate) < 0.:
-            star.galactic_longitude += 2. * pi
-
-        if star.galactic_longitude > 2. * pi:
-            star.galactic_longitude -= 2. * pi
+        # Unfolding from 0-180 to 0-360
+        if star.th_cylindric_coordinate > pi:
+            star.galactic_longitude = 2. * pi - star.galactic_longitude
 
         # TODO: or use arctan2
         star.galactic_latitude = atan(abs(star.z_coordinate
                                           / distance_plane_projection))
-
         if star.z_coordinate < 0.:
             star.galactic_latitude = -star.galactic_latitude
 
