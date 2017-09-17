@@ -11,9 +11,10 @@ from alcor.models.star import Star
 
 
 # TODO: find out the meaning of parameters
+# ngp - North Galactic Pole
 def calculate_coordinates(stars: List[Star],
                           solar_galactocentric_distance: float,
-                          deltag: float = 0.478,
+                          ngp_declination: float = 0.478,
                           theta: float = 2.147,
                           alphag: float = 3.35
                           ) -> None:
@@ -75,15 +76,16 @@ def calculate_coordinates(stars: List[Star],
         star.proper_motion = sqrt(star.proper_motion_component_l ** 2
                                   + star.proper_motion_component_b ** 2)
 
-        star.declination = (asin(sin(deltag) * sin_latitude
-                            + cos(deltag) * cos_latitude
-                              * cos(theta - star.galactic_longitude)))
+        star.declination = (asin(sin(ngp_declination) * sin_latitude
+                                 + cos(ngp_declination) * cos_latitude
+                                   * cos(theta - star.galactic_longitude)))
 
         # TODO: what is xs and xc?
         xs = ((cos_latitude * sin(theta - star.galactic_longitude))
               / cos(star.declination))
-        xc = ((cos(deltag) * sin_latitude - sin(deltag) * cos_latitude
-               * cos(theta - star.galactic_longitude))
+        xc = ((cos(ngp_declination) * sin_latitude
+               - sin(ngp_declination) * cos_latitude
+                 * cos(theta - star.galactic_longitude))
               / cos(star.declination))
 
         if xs >= 0.:
