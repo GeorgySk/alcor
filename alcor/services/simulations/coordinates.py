@@ -64,8 +64,7 @@ def calculate_coordinates(stars: List[Star],
             -star.u_velocity * cos_longitude * sin_latitude
             - star.v_velocity * sin_latitude * sin_longitude
             + star.w_velocity * cos_latitude)
-        # TODO: rename as radial velocity
-        star.proper_motion_component_vr = (
+        star.radial_velocity = (
             (cos_latitude * cos_longitude * star.u_velocity)
             + (cos_latitude * sin_latitude * star.v_velocity)
             + (sin_latitude * star.w_velocity))
