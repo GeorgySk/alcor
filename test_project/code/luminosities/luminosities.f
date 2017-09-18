@@ -72,7 +72,8 @@ C             WD of CO: m_WD <1.14; of ONe: m_wd>1.14
                   end if
 C                 Calculating the lifetime in the main sequence
 C                 TODO: resolve the problem with halo stars
-                  call tsp(m(i), 
+                  call get_main_sequence_lifetime(
+     &                     m(i), 
      &                     metallicityOfWD(i), 
      &                     main_sequence_lifetime(i))
                   coolingTime(i) = max_age - starBirthTime(i) 
@@ -125,21 +126,18 @@ C         Making the transfer
       end subroutine
 
 
-C     TODO: give a better name
-      subroutine tsp(stellar_mass, 
-     &               metallicity,
-     &               t)
+      subroutine get_main_sequence_lifetime(stellar_mass, 
+     &                                      metallicity,
+     &                                      main_sequence_lifetime)
 C         Calculates lifetime in the main sequence for a given 
 C         metallicity Z € [0.01, 0.001] for standart helium content 
 C         according to model by Leandro & Renedo et al.(2010)
 C         Data in solar masses and Gyr
-C         TODO: what is SP?
-C         t: lifetime in the SP.
           implicit none
 
           real :: stellar_mass,
      &            metallicity,
-     &            t,
+     &            main_sequence_lifetime,
      &            mms(10),
      &            tms(10),
      &            mms2(7),
@@ -244,8 +242,9 @@ C                 TODO: eliminate goto
           end if
 
 C         Interpolating for the value of Z, z solar 10
-          t = tsub + ((tsol - tsub) / (0.01 - 0.001)) 
-     &               * (metallicity - 0.001)
+          main_sequence_lifetime = tsub + ((tsol - tsub) 
+     &                                     / (0.01 - 0.001)) 
+     &                                    * (metallicity - 0.001)
       end subroutine
       
 
