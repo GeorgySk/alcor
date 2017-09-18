@@ -107,13 +107,23 @@ C         ---  END IF CO/ONe ---
 
           luminosityOfWD(i) = -lum
           effTempOfWD(i) = teff            
+
+          call EXTINCT(real(lgac(i) * 180.0 / pi),
+     &                 real(bgac(i) * 180.0 / pi),
+     &                 real(rgac(i)),
+     &                 AVT,SAVT,AVC,JMAX,AV,SAV)
+          extinction = AVT + AVC
           
-          u_ubvrij(i) = c1
-          b_ubvrij(i) = c2
-          v_ubvrij(i) = c3
-          r_ubvrij(i) = c4
-          i_ubvrij(i) = c5
-          j_ubvrij(i) = c6
+C         Coefficients were taken from Table 6 of "Maps of dust 
+C         infrared emission for use in estimation of reddening and
+C         cosmic microwave background radiation foregrounds" by 
+C         Schlegel et al. 1998
+          u_ubvrij(i) = c1 + extinction * 1.664
+          b_ubvrij(i) = c2 + extinction * 1.321
+          v_ubvrij(i) = c3 + extinction * 1.015
+          r_ubvrij(i) = c4 + extinction * 0.819
+          i_ubvrij(i) = c5 + extinction * 0.594
+          j_ubvrij(i) = c6 + extinction * 0.276
 
 C       ---  ELSE mass >= 1.4  --- EXPLOTA, exceeding Chandrasekar limit
         else
