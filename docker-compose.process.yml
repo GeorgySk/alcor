@@ -10,29 +10,28 @@ services:
     extra_hosts:
       - "dockerhost:$DOCKERHOST"  # for debugging
     command:
-      # Processing generated data:
-      - process
-      - --last=1
-#      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
-      - --filtration-method
-      - restricted
-      - --nullify-radial-velocity
-      - --w-luminosity-function
-      - --w-velocities-clouds
-      - --w-velocities-vs-magnitude
-      - --w-lepine-criterion
+        # Processing generated data:
+        - process
+        - --last=1
+#        - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
+#        - --filtration-method
+#        - restricted
+        - --nullify-radial-velocity
+        - --w-luminosity-function
+        - --w-velocities-clouds
+        - --w-velocities-vs-magnitude
+        - --w-lepine-criterion
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 
   postgres:
     image: postgres:latest
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres-data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=alcor
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
 
 volumes:
-  cassandra-data:
-  postgres_data:
+  postgres-data:

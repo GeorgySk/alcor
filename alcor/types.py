@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from numbers import Number
 from typing import (Union,
+                    Callable,
                     Dict,
                     Tuple,
                     List)
@@ -18,5 +19,8 @@ ColumnValueType = Union[int,
                         datetime,
                         uuid.UUID,
                         None]
-ParametersValuesType = Dict[str, Union[NumericType,
-                                       Dict[str, Union[str, NumericType]]]]
+BolometricIndexType = Callable[[float], int]
+StarBolometricIndexType = Callable[[Star], int]
+GridParametersInfoType = Dict[str, Union[NumericType,
+                                         Dict[str, NumericType]]]
+CSVParametersInfoType = Dict[str, Dict[str, Union[str, int]]]

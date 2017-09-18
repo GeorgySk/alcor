@@ -1,9 +1,9 @@
 precision: 6
 
-geometry: cones
+geometry: sphere
 
-parameters:
-  commons:
+grid:
+  common:
 #   TODO: this is not applied to cone
     burst_time: 0.6
     DB_fraction: 0.2
@@ -14,9 +14,12 @@ parameters:
     mass_reduction_factor: 0.03
   cones:
     thick_disk_stars_fraction: 0.8
+
+csv:
+  cones:
     longitudes:
-      csv: ../test_angles.csv
+      path: ../test_angles.csv
       column: 8
     latitudes:
-      csv: ../test_angles.csv
+      path: ../test_angles.csv
       column: 9

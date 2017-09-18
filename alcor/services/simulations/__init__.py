@@ -1,1 +1,1 @@
-from .service import run_simulations
+from .service import run

@@ -24,12 +24,11 @@ services:
   postgres:
     image: postgres:latest
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres-data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=alcor
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
 
 volumes:
-  cassandra-data:
-  postgres_data:
+  postgres-data:

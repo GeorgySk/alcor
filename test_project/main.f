@@ -295,7 +295,7 @@ C     TODO: add choosing what output we want to get
      &                  'proper_motion_component_vr ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'galactic_distance ',
+     &                  'distance ',
      &                  'galactic_latitude ',
      &                  'galactic_longitude ',
      &                  'ugriz_g_apparent ',
@@ -308,12 +308,12 @@ C     TODO: add choosing what output we want to get
      &                  'v_velocity ',
      &                  'w_velocity ',
      &                  'spectral_type ',
-     &                  'disk_belonging'
+     &                  'galactic_disk_type'
       else if (geometry == 'cones') then
           write(421, *) 'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
-     &                  'galactic_distance ',
+     &                  'distance ',
      &                  'galactic_longitude ',
      &                  'galactic_latitude ',
      &                  'ugriz_g_apparent ',
@@ -321,7 +321,7 @@ C     TODO: add choosing what output we want to get
      &                  'ugriz_gr ',
      &                  'ugriz_ri ',
      &                  'ugriz_iz ',
-     &                  'disk_belonging ',
+     &                  'galactic_disk_type ',
      &                  'spectral_type'
       end if
       close(421)

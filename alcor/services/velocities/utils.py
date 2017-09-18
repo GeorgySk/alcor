@@ -6,9 +6,9 @@ from alcor.models.velocities import (LepineCaseUVCloud,
                                      LepineCaseVWCloud)
 
 
-def star_cloud(star: Star) -> Union[LepineCaseUVCloud,
-                                    LepineCaseUWCloud,
-                                    LepineCaseVWCloud]:
+def lepine_cloud(star: Star) -> Union[LepineCaseUVCloud,
+                                      LepineCaseUWCloud,
+                                      LepineCaseVWCloud]:
     max_coordinates_modulus = star.max_coordinates_modulus
 
     if abs(star.x_coordinate) == max_coordinates_modulus:

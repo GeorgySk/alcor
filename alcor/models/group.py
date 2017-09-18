@@ -1,5 +1,4 @@
 import uuid
-from typing import Optional
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
@@ -20,6 +19,6 @@ class Group(Base):
 
     def __init__(self,
                  id: uuid.UUID,
-                 original_id: Optional[uuid.UUID]):
+                 original_id: uuid.UUID = None):
         self.id = id
         self.original_id = original_id

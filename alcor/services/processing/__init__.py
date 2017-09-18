@@ -1,1 +1,1 @@
-from .service import run_processing
+from .service import run

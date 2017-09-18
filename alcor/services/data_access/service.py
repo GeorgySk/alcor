@@ -1,11 +1,13 @@
 import uuid
 from typing import List
 
+from sqlalchemy import func, not_
 from sqlalchemy.orm.session import Session
 
+from alcor.models import (Group,
+                          Star,
+                          associations)
 from alcor.models.base import Base
-from alcor.models.group import Group
-from alcor.models.star import Star
 
 
 def fetch_all(model: Base,
@@ -15,11 +17,35 @@ def fetch_all(model: Base,
     return query.all()
 
 
+def fetch_random(model: Base,
+                 *,
+                 limit: int = None,
+                 session: Session) -> List[Base]:
+    query = (session.query(model)
+             .order_by(func.random())
+             .limit(limit))
+    return query.all()
+
+
 def fetch_group_stars(*,
                       group_id: uuid.UUID,
                       session: Session) -> List[Star]:
     query = (session.query(Star)
              .filter(Star.group_id == group_id))
+    return query.all()
+
+
+def fetch_unprocessed_stars(*,
+                            group_id: uuid.UUID = None,
+                            session: Session) -> List[Star]:
+    has_been_processed = (session.query(Star)
+                          .filter(Star.id ==
+                                  associations.ProcessedStars.processed_id)
+                          .exists())
+    query = (session.query(Star)
+             .filter(not_(has_been_processed)))
+    if group_id:
+        query = query.filter(Star.group_id == group_id)
     return query.all()
 
 

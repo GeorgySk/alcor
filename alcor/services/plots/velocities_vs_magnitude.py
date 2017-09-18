@@ -1,16 +1,16 @@
 from typing import (Tuple,
                     List)
 
-from matplotlib.axes import Axes
-from sqlalchemy.orm.session import Session
 import matplotlib
-matplotlib.use('Agg')
+
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
-import matplotlib.pyplot as plt
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from sqlalchemy.orm.session import Session
 
-from alcor.services.data_access import fetch_all
 from alcor.models.velocities_vs_magnitudes.bins import (Bin,
                                                         LepineCaseUBin,
                                                         LepineCaseVBin,
@@ -19,6 +19,7 @@ from alcor.models.velocities_vs_magnitudes.clouds import (Cloud,
                                                           LepineCaseUCloud,
                                                           LepineCaseVCloud,
                                                           LepineCaseWCloud)
+from alcor.services.data_access import fetch_all
 
 
 def plot(session: Session,
