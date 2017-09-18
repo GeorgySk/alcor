@@ -64,6 +64,7 @@ STAR_PARAMETERS_NAMES = ['mass',
 class GalacticDiskType(enum.IntEnum):
     thin = 1
     thick = 2
+    halo = 3
 
 
 @memoize_properties

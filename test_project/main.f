@@ -630,6 +630,8 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
                   disk_str = 'thin'
               else if (disk_belonging(i) == 2) then
                   disk_str = 'thick'
+              else if (disk_belonging(i) == 3) then
+                  disk_str = 'halo'
               end if
 
               right_ascension_prop_motion = (
