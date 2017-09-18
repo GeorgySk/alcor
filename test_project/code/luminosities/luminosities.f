@@ -37,6 +37,9 @@ C       m: mass in the main sequence
      &            m(MAX_STARS_COUNT)
           integer disk_belonging(MAX_STARS_COUNT),
      &            flagOfWD(MAX_STARS_COUNT)
+          double precision :: coordinate_R(MAX_STARS_COUNT),
+     &                        coordinate_Theta(MAX_STARS_COUNT),
+     &                        coordinate_Zcylindr(MAX_STARS_COUNT)
 
 C         TODO: give names with one style
           common /tm/ starBirthTime, m
@@ -53,6 +56,9 @@ C         TODO: give names with one style
      &                   parameterIMF,
      &                   parameterIFMR,
      &                   burst_age
+         common /coorcil/ coordinate_R,
+     &                     coordinate_Theta,
+     &                     coordinate_Zcylindr
 
           max_age = max(thin_disk_age, thick_disk_age, halo_age)
 
@@ -118,6 +124,7 @@ C         Making the transfer
                   metallicityOfWD(k) = metallicityOfWD(i)
                   starBirthTime(k) = starBirthTime(i)
                   disk_belonging(k) = disk_belonging(i)
+                  coordinate_Zcylindr(k) = coordinate_Zcylindr(i)
               end if
           end do
     

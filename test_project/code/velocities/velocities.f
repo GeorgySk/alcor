@@ -89,7 +89,6 @@ C         Making the transfer of z, r, theta
           do i = 1, sample_stars_count
               if (flagOfWD(i) == 1) then
                   k = k + 1
-                  coordinate_Zcylindr(k) = coordinate_Zcylindr(i)
                   if (geometry == 'cones') then
                       coordinate_R(k) = coordinate_R(i)
                       coordinate_Theta(k) = coordinate_Theta(i)
