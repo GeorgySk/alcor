@@ -15,9 +15,9 @@ def parameters_values(
         parameters_info: GridParametersInfoType,
         precision: int) -> Iterator[Dict[str, NumericType]]:
     values_ranges_by_names = dict(
-        parameters_names_values_ranges(
-            parameters_info=parameters_info,
-            precision=precision))
+            parameters_names_values_ranges(
+                    parameters_info=parameters_info,
+                    precision=precision))
     parameters_names = list(values_ranges_by_names)
     for values in product(*values_ranges_by_names.values()):
         yield dict(zip(parameters_names, values))
@@ -41,5 +41,5 @@ def parameters_names_values_ranges(
                 round(start_value + value_number * step_size,
                       precision)
                 for value_number in range(values_count)
-                ]
+            ]
             yield name, values_range

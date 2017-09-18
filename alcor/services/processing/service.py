@@ -30,11 +30,11 @@ def run(*,
                                     session=session)]
     for group in groups:
         stars_group.process(
-            group=group,
-            filtration_method=filtration_method,
-            nullify_radial_velocity=nullify_radial_velocity,
-            w_luminosity_function=w_luminosity_function,
-            w_velocities_clouds=w_velocities_clouds,
-            w_velocities_vs_magnitude=w_velocities_vs_magnitude,
-            w_lepine_criterion=w_lepine_criterion,
-            session=session)
+                group=group,
+                filtration_method=filtration_method,
+                nullify_radial_velocity=nullify_radial_velocity,
+                w_luminosity_function=w_luminosity_function,
+                w_velocities_clouds=w_velocities_clouds,
+                w_velocities_vs_magnitude=w_velocities_vs_magnitude,
+                w_lepine_criterion=w_lepine_criterion,
+                session=session)

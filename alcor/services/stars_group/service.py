@@ -49,23 +49,23 @@ def process(*,
 
     if w_luminosity_function:
         luminosity_function.process_stars_group(
-            stars=stars,
-            group=group,
-            session=session)
+                stars=stars,
+                group=group,
+                session=session)
 
     if w_velocities_clouds:
         velocities.process_stars_group(
-            stars=stars,
-            group=group,
-            w_lepine_criterion=w_lepine_criterion,
-            session=session)
+                stars=stars,
+                group=group,
+                w_lepine_criterion=w_lepine_criterion,
+                session=session)
 
     if w_velocities_vs_magnitude:
         velocities_vs_magnitudes.process_stars_group(
-            stars=stars,
-            group=group,
-            w_lepine_criterion=w_lepine_criterion,
-            session=session)
+                stars=stars,
+                group=group,
+                w_lepine_criterion=w_lepine_criterion,
+                session=session)
 
     original_id = group.id
     processed_group_id = uuid.uuid4()
@@ -103,5 +103,5 @@ def processed_stars_associations(original_stars: List[Star],
     for original_star, processed_star in zip(original_stars,
                                              processed_stars):
         yield associations.ProcessedStars(
-            original_id=original_star.id,
-            processed_id=processed_star.id)
+                original_id=original_star.id,
+                processed_id=processed_star.id)

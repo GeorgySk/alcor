@@ -1,14 +1,14 @@
 import uuid
 from typing import Optional
 
+from sqlalchemy.orm.session import Session
+
 from . import (luminosity_function,
                velocities_vs_magnitude,
                velocity_clouds,
                heatmaps,
                toomre_diagram,
                ugriz_diagrams)
-
-from sqlalchemy.orm.session import Session
 
 
 def draw(group_id: Optional[uuid.UUID],

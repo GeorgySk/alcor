@@ -2,8 +2,8 @@ import logging
 from typing import (Callable,
                     List)
 
-from alcor.models import Group
-from alcor.models import Star
+from alcor.models import (Group,
+                          Star)
 from alcor.types import (BolometricIndexType,
                          StarBolometricIndexType,
                          StarsBinsType)
@@ -65,9 +65,9 @@ def stars_packer(*,
                 res[index].append(star)
             else:
                 logger.warning(
-                    f'Bolometric magnitude {star.bolometric_magnitude} '
-                    'is out of bounds '
-                    f'for star with id {star.id}.')
+                        f'Bolometric magnitude {star.bolometric_magnitude} '
+                        'is out of bounds '
+                        f'for star with id {star.id}.')
         return res
 
     return pack_stars
