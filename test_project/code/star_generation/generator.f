@@ -162,7 +162,7 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
                   scale_height = THICK_DISK_SCALE_HEIGHT_KPC
               end if
 
-C             Coordinates of halo stars will be generated in other place
+C             Coordinates of halo stars will be generated in polar.f
               if (disk_belonging(stars_count) /= 3) then
 C                 Inverse transform sampling for y = exp(-z / H)
                   do
