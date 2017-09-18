@@ -38,8 +38,11 @@ result.xml
 fort.*
 main.e
 
-# outputs
-*.res
+# simulations inputs
 *.csv
-*.html
+
+# simulations outputs
+*.res
+
+# plots
 *.ps
