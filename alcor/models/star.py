@@ -222,8 +222,11 @@ class Star(Base):
 
     @classmethod
     def deserialize(cls, serialized: Dict[str, Any]) -> 'Star':
-        serialized = dict(serialized)
-        star_id = serialized.pop('id')
+        fields_to_copy = cls.fields_to_copy()
+        serialized = {key: value
+                      for key, value in serialized.items()
+                      if key in fields_to_copy}
+        star_id = serialized.pop('id', None)
         star = cls(**serialized)
         star.id = star_id
         return star
