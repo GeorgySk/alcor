@@ -1,5 +1,4 @@
 click>=6.7 # command-line options and arguments
 pydevd  # debugging
-sqlalchemy>=1.1.11
 sqlalchemy_helpers>=0.0.3
 sqlalchemy_utils>=0.32.14
