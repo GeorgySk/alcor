@@ -75,23 +75,29 @@ def values_by_metallicity_are_close(table: CoolingSequencesType,
                                     other_table: CoolingSequencesType,
                                     *,
                                     relative_tolerance: float = 1E-4) -> bool:
-    for metallicity, x_sequences in table.items():
-        y_sequences = other_table[metallicity]
-        for key, x_values in x_sequences.items():
-            y_values = y_sequences[key]
-            for x_value, y_value in zip(x_values, y_values):
-                if x_value.shape is ():
-                    if not np.isnan(x_value) and not np.isnan(y_value):
+    for metallicity, table_sequences in table.items():
+        other_table_sequences = other_table[metallicity]
+        for sequence_name, sequence_values in table_sequences.items():
+            other_sequence_values = other_table_sequences[sequence_name]
+
+            if sequence_values.ndim == 1:
+                for x_value, y_value in zip(sequence_values,
+                                            other_sequence_values):
+                    # NaN when compared with other NaN always gives False
+                    if np.isnan(x_value) and np.isnan(y_value):
+                        continue
+                    if not isclose(x_value,
+                                   y_value,
+                                   rel_tol=relative_tolerance):
+                        return False
+            else:
+                for x_row, y_row in zip(sequence_values,
+                                        other_sequence_values):
+                    for x_value, y_value in zip(x_row, y_row):
+                        if np.isnan(x_value) and np.isnan(y_value):
+                            continue
                         if not isclose(x_value,
                                        y_value,
                                        rel_tol=relative_tolerance):
                             return False
-                else:
-                    for (x_sub_value, y_sub_value) in zip(x_value, y_value):
-                        if (not np.isnan(x_sub_value)
-                                and not np.isnan(y_sub_value)):
-                            if not isclose(x_sub_value,
-                                           y_sub_value,
-                                           rel_tol=relative_tolerance):
-                                return False
     return True
