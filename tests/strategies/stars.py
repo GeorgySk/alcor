@@ -1,72 +1,46 @@
 import sys
 from decimal import Decimal
+from functools import partial
+from typing import (Iterator,
+                    Tuple)
 
 from hypothesis import strategies
-from hypothesis.searchstrategy.strategies import MappedSearchStrategy
+from hypothesis.searchstrategy import SearchStrategy
+from hypothesis_sqlalchemy import tables
+from sqlalchemy import Float
 
 from alcor.models import Star
-from alcor.models.star import GalacticDiskType
-from alcor.services.common import STARS_SPECTRAL_TYPES
 
 
-def stars_factory(nullable: bool) -> MappedSearchStrategy:
-    decimals = strategies.decimals(allow_nan=False,
-                                   allow_infinity=False)
+def stars_factory(nullable: bool) -> SearchStrategy:
+    table = Star.__table__
+    fixed_columns_values = dict(fixed_stars_columns_values(nullable))
+    records = tables.records.factory(table, **fixed_columns_values)
+
+    columns_names = [column.name
+                     for column in table.columns]
+    return (records
+            .map(partial(zip, columns_names))
+            .map(dict)
+            .map(Star.deserialize))
+
+
+def fixed_stars_columns_values(nullable: bool
+                               ) -> Iterator[Tuple[str, SearchStrategy]]:
+    table = Star.__table__
     positive_decimals = strategies.decimals(
-        min_value=Decimal(sys.float_info.epsilon),
-        allow_nan=False,
-        allow_infinity=False)
-
+            min_value=Decimal(sys.float_info.epsilon),
+            allow_nan=False,
+            allow_infinity=False)
     if nullable:
-        decimals |= strategies.none()
         positive_decimals |= strategies.none()
-
-    return strategies.builds(
-        Star,
-        # group_id
-        strategies.text(min_size=6),
-        # luminosity
-        decimals,
-        # proper_motion
-        positive_decimals,
-        # proper_motion_component_b
-        decimals,
-        # proper_motion_component_l
-        decimals,
-        # proper_motion_component_vr
-        decimals,
-        # right_ascension
-        decimals,
-        # declination
-        decimals,
-        # distance
-        decimals,
-        # galactic_latitude
-        decimals,
-        # galactic_longitude
-        decimals,
-        # ugriz_g_apparent
-        decimals,
-        # ugriz_ug
-        decimals,
-        # ugriz_gr
-        decimals,
-        # ugriz_ri
-        decimals,
-        # ugriz_iz
-        decimals,
-        # v_photometry
-        decimals,
-        # u_velocity
-        decimals,
-        # v_velocity
-        decimals,
-        # w_velocity
-        decimals,
-        # spectral_type
-        strategies.one_of(map(strategies.just, STARS_SPECTRAL_TYPES)),
-        # galactic_disk_type
-        strategies.one_of(map(strategies.just, GalacticDiskType)))
+    else:
+        decimals = strategies.decimals(allow_nan=False,
+                                       allow_infinity=False)
+        for column in table.columns:
+            if isinstance(column.type, Float):
+                yield column.name, decimals
+    yield Star.proper_motion.name, positive_decimals
 
 
 defined_stars = stars_factory(nullable=False)
