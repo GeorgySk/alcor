@@ -73,7 +73,8 @@ def nan_matrix(shape: Union[int, Tuple[int, ...]],
 
 def values_by_metallicity_are_close(x: CoolingSequencesType,
                                     y: CoolingSequencesType,
-                                    rel_tol: float = 1E-4) -> bool:
+                                    *,
+                                    relative_tolerance: float = 1E-4) -> bool:
     for metallicity, x_sequences in x.items():
         y_sequences = y[metallicity]
         for key, x_values in x_sequences.items():
@@ -83,7 +84,7 @@ def values_by_metallicity_are_close(x: CoolingSequencesType,
                     if not np.isnan(x_value) and not np.isnan(y_value):
                         if not isclose(x_value,
                                        y_value,
-                                       rel_tol=rel_tol):
+                                       rel_tol=relative_tolerance):
                             return False
                 else:
                     for (x_sub_value, y_sub_value) in zip(x_value, y_value):
@@ -91,6 +92,6 @@ def values_by_metallicity_are_close(x: CoolingSequencesType,
                                 and not np.isnan(y_sub_value)):
                             if not isclose(x_sub_value,
                                            y_sub_value,
-                                           rel_tol=rel_tol):
+                                           rel_tol=relative_tolerance):
                                 return False
     return True
