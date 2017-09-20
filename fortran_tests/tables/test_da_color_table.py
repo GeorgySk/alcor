@@ -54,12 +54,18 @@ def read_colors_from_fortran(rows_count: int,
                              ) -> Dict[str, np.ndarray]:
     rows_counts = nan_matrix(shape=files_count, dtype='i')
     masses = nan_matrix(shape=files_count)
-    luminosities = nan_matrix(shape=(files_count, rows_count), order='F')
-    u_ubvri = nan_matrix(shape=(files_count, rows_count), order='F')
-    b_ubvri = nan_matrix(shape=(files_count, rows_count), order='F')
-    v_ubvri = nan_matrix(shape=(files_count, rows_count), order='F')
-    r_ubvri = nan_matrix(shape=(files_count, rows_count), order='F')
-    i_ubvri = nan_matrix(shape=(files_count, rows_count), order='F')
+    luminosities = nan_matrix(shape=(files_count, rows_count),
+                              order='F')
+    u_ubvri = nan_matrix(shape=(files_count, rows_count),
+                         order='F')
+    b_ubvri = nan_matrix(shape=(files_count, rows_count),
+                         order='F')
+    v_ubvri = nan_matrix(shape=(files_count, rows_count),
+                         order='F')
+    r_ubvri = nan_matrix(shape=(files_count, rows_count),
+                         order='F')
+    i_ubvri = nan_matrix(shape=(files_count, rows_count),
+                         order='F')
 
     get_from_fortran(initlink=fort_files_initial_unit,
                      ntrk=rows_counts,

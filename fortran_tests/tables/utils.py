@@ -19,21 +19,26 @@ def read_sequences_by_metallicity_from_fortran(
         get_from_fortran: Callable,
         ) -> CoolingSequencesType:
     metallicities_count = len(files_counts_per_metallicity)
-    rows_counts = [nan_matrix(shape=files_count, dtype='i')
+    rows_counts = [nan_matrix(shape=files_count,
+                              dtype='i')
                    for files_count in files_counts_per_metallicity]
     masses = [nan_matrix(shape=files_count)
               for files_count in files_counts_per_metallicity]
-    cooling_times = [nan_matrix(shape=(files_count, rows_count), order='F')
+    cooling_times = [nan_matrix(shape=(files_count, rows_count),
+                                order='F')
                      for files_count in files_counts_per_metallicity]
     pre_wd_lifetimes = [nan_matrix(shape=files_count)
                         for files_count in files_counts_per_metallicity]
-    luminosities = [nan_matrix(shape=(files_count, rows_count), order='F')
+    luminosities = [nan_matrix(shape=(files_count, rows_count),
+                               order='F')
                     for files_count in files_counts_per_metallicity]
     effective_temperatures = [
-        nan_matrix(shape=(files_count, rows_count), order='F')
+        nan_matrix(shape=(files_count, rows_count),
+                   order='F')
         for files_count in files_counts_per_metallicity]
     surface_gravities = [
-        nan_matrix(shape=(files_count, rows_count), order='F')
+        nan_matrix(shape=(files_count, rows_count),
+                   order='F')
         for files_count in files_counts_per_metallicity]
 
     for index in range(metallicities_count):
