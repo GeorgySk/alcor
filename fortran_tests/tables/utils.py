@@ -71,12 +71,12 @@ def nan_matrix(shape: Union[int, Tuple[int, ...]],
                    order=order)
 
 
-def values_by_metallicity_are_close(x: CoolingSequencesType,
-                                    y: CoolingSequencesType,
+def values_by_metallicity_are_close(table: CoolingSequencesType,
+                                    other_table: CoolingSequencesType,
                                     *,
                                     relative_tolerance: float = 1E-4) -> bool:
-    for metallicity, x_sequences in x.items():
-        y_sequences = y[metallicity]
+    for metallicity, x_sequences in table.items():
+        y_sequences = other_table[metallicity]
         for key, x_values in x_sequences.items():
             y_values = y_sequences[key]
             for x_value, y_value in zip(x_values, y_values):
