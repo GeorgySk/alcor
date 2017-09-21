@@ -42,9 +42,7 @@ C     with its height direction set by longitude and latitude
      &            m(MAX_STARS_COUNT),
      &            delta_longitude,
      &            min_longitude,
-     &            max_longitude,
      &            min_latitude,
-     &            max_latitude,
      &            normalization_cone_mass,
      &            max_density,
      &            total_mass,
@@ -87,9 +85,7 @@ C         y = t * exp(-t / tau)
           ! NOTE: this can be infinity
           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
           min_longitude = cone_height_longitude  - delta_longitude / 2.0
-          max_longitude = cone_height_longitude  + delta_longitude / 2.0
           min_latitude = cone_height_latitude  - DELTA_LATITUDE / 2.0
-          max_latitude = cone_height_latitude + DELTA_LATITUDE / 2.0
 
           total_mass = 0.0
           stars_count = 0
