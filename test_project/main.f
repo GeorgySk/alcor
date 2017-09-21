@@ -65,8 +65,6 @@ C     For terminal:
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: min_longitude, max_longitude, 
-     &        min_latitude, max_latitude
       real :: u_ubvrij(numberOfStars),
      &        b_ubvrij(numberOfStars),
      &        v_ubvrij(numberOfStars),
@@ -356,8 +354,6 @@ C         converting cone height parameters from deg to rad
      &                                 numberOfStarsInSample,iseed,
      &                                 thick_disk_stars_fraction,
      &                                 thin_disk_age,
-     &                                 min_longitude, max_longitude,
-     &                                 min_latitude, max_latitude,
      &                                 massReductionFactor,
      &                                 thick_disk_age,
      &                                 thick_disk_sfr_param)
@@ -400,7 +396,6 @@ C         Calculating the trajectories according to/along z-coordinate
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
      &         cone_height_latitudes(i),
      &         u_ubvrij, b_ubvrij, v_ubvrij, r_ubvrij, i_ubvrij,
@@ -470,7 +465,6 @@ C***********************************************************************
       include 'code/colors/errors/errfot.f'
 
       subroutine printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitude,
      &         cone_height_latitude, u_ubvrij, b_ubvrij, v_ubvrij,
      &         r_ubvrij, i_ubvrij, j_ubvrij)
