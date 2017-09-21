@@ -99,7 +99,7 @@ C         y = t * exp(-t / tau)
 
           ! TODO: figure out the case of b = 90º
           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
-          min_longitude = cone_height_longitude  - delta_longitude / 2.0
+          min_longitude = cone_height_longitude - delta_longitude / 2.0
           min_latitude = cone_height_latitude  - DELTA_LATITUDE / 2.0
 
           total_mass = 0.0
@@ -190,6 +190,7 @@ C                 Accepting/rejecting method
      &                                        * ran(iseed)
                   latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
           
+C                 Accepting/rejecting method
                   inner_do3: do
                       distance = CONE_HEIGHT * ran(iseed)
           
@@ -197,8 +198,8 @@ C                 Accepting/rejecting method
      &                                      longitude,
      &                                      latitude,
      &                                      THICK_DISK_SCALEHEIGHT)          
-C                     Accepting/rejecting method
-                      random_valid_density = max_density * ran(iseed)
+                      random_valid_density = thick_disk_max_density 
+     &                                       * ran(iseed)
           
                       if (random_valid_density <= density) then
                           exit
@@ -220,7 +221,8 @@ C                     Accepting/rejecting method
                       total_mass = total_mass + m(stars_count)
                   end if
 
-                  if (total_mass >= normalization_cone_mass) then 
+                  if (total_mass 
+     &                    >= thick_disk_normalization_cone_mass) then 
                       exit
                   end if
 
