@@ -55,14 +55,21 @@ C     with its height direction set by longitude and latitude
      &            distance,
      &            get_density,
      &            generate_star_mass,
-     &            tmax,
      &            thick_disk_max_sfr_relative_time,
-     &            ttry,
-     &            ft,
-     &            fz,
      &            opposite_triangle_side,
      &            thick_disk_age,
-     &            thick_disk_sfr_param
+     &            thick_disk_sfr_param,
+     &            thin_disk_normalization_cone_mass,
+     &            thin_disk_max_density,
+     &            thick_disk_normalization_cone_mass,
+     &            thick_disk_max_density,
+     &            thick_disk_max_sfr,
+     &            time_try,
+     &            time_try_sfr,
+     &            sfr_try,
+     &            thick_disk_birth_init_time,
+     &            max_age,
+     &            thin_disk_birth_init_time
           
 
           double precision :: coordinate_Theta(MAX_STARS_COUNT),
@@ -76,13 +83,21 @@ C     with its height direction set by longitude and latitude
      &                     coordinate_Zcylindr
           common /index/ flagOfWD,numberOfWDs,disk_belonging
 
+          max_age = max(thin_disk_age, thick_disk_age)
+          thin_disk_birth_init_time = max_age - thin_disk_age
+          thick_disk_birth_init_time = max_age - thick_disk_age
+
 C         This can be easily proved by taking derivative from
 C         y = t * exp(-t / tau)
           thick_disk_max_sfr_relative_time = thick_disk_sfr_param
 
+          thick_disk_max_sfr = (thick_disk_max_sfr_relative_time 
+     &                          * exp(-thick_disk_max_sfr_relative_time 
+     &                                / thick_disk_sfr_param))
+
           thin_disk_stars_fraction = 1.0 - thick_disk_stars_fraction
 
-          ! NOTE: this can be infinity
+          ! TODO: figure out the case of b = 90º
           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
           min_longitude = cone_height_longitude  - delta_longitude / 2.0
           min_latitude = cone_height_latitude  - DELTA_LATITUDE / 2.0
@@ -90,141 +105,138 @@ C         y = t * exp(-t / tau)
           total_mass = 0.0
           stars_count = 0
 
-C         TODO: this is a boilerplate
-          if (thin_disk_stars_fraction > 0.0) then
+          thin_disk_normalization_cone_mass = (massReductionFactor 
+     &        * get_cone_mass(
+     &              cone_height_longitude, 
+     &              cone_height_latitude, 
+     &              THIN_DISK_DENSITY * thin_disk_stars_fraction,
+     &              THIN_DISK_SCALEHEIGHT))
+          thin_disk_max_density = get_max_density(
+     &        cone_height_longitude,
+     &        cone_height_latitude,
+     &        THIN_DISK_SCALEHEIGHT)
 
-              normalization_cone_mass = get_cone_mass(
+          thick_disk_normalization_cone_mass = (massReductionFactor 
+     &        * get_cone_mass(
      &              cone_height_longitude, 
      &              cone_height_latitude,
-     &              THIN_DISK_DENSITY * thin_disk_stars_fraction,
-     &               THIN_DISK_SCALEHEIGHT)
-              normalization_cone_mass = normalization_cone_mass 
-     &                              * massReductionFactor
+     &              THIN_DISK_DENSITY * thick_disk_stars_fraction,
+     &              THICK_DISK_SCALEHEIGHT))
+          thick_disk_max_density = get_max_density(
+     &        cone_height_longitude,
+     &        cone_height_latitude,
+     &        THICK_DISK_SCALEHEIGHT)
 
-              max_density = get_max_density(cone_height_longitude,
-     &                                      cone_height_latitude,
-     &                                      THIN_DISK_SCALEHEIGHT)
-
+          if (thin_disk_stars_fraction > 0.0) then
               outer_do2: do
-                  stars_count = stars_count + 1
-          
+                  stars_count = stars_count + 1          
                   disk_belonging(stars_count) = 1
-          
-C                 assuming uniform distribution
-                  longitude = min_longitude + delta_longitude*ran(iseed)
+
+                  longitude = min_longitude + delta_longitude 
+     &                                        * ran(iseed)
                   latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
           
+C                 Accepting/rejecting method
                   inner_do2: do
-                      ! Distance between Sun and random point in the cone
                       distance = CONE_HEIGHT * ran(iseed)
           
                       density = get_density(distance,
      &                                      longitude,
      &                                      latitude,
      &                                      THIN_DISK_SCALEHEIGHT)
-          
-                      ! Monte-Carlo accepting/rejecting method
-                      ! TODO: find out if this can be outside the inner loop
-                      random_valid_density = max_density * ran(iseed)
-          
-                      if (random_valid_density <= density) exit
+                      random_valid_density = thin_disk_max_density 
+     &                                       * ran(iseed)
+
+                      if (random_valid_density <= density) then
+                          exit
+                      end if
                   end do inner_do2
-          
-C                 mass
+
                   m(stars_count) = generate_star_mass(iseed)
-C                 converting from galactic to cyl.galactocentric
-                  coordinate_R(stars_count) 
-     &                = opposite_triangle_side(
-     &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
-     &                      distance * abs(cos(latitude)), 
-     &                      longitude)
-                  coordinate_Theta(stars_count) 
-     &                = asin(distance*abs(cos(latitude))
-     &                  *sin(longitude)/coordinate_R(stars_count))
+
+                  coordinate_R(stars_count) = opposite_triangle_side(
+     &                SOLAR_GALACTOCENTRIC_DISTANCE, 
+     &                distance * abs(cos(latitude)), 
+     &                longitude)
+                  coordinate_Theta(stars_count) = asin(
+     &                distance * abs(cos(latitude)) * sin(longitude)
+     &                / coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * sin(latitude)
           
-                  if(distance < NORMALIZATION_CONE_HEIGHT) then
+                  if (distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
                   end if
           
-                  if (total_mass >= normalization_cone_mass) exit
-          
-                  ! Assuming constant star formation rate
-                  starBirthTime(stars_count) =thin_disk_age*ran(iseed)
-              end do outer_do2
+                  if (total_mass 
+     &                    >= thin_disk_normalization_cone_mass) then
+                      exit
+                  end if
 
-              total_mass = 0.0
+                  starBirthTime(stars_count) = thin_disk_birth_init_time
+     &                                         + thin_disk_age 
+     &                                           * ran(iseed)
+              end do outer_do2
           end if
 
+          total_mass = 0.0
+
           if (thick_disk_stars_fraction > 0.0) then
-
-              normalization_cone_mass = get_cone_mass(
-     &            cone_height_longitude, 
-     &            cone_height_latitude,
-     &            THIN_DISK_DENSITY * thick_disk_stars_fraction,
-     &            THICK_DISK_SCALEHEIGHT)
-              normalization_cone_mass = normalization_cone_mass 
-     &                                  * massReductionFactor
-    
-              max_density = get_max_density(cone_height_longitude,
-     &                                      cone_height_latitude,
-     &                                      THICK_DISK_SCALEHEIGHT)
-
               outer_do3: do
                   stars_count = stars_count + 1
-          
                   disk_belonging(stars_count) = 2
           
-C                 assuming uniform distribution
-                  longitude = min_longitude + delta_longitude*ran(iseed)
+                  longitude = min_longitude + delta_longitude 
+     &                                        * ran(iseed)
                   latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
           
                   inner_do3: do
-                      ! Distance between Sun and random point in the cone
                       distance = CONE_HEIGHT * ran(iseed)
           
-                      density = get_density(distance,longitude,latitude,
-     &                                          THICK_DISK_SCALEHEIGHT)
-          
-                      ! Monte-Carlo accepting/rejecting method
-                      ! TODO: find out if this can be outside the inner loop
+                      density = get_density(distance,
+     &                                      longitude,
+     &                                      latitude,
+     &                                      THICK_DISK_SCALEHEIGHT)          
+C                     Accepting/rejecting method
                       random_valid_density = max_density * ran(iseed)
           
-                      if (random_valid_density <= density) exit
+                      if (random_valid_density <= density) then
+                          exit
+                      end if
                   end do inner_do3
           
-C                 mass
                   m(stars_count) = generate_star_mass(iseed)
-C                 converting from galactic to cyl.galactocentric
-                  coordinate_R(stars_count) 
-     &                = opposite_triangle_side(
-     &                      SOLAR_GALACTOCENTRIC_DISTANCE, 
-     &                      distance * abs(cos(latitude)), 
-     &                      longitude)
-                  coordinate_Theta(stars_count) 
-     &                = asin(distance*abs(cos(latitude))
-     &                  *sin(longitude)/coordinate_R(stars_count))
+
+                  coordinate_R(stars_count) = opposite_triangle_side(
+     &                SOLAR_GALACTOCENTRIC_DISTANCE, 
+     &                distance * abs(cos(latitude)), 
+     &                longitude)
+                  coordinate_Theta(stars_count) = asin(
+     &                distance * abs(cos(latitude)) * sin(longitude)
+     &                / coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * sin(latitude)
-                  if(distance < NORMALIZATION_CONE_HEIGHT) then
+                  if (distance < NORMALIZATION_CONE_HEIGHT) then
                       total_mass = total_mass + m(stars_count)
                   end if
-                  if (total_mass >= normalization_cone_mass) exit
-          
-                  ! Assuming constant star formation rate
-                  starBirthTime(stars_count) =thin_disk_age*ran(iseed)
-                  tmax = thick_disk_max_sfr_relative_time 
-     &                   * exp(-thick_disk_max_sfr_relative_time 
-     &                         / thick_disk_sfr_param)
- 33               ttry = thick_disk_age * ran(iseed)
-                  ft = ttry * exp(-ttry/thick_disk_sfr_param)
-                  fz = tmax * ran(iseed)
-                  if (fz .le. ft) then
-                      starBirthTime(stars_count) = ttry
-                  else
-                      goto 33
+
+                  if (total_mass >= normalization_cone_mass) then 
+                      exit
                   end if
+
+                  do
+                      time_try = thick_disk_age * ran(iseed)
+                      time_try_sfr = time_try 
+     &                               * exp(-time_try 
+     &                                      / thick_disk_sfr_param)
+                      sfr_try = thick_disk_max_sfr * ran(iseed)
+
+                      if (sfr_try <= time_try_sfr) then
+                          starBirthTime(stars_count) = (
+     &                        time_try + thick_disk_birth_init_time)
+                          exit
+                      end if
+                  end do
               end do outer_do3
           end if
 
