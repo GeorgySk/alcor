@@ -358,7 +358,9 @@ C         converting cone height parameters from deg to rad
      &                                 thin_disk_age,
      &                                 min_longitude, max_longitude,
      &                                 min_latitude, max_latitude,
-     &                                 massReductionFactor)
+     &                                 massReductionFactor,
+     &                                 thick_disk_age,
+     &                                 thick_disk_sfr_param)
           else 
               write(6,*) "wrong geometry name, use 'sphere' or 'cones'"
           end if
