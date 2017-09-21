@@ -10,7 +10,9 @@ C     with its height direction set by longitude and latitude
      &                               max_longitude,
      &                               min_latitude,
      &                               max_latitude,
-     &                               massReductionFactor)
+     &                               massReductionFactor,
+     &                               thick_disk_age,
+     &                               thick_disk_sfr_param)
           implicit none
           
           external ran
@@ -25,9 +27,7 @@ C     with its height direction set by longitude and latitude
      &                       THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                       THIN_DISK_SCALEHEIGHT = 0.25,
      &                       THICK_DISK_SCALEHEIGHT = 1.5,
-     &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5,
-     &                       THICK_DISK_AGE = 12.0,
-     &                       THICK_DISK_SFR_PARAM = 2.0
+     &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
 
           integer :: iseed,
      &               numberOfStarsInSample,
@@ -62,11 +62,13 @@ C     with its height direction set by longitude and latitude
      &            get_density,
      &            generate_star_mass,
      &            tmax,
-     &            thick_disk_max_sfr_relative_time = 10.0,
+     &            thick_disk_max_sfr_relative_time,
      &            ttry,
      &            ft,
      &            fz,
-     &            opposite_triangle_side
+     &            opposite_triangle_side,
+     &            thick_disk_age,
+     &            thick_disk_sfr_param
           
 
           double precision :: coordinate_Theta(MAX_STARS_COUNT),
@@ -79,6 +81,10 @@ C     with its height direction set by longitude and latitude
      &                     coordinate_Theta,
      &                     coordinate_Zcylindr
           common /index/ flagOfWD,numberOfWDs,disk_belonging
+
+C         This can be easily proved by taking derivative from
+C         y = t * exp(-t / tau)
+          thick_disk_max_sfr_relative_time = thick_disk_sfr_param
 
           thin_disk_stars_fraction = 1.0 - thick_disk_stars_fraction
 
@@ -218,9 +224,9 @@ C                 converting from galactic to cyl.galactocentric
                   starBirthTime(stars_count) =thin_disk_age*ran(iseed)
                   tmax = thick_disk_max_sfr_relative_time 
      &                   * exp(-thick_disk_max_sfr_relative_time 
-     &                         / THICK_DISK_SFR_PARAM)
- 33               ttry = THICK_DISK_AGE * ran(iseed)
-                  ft = ttry * exp(-ttry/THICK_DISK_SFR_PARAM)
+     &                         / thick_disk_sfr_param)
+ 33               ttry = thick_disk_age * ran(iseed)
+                  ft = ttry * exp(-ttry/thick_disk_sfr_param)
                   fz = tmax * ran(iseed)
                   if (fz .le. ft) then
                       starBirthTime(stars_count) = ttry
