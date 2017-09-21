@@ -1,4 +1,3 @@
-C     FIXME: timelines for thin/thick disks shouldn't start at one point
 C     Generates stars population inside a square pyramid (pencil/cone) 
 C     with its height direction set by longitude and latitude
       subroutine generate_cone_stars(cone_height_longitude,
@@ -17,25 +16,7 @@ C     with its height direction set by longitude and latitude
           external ran
           real ran
 
-          real :: cone_height_longitude,
-     &            cone_height_latitude,
-     &            thin_disk_age,
-     &            thick_disk_stars_fraction,
-     &            thin_disk_stars_fraction,
-     &            massReductionFactor
-          integer :: iseed,
-     &               numberOfStarsInSample
-
-          integer, parameter :: numberOfStars = 6000000
-          real :: starBirthTime(numberOfStars),
-     &            m(numberOfStars)
-          double precision :: coordinate_Theta(numberOfStars),
-     &                        coordinate_R(numberOfStars),
-     &                        coordinate_Zcylindr(numberOfStars)
-          integer :: numberOfWDs,
-     &               disk_belonging(numberOfStars),
-     &               flagOfWD(numberOfStars)
-
+          integer, parameter :: MAX_STARS_COUNT = 6000000
           real, parameter :: PI = 4.0 * atan(1.0),
      &                       FI = PI / 180.0,
      &                       DELTA_LATITUDE = 2.64 * FI,
@@ -44,8 +25,26 @@ C     with its height direction set by longitude and latitude
      &                       THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                       THIN_DISK_SCALEHEIGHT = 0.25,
      &                       THICK_DISK_SCALEHEIGHT = 1.5,
-     &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
-          real :: delta_longitude,
+     &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5,
+     &                       THICK_DISK_AGE = 12.0,
+     &                       THICK_DISK_SFR_PARAM = 2.0
+
+          integer :: iseed,
+     &               numberOfStarsInSample,
+     &               numberOfWDs,
+     &               stars_count,
+     &               disk_belonging(MAX_STARS_COUNT),
+     &               flagOfWD(MAX_STARS_COUNT)
+
+          real :: cone_height_longitude,
+     &            cone_height_latitude,
+     &            thin_disk_age,
+     &            thick_disk_stars_fraction,
+     &            thin_disk_stars_fraction,
+     &            massReductionFactor,
+     &            starBirthTime(MAX_STARS_COUNT),
+     &            m(MAX_STARS_COUNT),
+     &            delta_longitude,
      &            min_longitude,
      &            max_longitude,
      &            min_latitude,
@@ -63,14 +62,16 @@ C     with its height direction set by longitude and latitude
      &            get_density,
      &            generate_star_mass,
      &            tmax,
-     &            tmdisk = 10.0,
-     &            tau = 2.0,
+     &            thick_disk_max_sfr_relative_time = 10.0,
      &            ttry,
-     &            ttdisk = 12.0,
      &            ft,
      &            fz,
      &            opposite_triangle_side
-          integer :: stars_count
+          
+
+          double precision :: coordinate_Theta(MAX_STARS_COUNT),
+     &                        coordinate_R(MAX_STARS_COUNT),
+     &                        coordinate_Zcylindr(MAX_STARS_COUNT)
 
           common /tm/ starBirthTime,
      &                m
@@ -215,9 +216,11 @@ C                 converting from galactic to cyl.galactocentric
           
                   ! Assuming constant star formation rate
                   starBirthTime(stars_count) =thin_disk_age*ran(iseed)
-                  tmax = tmdisk * exp(-tmdisk/tau)
- 33               ttry = ttdisk * ran(iseed)
-                  ft = ttry * exp(-ttry/tau)
+                  tmax = thick_disk_max_sfr_relative_time 
+     &                   * exp(-thick_disk_max_sfr_relative_time 
+     &                         / THICK_DISK_SFR_PARAM)
+ 33               ttry = THICK_DISK_AGE * ran(iseed)
+                  ft = ttry * exp(-ttry/THICK_DISK_SFR_PARAM)
                   fz = tmax * ran(iseed)
                   if (fz .le. ft) then
                       starBirthTime(stars_count) = ttry
