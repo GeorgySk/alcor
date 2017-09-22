@@ -8,7 +8,10 @@ C     with its height direction set by longitude and latitude
      &                               thin_disk_age,
      &                               massReductionFactor,
      &                               thick_disk_age,
-     &                               thick_disk_sfr_param)
+     &                               thick_disk_sfr_param,
+     &                               halo_age,
+     &                               halo_stars_formation_time,
+     &                               halo_stars_fraction)
           implicit none
           
           external ran
@@ -23,7 +26,8 @@ C     with its height direction set by longitude and latitude
      &                       THIN_DISK_DENSITY = 0.095 * 1.0e9,
      &                       THIN_DISK_SCALEHEIGHT = 0.25,
      &                       THICK_DISK_SCALEHEIGHT = 1.5,
-     &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5
+     &                       SOLAR_GALACTOCENTRIC_DISTANCE = 8.5,
+     &                       HALO_CORE_RADIUS = 5.0
 
           integer :: iseed,
      &               numberOfStarsInSample,
@@ -43,8 +47,6 @@ C     with its height direction set by longitude and latitude
      &            delta_longitude,
      &            min_longitude,
      &            min_latitude,
-     &            normalization_cone_mass,
-     &            max_density,
      &            total_mass,
      &            longitude,
      &            latitude,
@@ -69,9 +71,15 @@ C     with its height direction set by longitude and latitude
      &            sfr_try,
      &            thick_disk_birth_init_time,
      &            max_age,
-     &            thin_disk_birth_init_time
+     &            thin_disk_birth_init_time,
+     &            halo_age,
+     &            halo_stars_formation_time,
+     &            halo_age_birth_init_time,
+     &            halo_stars_fraction,
+     &            get_halo_density,
+     &            halo_max_density,
+     &            halo_normalization_cone_mass
           
-
           double precision :: coordinate_Theta(MAX_STARS_COUNT),
      &                        coordinate_R(MAX_STARS_COUNT),
      &                        coordinate_Zcylindr(MAX_STARS_COUNT)
@@ -83,9 +91,10 @@ C     with its height direction set by longitude and latitude
      &                     coordinate_Zcylindr
           common /index/ flagOfWD,numberOfWDs,disk_belonging
 
-          max_age = max(thin_disk_age, thick_disk_age)
+          max_age = max(thin_disk_age, thick_disk_age, halo_age)
           thin_disk_birth_init_time = max_age - thin_disk_age
           thick_disk_birth_init_time = max_age - thick_disk_age
+          halo_age_birth_init_time = max_age - halo_age
 
 C         This can be easily proved by taking derivative from
 C         y = t * exp(-t / tau)
@@ -95,7 +104,8 @@ C         y = t * exp(-t / tau)
      &                          * exp(-thick_disk_max_sfr_relative_time 
      &                                / thick_disk_sfr_param))
 
-          thin_disk_stars_fraction = 1.0 - thick_disk_stars_fraction
+          thin_disk_stars_fraction = 1.0 - thick_disk_stars_fraction 
+     &                               - halo_stars_fraction
 
           ! TODO: figure out the case of b = 90º
           delta_longitude = DELTA_LATITUDE / cos(cone_height_latitude)
@@ -127,8 +137,17 @@ C         y = t * exp(-t / tau)
      &        cone_height_latitude,
      &        THICK_DISK_SCALEHEIGHT)
 
+          halo_normalization_cone_mass = (massReductionFactor 
+     &        * get_cone_mass(
+     &              cone_height_longitude, 
+     &              cone_height_latitude,
+     &              THIN_DISK_DENSITY * halo_stars_fraction,
+     &              THICK_DISK_SCALEHEIGHT))
+          halo_max_density = 1.0 + (SOLAR_GALACTOCENTRIC_DISTANCE 
+     &                              / HALO_CORE_RADIUS) ** 2
+
           if (thin_disk_stars_fraction > 0.0) then
-              outer_do2: do
+              outer_do1: do
                   stars_count = stars_count + 1          
                   disk_belonging(stars_count) = 1
 
@@ -137,7 +156,7 @@ C         y = t * exp(-t / tau)
                   latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
           
 C                 Accepting/rejecting method
-                  inner_do2: do
+                  inner_do1: do
                       distance = CONE_HEIGHT * ran(iseed)
           
                       density = get_density(distance,
@@ -150,7 +169,7 @@ C                 Accepting/rejecting method
                       if (random_valid_density <= density) then
                           exit
                       end if
-                  end do inner_do2
+                  end do inner_do1
 
                   m(stars_count) = generate_star_mass(iseed)
 
@@ -176,15 +195,78 @@ C                 Accepting/rejecting method
                   starBirthTime(stars_count) = thin_disk_birth_init_time
      &                                         + thin_disk_age 
      &                                           * ran(iseed)
-              end do outer_do2
+              end do outer_do1
           end if
 
           total_mass = 0.0
 
           if (thick_disk_stars_fraction > 0.0) then
-              outer_do3: do
+              outer_do2: do
                   stars_count = stars_count + 1
                   disk_belonging(stars_count) = 2
+          
+                  longitude = min_longitude + delta_longitude 
+     &                                        * ran(iseed)
+                  latitude = min_latitude + DELTA_LATITUDE * ran(iseed)
+          
+C                 Accepting/rejecting method
+                  inner_do2: do
+                      distance = CONE_HEIGHT * ran(iseed)
+          
+                      density = get_density(distance,
+     &                                      longitude,
+     &                                      latitude,
+     &                                      THICK_DISK_SCALEHEIGHT)          
+                      random_valid_density = thick_disk_max_density 
+     &                                       * ran(iseed)
+          
+                      if (random_valid_density <= density) then
+                          exit
+                      end if
+                  end do inner_do2
+          
+                  m(stars_count) = generate_star_mass(iseed)
+
+                  coordinate_R(stars_count) = opposite_triangle_side(
+     &                SOLAR_GALACTOCENTRIC_DISTANCE, 
+     &                distance * abs(cos(latitude)), 
+     &                longitude)
+                  coordinate_Theta(stars_count) = asin(
+     &                distance * abs(cos(latitude)) * sin(longitude)
+     &                / coordinate_R(stars_count))
+                  coordinate_Zcylindr(stars_count) = distance 
+     &                                               * sin(latitude)
+                  if (distance < NORMALIZATION_CONE_HEIGHT) then
+                      total_mass = total_mass + m(stars_count)
+                  end if
+
+                  if (total_mass 
+     &                    >= thick_disk_normalization_cone_mass) then 
+                      exit
+                  end if
+
+                  do
+                      time_try = thick_disk_age * ran(iseed)
+                      time_try_sfr = time_try 
+     &                               * exp(-time_try 
+     &                                      / thick_disk_sfr_param)
+                      sfr_try = thick_disk_max_sfr * ran(iseed)
+
+                      if (sfr_try <= time_try_sfr) then
+                          starBirthTime(stars_count) = (
+     &                        time_try + thick_disk_birth_init_time)
+                          exit
+                      end if
+                  end do
+              end do outer_do2
+          end if
+
+          total_mass = 0.0
+
+          if (halo_stars_fraction > 0.0) then
+              outer_do3: do
+                  stars_count = stars_count + 1
+                  disk_belonging(stars_count) = 3
           
                   longitude = min_longitude + delta_longitude 
      &                                        * ran(iseed)
@@ -194,11 +276,10 @@ C                 Accepting/rejecting method
                   inner_do3: do
                       distance = CONE_HEIGHT * ran(iseed)
           
-                      density = get_density(distance,
-     &                                      longitude,
-     &                                      latitude,
-     &                                      THICK_DISK_SCALEHEIGHT)          
-                      random_valid_density = thick_disk_max_density 
+                      density = get_halo_density(distance,
+     &                                           longitude,
+     &                                           latitude)          
+                      random_valid_density = halo_max_density 
      &                                       * ran(iseed)
           
                       if (random_valid_density <= density) then
@@ -390,6 +471,31 @@ C                 Accepting/rejecting method
      &              * exp(-abs(pole_projection) / scaleheight)
      &              * exp(-abs(galactocentric_distance)
      &                     / THICK_DISK_SCALELENGTH)
+      end function
+
+
+      function get_halo_density(distance,
+     &                          longitude,
+     &                          latitude) result(density)
+          implicit none
+          real, intent(in) :: distance, 
+     &                        longitude,
+     &                        latitude
+          real :: density,
+     &            galactocentric_distance
+          real, parameter :: SOLAR_GALACTOCENTRIC_DISTANCE = 8.5,
+     &                       THICK_DISK_SCALELENGTH = 3.0,
+     &                       HALO_CORE_RADIUS = 5.0  ! kpc
+          
+          galactocentric_distance  = sqrt(
+     &        (SOLAR_GALACTOCENTRIC_DISTANCE - distance * cos(latitude) 
+     &                                         * cos(longitude)) ** 2
+     &        + (distance * cos(latitude) * sin(latitude)) ** 2
+     &        + (distance * sin(latitude)) ** 2)
+  
+          density = (HALO_CORE_RADIUS ** 2 
+     &               + SOLAR_GALACTOCENTRIC_DISTANCE ** 2)
+     &              / (HALO_CORE_RADIUS ** 2 + distance ** 2)
       end function
 
 
