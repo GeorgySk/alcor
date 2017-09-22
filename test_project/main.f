@@ -313,6 +313,8 @@ C     TODO: add choosing what output we want to get
      &                  'proper_motion_component_b ',
      &                  'proper_motion_component_l ',
      &                  'proper_motion ',
+     &                  'proper_motion_component_l ',
+     &                  'proper_motion_component_b ',
      &                  'distance ',
      &                  'birth_time ',
      &                  'spectral_type ',
