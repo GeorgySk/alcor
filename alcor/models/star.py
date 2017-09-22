@@ -111,7 +111,7 @@ class Star(Base):
     j_abs_magnitude = Column(Float(asdecimal=True),
                              nullable=True)
     b_abs_magnitude = Column(Float(asdecimal=True),
-                             nullable = True)
+                             nullable=True)
     r_abs_magnitude = Column(Float(asdecimal=True),
                              nullable=True)
     v_abs_magnitude = Column(Float(asdecimal=True),
