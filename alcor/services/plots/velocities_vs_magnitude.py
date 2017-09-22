@@ -1,3 +1,4 @@
+import os
 from typing import (Tuple,
                     List)
 
@@ -10,6 +11,7 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
+import pandas as pd
 
 from alcor.models.velocities_vs_magnitudes.bins import (Bin,
                                                         LepineCaseUBin,
@@ -119,11 +121,56 @@ def plot_lepine_case(session: Session,
                      u_label: str = '$U_{LSR}(km/s)$',
                      v_label: str = '$V_{LSR}(km/s)$',
                      w_label: str = '$W_{LSR}(km/s)$',
-                     magnitude_label: str = '$M_{bol}$') -> None:
-    figure, (subplot_u,
-             subplot_v,
-             subplot_w) = plt.subplots(nrows=3,
-                                       figsize=figure_size)
+                     magnitude_label: str = '$M_{bol}$',
+                     u_observational_bins_path: str = 'observational_data'
+                                                      '/mbol_avg_u.dat',
+                     v_observational_bins_path: str = 'observational_data'
+                                                      '/mbol_avg_v.dat',
+                     w_observational_bins_path: str = 'observational_data'
+                                                      '/mbol_avg_w.dat',
+                     u_observational_clouds_path: str = 'observational_data'
+                                                        '/mbol_cloud_u.dat',
+                     v_observational_clouds_path: str = 'observational_data'
+                                                        '/mbol_cloud_v.dat',
+                     w_observational_clouds_path: str = 'observational_data'
+                                                        '/mbol_cloud_w.dat',
+                     ) -> None:
+    # TODO: find a proper way to use relative paths
+    base_dir = os.path.dirname(__file__)
+    observational_bins_paths = dict(
+            u=os.path.join(base_dir, u_observational_bins_path),
+            v=os.path.join(base_dir, v_observational_bins_path),
+            w=os.path.join(base_dir, w_observational_bins_path))
+    observational_clouds_paths = dict(
+            u=os.path.join(base_dir, u_observational_clouds_path),
+            v=os.path.join(base_dir, v_observational_clouds_path),
+            w=os.path.join(base_dir, w_observational_clouds_path))
+
+    u_observational_bins_df = pd.read_csv(observational_bins_paths['u'],
+                                          delimiter=' ',
+                                          skipinitialspace=True,
+                                          header=None)
+    v_observational_bins_df = pd.read_csv(observational_bins_paths['v'],
+                                          delimiter=' ',
+                                          skipinitialspace=True,
+                                          header=None)
+    w_observational_bins_df = pd.read_csv(observational_bins_paths['w'],
+                                          delimiter=' ',
+                                          skipinitialspace=True,
+                                          header=None)
+
+    u_observational_clouds_df = pd.read_csv(observational_clouds_paths['u'],
+                                            delimiter=' ',
+                                            skipinitialspace=True,
+                                            header=None)
+    v_observational_clouds_df = pd.read_csv(observational_clouds_paths['v'],
+                                            delimiter=' ',
+                                            skipinitialspace=True,
+                                            header=None)
+    w_observational_clouds_df = pd.read_csv(observational_clouds_paths['w'],
+                                            delimiter=' ',
+                                            skipinitialspace=True,
+                                            header=None)
 
     # TODO: implement other fetching functions
     u_vs_mag_bins = fetch_all(LepineCaseUBin,
@@ -139,12 +186,14 @@ def plot_lepine_case(session: Session,
                         for stars_bin in u_vs_mag_bins]
     u_velocities_std = [stars_bin.u_velocity_std
                         for stars_bin in u_vs_mag_bins]
+
     v_bins_avg_magnitudes = [stars_bin.avg_magnitude
                              for stars_bin in v_vs_mag_bins]
     avg_velocities_v = [stars_bin.avg_v_velocity
                         for stars_bin in v_vs_mag_bins]
     velocities_v_std = [stars_bin.v_velocity_std
                         for stars_bin in v_vs_mag_bins]
+
     w_bins_avg_magnitudes = [stars_bin.avg_magnitude
                              for stars_bin in w_vs_mag_bins]
     avg_velocities_w = [stars_bin.avg_w_velocity
@@ -189,20 +238,35 @@ def plot_lepine_case(session: Session,
     w_velocities = [star.w_velocity
                     for star in w_vs_mag_cloud]
 
+    figure, (subplot_u,
+             subplot_v,
+             subplot_w) = plt.subplots(nrows=3,
+                                       figsize=figure_size)
+
     draw_subplot(subplot=subplot_u,
                  ylabel=u_label,
                  x_line=u_bins_avg_magnitudes,
                  y_line=avg_u_velocities,
                  yerr=u_velocities_std,
                  x_scatter=u_magnitudes,
-                 y_scatter=u_velocities)
+                 y_scatter=u_velocities,
+                 x_line_obs=u_observational_bins_df[0],
+                 y_line_obs=u_observational_bins_df[1],
+                 yerr_obs=u_observational_bins_df[2],
+                 x_scatter_obs=u_observational_clouds_df[0],
+                 y_scatter_obs=u_observational_clouds_df[1])
     draw_subplot(subplot=subplot_v,
                  ylabel=v_label,
                  x_line=v_bins_avg_magnitudes,
                  y_line=avg_velocities_v,
                  yerr=velocities_v_std,
                  x_scatter=v_magnitudes,
-                 y_scatter=v_velocities)
+                 y_scatter=v_velocities,
+                 x_line_obs=v_observational_bins_df[0],
+                 y_line_obs=v_observational_bins_df[1],
+                 yerr_obs=v_observational_bins_df[2],
+                 x_scatter_obs=v_observational_clouds_df[0],
+                 y_scatter_obs=v_observational_clouds_df[1])
     draw_subplot(subplot=subplot_w,
                  xlabel=magnitude_label,
                  ylabel=w_label,
@@ -210,7 +274,12 @@ def plot_lepine_case(session: Session,
                  y_line=avg_velocities_w,
                  yerr=velocities_w_std,
                  x_scatter=w_magnitudes,
-                 y_scatter=w_velocities)
+                 y_scatter=w_velocities,
+                 x_line_obs=w_observational_bins_df[0],
+                 y_line_obs=w_observational_bins_df[1],
+                 yerr_obs=w_observational_bins_df[2],
+                 x_scatter_obs=w_observational_clouds_df[0],
+                 y_scatter_obs=w_observational_clouds_df[1])
 
     # Removing unnecessary x-labels for top and middle subplots
     subplot_u.set_xticklabels([])
@@ -231,6 +300,11 @@ def draw_subplot(*,
                  x_line: List[float],
                  y_line: List[float],
                  yerr: List[float],
+                 x_line_obs: pd.core.series.Series = None,
+                 y_line_obs: pd.core.series.Series = None,
+                 yerr_obs: pd.core.series.Series = None,
+                 x_scatter_obs: pd.core.series.Series = None,
+                 y_scatter_obs: pd.core.series.Series = None,
                  marker: str = 's',
                  markersize: float = 3.,
                  line_color: str = 'k',
@@ -253,9 +327,21 @@ def draw_subplot(*,
                      color=line_color,
                      capsize=capsize,
                      linewidth=linewidth)
+    subplot.errorbar(x=x_line_obs,
+                     y=y_line_obs,
+                     yerr=yerr_obs,
+                     marker=marker,
+                     markersize=markersize,
+                     color='r',
+                     capsize=capsize,
+                     linewidth=linewidth)
     subplot.scatter(x=x_scatter,
                     y=y_scatter,
                     color=scatter_color,
+                    s=scatter_point_size)
+    subplot.scatter(x=x_scatter_obs,
+                    y=y_scatter_obs,
+                    color='r',
                     s=scatter_point_size)
 
     subplot.minorticks_on()

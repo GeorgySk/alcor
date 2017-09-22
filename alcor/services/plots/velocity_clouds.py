@@ -1,3 +1,4 @@
+import os
 from typing import (Tuple,
                     List)
 
@@ -11,6 +12,7 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.axes import Axes
 from sqlalchemy.orm.session import Session
+import pandas as pd
 
 from alcor.services.data_access import fetch_all
 from alcor.models.velocities.clouds import (Cloud,
@@ -106,11 +108,29 @@ def plot_lepine_case(session: Session,
                      w_label: str = '$W(km/s)$',
                      u_limits: Tuple[float, float] = (-150, 150),
                      v_limits: Tuple[float, float] = (-150, 150),
-                     w_limits: Tuple[float, float] = (-150, 150)):
-    figure, (uv_subplot,
-             uw_subplot,
-             vw_subplot) = plt.subplots(nrows=3,
-                                        figsize=figure_size)
+                     w_limits: Tuple[float, float] = (-150, 150),
+                     uv_observational_path: str = 'observational_data/uv.dat',
+                     uw_observational_path: str = 'observational_data/uw.dat',
+                     vw_observational_path: str = 'observational_data/vw.dat'
+                     ) -> None:
+    base_dir = os.path.dirname(__file__)
+    observational_clouds_paths = dict(
+            uv=os.path.join(base_dir, uv_observational_path),
+            uw=os.path.join(base_dir, uw_observational_path),
+            vw=os.path.join(base_dir, vw_observational_path))
+
+    uv_observational_cloud_df = pd.read_csv(observational_clouds_paths['uv'],
+                                            delimiter=' ',
+                                            skipinitialspace=True,
+                                            header=None)
+    uw_observational_cloud_df = pd.read_csv(observational_clouds_paths['uw'],
+                                            delimiter=' ',
+                                            skipinitialspace=True,
+                                            header=None)
+    vw_observational_cloud_df = pd.read_csv(observational_clouds_paths['vw'],
+                                            delimiter=' ',
+                                            skipinitialspace=True,
+                                            header=None)
 
     # TODO: Add other fetching options
     uv_points = fetch_all(LepineCaseUVCloud,
@@ -124,14 +144,21 @@ def plot_lepine_case(session: Session,
                              for star in uv_points]
     uv_cloud_v_velocities = [star.v_velocity
                              for star in uv_points]
+
     uw_cloud_u_velocities = [star.u_velocity
                              for star in uw_points]
     uw_cloud_w_velocities = [star.w_velocity
                              for star in uw_points]
+
     vw_cloud_v_velocities = [star.v_velocity
                              for star in vw_points]
     vw_cloud_w_velocities = [star.w_velocity
                              for star in vw_points]
+
+    figure, (uv_subplot,
+             uw_subplot,
+             vw_subplot) = plt.subplots(nrows=3,
+                                        figsize=figure_size)
 
     draw_subplot(subplot=uv_subplot,
                  xlabel=u_label,
@@ -140,6 +167,8 @@ def plot_lepine_case(session: Session,
                  ylim=v_limits,
                  x=uv_cloud_u_velocities,
                  y=uv_cloud_v_velocities,
+                 x_obs=uv_observational_cloud_df[0],
+                 y_obs=uv_observational_cloud_df[1],
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_V,
                  x_std=STD_POPULATION_U,
@@ -151,6 +180,8 @@ def plot_lepine_case(session: Session,
                  ylim=w_limits,
                  x=uw_cloud_u_velocities,
                  y=uw_cloud_w_velocities,
+                 x_obs=uw_observational_cloud_df[0],
+                 y_obs=uw_observational_cloud_df[1],
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_U,
@@ -162,6 +193,8 @@ def plot_lepine_case(session: Session,
                  ylim=w_limits,
                  x=vw_cloud_v_velocities,
                  y=vw_cloud_w_velocities,
+                 x_obs=vw_observational_cloud_df[0],
+                 y_obs=vw_observational_cloud_df[1],
                  x_avg=AVERAGE_POPULATION_VELOCITY_V,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_V,
@@ -180,6 +213,8 @@ def draw_subplot(*,
                  ylim: Tuple[float, float],
                  x: List[float],
                  y: List[float],
+                 x_obs: pd.core.series.Series = None,
+                 y_obs: pd.core.series.Series = None,
                  cloud_color: str = 'k',
                  point_size: float = 0.5,
                  x_avg: float,
@@ -194,6 +229,10 @@ def draw_subplot(*,
     subplot.scatter(x=x,
                     y=y,
                     color=cloud_color,
+                    s=point_size)
+    subplot.scatter(x=x_obs,
+                    y=y_obs,
+                    color='r',
                     s=point_size)
     plot_ellipses(subplot=subplot,
                   x_avg=x_avg,
