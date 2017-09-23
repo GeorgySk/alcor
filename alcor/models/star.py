@@ -50,6 +50,7 @@ STAR_PARAMETERS_NAMES = ['mass',
                          'galactic_latitude',
                          'galactic_longitude',
                          'j_abs_magnitude',
+                         'b_abs_magnitude',
                          'v_abs_magnitude',
                          'r_abs_magnitude',
                          'i_abs_magnitude',
@@ -109,6 +110,8 @@ class Star(Base):
                                 nullable=True)
     j_abs_magnitude = Column(Float(asdecimal=True),
                              nullable=True)
+    b_abs_magnitude = Column(Float(asdecimal=True),
+                             nullable = True)
     r_abs_magnitude = Column(Float(asdecimal=True),
                              nullable=True)
     v_abs_magnitude = Column(Float(asdecimal=True),
@@ -150,6 +153,7 @@ class Star(Base):
                  galactic_latitude: float = None,
                  galactic_longitude: float = None,
                  j_abs_magnitude: float = None,
+                 b_abs_magnitude: float = None,
                  r_abs_magnitude: float = None,
                  v_abs_magnitude: float = None,
                  i_abs_magnitude: float = None,
@@ -178,6 +182,7 @@ class Star(Base):
         self.galactic_latitude = galactic_latitude
         self.galactic_longitude = galactic_longitude
         self.j_abs_magnitude = j_abs_magnitude
+        self.b_abs_magnitude = b_abs_magnitude
         self.r_abs_magnitude = r_abs_magnitude
         self.v_abs_magnitude = v_abs_magnitude
         self.i_abs_magnitude = i_abs_magnitude
@@ -214,12 +219,7 @@ class Star(Base):
                    abs(self.y_coordinate),
                    abs(self.z_coordinate))
 
-    @property
-    def ugriz_rz(self) -> float:
-        return float(self.ugriz_ri) + float(self.ugriz_iz)
-
-    @property
-    def cartesian_coordinates(self) -> Tuple[float, float, float]:
+    def to_cartesian_from_equatorial(self) -> Tuple[float, float, float]:
         right_ascension = float(self.right_ascension)
         declination = float(self.declination)
         distance = float(self.distance)
