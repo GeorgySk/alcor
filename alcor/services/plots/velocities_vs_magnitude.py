@@ -1,4 +1,5 @@
 import os
+from functools import partial
 from typing import (Tuple,
                     List)
 
@@ -135,6 +136,19 @@ def plot_lepine_case(session: Session,
                      w_observational_clouds_path: str = 'observational_data'
                                                         '/mbol_cloud_w.dat',
                      ) -> None:
+    subplots = {}
+    figure, (subplots['u'],
+             subplots['v'],
+             subplots['w']) = plt.subplots(nrows=3,
+                                           figsize=figure_size)
+
+    velocities_labels = dict(u=u_label,
+                             v=v_label,
+                             w=w_label)
+    magnitude_labels = dict(u=None,
+                            v=None,
+                            w=magnitude_label)
+
     # TODO: find a proper way to use relative paths
     base_dir = os.path.dirname(__file__)
     observational_bins_paths = dict(
@@ -146,144 +160,79 @@ def plot_lepine_case(session: Session,
             v=os.path.join(base_dir, v_observational_clouds_path),
             w=os.path.join(base_dir, w_observational_clouds_path))
 
-    u_observational_bins_df = pd.read_csv(observational_bins_paths['u'],
-                                          delimiter=' ',
-                                          skipinitialspace=True,
-                                          header=None)
-    v_observational_bins_df = pd.read_csv(observational_bins_paths['v'],
-                                          delimiter=' ',
-                                          skipinitialspace=True,
-                                          header=None)
-    w_observational_bins_df = pd.read_csv(observational_bins_paths['w'],
-                                          delimiter=' ',
-                                          skipinitialspace=True,
-                                          header=None)
-
-    u_observational_clouds_df = pd.read_csv(observational_clouds_paths['u'],
-                                            delimiter=' ',
-                                            skipinitialspace=True,
-                                            header=None)
-    v_observational_clouds_df = pd.read_csv(observational_clouds_paths['v'],
-                                            delimiter=' ',
-                                            skipinitialspace=True,
-                                            header=None)
-    w_observational_clouds_df = pd.read_csv(observational_clouds_paths['w'],
-                                            delimiter=' ',
-                                            skipinitialspace=True,
-                                            header=None)
+    read_csv = partial(pd.read_csv,
+                       delimiter=' ',
+                       skipinitialspace=True,
+                       header=None)
 
     # TODO: implement other fetching functions
-    u_vs_mag_bins = fetch_all(LepineCaseUBin,
-                              session=session)
-    v_vs_mag_bins = fetch_all(LepineCaseVBin,
-                              session=session)
-    w_vs_mag_bins = fetch_all(LepineCaseWBin,
-                              session=session)
+    fetch = partial(fetch_all,
+                    session=session)
+    velocity_vs_magnitude_bins = dict(u=fetch(LepineCaseUBin),
+                                      v=fetch(LepineCaseVBin),
+                                      w=fetch(LepineCaseWBin))
+    velocity_vs_magnitude_clouds = dict(u=fetch(LepineCaseUCloud),
+                                        v=fetch(LepineCaseVCloud),
+                                        w=fetch(LepineCaseWCloud))
 
-    u_bins_avg_magnitudes = [stars_bin.avg_magnitude
-                             for stars_bin in u_vs_mag_bins]
-    avg_u_velocities = [stars_bin.avg_u_velocity
-                        for stars_bin in u_vs_mag_bins]
-    u_velocities_std = [stars_bin.u_velocity_std
-                        for stars_bin in u_vs_mag_bins]
+    observational_bins_dfs = {}
+    observational_clouds_dfs = {}
+    bins_avg_magnitudes = {}
+    magnitudes = {}
+    for key in ('u', 'v', 'w'):
+        observational_bins_dfs[key] = read_csv(observational_bins_paths[key])
+        observational_clouds_dfs[key] = read_csv(
+                observational_clouds_paths[key])
+        bins_avg_magnitudes[key] = [
+            stars_bin.avg_magnitude
+            for stars_bin in velocity_vs_magnitude_bins[key]]
+        magnitudes[key] = [star.bolometric_magnitude
+                           for star in velocity_vs_magnitude_clouds[key]]
 
-    v_bins_avg_magnitudes = [stars_bin.avg_magnitude
-                             for stars_bin in v_vs_mag_bins]
-    avg_velocities_v = [stars_bin.avg_v_velocity
-                        for stars_bin in v_vs_mag_bins]
-    velocities_v_std = [stars_bin.v_velocity_std
-                        for stars_bin in v_vs_mag_bins]
+    avg_velocities = dict(
+            u=[stars_bin.avg_u_velocity
+               for stars_bin in velocity_vs_magnitude_bins['u']],
+            v=[stars_bin.avg_v_velocity
+               for stars_bin in velocity_vs_magnitude_bins['v']],
+            w=[stars_bin.avg_w_velocity
+               for stars_bin in velocity_vs_magnitude_bins['w']])
+    velocities_std = dict(
+            u=[stars_bin.u_velocity_std
+               for stars_bin in velocity_vs_magnitude_bins['u']],
+            v=[stars_bin.v_velocity_std
+               for stars_bin in velocity_vs_magnitude_bins['v']],
+            w=[stars_bin.w_velocity_std
+               for stars_bin in velocity_vs_magnitude_bins['w']])
+    velocities = dict(u=[star.u_velocity
+                         for star in velocity_vs_magnitude_clouds['u']],
+                      v=[star.v_velocity
+                         for star in velocity_vs_magnitude_clouds['v']],
+                      w=[star.w_velocity
+                         for star in velocity_vs_magnitude_clouds['w']])
 
-    w_bins_avg_magnitudes = [stars_bin.avg_magnitude
-                             for stars_bin in w_vs_mag_bins]
-    avg_velocities_w = [stars_bin.avg_w_velocity
-                        for stars_bin in w_vs_mag_bins]
-    velocities_w_std = [stars_bin.w_velocity_std
-                        for stars_bin in w_vs_mag_bins]
-
-    (u_bins_avg_magnitudes,
-     avg_u_velocities,
-     u_velocities_std) = zip(*sorted(zip(u_bins_avg_magnitudes,
-                                         avg_u_velocities,
-                                         u_velocities_std)))
-    (v_bins_avg_magnitudes,
-     avg_velocities_v,
-     velocities_v_std) = zip(*sorted(zip(v_bins_avg_magnitudes,
-                                         avg_velocities_v,
-                                         velocities_v_std)))
-    (w_bins_avg_magnitudes,
-     avg_velocities_w,
-     velocities_w_std) = zip(*sorted(zip(w_bins_avg_magnitudes,
-                                         avg_velocities_w,
-                                         velocities_w_std)))
-
-    # TODO: implement other fetching functions
-    u_vs_mag_cloud = fetch_all(LepineCaseUCloud,
-                               session=session)
-    v_vs_mag_cloud = fetch_all(LepineCaseVCloud,
-                               session=session)
-    w_vs_mag_cloud = fetch_all(LepineCaseWCloud,
-                               session=session)
-
-    u_magnitudes = [star.bolometric_magnitude
-                    for star in u_vs_mag_cloud]
-    u_velocities = [star.u_velocity
-                    for star in u_vs_mag_cloud]
-    v_magnitudes = [star.bolometric_magnitude
-                    for star in v_vs_mag_cloud]
-    v_velocities = [star.v_velocity
-                    for star in v_vs_mag_cloud]
-    w_magnitudes = [star.bolometric_magnitude
-                    for star in w_vs_mag_cloud]
-    w_velocities = [star.w_velocity
-                    for star in w_vs_mag_cloud]
-
-    figure, (subplot_u,
-             subplot_v,
-             subplot_w) = plt.subplots(nrows=3,
-                                       figsize=figure_size)
-
-    draw_subplot(subplot=subplot_u,
-                 ylabel=u_label,
-                 x_line=u_bins_avg_magnitudes,
-                 y_line=avg_u_velocities,
-                 yerr=u_velocities_std,
-                 x_scatter=u_magnitudes,
-                 y_scatter=u_velocities,
-                 x_line_obs=u_observational_bins_df[0],
-                 y_line_obs=u_observational_bins_df[1],
-                 yerr_obs=u_observational_bins_df[2],
-                 x_scatter_obs=u_observational_clouds_df[0],
-                 y_scatter_obs=u_observational_clouds_df[1])
-    draw_subplot(subplot=subplot_v,
-                 ylabel=v_label,
-                 x_line=v_bins_avg_magnitudes,
-                 y_line=avg_velocities_v,
-                 yerr=velocities_v_std,
-                 x_scatter=v_magnitudes,
-                 y_scatter=v_velocities,
-                 x_line_obs=v_observational_bins_df[0],
-                 y_line_obs=v_observational_bins_df[1],
-                 yerr_obs=v_observational_bins_df[2],
-                 x_scatter_obs=v_observational_clouds_df[0],
-                 y_scatter_obs=v_observational_clouds_df[1])
-    draw_subplot(subplot=subplot_w,
-                 xlabel=magnitude_label,
-                 ylabel=w_label,
-                 x_line=w_bins_avg_magnitudes,
-                 y_line=avg_velocities_w,
-                 yerr=velocities_w_std,
-                 x_scatter=w_magnitudes,
-                 y_scatter=w_velocities,
-                 x_line_obs=w_observational_bins_df[0],
-                 y_line_obs=w_observational_bins_df[1],
-                 yerr_obs=w_observational_bins_df[2],
-                 x_scatter_obs=w_observational_clouds_df[0],
-                 y_scatter_obs=w_observational_clouds_df[1])
+    for key in ('u', 'v', 'w'):
+        (bins_avg_magnitudes[key],
+         avg_velocities[key],
+         velocities_std[key]) = zip(*sorted(zip(bins_avg_magnitudes[key],
+                                                avg_velocities[key],
+                                                velocities_std[key])))
+        draw_subplot(subplot=subplots[key],
+                     xlabel=magnitude_labels[key],
+                     ylabel=velocities_labels[key],
+                     x_line=bins_avg_magnitudes[key],
+                     y_line=avg_velocities[key],
+                     yerr=velocities_std[key],
+                     x_scatter=magnitudes[key],
+                     y_scatter=velocities[key],
+                     x_line_obs=observational_bins_dfs[key][0],
+                     y_line_obs=observational_bins_dfs[key][1],
+                     yerr_obs=observational_bins_dfs[key][2],
+                     x_scatter_obs=observational_clouds_dfs[key][0],
+                     y_scatter_obs=observational_clouds_dfs[key][1])
 
     # Removing unnecessary x-labels for top and middle subplots
-    subplot_u.set_xticklabels([])
-    subplot_v.set_xticklabels([])
+    subplots['u'].set_xticklabels([])
+    subplots['v'].set_xticklabels([])
 
     # TODO: delete overlapping y-labels
     figure.subplots_adjust(hspace=0)
