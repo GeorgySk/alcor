@@ -8,7 +8,7 @@ import click
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_helpers.connectable import (check_connection,
-                                            get_engine,
+                                            create_engine,
                                             db_uri_to_str)
 from sqlalchemy_utils import (database_exists,
                               create_database,
@@ -56,7 +56,7 @@ def simulate(ctx: click.Context,
     db_uri = ctx.obj
     check_connection(db_uri)
 
-    with get_engine(db_uri) as engine:
+    with create_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
 
@@ -135,7 +135,7 @@ def process(ctx: click.Context,
     db_uri = ctx.obj
     check_connection(db_uri)
 
-    with get_engine(db_uri) as engine:
+    with create_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
 
@@ -200,7 +200,7 @@ def plot(ctx: click.Context,
     db_uri = ctx.obj
     check_connection(db_uri)
 
-    with get_engine(db_uri) as engine:
+    with create_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
         plots.draw(group_id,
@@ -236,7 +236,7 @@ def init_db(ctx: click.Context) -> None:
         logging.info(f'Creating "{db_uri_str}" database.')
         create_database(db_uri)
 
-    with get_engine(db_uri) as engine:
+    with create_engine(db_uri) as engine:
         logging.info(f'Creating "{db_uri_str}" database schema.')
         Base.metadata.create_all(bind=engine)
 
