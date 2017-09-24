@@ -49,11 +49,12 @@ STAR_PARAMETERS_NAMES = ['mass',
                          'distance',
                          'galactic_latitude',
                          'galactic_longitude',
-                         'j_abs_magnitude',
+                         'u_abs_magnitude',
                          'b_abs_magnitude',
                          'v_abs_magnitude',
                          'r_abs_magnitude',
                          'i_abs_magnitude',
+                         'j_abs_magnitude',
                          'u_velocity',
                          'v_velocity',
                          'w_velocity',
@@ -108,15 +109,17 @@ class Star(Base):
                                nullable=True)
     galactic_longitude = Column(Float(),
                                 nullable=True)
-    j_abs_magnitude = Column(Float(),
+    u_abs_magnitude = Column(Float(),
                              nullable=True)
     b_abs_magnitude = Column(Float(),
                              nullable=True)
-    r_abs_magnitude = Column(Float(),
-                             nullable=True)
     v_abs_magnitude = Column(Float(),
                              nullable=True)
+    r_abs_magnitude = Column(Float(),
+                             nullable=True)
     i_abs_magnitude = Column(Float(),
+                             nullable=True)
+    j_abs_magnitude = Column(Float(),
                              nullable=True)
     u_velocity = Column(Float(),
                         nullable=True)
@@ -152,11 +155,12 @@ class Star(Base):
                  distance: float = None,
                  galactic_latitude: float = None,
                  galactic_longitude: float = None,
-                 j_abs_magnitude: float = None,
+                 u_abs_magnitude: float = None,
                  b_abs_magnitude: float = None,
-                 r_abs_magnitude: float = None,
                  v_abs_magnitude: float = None,
+                 r_abs_magnitude: float = None,
                  i_abs_magnitude: float = None,
+                 j_abs_magnitude: float = None,
                  u_velocity: float = None,
                  v_velocity: float = None,
                  w_velocity: float = None,
@@ -181,11 +185,12 @@ class Star(Base):
         self.distance = distance
         self.galactic_latitude = galactic_latitude
         self.galactic_longitude = galactic_longitude
-        self.j_abs_magnitude = j_abs_magnitude
+        self.u_abs_magnitude = u_abs_magnitude
         self.b_abs_magnitude = b_abs_magnitude
-        self.r_abs_magnitude = r_abs_magnitude
         self.v_abs_magnitude = v_abs_magnitude
+        self.r_abs_magnitude = r_abs_magnitude
         self.i_abs_magnitude = i_abs_magnitude
+        self.j_abs_magnitude = j_abs_magnitude
         self.u_velocity = u_velocity
         self.v_velocity = v_velocity
         self.w_velocity = w_velocity
