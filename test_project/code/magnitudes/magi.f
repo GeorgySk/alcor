@@ -96,7 +96,7 @@ C         ---  END IF CO/ONe ---
           end if
 
           luminosityOfWD(i) = -lum
-          effTempOfWD(i) = teff            
+          effTempOfWD(i) = teff
 
           u_ubvrij(i) = c1
           b_ubvrij(i) = c2
