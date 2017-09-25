@@ -664,7 +664,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      ww(i),
      &                      right_ascension_prop_motion,
      &                      declination_prop_motion,
-     &                      total_prop_motion,
+     &                      properMotion(i),
      &                      longitude_proper_motion(i),
      &                      latitude_proper_motion(i),
      &                      rgac(i),
