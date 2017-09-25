@@ -44,7 +44,8 @@ def check(star: Star,
         # Transformation from UBVRI to ugriz. More info at:
         # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
         g_ugriz_abs_magnitude = (float(star.v_abs_magnitude) - 0.124
-                                 + 0.63 * float(star.b_abs_magnitude))
+                                 + 0.63 * float(star.b_abs_magnitude
+                                                - star.v_abs_magnitude))
         z_ugriz_abs_magnitude = (g_ugriz_abs_magnitude
                                  - 1.646 * float(star.v_abs_magnitude
                                                  - star.r_abs_magnitude)
