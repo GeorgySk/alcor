@@ -55,6 +55,8 @@ def check(star: Star,
         # TODO: find out the meaning and check if the last 5 is correct
         hrm = g_ugriz_abs_magnitude + float(
                 5. * log10(star.proper_motion) + 5.)
+        v_apparent_magnitude = float(star.v_abs_magnitude) - 5. + 5. * (
+            log10(float(star.distance)) + 3.)
 
         if star.proper_motion < min_proper_motion:
             eliminations_counter['by_proper_motion'] += 1
@@ -70,7 +72,7 @@ def check(star: Star,
             eliminations_counter['by_reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constant
-        elif star.v_abs_magnitude >= 19.:
+        elif v_apparent_magnitude >= 19.:
             eliminations_counter['by_apparent_magnitude'] += 1
             return True
     return False
