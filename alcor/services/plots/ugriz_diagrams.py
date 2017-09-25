@@ -35,13 +35,21 @@ def plot(session: Session,
     stars = fetch_all(Star,
                       session=session)
 
-    ugriz_ug = [float(star.ugriz_ug)
+    # TODO: write a function? relative transformation happens in sampling.py
+    # Transformation from UBVRI to ugriz. More info at:
+    # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
+    ugriz_ug = [0.75 * float(star.u_abs_magnitude - star.b_abs_magnitude)
+                + 0.77 * float(star.b_abs_magnitude - star.v_abs_magnitude)
+                + 0.72
                 for star in stars]
-    ugriz_gr = [float(star.ugriz_gr)
+    ugriz_gr = [1.646 * float(star.v_abs_magnitude - star.r_abs_magnitude)
+                - 0.139
                 for star in stars]
-    ugriz_ri = [float(star.ugriz_ri)
+    ugriz_ri = [1.007 * float(star.r_abs_magnitude - star.i_abs_magnitude)
+                - 0.236
                 for star in stars]
-    ugriz_iz = [float(star.ugriz_iz)
+    ugriz_iz = [0.577 * float(star.r_abs_magnitude - star.i_abs_magnitude)
+                - 0.15
                 for star in stars]
 
     draw_subplot(subplot=subplot_ug_vs_gr,

@@ -1,4 +1,4 @@
-      subroutine traject(galacticDiskAge)
+      subroutine traject(thin_disk_age)
 C     Calculating trajectories of WDs according to z-axis using the 4th 
 C     order Runge-Kuttta.
       implicit none
@@ -26,7 +26,7 @@ C     TODO: find out the meaning of hmin, wosun
      &           NOK,
      &           NBAD,
      &           flagOfWD(MAX_STARS_COUNT)
-      real :: galacticDiskAge,
+      real :: thin_disk_age,
      &        final_time,
      &        xcar,
      &        ycar,
@@ -70,7 +70,7 @@ C     symbolic names to be used as actual arguments.
       external DERIVS
       external RKQC
             
-      final_time = galacticDiskAge * SECONDS_IN_GYR 
+      final_time = thin_disk_age * SECONDS_IN_GYR 
 
 C     Integrating trajectories
       do wd_index = 1, numberOfWDs
@@ -81,7 +81,7 @@ C         TODO: find out the meaning of wo and 8.0
           zo = real(coordinate_Zcylindr(wd_index) * METERS_IN_PARSEC)
 C         TODO: find out the meaning of ecini
           ecini = 0.5 * wo * wo
-          time_increment = (galacticDiskAge - starBirthTime(wd_index)) 
+          time_increment = (thin_disk_age - starBirthTime(wd_index)) 
      &                     / float(NJUMPS)
 C         Time in seconds
 C         TODO: find out the meaning of htry

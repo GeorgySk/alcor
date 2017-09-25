@@ -19,7 +19,7 @@ services:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
       - FORTRAN_COMPILER_OPTIONS=-g -fbacktrace
         -ffpe-trap=zero,overflow,invalid -Wall -Wextra -Wconversion
-        -fbounds-check -fcheck=all
+        -fbounds-check -fcheck=all -fmax-errors=5
 
   postgres:
     image: postgres:latest
@@ -29,6 +29,8 @@ services:
       - POSTGRES_DB=alcor
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
 
 volumes:
   postgres-data:

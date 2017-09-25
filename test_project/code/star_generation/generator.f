@@ -1,39 +1,34 @@
       subroutine gen(iseed,
      &               parameterOfSFR,
-     &               areaOfSector,
+     &               radius,
      &               numberOfStarsInSample,
-     &               galacticDiskAge,
-     &               timeOfBurst,
+     &               thin_disk_age,
+     &               burst_age,
      &               massReductionFactor,
-     &               thick_disk_stars_fraction)
+     &               thick_disk_stars_fraction,
+     &               halo_stars_fraction,
+     &               thick_disk_age,
+     &               thick_disk_sfr_param,
+     &               halo_age,
+     &               halo_stars_formation_time)
 C     Divides the SFR in intervals of time. In each interval, the total 
 C     mass of stars is distributed. The mass of each star follows the 
 C     distribution law given by Initial Mass Function (IMF). The birth 
 C     time is also calculated, from which the scale height and finally 
-C     cylindrical z-coordinate are determined.       
-C           TODO: implement more modern RNG
-C           iseed: seed for random generator
-C           areaOfSector: area of the considered sector in Kpc²
-C           timeOfBurst: how many Gyr ago burst of star gener-n happened
+C     cylindrical z-coordinate are determined.
       implicit none
 
-C     Overloading intrinsic 'ran' function by our own RNG
       external ran
       real ran
 
-C     TODO: this is numberOfStars, take it up as const
       integer, parameter :: MAX_STARS_COUNT = 6000000,
      &                      BINS_COUNT = 5000
-      real, parameter :: Z_DISTRIBUTION_ZO = 1.0,
-     &                   THIN_DISK_SCALE_HEIGHT_KPC = 0.250,
-C                        TODO: this const is in cone generator, take up
+      real, parameter :: THIN_DISK_SCALE_HEIGHT_KPC = 0.250,
      &                   THICK_DISK_SCALE_HEIGHT_KPC = 0.900,
-C                        TODO: these are params of thick disk. exactly?
-     &                   TTDISK = 12.0,
-     &                   TMDISK = 10.0,
-     &                   TAU = 2.0,
-     &                   STARS_BIRTH_START_TIME = 0.0,
-     &                   BURST_FORMATION_FACTOR = 5.0
+     &                   BURST_FORMATION_FACTOR = 5.0,
+     &                   HALO_STARS_BIRTH_END_TIME = 1.0,
+     &                   HALO_DISTANCE_PARAM = 5.0,
+     &                   PI = 4.0 * atan(1.0)
       integer ::  iseed,
      &            numberOfStarsInSample, 
      &            bin_index, 
@@ -41,22 +36,29 @@ C                        TODO: these are params of thick disk. exactly?
      &            in, 
      &            numberOfWDs,
      &            flagOfWD(MAX_STARS_COUNT)
-      real :: zz,                          tmax,
-     &        ft,                          fz,
-     &        timeOfBurst,                 burst_start_time, 
-     &        current_bin_initial_time,    xx,
-     &        ttry,                        thick_disk_stars_fraction,
-     &        parameterOfSFR,              areaOfSector,
-     &        galacticDiskAge,             normalization_const,
+      real :: z_coordinate,                radius,
+     &        time_try_sfr,                sfr_try,
+     &        burst_age,                   burst_init_time, 
+     &        current_bin_init_time,       random_value,
+     &        time_try,                    thick_disk_stars_fraction,
+     &        parameterOfSFR,              areaOfSector, 
+     &        thin_disk_age,               normalization_const,
      &        time_increment,              massReductionFactor,
      &        psi,                         star_mass,
-     &        total_generated_mass_in_bin, mrep                         
+     &        total_generated_mass_in_bin, mrep,
+     &        halo_stars_fraction,         burst_mrep,
+     &        normal_mrep,                 thick_disk_max_sfr,
+     &        thin_disk_birth_init_time,   thick_disk_age,
+     &        thick_disk_max_sfr_relative_time,    thick_disk_sfr_param,
+     &        halo_age,                    halo_stars_formation_time,
+     &        thick_disk_birth_init_time,  max_age,
+     &        halo_birth_init_time
       real :: mass_from_Salpeter_IMF, 
      &        get_normalization_const
       double precision :: coordinate_Theta(MAX_STARS_COUNT),
      &                    coordinate_R(MAX_STARS_COUNT),
      &                    coordinate_Zcylindr(MAX_STARS_COUNT)
-C     TODO: find out what is m. massInMainSequence? 
+C     TODO: rename this to main_sequence_mass? 
       real :: m(MAX_STARS_COUNT), 
      &        starBirthTime(MAX_STARS_COUNT),
      &        scale_height
@@ -71,106 +73,111 @@ C     TODO: find out what is m. massInMainSequence?
      &               numberOfWDs,
      &               disk_belonging
 
-C     Calculating the mass, time of birth and z-coordinate of every star
-C     Calculating the normalization constant of the SFR
+C     TODO: find out the meaning of psi, mrep and 1.0e6
       normalization_const = get_normalization_const(parameterOfSFR, 
-     &                                              galacticDiskAge)
-      time_increment = (galacticDiskAge - STARS_BIRTH_START_TIME) 
-     &                 / BINS_COUNT
-C     TODO: find out the meaning
+     &                                              thin_disk_age)
+      time_increment = thin_disk_age / BINS_COUNT
       psi = normalization_const * time_increment
+      areaOfSector = PI * radius ** 2
+      mrep = psi * areaOfSector * 1.0e6
+      mrep = mrep * massReductionFactor
+      normal_mrep = mrep
+      burst_mrep = mrep * BURST_FORMATION_FACTOR
 
-C     NOTE: this stars_count counter variable is used in GOTO-loop, which is bad
+      max_age = max(thin_disk_age, thick_disk_age, halo_age)
+      burst_init_time = max_age - burst_age
+      thin_disk_birth_init_time = max_age - thin_disk_age
+      thick_disk_birth_init_time = max_age - thick_disk_age
+      halo_birth_init_time = max_age - halo_age
+C     This can be easily proved by taking derivative from
+C     y = t * exp(-t / tau)
+      thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
+      thick_disk_max_sfr = (thick_disk_max_sfr_relative_time 
+     &                      * exp(-thick_disk_max_sfr_relative_time 
+     &                              / thick_disk_sfr_param))
+
+      write(6,*) '      Mass reduction factor = ', massReductionFactor
+
       stars_count = 0
-
-      write(6,*) '      Factor of mass reduction=', massReductionFactor
-
-C     Calculating the mass to be distributed at each interval       
+     
       do bin_index = 1, BINS_COUNT
-C         TODO: find out the meaning of 1.0e6 and mrep
-          mrep = psi * areaOfSector * 1.0e6
-          mrep = mrep * massReductionFactor
           total_generated_mass_in_bin = 0.0
 
-C         Recent burst
-          burst_start_time = galacticDiskAge - timeOfBurst
-          current_bin_initial_time = STARS_BIRTH_START_TIME 
-     &                               + float(bin_index - 1) 
-     &                                 * time_increment
-      
-          if (current_bin_initial_time >= burst_start_time 
-     &            .and. current_bin_initial_time < galacticDiskAge) then
-              mrep = mrep * BURST_FORMATION_FACTOR
-          endif
+          current_bin_init_time = (thin_disk_birth_init_time 
+     &                             + float(bin_index - 1) 
+     &                               * time_increment)
+    
+          if (current_bin_init_time >= burst_init_time) then
+              mrep = burst_mrep
+          else
+              mrep = normal_mrep
+          end if
 
           do
-C             Calling to the IMF
               star_mass = mass_from_Salpeter_IMF(iseed)
-
-C             We already have the mass
               stars_count = stars_count + 1
 
               if (stars_count == MAX_STARS_COUNT) then 
                   write(6,*) '     ***  Dimension exceeded   ***'
                   write(6,*) '***  Increase the reduction factor   ***'
                   stop
-              else
-                  continue
               end if
 
-              m(stars_count) = star_mass
-              total_generated_mass_in_bin = total_generated_mass_in_bin 
-     &                                      + star_mass       
-         
-C             Birth time from SFR constant 
+              m(stars_count) = star_mass       
+
 C             disk_belonging = 1 (thin disk), = 2 (thick disk)
-              if (ran(iseed) <= thick_disk_stars_fraction) then
+              random_value = ran(iseed)
+              if (random_value <= thick_disk_stars_fraction) then
                   disk_belonging(stars_count) = 2
-C                 TODO: find out what is going on here
-                  tmax = TMDISK * exp(-TMDISK / TAU)
                   do
-                      ttry = TTDISK * ran(iseed)
-                      ft = ttry * exp(-ttry / TAU)
-                      fz = tmax * ran(iseed)
-                      if (fz <= ft) then
-                          starBirthTime(stars_count) = ttry
+                      time_try = thick_disk_age * ran(iseed)
+                      time_try_sfr = time_try 
+     &                               * exp(-time_try 
+     &                                      / thick_disk_sfr_param)
+                      sfr_try = thick_disk_max_sfr * ran(iseed)
+                      if (sfr_try <= time_try_sfr) then
+                          starBirthTime(stars_count) = (
+     &                        time_try + thick_disk_birth_init_time)
                           exit
                       end if
                   end do
+              else if (random_value > thick_disk_stars_fraction 
+     &                 .and. random_value <= thick_disk_stars_fraction 
+     &                                       + halo_stars_fraction) then
+                  disk_belonging(stars_count) = 3
+                  starBirthTime(stars_count) = halo_birth_init_time
+     &                + halo_stars_formation_time * ran(iseed)
               else
                   disk_belonging(stars_count) = 1
-                  starBirthTime(stars_count) = STARS_BIRTH_START_TIME 
-     &                               + float(bin_index - 1) 
-     &                                 * time_increment 
-     &                               + time_increment * ran(iseed)
+                  starBirthTime(stars_count) = thin_disk_birth_init_time 
+     &                + float(bin_index - 1) * time_increment 
+     &                + time_increment * ran(iseed)
+                  total_generated_mass_in_bin = 
+     &                total_generated_mass_in_bin + star_mass
               end if
 
-C             Calculating z
               if (disk_belonging(stars_count) == 1) then
                   scale_height = THIN_DISK_SCALE_HEIGHT_KPC
-              else
+              else if (disk_belonging(stars_count) == 2) then
                   scale_height = THICK_DISK_SCALE_HEIGHT_KPC
               end if
 
-C             TODO: find out what is going on here
-              do
-                  xx = Z_DISTRIBUTION_ZO * scale_height * ran(iseed)
-                  if (xx /= 0.0) then
-                      exit
-                  end if
-              end do
-              zz = scale_height * LOG(Z_DISTRIBUTION_ZO 
-     &                                * scale_height / xx)   
-C             z-contstant       zz = 0.240 * ran(iseed)   
-              in = int(2.0 * ran(iseed))
-              coordinate_Zcylindr(stars_count) = zz * dfloat(1 - 2 * in)
-
-C             Checking if we have generated enough mass
+C             Coordinates of halo stars will be generated in polar.f
+              if (disk_belonging(stars_count) /= 3) then
+C                 Inverse transform sampling for y = exp(-z / H)
+                  do
+                      random_value = ran(iseed)
+                      if (random_value /= 0.0) then
+                          exit
+                      end if
+                  end do
+                  z_coordinate = -scale_height * log(random_value)
+C                 Assigning random sign
+                  in = int(2.0 * ran(iseed))
+                  coordinate_Zcylindr(stars_count) = z_coordinate 
+     &                                              * dfloat(1 - 2 * in)
+              end if
               if (total_generated_mass_in_bin >= mrep) then
-                  m(stars_count) = m(stars_count) 
-     &                             - (total_generated_mass_in_bin 
-     &                                - mrep)
-                  total_generated_mass_in_bin = mrep
                   exit
               end if
           end do
@@ -183,19 +190,19 @@ C             Checking if we have generated enough mass
 
 
       function get_normalization_const(parameterOfSFR, 
-     &                                 galacticDiskAge)
+     &                                 thin_disk_age)
 C         Calculating the normalization constant of the SFR
           implicit none
 
 C         TODO: find out what this sigma is
           real, parameter :: sigma = 51.0
           real :: parameterOfSFR,
-     &            galacticDiskAge,
+     &            thin_disk_age,
      &            get_normalization_const
 
           get_normalization_const = sigma 
      &                              / (parameterOfSFR 
-     &                                 * (1.0 - exp(-galacticDiskAge 
+     &                                 * (1.0 - exp(-thin_disk_age 
      &                                               / parameterOfSFR)))
       end function
 
@@ -216,20 +223,20 @@ C         Calculating the mass following the IMF by Salpeter 55.
      &               ISEED2
           real :: mass_from_Salpeter_IMF,
      &            fractionOfDB,
-     &            galacticDiskAge,
+     &            thin_disk_age,
      &            parameterIMF,
      &            parameterIFMR,
-     &            timeOfBurst,
+     &            burst_age,
      &            ymax,
      &            zy,
      &            zx,
      &            zyimf
 
           common /param/ fractionOfDB,
-     &                   galacticDiskAge,
+     &                   thin_disk_age,
      &                   parameterIMF,
      &                   parameterIFMR,
-     &                   timeOfBurst
+     &                   burst_age
           common /RSEED/ ISEED1,
      &                   ISEED2
            

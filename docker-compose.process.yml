@@ -32,6 +32,8 @@ services:
       - POSTGRES_DB=alcor
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
 
 volumes:
   postgres-data:

@@ -7,6 +7,7 @@
      &                      c3,
      &                      c4,
      &                      c5,
+     &                      c6,
      &                      effective_temperature,
      &                      log_surface_gravity,
      &                      table)
@@ -45,6 +46,7 @@ C     TODO: find out the meanings of variables and rename them
      &        c3,
      &        c4,
      &        c5,
+     &        c6,
      &        zet1,
      &        zet2,
      &        zet3
@@ -204,6 +206,6 @@ C     Colors interpolation, there is no metallicity here
       call intermag(wd_mass,luminosity,table(10)%ncol,
      &     table(10)%ntrk,table(10)%mass,table(10)%luminosity,
      &     table(10)%color_U,table(10)%color_B,table(10)%color_V,
-     &     table(10)%color_R,table(10)%color_I,c1,c2,c3,c4,c5)
-
+     &     table(10)%color_R,table(10)%color_I,table(10)%color_J,
+     &     c1,c2,c3,c4,c5,c6)
       end subroutine

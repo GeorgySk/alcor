@@ -1,28 +1,15 @@
-C***********************************************************************
-C     TODO: rewrite      
-      subroutine interlumda(tcool,mass,Z,lum,teff,logg,c1,c2,c3,c4,c5,
-     &           table)
+      subroutine interlumda(tcool,mass,Z,lum,teff,logg,
+     &                      c1,c2,c3,c4,c5,c6,table)
       use external_types
-C=======================================================================
-C
 C     This subroutine interpolates the luminosity of DA WD according
 C     to its mass, cooling time and metallicity.
 C     It uses the cooling tables by Althaus et al. (2009) and
 C     Renedo et al. (2010)
-C
-C     Modifications in 07/2012 (ER Cojocaru)
-C
-C-------------------------------------------------------------------
-C     Input parameters:
-C       tcool: cooling time
-C       mass: mass of WD
-C-------------------------------------------------------------------
 C     Output parameters
 C       lum: luminosity
 C       teff: effective temperature [K]
 C       logg: logarithm of the superficial gravity
 C       c1,c2,c3,c4,c5: UBVRI colors 
-C=======================================================================
       use external_types
       implicit real (a-h,m,o-z)
       
@@ -41,7 +28,7 @@ C     ---   Declaration of variables   ---
      &        numberOfMassesWithCoolSeq_4
       integer ntrkda(10),numberOfRows_1(7),numberOfRows_2(10),
      &        numberOfRows_3(8),numberOfRows_4(8)
-      real tcool,mass,Z,lum,teff,logg,c1,c2,c3,c4,c5
+      real tcool,mass,Z,lum,teff,logg,c1,c2,c3,c4,c5,c6
       real Z1,lum1,teff1,logg1
       real Z2,lum2,teff2,logg2
       real massOfWD(10),massOfWD_1(7),massOfWD_2(10),
@@ -207,9 +194,7 @@ C     interpolation of colors, here there is no metalicity
      &     table(11)%mass,
      &     table(11)%luminosity,table(11)%color_U,table(11)%color_B,
      &     table(11)%color_V,table(11)%color_R,table(11)%color_I,
-     &     c1,c2,c3,
-     &     c4,c5)
+     &     table(11)%color_J, c1,c2,c3,c4,c5,c6)
 
       return
       end
-C***********************************************************************

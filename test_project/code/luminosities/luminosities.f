@@ -1,4 +1,6 @@
-      subroutine lumx(numberOfStarsInSample)
+      subroutine lumx(numberOfStarsInSample,
+     &                thick_disk_age,
+     &                halo_age)
 C         Determining what stars are WDs and calculating cooling time 
 C         and luminosity for it
           implicit none
@@ -12,11 +14,14 @@ C                    Number of WDs of Oxygen-Neon type
      &               wd_ONe_count,
      &               i,
      &               k
-          real :: galacticDiskAge,
+          real :: thin_disk_age,
      &            parameterIFMR,
      &            fractionOfDB,
      &            parameterIMF,
-     &            timeOfBurst
+     &            burst_age,
+     &            thick_disk_age,
+     &            halo_age,
+     &            max_age
 
 C       TODO: change to logical - is_WD
 C       flagOfWD: 0 - it's not WD, 1 - it's a WD
@@ -32,6 +37,9 @@ C       m: mass in the main sequence
      &            m(MAX_STARS_COUNT)
           integer disk_belonging(MAX_STARS_COUNT),
      &            flagOfWD(MAX_STARS_COUNT)
+          double precision :: coordinate_R(MAX_STARS_COUNT),
+     &                        coordinate_Theta(MAX_STARS_COUNT),
+     &                        coordinate_Zcylindr(MAX_STARS_COUNT)
 
 C         TODO: give names with one style
           common /tm/ starBirthTime, m
@@ -44,10 +52,15 @@ C         TODO: give names with one style
      &                   disk_belonging
           common /cool/ coolingTime
           common /param/ fractionOfDB,
-     &                   galacticDiskAge,
+     &                   thin_disk_age,
      &                   parameterIMF,
      &                   parameterIFMR,
-     &                   timeOfBurst
+     &                   burst_age
+         common /coorcil/ coordinate_R,
+     &                     coordinate_Theta,
+     &                     coordinate_Zcylindr
+
+          max_age = max(thin_disk_age, thick_disk_age, halo_age)
 
           numberOfWDs = 0
           wd_ONe_count = 0
@@ -58,14 +71,18 @@ C         Deciding if the star is a WD
 C             Progenitor star that generates a ONe WD: 8.5 <M_MS < 10.5
 C             WD of CO: m_WD <1.14; of ONe: m_wd>1.14
               if (m(i) <= 10.5) then
-C                 Attributing a solar metallicity to all the stars
-                  metallicityOfWD(i) = 0.01
+                  if (disk_belonging(i) == 3) then
+                      metallicityOfWD(i) = 0.001
+                  else
+                      metallicityOfWD(i) = 0.01
+                  end if
 C                 Calculating the lifetime in the main sequence
-                  call tsp(m(i), 
+C                 TODO: resolve the problem with halo stars
+                  call get_main_sequence_lifetime(
+     &                     m(i), 
      &                     metallicityOfWD(i), 
      &                     main_sequence_lifetime(i))
-C                 Calculating the cooling time
-                  coolingTime(i) = galacticDiskAge - starBirthTime(i) 
+                  coolingTime(i) = max_age - starBirthTime(i) 
      &                             - main_sequence_lifetime(i)
                   if (coolingTime(i) > 0.0) then
 C                     Initial-to-Final Mass Relation (IFMR)
@@ -107,6 +124,7 @@ C         Making the transfer
                   metallicityOfWD(k) = metallicityOfWD(i)
                   starBirthTime(k) = starBirthTime(i)
                   disk_belonging(k) = disk_belonging(i)
+                  coordinate_Zcylindr(k) = coordinate_Zcylindr(i)
               end if
           end do
     
@@ -115,21 +133,18 @@ C         Making the transfer
       end subroutine
 
 
-C     TODO: give a better name
-      subroutine tsp(stellar_mass, 
-     &               metallicity,
-     &               t)
+      subroutine get_main_sequence_lifetime(stellar_mass, 
+     &                                      metallicity,
+     &                                      main_sequence_lifetime)
 C         Calculates lifetime in the main sequence for a given 
 C         metallicity Z € [0.01, 0.001] for standart helium content 
 C         according to model by Leandro & Renedo et al.(2010)
 C         Data in solar masses and Gyr
-C         TODO: what is SP?
-C         t: lifetime in the SP.
           implicit none
 
           real :: stellar_mass,
      &            metallicity,
-     &            t,
+     &            main_sequence_lifetime,
      &            mms(10),
      &            tms(10),
      &            mms2(7),
@@ -234,8 +249,9 @@ C                 TODO: eliminate goto
           end if
 
 C         Interpolating for the value of Z, z solar 10
-          t = tsub + ((tsol - tsub) / (0.01 - 0.001)) 
-     &               * (metallicity - 0.001)
+          main_sequence_lifetime = tsub + ((tsol - tsub) 
+     &                                     / (0.01 - 0.001)) 
+     &                                    * (metallicity - 0.001)
       end subroutine
       
 

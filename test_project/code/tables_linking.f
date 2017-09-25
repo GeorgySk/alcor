@@ -130,6 +130,7 @@
       allocate(table(10)%color_V(table(10)%ncol,table(10)%nrow))
       allocate(table(10)%color_R(table(10)%ncol,table(10)%nrow))
       allocate(table(10)%color_I(table(10)%ncol,table(10)%nrow))
+      allocate(table(10)%color_J(table(10)%ncol,table(10)%nrow))
 
       table(11)%initLink=60
       table(11)%tableType="colors"
@@ -144,6 +145,7 @@
       allocate(table(11)%color_V(table(11)%ncol,table(11)%nrow))
       allocate(table(11)%color_R(table(11)%ncol,table(11)%nrow))
       allocate(table(11)%color_I(table(11)%ncol,table(11)%nrow))
+      allocate(table(11)%color_J(table(11)%ncol,table(11)%nrow))
 
       return
       end

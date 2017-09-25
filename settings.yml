@@ -7,14 +7,17 @@ grid:
 #   TODO: this is not applied to cone
     burst_time: 0.6
     DB_fraction: 0.2
-#   TODO: there are other values for cone
-    galaxy_age: 9.2
+    thin_disk_age: 9.2
+    thick_disk_age: 12.0
+    halo_age: 13.5
+    halo_stars_formation_time: 1.0
+    thick_disk_star_formation_exponent: 2.0
     initial_mass_function_exponent: -2.35
     lifetime_mass_ratio: 1.0
-    mass_reduction_factor: 0.03
-  cones:
-    thick_disk_stars_fraction: 0.8
-
+    mass_reduction_factor: 0.0003
+    thick_disk_stars_fraction: 0.15
+    halo_stars_fraction: 0.05
+    radius: 2  # kpc
 csv:
   cones:
     longitudes:

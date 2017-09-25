@@ -21,9 +21,6 @@ def check(star: Star,
     # TODO: implement pc/kpc units
     distance_in_pc = star.distance * Decimal(1e3)
     parallax = Fraction(1, Fraction(distance_in_pc))
-    # TODO: find out the meaning of the following constants
-    hrm = star.ugriz_g_apparent + Decimal(5. * log10(star.proper_motion) + 5.)
-    gz = float(star.ugriz_gr) + float(star.ugriz_rz)
 
     if parallax < min_parallax:
         eliminations_counter['by_parallax'] += 1
@@ -43,19 +40,36 @@ def check(star: Star,
         return True
 
     if filtration_method == 'restricted':
+        # TODO: add properties or function for converting?
+        # Transformation from UBVRI to ugriz. More info at:
+        # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
+        g_ugriz_abs_magnitude = (float(star.v_abs_magnitude) - 0.124
+                                 + 0.63 * float(star.b_abs_magnitude))
+        z_ugriz_abs_magnitude = (g_ugriz_abs_magnitude
+                                 - 1.646 * float(star.v_abs_magnitude
+                                                 - star.r_abs_magnitude)
+                                 - 1.584 * float(star.r_abs_magnitude
+                                                 - star.i_abs_magnitude)
+                                 + 0.525)
+        # TODO: find out the meaning and check if the last 5 is correct
+        hrm = g_ugriz_abs_magnitude + float(
+                5. * log10(star.proper_motion) + 5.)
+
         if star.proper_motion < min_proper_motion:
             eliminations_counter['by_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
-        elif gz < -0.33 and hrm < 14.:
+        elif (g_ugriz_abs_magnitude - z_ugriz_abs_magnitude < -0.33
+              and hrm < 14.):
             eliminations_counter['by_reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
-        elif hrm < 3.559 * gz + 15.17:
+        elif (hrm < 3.559 * (g_ugriz_abs_magnitude - z_ugriz_abs_magnitude)
+              + 15.17):
             eliminations_counter['by_reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constant
-        elif star.v_photometry >= 19.:
+        elif star.v_abs_magnitude >= 19.:
             eliminations_counter['by_apparent_magnitude'] += 1
             return True
     return False

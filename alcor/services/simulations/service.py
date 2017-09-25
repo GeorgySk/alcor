@@ -56,17 +56,22 @@ def run_simulation(*,
                    output_file_name: str) -> None:
     args = ['./main.e',
             '-db', parameters_values['DB_fraction'],
-            '-g', parameters_values['galaxy_age'],
+            '-g', parameters_values['thin_disk_age'],
+            '-tda', parameters_values['thick_disk_age'],
+            '-ha', parameters_values['halo_age'],
+            '-hsft', parameters_values['halo_stars_formation_time'],
+            '-tde', parameters_values['thick_disk_star_formation_exponent'],
             '-mf', parameters_values['initial_mass_function_exponent'],
             '-ifr', parameters_values['lifetime_mass_ratio'],
             '-bt', parameters_values['burst_time'],
             '-mr', parameters_values['mass_reduction_factor'],
+            '-tdsf', parameters_values['thick_disk_stars_fraction'],
+            '-hsf', parameters_values['halo_stars_fraction'],
+            '-rad', parameters_values['radius'],
             '-o', output_file_name,
             '-geom', geometry]
 
     if geometry == 'cones':
-        args.extend(['-tdsf', parameters_values['thick_disk_stars_fraction']])
-
         try:
             args.extend(['-cl', parameters_values['longitudes']])
         except KeyError:

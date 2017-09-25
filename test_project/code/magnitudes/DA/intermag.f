@@ -9,11 +9,13 @@
      &                    color_V,
      &                    color_R,
      &                    color_I,
+     &                    color_J,
      &                    c1,
      &                    c2,
      &                    c3,
      &                    c4,
-     &                    c5)
+     &                    c5,
+     &                    c6)
 C     Interpolating luminosity of a DA WD according to its mass and 
 C     cooling time using the cooling sequence from input (corresponding 
 C     to certain metallicity)
@@ -41,6 +43,7 @@ C       c1,c2,c3,c4,c5: Johnson colors
      &        c3,
      &        c4,
      &        c5,
+     &        c6,
      &        c_1,
      &        c_2,
      &        a1,
@@ -53,7 +56,8 @@ C       c1,c2,c3,c4,c5: Johnson colors
      &        color_B(numberOfMassesWithColors,*),
      &        color_V(numberOfMassesWithColors,*),
      &        color_R(numberOfMassesWithColors,*),
-     &        color_I(numberOfMassesWithColors,*)
+     &        color_I(numberOfMassesWithColors,*),
+     &        color_J(numberOfMassesWithColors,*)
 
 C     TODO: find out the meaning of check variables
       check1 = 0
@@ -110,6 +114,14 @@ C       Greater luminosoty than known -> linear 2D extrapolation
           if (c5 < 0.0) then
             c5 = 0.0
           end if
+          call extrap1(lumi,color_J(1,1),color_J(1,2),luminosity(1,1),
+     &         luminosity(1,2),c_1)
+          call extrap1(lumi,color_J(2,1),color_J(2,2),luminosity(2,1),
+     &         luminosity(2,2),c_2)
+          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c6)
+          if (c6 < 0.0) then
+            c6 = 0.0
+          end if
           check3 = 1
           GOTO 45
 C       Smaller luminosity than known -> linear 2D extrapolation
@@ -154,6 +166,14 @@ C       Smaller luminosity than known -> linear 2D extrapolation
           call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c5)
           if (c5 < 0.0) then 
             c5 = 0.0
+          end if
+          call extrap1(lumi,color_J(1,ns1-1),color_J(1,ns1),
+     &         luminosity(1,ns1-1),luminosity(1,ns1),c_1)
+          call extrap1(lumi,color_J(2,ns2-1),color_J(2,ns2),
+     &         luminosity(2,ns2-1),luminosity(2,ns2),c_2)
+          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c6)
+          if (c6 < 0.0) then 
+            c6 = 0.0
           end if
           check3 = 1
           GOTO 45
@@ -208,6 +228,11 @@ C       Luminosity between the known values
             c_2 = color_I(2, i2) + (color_I(2, i2 + 1) 
      &            - color_I(2, i2)) * a2 / b2
             call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c5)
+            c_1 = color_J(1, i1) + (color_J(1, i1 + 1) 
+     &            - color_J(1, i1)) * a1 / b1
+            c_2 = color_J(2, i2) + (color_J(2, i2 + 1) 
+     &            - color_J(2, i2)) * a2 / b2
+            call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c6)
             GOTO 45
           end if
         end if
@@ -285,6 +310,19 @@ C       Greater luminosity than known -> linear 2D extrapolation
           if (c5 < 0.0) then 
             c5 = 0.0
           end if
+          call extrap1(lumi,color_J(numberOfMassesWithColors-1,1),
+     &         color_J(numberOfMassesWithColors-1,2),
+     &         luminosity(numberOfMassesWithColors-1,1),
+     &         luminosity(numberOfMassesWithColors-1,2),c_1)
+          call extrap1(lumi,color_J(numberOfMassesWithColors,1),
+     &         color_J(numberOfMassesWithColors,2),
+     &         luminosity(numberOfMassesWithColors,1),
+     &         luminosity(numberOfMassesWithColors,2),c_2)
+          call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors-1),
+     &         mtrk(numberOfMassesWithColors),c6)
+          if (c6 < 0.0) then 
+            c6 = 0.0
+          end if
           check3 = 1
           GOTO 45
 C       Smaller luminosity than known -> linear 2D extrapolation
@@ -335,7 +373,16 @@ C       Smaller luminosity than known -> linear 2D extrapolation
      &         color_I(numberOfMassesWithColors,ns2),
      &         luminosity(numberOfMassesWithColors,ns2-1),
      &         luminosity(numberOfMassesWithColors,ns2),c_2)
-          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c5)      
+          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c5)
+          call extrap1(lumi,color_J(numberOfMassesWithColors-1,ns1-1),
+     &         color_J(numberOfMassesWithColors-1,ns1),
+     &         luminosity(numberOfMassesWithColors-1,ns1-1),
+     &         luminosity(numberOfMassesWithColors-1,ns1),c_1)
+          call extrap1(lumi,color_J(numberOfMassesWithColors,ns2-1),
+     &         color_J(numberOfMassesWithColors,ns2),
+     &         luminosity(numberOfMassesWithColors,ns2-1),
+     &         luminosity(numberOfMassesWithColors,ns2),c_2)
+          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c6)   
           check3 = 1
           GOTO 45
 C       Luminosity between known values
@@ -414,6 +461,15 @@ C       Luminosity between known values
      &               - color_I(numberOfMassesWithColors, i2)) * a2 / b2
             call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors-1),
      &           mtrk(numberOfMassesWithColors),c5)
+            c_1 = color_J(numberOfMassesWithColors - 1, i1)
+     &            + (color_J(numberOfMassesWithColors - 1, i1 + 1)
+     &               - color_J(numberOfMassesWithColors - 1, i1)) * a1 
+     &              / b1
+            c_2 = color_J(numberOfMassesWithColors, i2)
+     &            + (color_J(numberOfMassesWithColors, i2 + 1)
+     &               - color_J(numberOfMassesWithColors, i2)) * a2 / b2
+            call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors-1),
+     &           mtrk(numberOfMassesWithColors),c6)
             GOTO 45
           end if
         end if
@@ -466,7 +522,15 @@ C         Larger luminosity than known -> linear 2D extrapolation
             call extrap1(mass,c_1,c_2,mtrk(k),mtrk(k+1),c5)
             if (c5 < 0.0) then 
               c5=0.0
-            end if  
+            end if
+            call extrap1(lumi,color_J(k,1),color_J(k,2),luminosity(k,1),
+     &           luminosity(k,2),c_1)
+            call extrap1(lumi,color_J(k+1,1),color_J(k+1,2),
+     &           luminosity(k+1,1),luminosity(k+1,2),c_2)
+            call extrap1(mass,c_1,c_2,mtrk(k),mtrk(k+1),c6)
+            if (c6 < 0.0) then 
+              c6=0.0
+            end if 
             check3 = 1      
             GOTO 45
 C         Smaller luminosity than known -> linear 2D extrapolation
@@ -496,7 +560,12 @@ C         Smaller luminosity than known -> linear 2D extrapolation
      &           luminosity(k,ns1-1),luminosity(k,ns1),c_1)
             call extrap1(lumi,color_I(k+1,ns2-1),color_I(k+1,ns2),
      &           luminosity(k+1,ns2-1),luminosity(k+1,ns2),c_2)
-            call extrap1(mass,c_1,c_2,mtrk(k),mtrk(k+1),c5)      
+            call extrap1(mass,c_1,c_2,mtrk(k),mtrk(k+1),c5)
+            call extrap1(lumi,color_J(k,ns1-1),color_J(k,ns1),
+     &           luminosity(k,ns1-1),luminosity(k,ns1),c_1)
+            call extrap1(lumi,color_J(k+1,ns2-1),color_J(k+1,ns2),
+     &           luminosity(k+1,ns2-1),luminosity(k+1,ns2),c_2)
+            call extrap1(mass,c_1,c_2,mtrk(k),mtrk(k+1),c6)  
             check3 = 1
             GOTO 45
 C         Luminosity between known values
@@ -546,6 +615,10 @@ C         Luminosity between known values
               c_2 = color_I(k+1,i2)+(color_I(k+1,i2+1)-color_I(k+1,i2))*
      &            a2/b2
               call extrap1(mass,c_1,c_2,mtrk(k),mtrk(k+1),c5)
+              c_1 = color_J(k,i1)+(color_J(k,i1+1)-color_J(k,i1))*a1/b1
+              c_2 = color_J(k+1,i2)+(color_J(k+1,i2+1)-color_J(k+1,i2))*
+     &            a2/b2
+              call extrap1(mass,c_1,c_2,mtrk(k),mtrk(k+1),c6)
               GOTO 45
             end if
           end if

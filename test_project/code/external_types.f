@@ -46,7 +46,8 @@ C        real :: color_R(10,650)
         real,allocatable :: color_R(:,:)
 C       should be color_I(ncol,nrow)..   
 C        real :: color_I(10,650)
-        real,allocatable :: color_I(:,:)
+        real,allocatable :: color_I(:, :)
+        real,allocatable :: color_J(:, :)
       ENDTYPE FileGroupInfo
 
       END MODULE external_types

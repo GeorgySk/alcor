@@ -27,50 +27,52 @@ C     intrinsic and must be defined in program
       external ran
       real ran
 
-C     ---  Variables description ---
-C     minimumSectorRadius - min radius of the sector of considered stars
-C     maximumSectorRadius - max radius of the sector of considered stars
-C     angleCoveringSector - angle in degrees, which covers the sector
-C     radiusOfSector: radius (kpc) of the sector centered at Sun
-C     galacticDiskAge (Gyr)
+C     thin_disk_age (Gyr)
 C     parameterOfSFR (taus): Y=exp(-t/taus)
 C     solarGalactocentricDistance: distance from Sun to Galaxy center;
 C     parameterIMF (alpha): M^{alpha}
 C     Initial-to-Final Mass Relation (IFMR) : 
 C         mfinal_new=parameterIFMR*mfinal_old
       integer numberOfStars
-      real galacticDiskAge,parameterOfSFR,
-     &                 minimumSectorRadius,
-     &                 maximumSectorRadius,angleCoveringSector,
-     &                 parameterIMF,radiusOfSector,scaleLength,
-     &                 areaOfSector,pi
+      real :: thin_disk_age,
+     &        parameterOfSFR,
+     &        parameterIMF,
+     &        scaleLength,
+     &        pi,
+     &        thick_disk_age,
+     &        halo_age,
+     &        halo_stars_formation_time,
+     &        thick_disk_sfr_param
       double precision :: solarGalactocentricDistance
       parameter (numberOfStars=6000000)
       parameter (solarGalactocentricDistance=8.5d0)
-      parameter (minimumSectorRadius=8.45)
-      parameter (maximumSectorRadius=8.55)
-      parameter (angleCoveringSector=0.674)
-C     TODO: find out if we need this variable or min/max sector radii
-      parameter (radiusOfSector=0.050)
       parameter (parameterOfSFR=25.0)
       parameter (scaleLength=3.5)
       integer i,j,k,ISEED1,ISEED2,iseed,numberOfStarsInSample
       real randomNumber,fractionOfDB
-      real parameterIFMR
+      real parameterIFMR, burst_age
 C     For terminal:
       integer :: num_args
       character(len = 30) :: arg
       character(len = 30) :: temp_string
       real :: massReductionFactor
-      real :: thick_disk_stars_fraction
+      real :: thick_disk_stars_fraction, 
+     &        halo_stars_fraction,
+     &        radius
       character(len = 100) :: output_filename
       character(len = 6) :: geometry
       real :: cone_height_longitude,
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: min_longitude, max_longitude, min_latitude,
-     &                    max_latitude
+      real :: min_longitude, max_longitude, 
+     &        min_latitude, max_latitude
+      real :: u_ubvrij(numberOfStars),
+     &        b_ubvrij(numberOfStars),
+     &        v_ubvrij(numberOfStars),
+     &        r_ubvrij(numberOfStars),
+     &        i_ubvrij(numberOfStars),
+     &        j_ubvrij(numberOfStars)
       logical :: is_numeric, longitudes_from_csv, latitudes_from_csv
       integer :: iterations_count, getNumberOfLines
 
@@ -85,24 +87,22 @@ C     For terminal:
 
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
-C     NOTE: use of commons is strongly discouraged!
       common /RSEED/ ISEED1,ISEED2
-      common /param/ fractionOfDB,galacticDiskAge,parameterIMF,
-     &               parameterIFMR,timeOfBurst
+      common /param/ fractionOfDB,thin_disk_age,parameterIMF,
+     &               parameterIFMR,burst_age
 
-C     --- Filling info about groups of files (cooling, color tables) ---    
-C ======================================================================
+C     Filling info about groups of files (cooling, color tables)
       call fillTable(table) 
 
-C     Terminal reading:
+C     Terminal reading
       num_args = iargc()
 
       if (num_args .eq. 0) then
         fractionOfDB = 0.20 
-        galacticDiskAge = 8.9
+        thin_disk_age = 9.2
         parameterIMF = -2.35
         parameterIFMR = 1.0
-        timeOfBurst = 0.6 
+        burst_age = 0.6 
       else
         do i = 1, num_args
 C           call get_command_argument(i, args(i))
@@ -113,7 +113,19 @@ C           call get_command_argument(i, args(i))
               read(temp_string, *) fractionOfDB 
             case ("-g")
               call getarg(i + 1, temp_string)
-              read(temp_string, *) galacticDiskAge 
+              read(temp_string, *) thin_disk_age
+            case ("-tda")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) thick_disk_age
+            case ("-ha")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) halo_age
+            case ("-hsft")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) halo_stars_formation_time
+            case ("-tde")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) thick_disk_sfr_param
             case ("-mf")
               call getarg(i + 1, temp_string)
               read(temp_string, *) parameterIMF
@@ -122,13 +134,19 @@ C           call get_command_argument(i, args(i))
               read(temp_string, *) parameterIFMR
             case ("-bt")
               call getarg(i + 1, temp_string)
-              read(temp_string, *) timeOfBurst
+              read(temp_string, *) burst_age
             case ("-mr")
               call getarg(i + 1, temp_string)
               read(temp_string, *) massReductionFactor
             case ("-tdsf")
               call getarg(i + 1, temp_string)
               read(temp_string, *) thick_disk_stars_fraction
+            case ("-hsf")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) halo_stars_fraction
+            case ("-rad")
+              call getarg(i + 1, temp_string)
+              read(temp_string, *) radius
             case ("-o")
               call getarg(i + 1, output_filename)
             case ('-geom')
@@ -199,10 +217,8 @@ C           call get_command_argument(i, args(i))
       write(6,*) '            Used parameters:'
       write(6,*) 'numberOfStars=    ',numberOfStars
       write(6,*) 'SFR: parameterOfSFR=',parameterOfSFR,'Gyr'
-      write(6,*) 'galacticDiskAge=    ',galacticDiskAge,'Gyr'
-      write(6,*) 'minimumSectorRadius=',minimumSectorRadius,'kpc' 
-      write(6,*) 'maximumSectorRadius=',maximumSectorRadius,'kpc'
-      write(6,*) 'radiusOfSector=     ',radiusOfSector,'kpc'
+      write(6,*) 'thin disk age=      ',thin_disk_age,'Gyr'
+      write(6,*) 'area radius=        ',radius,'kpc'
       write(6,*) ' '
       write(6,*) '=========================================='
       write(6,*) ' '
@@ -212,40 +228,31 @@ C           call get_command_argument(i, args(i))
      &eeds'
       write(6,*) ' '
 
-C     ---Reading seeds line from $temporary_files/seeds_line.in
-C ======================================================================
-      iseed=-9
-C       read(72,100) iseed1,iseed2
+C     Reading seeds line from $temporary_files/seeds_line.in
+      iseed = -9
 C     This is done for cone geometry and 5000 plates as we don't want 
 C     the sequence of RNs to repeat itself(init:805577 133547):
-      open(unit=772,file='input_data/seeds_line.in')
-      read(unit=772,fmt=*) iseed1, iseed2
+      open(unit=772, file='input_data/seeds_line.in')
+      read(unit=772, fmt=*) iseed1, iseed2
       close(unit=772)
       if (geometry == 'cones') then
           iseed1 = iseed1 - 1
           iseed2 = iseed2 + 1
       end if
-      open(unit=772,file='input_data/seeds_line.in',status='replace')
-      write(unit=772,fmt=100) iseed1,iseed2
+      open(unit=772, file='input_data/seeds_line.in', status='replace')
+      write(unit=772, fmt=100) iseed1,iseed2
       close(unit=772)
-C    finished rewriting seeds here
- 100   format(I6,2x,I6)  
-      write(6,*) 'iseed1=',iseed1
-      write(6,*) 'iseed2=',iseed2
+ 100  format(I6,2x,I6)  
+      write(6,*) 'iseed1=', iseed1
+      write(6,*) 'iseed2=', iseed2
 C     QUESTION: why do we need this part?      
       do i=1,10
         randomNumber=ran(iseed)
         write (6,*) i,randomNumber
       end do  
 
-C     ---  Calculating the area of the sector  ---
-C ======================================================================
-C     This style ensures maximum precision when assigning a value to PI.
       pi=4.0*atan(1.0)
-      areaOfSector=pi*radiusOfSector**2
 
-C     ---  Program itself  ---
-C ======================================================================
       write(6,*) '1. Reading the cooling tables (1/9)'
 
       write(6,*) '   1.1 Tracks of CO DA WD Z=0.001;0.01;0.03;0.06'
@@ -288,27 +295,29 @@ C     Calling the function 'incooldb' for 3 metalicities that we have
 C     TODO: add choosing what output we want to get
       open(421, file = output_filename)
       if (geometry == 'sphere') then
-          write(421, *) 'luminosity ',
-     &                  'proper_motion ',
-     &                  'proper_motion_component_b ',
-     &                  'proper_motion_component_l ',
-     &                  'proper_motion_component_vr ',
+          write(421, *) 'mass ',
+     &                  'r_galactocentric ',
+     &                  'th_galactocentric ',
+     &                  'z_coordinate ',
+     &                  'galactic_longitude ',
+     &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'distance ',
-     &                  'galactic_latitude ',
-     &                  'galactic_longitude ',
-     &                  'ugriz_g_apparent ',
-     &                  'ugriz_ug ',    
-     &                  'ugriz_gr ',    
-     &                  'ugriz_ri ',
-     &                  'ugriz_iz ',
-     &                  'v_photometry ',
+     &                  'j_abs_magnitude ',
+     &                  'b_abs_magnitude ',
+     &                  'v_abs_magnitude ',
+     &                  'r_abs_magnitude ',
+     &                  'i_abs_magnitude ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
+     &                  'right_ascension_proper_motion ',
+     &                  'declination_proper_motion ',
+     &                  'proper_motion ',
+     &                  'distance ',
+     &                  'birth_time ',
      &                  'spectral_type ',
-     &                  'galactic_disk_type'
+     &                  'galactic_disk_type '
       else if (geometry == 'cones') then
           write(421, *) 'u_velocity ',
      &                  'v_velocity ',
@@ -316,11 +325,6 @@ C     TODO: add choosing what output we want to get
      &                  'distance ',
      &                  'galactic_longitude ',
      &                  'galactic_latitude ',
-     &                  'ugriz_g_apparent ',
-     &                  'ugriz_ug ',
-     &                  'ugriz_gr ',
-     &                  'ugriz_ri ',
-     &                  'ugriz_iz ',
      &                  'galactic_disk_type ',
      &                  'spectral_type'
       end if
@@ -338,16 +342,19 @@ C         converting cone height parameters from deg to rad
 
           write(6,*) '2. Calling the IMF and SFR (2/9)'
           if (geometry == 'sphere') then
-              call gen(iseed,parameterOfSFR,areaOfSector,
-     &                 numberOfStarsInSample,galacticDiskAge,
-     &                 timeOfBurst,massReductionFactor,
-     &                 thick_disk_stars_fraction)
+              call gen(iseed,parameterOfSFR,radius,
+     &                 numberOfStarsInSample,thin_disk_age,
+     &                 burst_age,massReductionFactor,
+     &                 thick_disk_stars_fraction,
+     &                 halo_stars_fraction, thick_disk_age,
+     &                 thick_disk_sfr_param,
+     &                 halo_age, halo_stars_formation_time)
           else if (geometry == 'cones') then
               call generate_cone_stars(cone_height_longitudes(i),
      &                                 cone_height_latitudes(i),
      &                                 numberOfStarsInSample,iseed,
      &                                 thick_disk_stars_fraction,
-     &                                 galacticDiskAge,
+     &                                 thin_disk_age,
      &                                 min_longitude, max_longitude,
      &                                 min_latitude, max_latitude,
      &                                 massReductionFactor)
@@ -357,14 +364,13 @@ C         converting cone height parameters from deg to rad
           write(6,*) "numberOfStarsInSample=", numberOfStarsInSample
       
           write(6,*) '3. Calculating luminosities (3/9)'
-          call lumx(numberOfStarsInSample)      
+          call lumx(numberOfStarsInSample, thick_disk_age, halo_age)      
 
           ! if cone then we already calculated them
           if (geometry == 'sphere') then
               write(6,*) '4. Calculating polar coordinates (4/9)'
-              call polar(iseed,minimumSectorRadius,maximumSectorRadius,
-     &                   angleCoveringSector,radiusOfSector,
-     &                   solarGalactocentricDistance,scaleLength)
+              call polar(iseed, radius,
+     &                   solarGalactocentricDistance, scaleLength)
           end if
 
           write(6,*) '5. Generating heliocentric velocities (5/9)'
@@ -374,19 +380,28 @@ C         TODO: find out why we are missing the next step
           goto 7
 C         Calculating the trajectories according to/along z-coordinate
           write(6,*) '6. Integrating trajectories (6/9)'
-          call traject(galacticDiskAge)
+          call traject(thin_disk_age)
 
 7         write(6,*) '7. Calculating coordinates (7/9)'
           call coor(solarGalactocentricDistance)
 
           write(6,*) '8. Determinating visual magnitudes (8/9)'
-          call magi(fractionOfDB,table) 
+          call magi(fractionOfDB,
+     &              table,
+     &              u_ubvrij,
+     &              b_ubvrij,
+     &              v_ubvrij,
+     &              r_ubvrij,
+     &              i_ubvrij,
+     &              j_ubvrij) 
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
      &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
-     &         cone_height_latitudes(i))
+     &         cone_height_latitudes(i),
+     &         u_ubvrij, b_ubvrij, v_ubvrij, r_ubvrij, i_ubvrij,
+     &         j_ubvrij)
           open(765, file='processed_cones.txt')
           write(unit=765,fmt=*) cone_height_longitudes(i),
      &                          cone_height_latitudes(i)
@@ -454,7 +469,8 @@ C***********************************************************************
       subroutine printForProcessing(output_filename, geometry, iseed,
      &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitude,
-     &         cone_height_latitude)
+     &         cone_height_latitude, u_ubvrij, b_ubvrij, v_ubvrij,
+     &         r_ubvrij, i_ubvrij, j_ubvrij)
       implicit none
       external ran
       real ran
@@ -488,7 +504,13 @@ C     Binning of Luminosity Function
 C     Minimum proper motion
       parameter (minimumProperMotion=0.04)
 C     Parameters of mass histograms
-
+      
+      real :: u_ubvrij(numberOfStars),
+     &        b_ubvrij(numberOfStars),
+     &        v_ubvrij(numberOfStars),
+     &        r_ubvrij(numberOfStars),
+     &        i_ubvrij(numberOfStars),
+     &        j_ubvrij(numberOfStars)
       double precision :: properMotion(numberOfStars),
      &                    rightAscension(numberOfStars),
      &                    declination(numberOfStars)
@@ -513,8 +535,6 @@ C     NOTE: this 70 comes from nowhere
      &     latitude_proper_motion(numberOfStars),
      &     radial_velocity(numberOfStars)
       real errora(70),ndfa(70)
-C     ugriz-color system and V-band from Johnson system
-      real v(numberOfStars)
       real massInBin(70)
       integer :: typeOfWD(numberOfStars)
 C     values of LF in each bin. o-observational
@@ -545,7 +565,6 @@ C     SD for velocities in each bin
 C     2D-array of velocities (nº of bin; newly assigned to WD nº in bin)
 C     needed to calculate Standart Deviation (SD) for velocities in each 
 C     bin
-C     TODO: make dynamic array or linked list
       real arrayOfVelocitiesForSD_u(25,50000)
       real arrayOfVelocitiesForSD_v(25,50000)
       real arrayOfVelocitiesForSD_w(25,50000)
@@ -564,12 +583,6 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real latitude, longitude,zzx,cone_height_longitude
       double precision :: ros
       real cone_height_latitude
-C       TODO: no need to keep these
-      real :: ugriz_ug(numberOfStars),
-     &                    ugriz_gr(numberOfStars),
-     &                    ugriz_ri(numberOfStars),
-     &                    ugriz_iz(numberOfStars),
-     &                    ugriz_g_apparent(numberOfStars)
       logical :: with_overlapping_checking = .true.
       integer processed_cones_count, overlappings, stars_counter,
      & eliminations_counter
@@ -577,10 +590,13 @@ C       TODO: no need to keep these
       real prev_cone_longitude
       logical longitude_overlapping, latitude_overlapping,
      &  star_in_intersection
-      real :: UB(numberOfStars), BV(numberOfStars), 
-     &                    VRR(numberOfStars), RI(numberOfStars)
-C      &                    ugriz_g_apparent(numberOfStars)
       character(len=:), allocatable :: disk_str
+      real :: gal_to_equat_angle = 2.147
+      real :: right_ascension_prop_motion,
+     &        declination_prop_motion,
+     &        total_prop_motion
+      real :: m(numberOfStars), 
+     &        starBirthTime(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
      &                effTempOfWD
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
@@ -592,14 +608,11 @@ C      &                    ugriz_g_apparent(numberOfStars)
       common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
-C       TODO: no need to keep these
-      common /photo/ ugriz_ug, ugriz_gr, ugriz_ri, ugriz_iz, 
-     &               ugriz_g_apparent
       common /indexdb/ typeOfWD
-      common /johnson/ V
       common /vel/ uu,vv,ww
-      common /ubvri/ UB, BV, VRR, RI
-C      &, ugriz_g_apparent
+      common /tm/ starBirthTime, 
+     &            m
+
       pi = 4.0 * atan(1.0)
       DELTA_LATITUDE = 2.64 * pi / 180.0
       overlappings = 0
@@ -613,27 +626,45 @@ C      &, ugriz_g_apparent
                   disk_str = 'thin'
               else if (disk_belonging(i) == 2) then
                   disk_str = 'thick'
+              else if (disk_belonging(i) == 3) then
+                  disk_str = 'halo'
               end if
-              write(421, *) luminosityOfWD(i),
-     &                      properMotion(i),
-     &                      latitude_proper_motion(i),
-     &                      longitude_proper_motion(i),
-     &                      radial_velocity(i),
+
+              right_ascension_prop_motion = (
+     &            sin(gal_to_equat_angle)
+     &            * longitude_proper_motion(i)
+     &            - cos(gal_to_equat_angle) 
+     &              * latitude_proper_motion(i))
+              declination_prop_motion = (cos(gal_to_equat_angle) 
+     &                                   * longitude_proper_motion(i)
+     &                                   + sin(gal_to_equat_angle)
+     &                                     * latitude_proper_motion(i))
+              total_prop_motion = real(
+     &            sqrt(right_ascension_prop_motion ** 2
+     &                 * cos(declination(i)) ** 2
+     &                 + declination_prop_motion ** 2))
+
+              write(421, *) massOfWD(i),
+     &                      coordinate_R(i),
+     &                      coordinate_Theta(i),
+     &                      coordinate_Zcylindr(i),
+     &                      lgac(i),
+     &                      bgac(i),
      &                      rightAscension(i),
      &                      declination(i),
-     &                      rgac(i),
-     &                      bgac(i),
-     &                      lgac(i),
-     &                      ugriz_g_apparent(i),
-C                           TODO: better save ubvri, ugriz is derivative
-     &                      ugriz_ug(i),
-     &                      ugriz_gr(i),
-     &                      ugriz_ri(i),
-     &                      ugriz_iz(i),
-     &                      V(i),
+     &                      j_ubvrij(i),
+     &                      b_ubvrij(i),
+     &                      v_ubvrij(i),
+     &                      r_ubvrij(i),
+     &                      i_ubvrij(i),
      &                      uu(i),
      &                      vv(i),
      &                      ww(i),
+     &                      right_ascension_prop_motion,
+     &                      declination_prop_motion,
+     &                      total_prop_motion,
+     &                      rgac(i),
+     &                      starBirthTime(i),
      &                      typeOfWD(i),
      &                      disk_str
           end do
@@ -738,14 +769,13 @@ C                TODO: figure out what to do with ill-conditioned cases
      &           then
                      longitude = 0.0
                  else
-                     longitude = dacos((solarGalactocentricDistance ** 2
-     &                                  + ros**2
-     &                                  - coordinate_R(i) ** 2)
-     &                                 / (2.0d0 
-     &                                    * solarGalactocentricDistance 
-     &                                    * ros))
+                     longitude = real(
+     &                   dacos((solarGalactocentricDistance ** 2
+     &                          + ros**2 - coordinate_R(i) ** 2)
+     &                         / (2.0d0 * solarGalactocentricDistance 
+     &                            * ros)))
                  end if
-                 zzx=coordinate_Zcylindr(i)/ros
+                 zzx = real(coordinate_Zcylindr(i) / ros)
                  latitude = atan(zzx)
 C                TODO: i am confused about how all this works now.
 C                the reason for these conditions is that for angles > pi
@@ -799,11 +829,6 @@ C                if cone crosses 2pi, move it -2pi
      &                            rgac(i),
      &                            longitude,
      &                            latitude,
-     &                            ugriz_g_apparent(i),
-     &                            ugriz_ug(i),
-     &                            ugriz_gr(i),
-     &                            ugriz_ri(i),
-     &                            ugriz_iz(i),
      &                            disk_str,
      &                            typeOfWD(i)
                  else
@@ -880,12 +905,6 @@ C           if cone crosses 2pi, move it -2pi
      &                   rgac(i),
      &                   longitude,
      &                   latitude,
-C     TODO: we need to save u g r i z, not u-g, g-r etc..
-     &                   ugriz_g_apparent(i),
-     &                   ugriz_ug(i),
-     &                   ugriz_gr(i),
-     &                   ugriz_ri(i),
-     &                   ugriz_iz(i),
      &                   disk_str,
      &                   typeOfWD(i)
          end do
