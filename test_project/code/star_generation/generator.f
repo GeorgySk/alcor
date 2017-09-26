@@ -165,13 +165,9 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
 C             Coordinates of halo stars will be generated in polar.f
               if (disk_belonging(stars_count) /= 3) then
 C                 Inverse transform sampling for y = exp(-z / H)
-                  do
-                      random_value = ran(iseed)
-                      if (random_value /= 0.0) then
-                          exit
-                      end if
-                  end do
-                  z_coordinate = -scale_height * log(random_value)
+                  z_coordinate = -scale_height * log(
+     &                1.0 - ran(iseed) * (1.0 - exp(-radius
+     &                                              / scale_height)))
 C                 Assigning random sign
                   in = int(2.0 * ran(iseed))
                   coordinate_Zcylindr(stars_count) = z_coordinate 
