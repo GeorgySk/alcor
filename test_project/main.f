@@ -344,7 +344,7 @@ C     TODO: add choosing what output we want to get
      &                  'distance ',
      &                  'birth_time ',
      &                  'spectral_type ',
-     &                  'disk_belonging '
+     &                  'galactic_disk_type '
       end if
       close(421)
       
