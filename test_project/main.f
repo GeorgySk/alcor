@@ -296,6 +296,7 @@ C     TODO: add choosing what output we want to get
       open(421, file = output_filename)
       if (geometry == 'sphere') then
           write(421, *) 'mass ',
+     &                  'luminosity ',
      &                  'r_galactocentric ',
      &                  'th_galactocentric ',
      &                  'z_coordinate ',
@@ -645,6 +646,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                 + declination_prop_motion ** 2))
 
               write(421, *) massOfWD(i),
+     &                      luminosityOfWD(i),
      &                      coordinate_R(i),
      &                      coordinate_Theta(i),
      &                      coordinate_Zcylindr(i),
