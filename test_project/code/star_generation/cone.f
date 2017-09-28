@@ -34,7 +34,8 @@ C     with its height direction set by longitude and latitude
      &               numberOfWDs,
      &               stars_count,
      &               disk_belonging(MAX_STARS_COUNT),
-     &               flagOfWD(MAX_STARS_COUNT)
+     &               flagOfWD(MAX_STARS_COUNT),
+     &               thin_disk_stars_count
 
           real :: cone_height_longitude,
      &            cone_height_latitude,
@@ -198,7 +199,7 @@ C                 Accepting/rejecting method
               end do outer_do1
           end if
 
-          total_mass = 0.0
+          thin_disk_stars_count = stars_count
 
           if (thick_disk_stars_fraction > 0.0) then
               outer_do2: do
@@ -236,14 +237,6 @@ C                 Accepting/rejecting method
      &                / coordinate_R(stars_count))
                   coordinate_Zcylindr(stars_count) = distance 
      &                                               * sin(latitude)
-                  if (distance < NORMALIZATION_CONE_HEIGHT) then
-                      total_mass = total_mass + m(stars_count)
-                  end if
-
-                  if (total_mass 
-     &                    >= thick_disk_normalization_cone_mass) then 
-                      exit
-                  end if
 
                   do
                       time_try = thick_disk_age * ran(iseed)
@@ -258,6 +251,11 @@ C                 Accepting/rejecting method
                           exit
                       end if
                   end do
+
+                  if (stars_count > thin_disk_stars_count * 
+     &                    (1.0 + thick_disk_stars_fraction)) then
+                      exit
+                  end if
               end do outer_do2
           end if
 
