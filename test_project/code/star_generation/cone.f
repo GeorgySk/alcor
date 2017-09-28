@@ -147,7 +147,7 @@ C         y = t * exp(-t / tau)
           halo_max_density = 1.0 + (SOLAR_GALACTOCENTRIC_DISTANCE 
      &                              / HALO_CORE_RADIUS) ** 2
 
-          if (thin_disk_stars_fraction > 0.0) then
+          if (thin_disk_stars_fraction > 1e-4) then
               outer_do1: do
                   stars_count = stars_count + 1          
                   disk_belonging(stars_count) = 1
@@ -201,7 +201,7 @@ C                 Accepting/rejecting method
 
           thin_disk_stars_count = stars_count
 
-          if (thick_disk_stars_fraction > 0.0) then
+          if (thick_disk_stars_fraction > 1e-4) then
               outer_do2: do
                   stars_count = stars_count + 1
                   disk_belonging(stars_count) = 2
@@ -261,7 +261,7 @@ C                 Accepting/rejecting method
 
           total_mass = 0.0
 
-          if (halo_stars_fraction > 0.0) then
+          if (halo_stars_fraction > 1e-4) then
               outer_do3: do
                   stars_count = stars_count + 1
                   disk_belonging(stars_count) = 3
