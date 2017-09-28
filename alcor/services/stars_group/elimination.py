@@ -75,7 +75,7 @@ def check(star: Star,
             return True
         # TODO: find out the meaning of the following constants
         elif (hrm < 3.559 * (g_apparent_magnitude - z_apparent_magnitude)
-                    + 15.17):
+              + 15.17):
             eliminations_counter['by_reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constant
