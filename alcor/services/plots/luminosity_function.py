@@ -7,6 +7,8 @@ import matplotlib
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
+from decimal import Decimal
+
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
@@ -58,10 +60,40 @@ def plot(session: Session,
                           for graph_point in graph_points]
     stars_count_logarithms = [graph_point.stars_count_logarithm
                               for graph_point in graph_points]
-    upper_errorbars = [graph_point.upper_error_bar
-                       for graph_point in graph_points]
-    lower_errorbars = [graph_point.lower_error_bar
-                       for graph_point in graph_points]
+
+    # As simulated number of white dwarfs (WDs) can be much greater than the
+    # number of WDs for which observational luminosity function (LF) is
+    # plotted, we normalize the LF based on synthetic(simulated) WDs
+    # to the observational one (move to the same location on the plot).
+    # We do it in 'processing' module. TODO: move it here
+    # Another thing is that error bars become very small for synthetic LF
+    # and here we 1) get number of stars for which we would have the
+    # corresponding normalized logN and 2) calculate new not squeezed error
+    # bars corresponding to this number of stars
+    normalized_stars_counts = [
+        FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
+        * 10. ** float(stars_count_logarithm)
+        for stars_count_logarithm in stars_count_logarithms]
+    upper_errorbars = [
+        log10((stars_count + sqrt(stars_count))
+              / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
+        - log10(stars_count / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
+        for stars_count in normalized_stars_counts]
+
+    lower_errorbars = []
+    for stars_count in normalized_stars_counts:
+        try:
+            lower_errorbars.append(
+                    log10(stars_count
+                          / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
+                    - log10((stars_count - sqrt(stars_count) + EPSILON)
+                            / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME))
+        except ValueError:
+            # Some number so that errorbar would go below the plot
+            lower_errorbars.append(5.0)
+
+    upper_errorbars = [Decimal(errorbar) for errorbar in upper_errorbars]
+    lower_errorbars = [Decimal(errorbar) for errorbar in lower_errorbars]
 
     (avg_bin_magnitudes,
      stars_count_logarithms,
