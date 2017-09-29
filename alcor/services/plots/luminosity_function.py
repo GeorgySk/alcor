@@ -61,6 +61,15 @@ def plot(session: Session,
     stars_count_logarithms = [graph_point.stars_count_logarithm
                               for graph_point in graph_points]
 
+    # As simulated number of white dwarfs (WDs) can be much greater than the
+    # number of WDs for which observational luminosity function (LF) is
+    # plotted, we normalize the LF based on synthetic(simulated) WDs
+    # to the observational one (move to the same location on the plot).
+    # We do it in 'processing' module. TODO: move it here
+    # Another thing is that error bars become very small for synthetic LF
+    # and here we 1) get number of stars for which we would have the
+    # corresponding normalized logN and 2) calculate new not squeezed error
+    # bars corresponding to this number of stars
     normalized_stars_counts = [
         FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
         * 10. ** float(stars_count_logarithm)
