@@ -10,7 +10,6 @@ from alcor.services.data_access import (fetch_unprocessed_groups,
 
 
 def run(*,
-        filtration_method: str,
         last_groups_count: Optional[int],
         unprocessed_groups: bool,
         group_id: Optional[uuid.UUID],
@@ -26,5 +25,4 @@ def run(*,
     for group in groups:
         stars_group.process(
                 group=group,
-                filtration_method=filtration_method,
                 session=session)
