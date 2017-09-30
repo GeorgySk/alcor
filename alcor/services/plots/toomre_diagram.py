@@ -11,31 +11,22 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
-from sqlalchemy.orm.session import Session
 
 from alcor.models import (GalacticDiskType,
                           Star)
 from alcor.services.common import PECULIAR_SOLAR_VELOCITY_V
-from alcor.services.data_access import fetch_random
-
 logger = logging.getLogger(__name__)
 
 
-def plot(session: Session,
+def plot(stars: List[Star],
          filename: str = 'toomre_diagram.ps',
          figure_size: Tuple[float, float] = (8, 8),
          ratio: float = 10 / 13,
          xlabel: str = '$V(km/s)$',
          ylabel: str = '$\sqrt{U^2+W^2}(km/s)$',
          thin_disk_color: str = 'r',
-         thick_disk_color: str = 'b',
-         desired_stars_count: int = 10_000) -> None:
+         thick_disk_color: str = 'b') -> None:
     figure, subplot = plt.subplots(figsize=figure_size)
-
-    # TODO: add other fetching options
-    stars = fetch_random(Star,
-                         limit=desired_stars_count,
-                         session=session)
 
     # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
     disks_types_stars = {}

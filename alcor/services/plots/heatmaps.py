@@ -15,21 +15,17 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 from matplotlib.colors import Colormap
 import numpy as np
-from sqlalchemy.orm.session import Session
 
 from alcor.models import Star
 from alcor.services.common import (PECULIAR_SOLAR_VELOCITY_U,
                                    PECULIAR_SOLAR_VELOCITY_V,
                                    PECULIAR_SOLAR_VELOCITY_W)
-from alcor.services.data_access import (fetch_all,
-                                        fetch_group_stars)
 
 logger = logging.getLogger(__name__)
 
 
 def plot(*,
-         group_id: Optional[uuid.UUID],
-         session: Session,
+         stars: List[Star],
          axes: str,
          uv_filename: str = 'heatmap_uv.ps',
          uw_filename: str = 'heatmap_uw.ps',
@@ -37,14 +33,6 @@ def plot(*,
          u_label: str = '$U(km/s)$',
          v_label: str = '$V(km/s)$',
          w_label: str = '$W(km/s)$') -> None:
-    # TODO: Add other fetching options
-    if group_id:
-        stars = fetch_group_stars(group_id=group_id,
-                                  session=session)
-    else:
-        stars = fetch_all(Star,
-                          session=session)
-
     # TODO: add coordinates
     if axes != 'velocities':
         return

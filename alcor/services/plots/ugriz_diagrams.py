@@ -4,7 +4,6 @@ from typing import (Tuple,
 
 import matplotlib
 from matplotlib.axes import Axes
-from sqlalchemy.orm.session import Session
 
 # More info at
 #  http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
@@ -13,12 +12,11 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
 from alcor.models import Star
-from alcor.services.data_access import fetch_all
 
 logger = logging.getLogger(__name__)
 
 
-def plot(session: Session,
+def plot(stars: List[Star],
          filename: str = 'ugriz.ps',
          figure_size: Tuple[float, float] = (8, 8),
          spacing: float = 0.25,
@@ -30,10 +28,6 @@ def plot(session: Session,
              subplot_gr_vs_ri,
              subplot_ri_vs_iz) = plt.subplots(nrows=3,
                                               figsize=figure_size)
-
-    # TODO: add more fetching options
-    stars = fetch_all(Star,
-                      session=session)
 
     # TODO: write a function? relative transformation happens in sampling.py
     # Transformation from UBVRI to ugriz. More info at:
