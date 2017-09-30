@@ -2,15 +2,12 @@ import uuid
 from collections import Counter
 from functools import partial
 from itertools import filterfalse
-from typing import Optional
 
 from sqlalchemy.orm.session import Session
 
-from alcor.models import (Star,
-                          eliminations)
+from alcor.models import eliminations
 from alcor.models.star import set_radial_velocity_to_zero
-from alcor.services.data_access import (fetch_all,
-                                        fetch_group_stars)
+from alcor.services.data_access import fetch_group_stars
 from alcor.services.stars_group import elimination
 from . import (luminosity_function,
                velocities_vs_magnitude,
@@ -20,7 +17,7 @@ from . import (luminosity_function,
                ugriz_diagrams)
 
 
-def draw(group_id: Optional[uuid.UUID],
+def draw(group_id: uuid.UUID,
          filtration_method: str,
          nullify_radial_velocity: bool,
          with_luminosity_function: bool,
@@ -34,12 +31,8 @@ def draw(group_id: Optional[uuid.UUID],
     if any((with_luminosity_function,
             with_velocity_clouds,
             with_velocities_vs_magnitude)):
-        if group_id:
-            stars = fetch_group_stars(group_id=group_id,
-                                      session=session)
-        else:
-            stars = fetch_all(Star,
-                              session=session)
+        stars = fetch_group_stars(group_id=group_id,
+                                  session=session)
 
         stars_count = len(stars)
         eliminations_counter = Counter()
