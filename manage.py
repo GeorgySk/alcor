@@ -16,7 +16,6 @@ from sqlalchemy_utils import (database_exists,
 
 from alcor.models.base import Base
 from alcor.services import (simulations,
-                            processing,
                             plots)
 from alcor.services.common import FILTRATION_METHODS
 from alcor.utils import load_settings
@@ -85,45 +84,7 @@ def simulate(ctx: click.Context,
 
 
 @main.command()
-@click.option('--unprocessed',
-              is_flag=True,
-              default=True,
-              help='Process all unprocessed groups')
-@click.option('--last',
-              type=int,
-              default=None,
-              help='Process last N groups by time')
-@click.option('--group_id',
-              default=None,
-              type=uuid.UUID,
-              help='Process a group by id')
-@click.pass_context
-def process(ctx: click.Context,
-            unprocessed: bool,
-            last: int,
-            group_id: Optional[uuid.UUID]
-            ) -> None:
-    db_uri = ctx.obj
-    check_connection(db_uri)
-
-    with create_engine(db_uri) as engine:
-        session_factory = sessionmaker(bind=engine)
-        session = session_factory()
-
-        if last is not None and group_id is not None:
-            raise ValueError('"last" and "id_groups" options are mutually'
-                             'exclusive')
-
-        if last is not None or group_id is not None:
-            unprocessed = None
-
-        processing.run(last_groups_count=last,
-                       unprocessed_groups=unprocessed,
-                       group_id=group_id,
-                       session=session)
-
-
-@main.command()
+# TODO: add other options
 @click.option('--group_id',
               default=None,
               type=uuid.UUID,
