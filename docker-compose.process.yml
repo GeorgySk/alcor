@@ -17,8 +17,6 @@ services:
 #        - --filtration-method
 #        - restricted
         - --nullify-radial-velocity
-        - --w-velocities-vs-magnitude
-        - --w-lepine-criterion
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
 

@@ -9,20 +9,13 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
-from sqlalchemy.orm.session import Session
 
-from alcor.models.velocities_vs_magnitudes.bins import (Bin,
-                                                        LepineCaseUBin,
-                                                        LepineCaseVBin,
-                                                        LepineCaseWBin)
-from alcor.models.velocities_vs_magnitudes.clouds import (Cloud,
-                                                          LepineCaseUCloud,
-                                                          LepineCaseVCloud,
-                                                          LepineCaseWCloud)
-from alcor.services.data_access import fetch_all
+from alcor.models import Star
+from alcor.services.velocities_vs_magnitudes import (lepine,
+                                                     raw)
 
 
-def plot(session: Session,
+def plot(stars: List[Star],
          figure_size: Tuple[float, float] = (10, 12),
          filename: str = 'velocities_vs_magnitude.ps',
          u_label: str = '$U_{LSR}(km/s)$',
@@ -34,51 +27,31 @@ def plot(session: Session,
              subplot_w) = plt.subplots(nrows=3,
                                        figsize=figure_size)
 
-    # TODO: implement other ways of fetching
-    bins = fetch_all(Bin,
-                     session=session)
+    bins = list(raw.bins(stars=stars))
 
-    avg_bin_magnitudes = [stars_bin.avg_magnitude
+    avg_bin_magnitudes = [float(stars_bin.avg_magnitude)
                           for stars_bin in bins]
-    avg_u_velocities = [stars_bin.avg_u_velocity
+    avg_u_velocities = [float(stars_bin.avg_u_velocity)
                         for stars_bin in bins]
-    avg_velocities_v = [stars_bin.avg_v_velocity
+    avg_velocities_v = [float(stars_bin.avg_v_velocity)
                         for stars_bin in bins]
-    avg_velocities_w = [stars_bin.avg_w_velocity
+    avg_velocities_w = [float(stars_bin.avg_w_velocity)
                         for stars_bin in bins]
-    u_velocities_std = [stars_bin.u_velocity_std
+    u_velocities_std = [float(stars_bin.u_velocity_std)
                         for stars_bin in bins]
-    velocities_v_std = [stars_bin.v_velocity_std
+    velocities_v_std = [float(stars_bin.v_velocity_std)
                         for stars_bin in bins]
-    velocities_w_std = [stars_bin.w_velocity_std
+    velocities_w_std = [float(stars_bin.w_velocity_std)
                         for stars_bin in bins]
 
-    (avg_bin_magnitudes,
-     avg_u_velocities,
-     avg_velocities_v,
-     avg_velocities_w,
-     u_velocities_std,
-     velocities_v_std,
-     velocities_w_std) = zip(*sorted(zip(avg_bin_magnitudes,
-                                         avg_u_velocities,
-                                         avg_velocities_v,
-                                         avg_velocities_w,
-                                         u_velocities_std,
-                                         velocities_v_std,
-                                         velocities_w_std)))
-
-    # TODO: implement other ways of fetching
-    clouds = fetch_all(Cloud,
-                       session=session)
-
-    magnitudes = [star.bolometric_magnitude
-                  for star in clouds]
-    u_velocities = [star.u_velocity
-                    for star in clouds]
-    v_velocities = [star.v_velocity
-                    for star in clouds]
-    w_velocities = [star.w_velocity
-                    for star in clouds]
+    magnitudes = [float(star.bolometric_magnitude)
+                  for star in stars]
+    u_velocities = [float(star.u_velocity)
+                    for star in stars]
+    v_velocities = [float(star.v_velocity)
+                    for star in stars]
+    w_velocities = [float(star.w_velocity)
+                    for star in stars]
 
     draw_subplot(subplot=subplot_u,
                  ylabel=u_label,
@@ -113,7 +86,7 @@ def plot(session: Session,
     plt.savefig(filename)
 
 
-def plot_lepine_case(session: Session,
+def plot_lepine_case(stars: List[Star],
                      figure_size: Tuple[float, float] = (10, 12),
                      filename: str = 'velocities_vs_magnitude.ps',
                      u_label: str = '$U_{LSR}(km/s)$',
@@ -125,68 +98,40 @@ def plot_lepine_case(session: Session,
              subplot_w) = plt.subplots(nrows=3,
                                        figsize=figure_size)
 
-    # TODO: implement other fetching functions
-    u_vs_mag_bins = fetch_all(LepineCaseUBin,
-                              session=session)
-    v_vs_mag_bins = fetch_all(LepineCaseVBin,
-                              session=session)
-    w_vs_mag_bins = fetch_all(LepineCaseWBin,
-                              session=session)
+    u_vs_mag_bins, v_vs_mag_bins, w_vs_mag_bins = lepine.bins(stars=stars)
 
-    u_bins_avg_magnitudes = [stars_bin.avg_magnitude
+    u_bins_avg_magnitudes = [float(stars_bin.avg_magnitude)
                              for stars_bin in u_vs_mag_bins]
-    avg_u_velocities = [stars_bin.avg_u_velocity
+    avg_u_velocities = [float(stars_bin.avg_u_velocity)
                         for stars_bin in u_vs_mag_bins]
-    u_velocities_std = [stars_bin.u_velocity_std
+    u_velocities_std = [float(stars_bin.u_velocity_std)
                         for stars_bin in u_vs_mag_bins]
-    v_bins_avg_magnitudes = [stars_bin.avg_magnitude
+    v_bins_avg_magnitudes = [float(stars_bin.avg_magnitude)
                              for stars_bin in v_vs_mag_bins]
-    avg_velocities_v = [stars_bin.avg_v_velocity
+    avg_velocities_v = [float(stars_bin.avg_v_velocity)
                         for stars_bin in v_vs_mag_bins]
-    velocities_v_std = [stars_bin.v_velocity_std
+    velocities_v_std = [float(stars_bin.v_velocity_std)
                         for stars_bin in v_vs_mag_bins]
-    w_bins_avg_magnitudes = [stars_bin.avg_magnitude
+    w_bins_avg_magnitudes = [float(stars_bin.avg_magnitude)
                              for stars_bin in w_vs_mag_bins]
-    avg_velocities_w = [stars_bin.avg_w_velocity
+    avg_velocities_w = [float(stars_bin.avg_w_velocity)
                         for stars_bin in w_vs_mag_bins]
-    velocities_w_std = [stars_bin.w_velocity_std
+    velocities_w_std = [float(stars_bin.w_velocity_std)
                         for stars_bin in w_vs_mag_bins]
 
-    (u_bins_avg_magnitudes,
-     avg_u_velocities,
-     u_velocities_std) = zip(*sorted(zip(u_bins_avg_magnitudes,
-                                         avg_u_velocities,
-                                         u_velocities_std)))
-    (v_bins_avg_magnitudes,
-     avg_velocities_v,
-     velocities_v_std) = zip(*sorted(zip(v_bins_avg_magnitudes,
-                                         avg_velocities_v,
-                                         velocities_v_std)))
-    (w_bins_avg_magnitudes,
-     avg_velocities_w,
-     velocities_w_std) = zip(*sorted(zip(w_bins_avg_magnitudes,
-                                         avg_velocities_w,
-                                         velocities_w_std)))
+    u_vs_mag_cloud, v_vs_mag_cloud, w_vs_mag_cloud = lepine.clouds(stars=stars)
 
-    # TODO: implement other fetching functions
-    u_vs_mag_cloud = fetch_all(LepineCaseUCloud,
-                               session=session)
-    v_vs_mag_cloud = fetch_all(LepineCaseVCloud,
-                               session=session)
-    w_vs_mag_cloud = fetch_all(LepineCaseWCloud,
-                               session=session)
-
-    u_magnitudes = [star.bolometric_magnitude
+    u_magnitudes = [float(star.bolometric_magnitude)
                     for star in u_vs_mag_cloud]
-    u_velocities = [star.u_velocity
+    u_velocities = [float(star.u_velocity)
                     for star in u_vs_mag_cloud]
-    v_magnitudes = [star.bolometric_magnitude
+    v_magnitudes = [float(star.bolometric_magnitude)
                     for star in v_vs_mag_cloud]
-    v_velocities = [star.v_velocity
+    v_velocities = [float(star.v_velocity)
                     for star in v_vs_mag_cloud]
-    w_magnitudes = [star.bolometric_magnitude
+    w_magnitudes = [float(star.bolometric_magnitude)
                     for star in w_vs_mag_cloud]
-    w_velocities = [star.w_velocity
+    w_velocities = [float(star.w_velocity)
                     for star in w_vs_mag_cloud]
 
     draw_subplot(subplot=subplot_u,

@@ -35,7 +35,8 @@ class Bin(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  avg_magnitude: float,
                  avg_u_velocity: float,
                  avg_v_velocity: float,
@@ -70,7 +71,8 @@ class LepineCaseUBin(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  avg_magnitude: float,
                  avg_u_velocity: float,
                  u_velocity_std: float):
@@ -97,7 +99,8 @@ class LepineCaseVBin(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  avg_magnitude: float,
                  avg_v_velocity: float,
                  v_velocity_std: float):
@@ -124,7 +127,8 @@ class LepineCaseWBin(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  avg_magnitude: float,
                  avg_w_velocity: float,
                  w_velocity_std: float):
