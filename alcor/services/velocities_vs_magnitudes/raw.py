@@ -3,8 +3,7 @@ from statistics import (mean,
 from typing import (Iterator,
                     List)
 
-from alcor.models import (Group,
-                          Star)
+from alcor.models import Star
 from alcor.models.velocities_vs_magnitudes import Bin
 from .utils import (STARS_BIN_SIZE,
                     DEFAULT_VELOCITY_STD,
@@ -12,10 +11,7 @@ from .utils import (STARS_BIN_SIZE,
                     pack_stars)
 
 
-def bins(*,
-         stars: List[Star],
-         group: Group) -> Iterator[Bin]:
-    group_id = group.id
+def bins(stars: List[Star]) -> Iterator[Bin]:
     stars_bins = pack_stars(stars)
     for index, stars_bin in enumerate(stars_bins):
         if not stars_bin:
@@ -40,8 +36,7 @@ def bins(*,
             u_velocity_std = DEFAULT_VELOCITY_STD
             v_velocity_std = DEFAULT_VELOCITY_STD
             w_velocity_std = DEFAULT_VELOCITY_STD
-        yield Bin(group_id=group_id,
-                  avg_magnitude=avg_magnitude,
+        yield Bin(avg_magnitude=avg_magnitude,
                   avg_u_velocity=avg_u_velocity,
                   avg_v_velocity=avg_v_velocity,
                   avg_w_velocity=avg_w_velocity,
