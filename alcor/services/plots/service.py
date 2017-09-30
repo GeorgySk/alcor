@@ -31,35 +31,38 @@ def draw(group_id: uuid.UUID,
          with_ugriz_diagrams: bool,
          desired_stars_count: int,
          session: Session) -> None:
-    if any((with_luminosity_function,
-            with_velocity_clouds,
-            with_velocities_vs_magnitude)):
-        if desired_stars_count:
-            stars = fetch_random(Star,
-                                 limit=desired_stars_count,
-                                 session=session)
-        else:
-            stars = fetch_group_stars(group_id=group_id,
-                                      session=session)
+    if not any((with_luminosity_function,
+                with_velocity_clouds,
+                with_velocities_vs_magnitude,
+                with_toomre_diagram,
+                with_ugriz_diagrams)):
+        return
 
-        stars_count = len(stars)
-        eliminations_counter = Counter()
+    if desired_stars_count:
+        stars = fetch_random(Star,
+                             limit=desired_stars_count,
+                             session=session)
+    else:
+        stars = fetch_group_stars(group_id=group_id,
+                                  session=session)
 
-        if filtration_method in {'restricted', 'full'}:
-            is_eliminated = partial(elimination.check,
-                                    eliminations_counter=eliminations_counter,
-                                    filtration_method=filtration_method)
-            stars = list(filterfalse(is_eliminated, stars))
+    stars_count = len(stars)
+    eliminations_counter = Counter()
 
-        # TODO: figure out what to do when there is no group_id
-        counter = eliminations.StarsCounter(group_id=group_id,
-                                            raw=stars_count,
-                                            **eliminations_counter)
-        session.add(counter)
-        session.commit()
+    if filtration_method in {'restricted', 'full'}:
+        is_eliminated = partial(elimination.check,
+                                eliminations_counter=eliminations_counter,
+                                filtration_method=filtration_method)
+        stars = list(filterfalse(is_eliminated, stars))
 
-        if nullify_radial_velocity:
-            stars = list(map(set_radial_velocity_to_zero, stars))
+    counter = eliminations.StarsCounter(group_id=group_id,
+                                        raw=stars_count,
+                                        **eliminations_counter)
+    session.add(counter)
+    session.commit()
+
+    if nullify_radial_velocity:
+        stars = list(map(set_radial_velocity_to_zero, stars))
 
     if with_luminosity_function:
         luminosity_function.plot(stars=stars)
