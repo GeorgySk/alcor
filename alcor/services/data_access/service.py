@@ -49,8 +49,8 @@ def fetch_last_groups(*,
     return query.all()
 
 
-def fetch_group_by_id(*,
-                      group_id: uuid.UUID,
+def fetch_group_by_id(group_id: uuid.UUID,
+                      *,
                       session: Session) -> Group:
     query = (session.query(Group)
              .filter(Group.id == group_id))
