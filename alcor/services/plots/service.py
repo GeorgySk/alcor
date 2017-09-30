@@ -5,11 +5,9 @@ from itertools import filterfalse
 
 from sqlalchemy.orm.session import Session
 
-from alcor.models import (eliminations,
-                          Star)
+from alcor.models import eliminations
 from alcor.models.star import set_radial_velocity_to_zero
-from alcor.services.data_access import (fetch_group_stars,
-                                        fetch_random)
+from alcor.services.data_access import fetch_group_stars
 from alcor.services.data_access.service import fetch_random_group_stars
 from alcor.services.stars_group import elimination
 from . import (luminosity_function,

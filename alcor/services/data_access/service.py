@@ -16,16 +16,6 @@ def fetch_all(model: Base,
     return query.all()
 
 
-def fetch_random(model: Base,
-                 *,
-                 limit: int = None,
-                 session: Session) -> List[Base]:
-    query = (session.query(model)
-             .order_by(func.random())
-             .limit(limit))
-    return query.all()
-
-
 def fetch_group_stars(*,
                       group_id: uuid.UUID,
                       session: Session) -> List[Star]:
