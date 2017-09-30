@@ -15,9 +15,13 @@ from sqlalchemy_utils import (database_exists,
                               drop_database)
 
 from alcor.models.base import Base
+from alcor.models import Group
 from alcor.services import (simulations,
                             plots)
 from alcor.services.common import FILTRATION_METHODS
+from alcor.services.data_access import (fetch_all,
+                                        fetch_group_by_id,
+                                        fetch_last_groups)
 from alcor.utils import load_settings
 
 logger = logging.getLogger(__name__)
@@ -84,11 +88,17 @@ def simulate(ctx: click.Context,
 
 
 @main.command()
-# TODO: add other options
 @click.option('--group_id',
               default=None,
               type=uuid.UUID,
-              help='Process a group by id')
+              help='Make plots for a group by id')
+@click.option('--last',
+              type=int,
+              default=1,
+              help='Make plots for last N groups by time')
+@click.option('--all-groups',
+              is_flag=True,
+              help='Make plots for all groups')
 @click.option('--filtration-method', '-m',
               type=click.Choice(FILTRATION_METHODS),
               default='raw',
@@ -127,6 +137,8 @@ def simulate(ctx: click.Context,
 @click.pass_context
 def plot(ctx: click.Context,
          group_id: Optional[uuid.UUID],
+         last: int,
+         all_groups: bool,
          filtration_method: str,
          nullify_radial_velocity: bool,
          luminosity_function: bool,
@@ -142,17 +154,31 @@ def plot(ctx: click.Context,
     with create_engine(db_uri) as engine:
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
-        plots.draw(group_id,
-                   filtration_method,
-                   nullify_radial_velocity,
-                   luminosity_function,
-                   velocities_vs_magnitude,
-                   velocity_clouds,
-                   lepine_criterion,
-                   heatmap,
-                   toomre_diagram,
-                   ugriz_color_color_diagram,
-                   session=session)
+
+        if all_groups:
+            groups = fetch_all(Group,
+                               session=session)
+        elif group_id:
+            groups = [fetch_group_by_id(group_id,
+                                        session=session)]
+        elif last:
+            groups = fetch_last_groups(limit=last,
+                                       session=session)
+        else:
+            return
+
+        for group in groups:
+            plots.draw(group.id,
+                       filtration_method,
+                       nullify_radial_velocity,
+                       luminosity_function,
+                       velocities_vs_magnitude,
+                       velocity_clouds,
+                       lepine_criterion,
+                       heatmap,
+                       toomre_diagram,
+                       ugriz_color_color_diagram,
+                       session=session)
 
 
 @main.command(name='clean_db')
