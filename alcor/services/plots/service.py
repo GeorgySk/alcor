@@ -3,6 +3,9 @@ from typing import Optional
 
 from sqlalchemy.orm.session import Session
 
+from alcor.models.star import Star
+from alcor.services.data_access import (fetch_all,
+                                        fetch_group_stars)
 from . import (luminosity_function,
                velocities_vs_magnitude,
                velocity_clouds,
@@ -21,7 +24,13 @@ def draw(group_id: Optional[uuid.UUID],
          with_ugriz_diagrams: bool,
          session: Session) -> None:
     if with_luminosity_function:
-        luminosity_function.plot(session=session)
+        if group_id:
+            stars = fetch_group_stars(group_id=group_id,
+                                      session=session)
+        else:
+            stars = fetch_all(Star,
+                              session=session)
+        luminosity_function.plot(stars)
 
     if with_velocities_vs_magnitude:
         if lepine_criterion:
