@@ -108,9 +108,6 @@ def simulate(ctx: click.Context,
 @click.option('--nullify-radial-velocity', '-nrv',
               is_flag=True,
               help='Sets radial velocities to zero.')
-@click.option('--w-velocities-clouds', '-uvw',
-              is_flag=True,
-              help='Prepare data for plotting velocity clouds.')
 @click.option('--w-velocities-vs-magnitude', '-vm',
               is_flag=True,
               help='Prepare data for plots of velocities vs bol. magnitude.')
@@ -124,7 +121,6 @@ def process(ctx: click.Context,
             group_id: Optional[uuid.UUID],
             filtration_method: str,
             nullify_radial_velocity: bool,
-            w_velocities_clouds: bool,
             w_velocities_vs_magnitude: bool,
             w_lepine_criterion: bool,
             ) -> None:
@@ -144,7 +140,6 @@ def process(ctx: click.Context,
 
         processing.run(filtration_method=filtration_method,
                        nullify_radial_velocity=nullify_radial_velocity,
-                       w_velocities_clouds=w_velocities_clouds,
                        w_velocities_vs_magnitude=w_velocities_vs_magnitude,
                        w_lepine_criterion=w_lepine_criterion,
                        last_groups_count=last,

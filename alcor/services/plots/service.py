@@ -23,13 +23,15 @@ def draw(group_id: Optional[uuid.UUID],
          with_toomre_diagram: bool,
          with_ugriz_diagrams: bool,
          session: Session) -> None:
-    if with_luminosity_function:
+    if any((with_luminosity_function, with_velocity_clouds)):
         if group_id:
             stars = fetch_group_stars(group_id=group_id,
                                       session=session)
         else:
             stars = fetch_all(Star,
                               session=session)
+
+    if with_luminosity_function:
         luminosity_function.plot(stars)
 
     if with_velocities_vs_magnitude:
@@ -40,9 +42,9 @@ def draw(group_id: Optional[uuid.UUID],
 
     if with_velocity_clouds:
         if lepine_criterion:
-            velocity_clouds.plot_lepine_case(session=session)
+            velocity_clouds.plot_lepine_case(stars)
         else:
-            velocity_clouds.plot(session=session)
+            velocity_clouds.plot(stars)
 
     if heatmaps_axes:
         heatmaps.plot(group_id=group_id,
