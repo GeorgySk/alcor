@@ -1,12 +1,17 @@
 import uuid
+from collections import Counter
+from functools import partial
+from itertools import filterfalse
 from typing import Optional
 
 from sqlalchemy.orm.session import Session
 
-from alcor.models import Star
+from alcor.models import (Star,
+                          eliminations)
 from alcor.models.star import set_radial_velocity_to_zero
 from alcor.services.data_access import (fetch_all,
                                         fetch_group_stars)
+from alcor.services.stars_group import elimination
 from . import (luminosity_function,
                velocities_vs_magnitude,
                velocity_clouds,
@@ -16,6 +21,7 @@ from . import (luminosity_function,
 
 
 def draw(group_id: Optional[uuid.UUID],
+         filtration_method: str,
          nullify_radial_velocity: bool,
          with_luminosity_function: bool,
          with_velocities_vs_magnitude: bool,
@@ -34,6 +40,23 @@ def draw(group_id: Optional[uuid.UUID],
         else:
             stars = fetch_all(Star,
                               session=session)
+
+        stars_count = len(stars)
+        eliminations_counter = Counter()
+
+        if filtration_method in {'restricted', 'full'}:
+            is_eliminated = partial(elimination.check,
+                                    eliminations_counter=eliminations_counter,
+                                    filtration_method=filtration_method)
+            stars = list(filterfalse(is_eliminated, stars))
+
+        # TODO: figure out what to do when there is no group_id
+        counter = eliminations.StarsCounter(group_id=group_id,
+                                            raw=stars_count,
+                                            **eliminations_counter)
+        session.add(counter)
+        session.commit()
+
         if nullify_radial_velocity:
             stars = list(map(set_radial_velocity_to_zero, stars))
 
