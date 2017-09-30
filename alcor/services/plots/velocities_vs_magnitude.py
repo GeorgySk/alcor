@@ -53,20 +53,6 @@ def plot(session: Session,
     velocities_w_std = [stars_bin.w_velocity_std
                         for stars_bin in bins]
 
-    (avg_bin_magnitudes,
-     avg_u_velocities,
-     avg_velocities_v,
-     avg_velocities_w,
-     u_velocities_std,
-     velocities_v_std,
-     velocities_w_std) = zip(*sorted(zip(avg_bin_magnitudes,
-                                         avg_u_velocities,
-                                         avg_velocities_v,
-                                         avg_velocities_w,
-                                         u_velocities_std,
-                                         velocities_v_std,
-                                         velocities_w_std)))
-
     # TODO: implement other ways of fetching
     clouds = fetch_all(Cloud,
                        session=session)
@@ -151,22 +137,6 @@ def plot_lepine_case(session: Session,
                         for stars_bin in w_vs_mag_bins]
     velocities_w_std = [stars_bin.w_velocity_std
                         for stars_bin in w_vs_mag_bins]
-
-    (u_bins_avg_magnitudes,
-     avg_u_velocities,
-     u_velocities_std) = zip(*sorted(zip(u_bins_avg_magnitudes,
-                                         avg_u_velocities,
-                                         u_velocities_std)))
-    (v_bins_avg_magnitudes,
-     avg_velocities_v,
-     velocities_v_std) = zip(*sorted(zip(v_bins_avg_magnitudes,
-                                         avg_velocities_v,
-                                         velocities_v_std)))
-    (w_bins_avg_magnitudes,
-     avg_velocities_w,
-     velocities_w_std) = zip(*sorted(zip(w_bins_avg_magnitudes,
-                                         avg_velocities_w,
-                                         velocities_w_std)))
 
     # TODO: implement other fetching functions
     u_vs_mag_cloud = fetch_all(LepineCaseUCloud,

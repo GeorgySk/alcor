@@ -94,15 +94,6 @@ def plot(session: Session,
 
     upper_errorbars = [Decimal(errorbar) for errorbar in upper_errorbars]
     lower_errorbars = [Decimal(errorbar) for errorbar in lower_errorbars]
-
-    (avg_bin_magnitudes,
-     stars_count_logarithms,
-     upper_errorbars,
-     lower_errorbars) = zip(*sorted(zip(avg_bin_magnitudes,
-                                        stars_count_logarithms,
-                                        upper_errorbars,
-                                        lower_errorbars)))
-
     asymmetric_errorbars = [lower_errorbars,
                             upper_errorbars]
 
