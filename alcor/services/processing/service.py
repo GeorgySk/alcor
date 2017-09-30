@@ -11,7 +11,6 @@ from alcor.services.data_access import (fetch_unprocessed_groups,
 
 def run(*,
         filtration_method: str,
-        nullify_radial_velocity: bool,
         last_groups_count: Optional[int],
         unprocessed_groups: bool,
         group_id: Optional[uuid.UUID],
@@ -28,5 +27,4 @@ def run(*,
         stars_group.process(
                 group=group,
                 filtration_method=filtration_method,
-                nullify_radial_velocity=nullify_radial_velocity,
                 session=session)

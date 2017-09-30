@@ -3,7 +3,8 @@ from typing import Optional
 
 from sqlalchemy.orm.session import Session
 
-from alcor.models.star import Star
+from alcor.models import Star
+from alcor.models.star import set_radial_velocity_to_zero
 from alcor.services.data_access import (fetch_all,
                                         fetch_group_stars)
 from . import (luminosity_function,
@@ -15,6 +16,7 @@ from . import (luminosity_function,
 
 
 def draw(group_id: Optional[uuid.UUID],
+         nullify_radial_velocity: bool,
          with_luminosity_function: bool,
          with_velocities_vs_magnitude: bool,
          with_velocity_clouds: bool,
@@ -32,6 +34,8 @@ def draw(group_id: Optional[uuid.UUID],
         else:
             stars = fetch_all(Star,
                               session=session)
+        if nullify_radial_velocity:
+            stars = list(map(set_radial_velocity_to_zero, stars))
 
     if with_luminosity_function:
         luminosity_function.plot(stars)

@@ -105,16 +105,12 @@ def simulate(ctx: click.Context,
                    '"full" - only declination '
                    'and parallax selection criteria, '
                    '"restricted" - apply all criteria (default)')
-@click.option('--nullify-radial-velocity', '-nrv',
-              is_flag=True,
-              help='Sets radial velocities to zero.')
 @click.pass_context
 def process(ctx: click.Context,
             unprocessed: bool,
             last: int,
             group_id: Optional[uuid.UUID],
-            filtration_method: str,
-            nullify_radial_velocity: bool
+            filtration_method: str
             ) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
@@ -131,7 +127,6 @@ def process(ctx: click.Context,
             unprocessed = None
 
         processing.run(filtration_method=filtration_method,
-                       nullify_radial_velocity=nullify_radial_velocity,
                        last_groups_count=last,
                        unprocessed_groups=unprocessed,
                        group_id=group_id,
@@ -143,6 +138,9 @@ def process(ctx: click.Context,
               default=None,
               type=uuid.UUID,
               help='Process a group by id')
+@click.option('--nullify-radial-velocity', '-nrv',
+              is_flag=True,
+              help='Sets radial velocities to zero.')
 @click.option('--luminosity-function', '-lf',
               is_flag=True,
               help='Plot luminosity function.')
@@ -170,6 +168,7 @@ def process(ctx: click.Context,
 @click.pass_context
 def plot(ctx: click.Context,
          group_id: Optional[uuid.UUID],
+         nullify_radial_velocity: bool,
          luminosity_function: bool,
          velocities_vs_magnitude: bool,
          velocity_clouds: bool,
@@ -184,6 +183,7 @@ def plot(ctx: click.Context,
         session_factory = sessionmaker(bind=engine)
         session = session_factory()
         plots.draw(group_id,
+                   nullify_radial_velocity,
                    luminosity_function,
                    velocities_vs_magnitude,
                    velocity_clouds,
