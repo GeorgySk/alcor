@@ -10,6 +10,7 @@ from alcor.models import (eliminations,
 from alcor.models.star import set_radial_velocity_to_zero
 from alcor.services.data_access import (fetch_group_stars,
                                         fetch_random)
+from alcor.services.data_access.service import fetch_random_group_stars
 from alcor.services.stars_group import elimination
 from . import (luminosity_function,
                velocities_vs_magnitude,
@@ -39,9 +40,9 @@ def draw(group_id: uuid.UUID,
         return
 
     if desired_stars_count:
-        stars = fetch_random(Star,
-                             limit=desired_stars_count,
-                             session=session)
+        stars = fetch_random_group_stars(group_id=group_id,
+                                         limit=desired_stars_count,
+                                         session=session)
     else:
         stars = fetch_group_stars(group_id=group_id,
                                   session=session)
