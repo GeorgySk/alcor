@@ -34,6 +34,17 @@ def fetch_group_stars(*,
     return query.all()
 
 
+def fetch_random_group_stars(*,
+                             group_id: uuid.UUID,
+                             limit: int = None,
+                             session: Session) -> List[Base]:
+    query = (session.query(Star)
+             .filter(Star.group_id == group_id)
+             .order_by(func.random())
+             .limit(limit))
+    return query.all()
+
+
 def fetch_last_groups(*,
                       limit: int,
                       session: Session) -> List[Group]:
