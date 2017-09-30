@@ -34,12 +34,6 @@ def fetch_group_stars(*,
     return query.all()
 
 
-def fetch_unprocessed_groups(session: Session) -> List[Group]:
-    query = (session.query(Group)
-             .filter(Group.original_id.is_(None)))
-    return query.all()
-
-
 def fetch_last_groups(*,
                       limit: int,
                       session: Session) -> List[Group]:
