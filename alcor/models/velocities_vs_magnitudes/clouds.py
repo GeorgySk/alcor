@@ -56,7 +56,8 @@ class LepineCaseUCloud(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  bolometric_magnitude: float,
                  u_velocity: float):
         self.group_id = group_id
@@ -79,7 +80,8 @@ class LepineCaseVCloud(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  bolometric_magnitude: float,
                  v_velocity: float):
         self.group_id = group_id
@@ -102,7 +104,8 @@ class LepineCaseWCloud(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  bolometric_magnitude: float,
                  w_velocity: float):
         self.group_id = group_id

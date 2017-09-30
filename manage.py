@@ -108,21 +108,13 @@ def simulate(ctx: click.Context,
 @click.option('--nullify-radial-velocity', '-nrv',
               is_flag=True,
               help='Sets radial velocities to zero.')
-@click.option('--w-velocities-vs-magnitude', '-vm',
-              is_flag=True,
-              help='Prepare data for plots of velocities vs bol. magnitude.')
-@click.option('--w-lepine-criterion', '-lcr',
-              is_flag=True,
-              help='Apply Lepine\'s criterion.')
 @click.pass_context
 def process(ctx: click.Context,
             unprocessed: bool,
             last: int,
             group_id: Optional[uuid.UUID],
             filtration_method: str,
-            nullify_radial_velocity: bool,
-            w_velocities_vs_magnitude: bool,
-            w_lepine_criterion: bool,
+            nullify_radial_velocity: bool
             ) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
@@ -140,8 +132,6 @@ def process(ctx: click.Context,
 
         processing.run(filtration_method=filtration_method,
                        nullify_radial_velocity=nullify_radial_velocity,
-                       w_velocities_vs_magnitude=w_velocities_vs_magnitude,
-                       w_lepine_criterion=w_lepine_criterion,
                        last_groups_count=last,
                        unprocessed_groups=unprocessed,
                        group_id=group_id,

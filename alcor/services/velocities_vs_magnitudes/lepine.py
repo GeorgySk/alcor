@@ -1,12 +1,10 @@
 from statistics import (mean,
                         stdev)
-from typing import (Union,
-                    Iterator,
+from typing import (Iterator,
                     Tuple,
                     List)
 
-from alcor.models import (Group,
-                          Star)
+from alcor.models import Star
 from alcor.models.velocities_vs_magnitudes import (LepineCaseUCloud,
                                                    LepineCaseVCloud,
                                                    LepineCaseWCloud,
@@ -21,50 +19,47 @@ from .utils import (STARS_BIN_SIZE,
                     star_bolometric_index)
 
 
-def clouds(stars: List[Star],
-           group: Group) -> Iterator[Union[LepineCaseUCloud,
-                                           LepineCaseVCloud,
-                                           LepineCaseWCloud]]:
-    group_id = group.id
+def clouds(stars: List[Star]) -> Tuple[List[LepineCaseUCloud],
+                                       List[LepineCaseVCloud],
+                                       List[LepineCaseWCloud]]:
+    u_cloud = []
+    v_cloud = []
+    w_cloud = []
     for star in stars:
         max_coordinates_modulus = star.max_coordinates_modulus
         bolometric_magnitude = star.bolometric_magnitude
 
         if abs(star.x_coordinate) == max_coordinates_modulus:
-            yield LepineCaseVCloud(group_id=group_id,
-                                   v_velocity=star.v_velocity,
-                                   bolometric_magnitude=bolometric_magnitude)
-            yield LepineCaseWCloud(group_id=group_id,
-                                   w_velocity=star.w_velocity,
-                                   bolometric_magnitude=bolometric_magnitude)
+            v_cloud.append(LepineCaseVCloud(
+                    v_velocity=star.v_velocity,
+                    bolometric_magnitude=bolometric_magnitude))
+            w_cloud.append(LepineCaseWCloud(
+                    w_velocity=star.w_velocity,
+                    bolometric_magnitude=bolometric_magnitude))
         elif abs(star.y_coordinate) == max_coordinates_modulus:
-            yield LepineCaseUCloud(group_id=group_id,
-                                   u_velocity=star.u_velocity,
-                                   bolometric_magnitude=bolometric_magnitude)
-            yield LepineCaseWCloud(group_id=group_id,
-                                   w_velocity=star.w_velocity,
-                                   bolometric_magnitude=bolometric_magnitude)
+            u_cloud.append(LepineCaseUCloud(
+                    u_velocity=star.u_velocity,
+                    bolometric_magnitude=bolometric_magnitude))
+            w_cloud.append(LepineCaseWCloud(
+                    w_velocity=star.w_velocity,
+                    bolometric_magnitude=bolometric_magnitude))
         else:
-            yield LepineCaseUCloud(group_id=group_id,
-                                   u_velocity=star.u_velocity,
-                                   bolometric_magnitude=bolometric_magnitude)
-            yield LepineCaseVCloud(group_id=group_id,
-                                   v_velocity=star.v_velocity,
-                                   bolometric_magnitude=bolometric_magnitude)
+            u_cloud.append(LepineCaseUCloud(
+                    u_velocity=star.u_velocity,
+                    bolometric_magnitude=bolometric_magnitude))
+            v_cloud.append(LepineCaseVCloud(
+                    v_velocity=star.v_velocity,
+                    bolometric_magnitude=bolometric_magnitude))
+    return u_cloud, v_cloud, w_cloud
 
 
-def bins(*,
-         stars: List[Star],
-         group: Group) -> Iterator[Union[LepineCaseUBin,
-                                         LepineCaseVBin,
-                                         LepineCaseWBin]]:
+def bins(stars: List[Star]) -> Tuple[List[LepineCaseUBin],
+                                     List[LepineCaseVBin],
+                                     List[LepineCaseWBin]]:
     u_stars_bins, v_stars_bins, w_stars_bins = stars_bins_by_velocities(stars)
-    yield from u_bins(stars_bins=u_stars_bins,
-                      group=group)
-    yield from v_bins(stars_bins=v_stars_bins,
-                      group=group)
-    yield from w_bins(stars_bins=w_stars_bins,
-                      group=group)
+    return (list(u_bins(stars_bins=u_stars_bins)),
+            list(v_bins(stars_bins=v_stars_bins)),
+            list(w_bins(stars_bins=w_stars_bins)))
 
 
 def stars_bins_by_velocities(stars: List[Star]) -> Tuple[StarsBinsType,
@@ -76,6 +71,9 @@ def stars_bins_by_velocities(stars: List[Star]) -> Tuple[StarsBinsType,
 
     for star in stars:
         index = star_bolometric_index(star)
+
+        if index > STARS_BINS_COUNT - 1 or index < 0:
+            continue
 
         max_coordinates_modulus = star.max_coordinates_modulus
 
@@ -92,9 +90,7 @@ def stars_bins_by_velocities(stars: List[Star]) -> Tuple[StarsBinsType,
     return u_stars_bins, v_stars_bins, w_stars_bins
 
 
-def u_bins(*,
-           stars_bins: StarsBinsType,
-           group: Group) -> Iterator[LepineCaseUBin]:
+def u_bins(stars_bins: StarsBinsType) -> Iterator[LepineCaseUBin]:
     for index, stars_bin in enumerate(stars_bins):
         if not stars_bin:
             continue
@@ -108,15 +104,12 @@ def u_bins(*,
         else:
             u_velocity_std = stdev(star.u_velocity
                                    for star in stars_bin)
-        yield LepineCaseUBin(group_id=group.id,
-                             avg_magnitude=avg_magnitude,
+        yield LepineCaseUBin(avg_magnitude=avg_magnitude,
                              avg_u_velocity=avg_u_velocity,
                              u_velocity_std=u_velocity_std)
 
 
-def v_bins(*,
-           stars_bins: StarsBinsType,
-           group: Group) -> Iterator[LepineCaseVBin]:
+def v_bins(stars_bins: StarsBinsType) -> Iterator[LepineCaseVBin]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
         if not stars_bin:
             continue
@@ -130,15 +123,12 @@ def v_bins(*,
         else:
             v_velocity_std = stdev(star.v_velocity
                                    for star in stars_bin)
-        yield LepineCaseVBin(group_id=group.id,
-                             avg_magnitude=avg_magnitude,
+        yield LepineCaseVBin(avg_magnitude=avg_magnitude,
                              avg_v_velocity=avg_v_velocity,
                              v_velocity_std=v_velocity_std)
 
 
-def w_bins(*,
-           stars_bins: StarsBinsType,
-           group: Group) -> Iterator[LepineCaseWBin]:
+def w_bins(stars_bins: StarsBinsType) -> Iterator[LepineCaseWBin]:
     for stars_bin_index, stars_bin in enumerate(stars_bins):
         if not stars_bin:
             continue
@@ -152,7 +142,6 @@ def w_bins(*,
         else:
             w_velocity_std = stdev(star.w_velocity
                                    for star in stars_bin)
-        yield LepineCaseWBin(group_id=group.id,
-                             avg_magnitude=avg_magnitude,
+        yield LepineCaseWBin(avg_magnitude=avg_magnitude,
                              avg_w_velocity=avg_w_velocity,
                              w_velocity_std=w_velocity_std)
