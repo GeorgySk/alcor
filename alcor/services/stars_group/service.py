@@ -12,8 +12,7 @@ from alcor.models import (Group,
                           eliminations,
                           associations)
 from alcor.models.star import set_radial_velocity_to_zero
-from alcor.services import (luminosity_function,
-                            velocities,
+from alcor.services import (velocities,
                             velocities_vs_magnitudes)
 from alcor.services.data_access import fetch_unprocessed_stars
 from . import elimination
@@ -23,7 +22,6 @@ def process(*,
             group: Group,
             filtration_method: str,
             nullify_radial_velocity: bool,
-            w_luminosity_function: bool,
             w_velocities_clouds: bool,
             w_velocities_vs_magnitude: bool,
             w_lepine_criterion: bool,
@@ -46,12 +44,6 @@ def process(*,
 
     if nullify_radial_velocity:
         stars = list(map(set_radial_velocity_to_zero, stars))
-
-    if w_luminosity_function:
-        luminosity_function.process_stars_group(
-                stars=stars,
-                group=group,
-                session=session)
 
     if w_velocities_clouds:
         velocities.process_stars_group(

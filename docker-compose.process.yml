@@ -17,7 +17,6 @@ services:
 #        - --filtration-method
 #        - restricted
         - --nullify-radial-velocity
-        - --w-luminosity-function
         - --w-velocities-clouds
         - --w-velocities-vs-magnitude
         - --w-lepine-criterion
