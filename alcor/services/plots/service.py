@@ -5,9 +5,11 @@ from itertools import filterfalse
 
 from sqlalchemy.orm.session import Session
 
-from alcor.models import eliminations
+from alcor.models import (eliminations,
+                          Star)
 from alcor.models.star import set_radial_velocity_to_zero
-from alcor.services.data_access import fetch_group_stars
+from alcor.services.data_access import (fetch_group_stars,
+                                        fetch_random)
 from alcor.services.stars_group import elimination
 from . import (luminosity_function,
                velocities_vs_magnitude,
@@ -27,12 +29,18 @@ def draw(group_id: uuid.UUID,
          heatmaps_axes: str,
          with_toomre_diagram: bool,
          with_ugriz_diagrams: bool,
+         desired_stars_count: int,
          session: Session) -> None:
     if any((with_luminosity_function,
             with_velocity_clouds,
             with_velocities_vs_magnitude)):
-        stars = fetch_group_stars(group_id=group_id,
-                                  session=session)
+        if desired_stars_count:
+            stars = fetch_random(Star,
+                                 limit=desired_stars_count,
+                                 session=session)
+        else:
+            stars = fetch_group_stars(group_id=group_id,
+                                      session=session)
 
         stars_count = len(stars)
         eliminations_counter = Counter()

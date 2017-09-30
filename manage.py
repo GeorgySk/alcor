@@ -134,6 +134,10 @@ def simulate(ctx: click.Context,
 @click.option('--ugriz-color-color-diagram', '-ugriz',
               is_flag=True,
               help='Plot color-color diagrams for ugriz photometry.')
+@click.option('--desired-stars-count',
+              type=int,
+              default=None,
+              help='Make plots for last N groups by time')
 @click.pass_context
 def plot(ctx: click.Context,
          group_id: Optional[uuid.UUID],
@@ -147,7 +151,8 @@ def plot(ctx: click.Context,
          lepine_criterion: bool,
          heatmap: str,
          toomre_diagram: bool,
-         ugriz_color_color_diagram: bool) -> None:
+         ugriz_color_color_diagram: bool,
+         desired_stars_count: int) -> None:
     db_uri = ctx.obj
     check_connection(db_uri)
 
@@ -178,6 +183,7 @@ def plot(ctx: click.Context,
                        heatmap,
                        toomre_diagram,
                        ugriz_color_color_diagram,
+                       desired_stars_count,
                        session=session)
 
 
