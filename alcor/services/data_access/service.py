@@ -1,12 +1,11 @@
 import uuid
 from typing import List
 
-from sqlalchemy import func, not_
+from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
 from alcor.models import (Group,
-                          Star,
-                          associations)
+                          Star)
 from alcor.models.base import Base
 
 
@@ -32,20 +31,6 @@ def fetch_group_stars(*,
                       session: Session) -> List[Star]:
     query = (session.query(Star)
              .filter(Star.group_id == group_id))
-    return query.all()
-
-
-def fetch_unprocessed_stars(*,
-                            group_id: uuid.UUID = None,
-                            session: Session) -> List[Star]:
-    has_been_processed = (session.query(Star)
-                          .filter(Star.id ==
-                                  associations.ProcessedStars.processed_id)
-                          .exists())
-    query = (session.query(Star)
-             .filter(not_(has_been_processed)))
-    if group_id:
-        query = query.filter(Star.group_id == group_id)
     return query.all()
 
 
