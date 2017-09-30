@@ -15,7 +15,7 @@ class StarsCounter(Base):
     id = Column(Integer(),
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
-                      nullable=True)
+                      nullable=False)
     raw = Column(Integer(),
                  nullable=False)
     by_parallax = Column(Integer(),
@@ -35,7 +35,7 @@ class StarsCounter(Base):
 
     def __init__(self,
                  *,
-                 group_id: uuid.UUID = None,
+                 group_id: uuid.UUID,
                  raw: int,
                  by_parallax: int = 0,
                  by_declination: int = 0,
