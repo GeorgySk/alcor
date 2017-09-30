@@ -54,27 +54,26 @@ def draw(group_id: uuid.UUID,
             stars = list(map(set_radial_velocity_to_zero, stars))
 
     if with_luminosity_function:
-        luminosity_function.plot(stars)
+        luminosity_function.plot(stars=stars)
 
     if with_velocities_vs_magnitude:
         if lepine_criterion:
-            velocities_vs_magnitude.plot_lepine_case(stars)
+            velocities_vs_magnitude.plot_lepine_case(stars=stars)
         else:
-            velocities_vs_magnitude.plot(stars)
+            velocities_vs_magnitude.plot(stars=stars)
 
     if with_velocity_clouds:
         if lepine_criterion:
-            velocity_clouds.plot_lepine_case(stars)
+            velocity_clouds.plot_lepine_case(stars=stars)
         else:
-            velocity_clouds.plot(stars)
+            velocity_clouds.plot(stars=stars)
 
     if heatmaps_axes:
-        heatmaps.plot(group_id=group_id,
-                      session=session,
+        heatmaps.plot(stars=stars,
                       axes=heatmaps_axes)
 
     if with_toomre_diagram:
-        toomre_diagram.plot(session=session)
+        toomre_diagram.plot(stars=stars)
 
     if with_ugriz_diagrams:
-        ugriz_diagrams.plot(session=session)
+        ugriz_diagrams.plot(stars=stars)
