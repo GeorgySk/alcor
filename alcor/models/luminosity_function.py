@@ -29,7 +29,8 @@ class Point(Base):
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 *,
+                 group_id: uuid.UUID = None,
                  avg_bin_magnitude: float,
                  stars_count_logarithm: float,
                  upper_error_bar: float,
