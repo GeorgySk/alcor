@@ -19,7 +19,6 @@ from . import elimination
 def process(*,
             group: Group,
             filtration_method: str,
-            nullify_radial_velocity: bool,
             session: Session) -> None:
     stars = fetch_unprocessed_stars(group_id=group.id,
                                     session=session)
@@ -37,35 +36,11 @@ def process(*,
                                         **eliminations_counter)
     session.add(counter)
 
-    if nullify_radial_velocity:
-        stars = list(map(set_radial_velocity_to_zero, stars))
-
     original_id = group.id
     processed_group_id = uuid.uuid4()
     processed_group = Group(id=processed_group_id,
                             original_id=original_id)
     session.add(processed_group)
-
-    if nullify_radial_velocity:
-        processed_stars = [Star(group_id=processed_group_id,
-                                u_velocity=star.u_velocity,
-                                v_velocity=star.v_velocity,
-                                w_velocity=star.w_velocity)
-                           for star in stars]
-    else:
-        # FIXME: why do we save empty stars only with new `id` and `group_id`?
-        processed_stars = [Star(group_id=processed_group_id)
-                           for _ in range(len(stars))]
-
-    session.add_all(processed_stars)
-
-    # We are flushing to set ids
-    # more at
-    # https://stackoverflow.com/questions/4201455/sqlalchemy-whats-the-difference-between-flush-and-commit
-    session.flush(processed_stars)
-
-    stars_associations = processed_stars_associations(stars, processed_stars)
-    session.add_all(stars_associations)
 
     session.commit()
 
