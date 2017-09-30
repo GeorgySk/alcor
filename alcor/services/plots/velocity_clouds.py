@@ -10,13 +10,8 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.axes import Axes
-from sqlalchemy.orm.session import Session
 
-from alcor.services.data_access import fetch_all
-from alcor.models.velocities.clouds import (Cloud,
-                                            LepineCaseUVCloud,
-                                            LepineCaseUWCloud,
-                                            LepineCaseVWCloud)
+from alcor.models import Star
 
 # Kinematic properties of the thin disk taken from the paper of
 # N.Rowell and N.C.Hambly (mean motions are relative to the Sun):
@@ -32,7 +27,7 @@ STD_POPULATION_V = 23
 STD_POPULATION_W = 18.1
 
 
-def plot(session: Session,
+def plot(stars: List[Star],
          filename: str = 'velocity_clouds.ps',
          figure_size: Tuple[float, float] = (8, 12),
          spacing: float = 0.25,
@@ -47,16 +42,12 @@ def plot(session: Session,
              vw_subplot) = plt.subplots(nrows=3,
                                         figsize=figure_size)
 
-    # TODO: Implement other fetching functions
-    cloud_points = fetch_all(Cloud,
-                             session=session)
-
     u_velocities = [star.u_velocity
-                    for star in cloud_points]
+                    for star in stars]
     v_velocities = [star.v_velocity
-                    for star in cloud_points]
+                    for star in stars]
     w_velocities = [star.w_velocity
-                    for star in cloud_points]
+                    for star in stars]
 
     draw_subplot(subplot=uv_subplot,
                  xlabel=u_label,
@@ -93,11 +84,10 @@ def plot(session: Session,
                  y_std=STD_POPULATION_W)
 
     figure.subplots_adjust(hspace=spacing)
-
     plt.savefig(filename)
 
 
-def plot_lepine_case(session: Session,
+def plot_lepine_case(stars: List[Star],
                      filename: str = 'velocity_clouds.ps',
                      figure_size: Tuple[float, float] = (8, 12),
                      spacing: float = 0.25,
@@ -112,26 +102,24 @@ def plot_lepine_case(session: Session,
              vw_subplot) = plt.subplots(nrows=3,
                                         figsize=figure_size)
 
-    # TODO: Add other fetching options
-    uv_points = fetch_all(LepineCaseUVCloud,
-                          session=session)
-    uw_points = fetch_all(LepineCaseUWCloud,
-                          session=session)
-    vw_points = fetch_all(LepineCaseVWCloud,
-                          session=session)
+    uv_cloud_u_velocities = []
+    uv_cloud_v_velocities = []
+    uw_cloud_u_velocities = []
+    uw_cloud_w_velocities = []
+    vw_cloud_v_velocities = []
+    vw_cloud_w_velocities = []
 
-    uv_cloud_u_velocities = [star.u_velocity
-                             for star in uv_points]
-    uv_cloud_v_velocities = [star.v_velocity
-                             for star in uv_points]
-    uw_cloud_u_velocities = [star.u_velocity
-                             for star in uw_points]
-    uw_cloud_w_velocities = [star.w_velocity
-                             for star in uw_points]
-    vw_cloud_v_velocities = [star.v_velocity
-                             for star in vw_points]
-    vw_cloud_w_velocities = [star.w_velocity
-                             for star in vw_points]
+    for star in stars:
+        max_coordinates_modulus = star.max_coordinates_modulus
+        if abs(star.x_coordinate) == max_coordinates_modulus:
+            vw_cloud_v_velocities.append(star.v_velocity)
+            vw_cloud_w_velocities.append(star.w_velocity)
+        elif abs(star.y_coordinate) == max_coordinates_modulus:
+            uw_cloud_u_velocities.append(star.u_velocity)
+            uw_cloud_w_velocities.append(star.w_velocity)
+        else:
+            uv_cloud_u_velocities.append(star.u_velocity)
+            uv_cloud_v_velocities.append(star.v_velocity)
 
     draw_subplot(subplot=uv_subplot,
                  xlabel=u_label,
@@ -168,7 +156,6 @@ def plot_lepine_case(session: Session,
                  y_std=STD_POPULATION_W)
 
     figure.subplots_adjust(hspace=spacing)
-
     plt.savefig(filename)
 
 

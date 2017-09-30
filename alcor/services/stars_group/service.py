@@ -22,7 +22,6 @@ def process(*,
             group: Group,
             filtration_method: str,
             nullify_radial_velocity: bool,
-            w_velocities_clouds: bool,
             w_velocities_vs_magnitude: bool,
             w_lepine_criterion: bool,
             session: Session) -> None:
@@ -44,13 +43,6 @@ def process(*,
 
     if nullify_radial_velocity:
         stars = list(map(set_radial_velocity_to_zero, stars))
-
-    if w_velocities_clouds:
-        velocities.process_stars_group(
-                stars=stars,
-                group=group,
-                w_lepine_criterion=w_lepine_criterion,
-                session=session)
 
     if w_velocities_vs_magnitude:
         velocities_vs_magnitudes.process_stars_group(
