@@ -45,7 +45,6 @@ def draw(group_id: uuid.UUID,
         stars = fetch_group_stars(group_id=group_id,
                                   session=session)
 
-    stars_count = len(stars)
     eliminations_counter = Counter()
 
     if filtration_method in {'restricted', 'full'}:
@@ -55,7 +54,7 @@ def draw(group_id: uuid.UUID,
         stars = list(filterfalse(is_eliminated, stars))
 
     counter = eliminations.StarsCounter(group_id=group_id,
-                                        raw=stars_count,
+                                        raw=len(stars),
                                         **eliminations_counter)
     session.add(counter)
     session.commit()
