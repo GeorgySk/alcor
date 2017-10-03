@@ -85,7 +85,8 @@ def plot(stars: List[Star],
 
     magnitudes = np.fromiter((star.bolometric_magnitude
                               for star in stars),
-                             dtype=np.float)
+                             dtype=np.float,
+                             count=len(stars))
     bins_indexes = pd.Series(bolometric_index(magnitudes))
 
     bins_counters = np.zeros(shape=stars_bins_count,
