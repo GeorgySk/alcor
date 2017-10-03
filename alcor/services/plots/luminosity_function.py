@@ -31,7 +31,7 @@ def bolometric_indexer(*,
                                                           np.ndarray]:
     def bolometric_index(magnitude: np.ndarray) -> np.ndarray:
         magnitude_amplitude = magnitude - min_magnitude
-        return np.floor(magnitude_amplitude / stars_bin_size).astype(int)
+        return np.floor(magnitude_amplitude / stars_bin_size).astype(np.int32)
 
     return bolometric_index
 
@@ -69,12 +69,12 @@ def plot(stars: List[Star],
     observed_stars_counts = np.insert(arr=observed_stars_counts,
                                       obj=0,
                                       values=np.zeros(shape=initial_index,
-                                                      dtype=int))
+                                                      dtype=np.int32))
     observed_stars_counts = np.append(
             arr=observed_stars_counts,
             values=np.zeros(
                     shape=stars_bins_count - observed_stars_counts.size,
-                    dtype=int))
+                    dtype=np.int32))
 
     observational_luminosity_function = luminosity_function(
             max_bolometric_magnitude=max_bolometric_magnitude,
@@ -88,7 +88,7 @@ def plot(stars: List[Star],
     bins_indexes = pd.Series(bolometric_index(magnitudes))
 
     bins_counters = np.zeros(shape=stars_bins_count,
-                             dtype=int)
+                             dtype=np.int32)
     # More info on np.ndarray iterations at https://goo.gl/jcqJFY
     # More info on indexation at https://goo.gl/uH7dUx
     for index, bin_counter in zip(np.ndindex(bins_counters.shape),
