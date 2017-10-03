@@ -1,5 +1,5 @@
-from typing import (Union,
-                    Callable,
+from functools import partial
+from typing import (Callable,
                     Tuple,
                     List)
 
@@ -21,6 +21,8 @@ OBSERVATIONAL_STARS_COUNTS = np.array(
 
 # TODO: replace by # 2 * pi * radius ** 3 / 3
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
+nan_array = partial(np.full,
+                    fill_value=np.nan)
 
 
 def bolometric_indexer(*,
@@ -153,10 +155,6 @@ def plot(stars: List[Star],
     subplot.set_aspect(ratio / subplot.get_data_ratio())
 
     plt.savefig(filename)
-
-
-def nan_array(shape: Union[int, Tuple[int, ...]]) -> np.ndarray:
-    return np.full(shape, np.nan)
 
 
 def luminosity_function(
