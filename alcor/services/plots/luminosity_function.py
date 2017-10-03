@@ -43,8 +43,8 @@ def plot(stars: List[Star],
          bin_size: float = 0.5,
          min_observed_magnitude: float = 7.75,
          observed_stars_counts: np.ndarray = OBSERVATIONAL_STARS_COUNTS,
-         # We choose these bins because they have many objects and don't lie in
-         # problematic regions
+         # We choose these bins because they have many objects
+         # and don't lie in problematic regions
          trusted_bins: frozenset = {15, 16, 17},
          filename: str = 'luminosity_function.ps',
          figure_size: Tuple[float, float] = (7, 7),
@@ -63,8 +63,8 @@ def plot(stars: List[Star],
 
     stars_bins_count = np.asscalar(bolometric_index(max_bolometric_magnitude))
 
-    # Aligning observed stars counts with the scale defined by min and max
-    # bolometric magnitudes
+    # Aligning observed stars counts with the scale
+    # defined by min and max bolometric magnitudes
     initial_index = np.asscalar(bolometric_index(min_observed_magnitude))
     observed_stars_counts = np.insert(arr=observed_stars_counts,
                                       obj=0,
@@ -100,9 +100,9 @@ def plot(stars: List[Star],
                                             op_flags=['readwrite'])):
         bin_counter[...] = bins_indexes[bins_indexes == index].count()
 
-    # As simulated number of white dwarfs (WDs) can be much greater than the
-    # number of WDs for which observational luminosity function (LF) is
-    # plotted, we normalize the LF based on synthetic(simulated) WDs
+    # As simulated number of white dwarfs (WDs) can be much greater
+    # than the number of WDs for which observational luminosity function (LF)
+    # is plotted,  we normalize the LF based on synthetic(simulated) WDs
     # to the observational one (move to the same location on the plot).
     actual_stars_counts = pd.Series(bins_counters)
 
