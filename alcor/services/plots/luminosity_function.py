@@ -1,7 +1,6 @@
 from typing import (Union,
                     Callable,
                     Tuple,
-                    Set,
                     List)
 
 import matplotlib
@@ -44,7 +43,7 @@ def plot(stars: List[Star],
          observed_stars_counts: np.ndarray = OBSERVATIONAL_STARS_COUNTS,
          # We choose these bins because they have many objects and don't lie in
          # problematic regions
-         trusted_bins: Set = {15, 16, 17},
+         trusted_bins: frozenset = {15, 16, 17},
          filename: str = 'luminosity_function.ps',
          figure_size: Tuple[float, float] = (7, 7),
          ratio: float = 10 / 13,
