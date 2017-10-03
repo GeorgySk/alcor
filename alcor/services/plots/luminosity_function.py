@@ -89,8 +89,10 @@ def plot(stars: List[Star],
 
     bins_counters = np.zeros(shape=stars_bins_count,
                              dtype=np.int32)
-    # More info on np.ndarray iterations at https://goo.gl/jcqJFY
-    # More info on indexation at https://goo.gl/uH7dUx
+    # More info on np.ndarray iterations at:
+    # docs.scipy.org/doc/numpy-1.13.0/reference/arrays.nditer.html#modifying-array-values
+    # More info on indexation at:
+    # docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.ndindex.html
     for index, bin_counter in zip(np.ndindex(bins_counters.shape),
                                   np.nditer(op=bins_counters,
                                             op_flags=['readwrite'])):
