@@ -171,14 +171,8 @@ def luminosity_function(
                 value=np.nan,
                 inplace=True)
 
-    # Replacing erroneous NaN values for errorbars
-    missing_values_rows = res.loc[
-        (res.isnull().any(axis=1))
-        & (res['log_stars_count'].notnull()), :].copy()
-    missing_values_rows.fillna(value=max_errorbar_len,
-                               inplace=True)
-    res.loc[(res.isnull().any(axis=1))
-            & (res['log_stars_count'].notnull()), :] = missing_values_rows
+    res = replace_nans(df=res,
+                       replacement=max_errorbar_len)
 
     return res
 
@@ -197,3 +191,22 @@ def trusted_bins_stars_count(stars_counts: pd.Series,
                              *,
                              trusted_bins: frozenset):
     return stars_counts[stars_counts.index.isin(trusted_bins)].sum()
+
+
+def replace_nans(df: DataFrame,
+                 replacement: float) -> DataFrame:
+    df_copy = pd.DataFrame(data=df,
+                           copy=True)
+
+    missing_values_rows_mask = df_copy.isnull().any(axis=1)
+    notnull_log_stars_count_rows_mask = df_copy['log_stars_count'].notnull()
+
+    missing_values_rows = df_copy.loc[
+                          missing_values_rows_mask
+                          & notnull_log_stars_count_rows_mask, :].copy()
+    missing_values_rows.fillna(value=replacement,
+                               inplace=True)
+    df_copy.loc[missing_values_rows_mask
+                & notnull_log_stars_count_rows_mask, :] = missing_values_rows
+
+    return df_copy
