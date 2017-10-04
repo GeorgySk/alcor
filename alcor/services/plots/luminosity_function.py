@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
+from pandas.core.series import Series
 
 from alcor.models import Star
 
@@ -87,22 +88,8 @@ def plot(stars: List[Star],
                            for star in stars])
     bins_indexes = pd.Series(bolometric_index(magnitudes))
 
-    bins_counters = np.zeros(shape=stars_bins_count,
-                             dtype=np.int32)
-    # More info on np.ndarray iterations at:
-    # docs.scipy.org/doc/numpy-1.13.0/reference/arrays.nditer.html#modifying-array-values
-    # More info on indexation at:
-    # docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.ndindex.html
-    for index, bin_counter in zip(np.ndindex(bins_counters.shape),
-                                  np.nditer(op=bins_counters,
-                                            op_flags=['readwrite'])):
-        bin_counter[...] = bins_indexes[bins_indexes == index].count()
-
-    # As simulated number of white dwarfs (WDs) can be much greater
-    # than the number of WDs for which observational luminosity function (LF)
-    # is plotted,  we normalize the LF based on synthetic(simulated) WDs
-    # to the observational one (move to the same location on the plot).
-    actual_stars_counts = pd.Series(bins_counters)
+    actual_stars_counts = count_indexes(indexes=bins_indexes,
+                                        bins_count=stars_bins_count)
 
     observed_stars_counts = pd.Series(observed_stars_counts)
     trusted_bins_observed_stars_count = (
@@ -196,3 +183,13 @@ def luminosity_function(
             & (res['log_stars_count'].notnull()), :] = missing_values_rows
 
     return res
+
+
+def count_indexes(indexes: Series,
+                  bins_count: int) -> Series:
+    counts = pd.Series(np.zeros(shape=bins_count,
+                                dtype=int))
+    for index in range(bins_count):
+        counts.iloc[index] = indexes[indexes == index].count().values
+
+    return counts
