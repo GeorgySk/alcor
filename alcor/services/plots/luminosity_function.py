@@ -92,16 +92,14 @@ def plot(stars: List[Star],
                                         bins_count=stars_bins_count)
 
     observed_stars_counts = pd.Series(observed_stars_counts)
-    trusted_bins_observed_stars_count = (
-        observed_stars_counts[
-            observed_stars_counts.index.isin(trusted_bins)].sum())
-    trusted_bins_simulated_stars_count = (
-        actual_stars_counts[
-            actual_stars_counts.index.isin(trusted_bins)].sum())
 
-    normalized_stars_counts = (actual_stars_counts
-                               * trusted_bins_observed_stars_count
-                               / trusted_bins_simulated_stars_count)
+    trusted_bins_stars_counter = partial(trusted_bins_stars_count,
+                                         trusted_bins=trusted_bins)
+
+    normalization_factor = (trusted_bins_stars_counter(observed_stars_counts)
+                            / trusted_bins_stars_counter(actual_stars_counts))
+
+    normalized_stars_counts = actual_stars_counts * normalization_factor
 
     synthetic_luminosity_function = luminosity_function(
             max_bolometric_magnitude=max_bolometric_magnitude,
@@ -193,3 +191,9 @@ def count_indexes(indexes: Series,
         counts.iloc[index] = indexes[indexes == index].count().values
 
     return counts
+
+
+def trusted_bins_stars_count(stars_counts: pd.Series,
+                             *,
+                             trusted_bins: frozenset):
+    return stars_counts[stars_counts.index.isin(trusted_bins)].sum()
