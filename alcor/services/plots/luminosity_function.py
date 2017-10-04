@@ -12,8 +12,6 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
-from pandas.core.frame import DataFrame
-from pandas.core.series import Series
 
 from alcor.models import Star
 
@@ -144,14 +142,12 @@ def plot(stars: List[Star],
     plt.savefig(filename)
 
 
-def luminosity_function(
-        min_bolometric_magnitude: float,
-        max_bolometric_magnitude: float,
-        bin_size: float,
-        stars_bins_count: int,
-        stars_counts: np.ndarray,
-        max_errorbar_len: float = 6.
-) -> DataFrame:
+def luminosity_function(min_bolometric_magnitude: float,
+                        max_bolometric_magnitude: float,
+                        bin_size: float,
+                        stars_bins_count: int,
+                        stars_counts: np.ndarray,
+                        max_errorbar_len: float = 6.) -> pd.DataFrame:
     luminosity_function_template = dict(
             magnitude=np.arange(min_bolometric_magnitude + bin_size / 2,
                                 max_bolometric_magnitude,
@@ -177,8 +173,8 @@ def luminosity_function(
     return res
 
 
-def count_indexes(indexes: Series,
-                  bins_count: int) -> Series:
+def count_indexes(indexes: pd.Series,
+                  bins_count: int) -> pd.Series:
     counts = pd.Series(np.zeros(shape=bins_count,
                                 dtype=int))
     for index in range(bins_count):
@@ -193,8 +189,8 @@ def trusted_bins_stars_count(stars_counts: pd.Series,
     return stars_counts[stars_counts.index.isin(trusted_bins)].sum()
 
 
-def replace_nans(df: DataFrame,
-                 replacement: float) -> DataFrame:
+def replace_nans(df: pd.DataFrame,
+                 replacement: float) -> pd.DataFrame:
     df_copy = pd.DataFrame(data=df,
                            copy=True)
 
