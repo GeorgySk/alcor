@@ -265,37 +265,3 @@ class Star(Base):
         parameters = dict(initializer_signature.parameters)
         parameters.pop('self')
         return ('id',) + tuple(parameters)
-
-
-def set_radial_velocity_to_zero(star: Star) -> Star:
-    # TODO: implement pc/kpc units
-    distance = float(star.distance)
-    galactic_latitude = float(star.galactic_latitude)
-    galactic_longitude = float(star.galactic_longitude)
-    proper_motion_component_b = float(star.proper_motion_component_b)
-    proper_motion_component_l = float(star.proper_motion_component_l)
-
-    distance_in_pc = distance * 1e3
-
-    a1 = (-ASTRONOMICAL_UNIT * cos(galactic_latitude)
-          * sin(galactic_longitude))
-    b1 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
-          * cos(galactic_longitude))
-    u_velocity = ((a1 * proper_motion_component_l
-                   + b1 * proper_motion_component_b)
-                  * distance_in_pc)
-
-    a2 = (ASTRONOMICAL_UNIT * cos(galactic_latitude)
-          * cos(galactic_longitude))
-    b2 = (-ASTRONOMICAL_UNIT * sin(galactic_latitude)
-          * sin(galactic_longitude))
-    v_velocity = ((a2 * proper_motion_component_l
-                   + b2 * proper_motion_component_b)
-                  * distance_in_pc)
-
-    b3 = ASTRONOMICAL_UNIT * cos(galactic_latitude)
-    w_velocity = (b3 * proper_motion_component_b
-                  * distance_in_pc)
-    return star.modify(u_velocity=u_velocity,
-                       v_velocity=v_velocity,
-                       w_velocity=w_velocity)
