@@ -184,7 +184,8 @@ def plot(ctx: click.Context,
                        toomre_diagram,
                        ugriz_color_color_diagram,
                        desired_stars_count,
-                       session=session)
+                       session=session,
+                       engine=engine)
 
 
 @main.command(name='clean_db')
