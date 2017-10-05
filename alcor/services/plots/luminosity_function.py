@@ -1,7 +1,6 @@
 from functools import partial
 from typing import (Callable,
-                    Tuple,
-                    List)
+                    Tuple)
 
 import matplotlib
 
@@ -13,13 +12,12 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 
-from alcor.models import Star
-
 OBSERVATIONAL_STARS_COUNTS = np.array(
         [3, 4, 5, 7, 12, 17, 17, 12, 20, 19, 37, 42, 52, 72, 96, 62, 20, 3, 1])
 
 # TODO: replace by # 2 * pi * radius ** 3 / 3
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
+SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 nan_array = partial(np.full,
                     fill_value=np.nan)
 
@@ -35,8 +33,7 @@ def bolometric_indexer(*,
     return bolometric_index
 
 
-# TODO: there is no need to have stars with all the fields
-def plot(stars: List[Star],
+def plot(stars: pd.DataFrame,
          min_bolometric_magnitude: float = 6.,
          max_bolometric_magnitude: float = 21.,
          bin_size: float = 0.5,
@@ -82,8 +79,7 @@ def plot(stars: List[Star],
             stars_bins_count=stars_bins_count,
             stars_counts=observed_stars_counts)
 
-    magnitudes = np.array([star.bolometric_magnitude
-                           for star in stars])
+    magnitudes = bolometric_magnitude(luminosity=stars['luminosity'])
     bins_indexes = pd.Series(bolometric_index(magnitudes))
 
     actual_stars_counts = count_indexes(indexes=bins_indexes,
@@ -178,7 +174,7 @@ def count_indexes(indexes: pd.Series,
     counts = pd.Series(np.zeros(shape=bins_count,
                                 dtype=int))
     for index in range(bins_count):
-        counts.iloc[index] = indexes[indexes == index].count().values
+        counts.iloc[index] = indexes[indexes == index].count()
 
     return counts
 
@@ -206,3 +202,9 @@ def replace_nans(df: pd.DataFrame,
                 & notnull_log_stars_count_rows_mask, :] = missing_values_rows
 
     return df_copy
+
+
+def bolometric_magnitude(luminosity: pd.Series) -> pd.Series:
+    # More info at
+    # https://en.wikipedia.org/wiki/Absolute_magnitude#Bolometric_magnitude
+    return 2.5 * luminosity + SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE
