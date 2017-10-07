@@ -1,6 +1,7 @@
 from functools import partial
 from math import radians
-from typing import Callable, Tuple
+from typing import (Callable,
+                    Tuple)
 
 # TODO: sort out the mess with numpy and/or pandas
 import numpy as np

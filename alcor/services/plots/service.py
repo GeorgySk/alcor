@@ -144,14 +144,12 @@ def draw(group_id: uuid.UUID,
         else:
             velocities_vs_magnitude.plot(stars=stars)
 
-    # TODO: implement pandas
     if with_velocity_clouds:
         if lepine_criterion:
             velocity_clouds.plot_lepine_case(stars=stars)
         else:
             velocity_clouds.plot(stars=stars)
 
-    # TODO: implement pandas
     if heatmaps_axes:
         heatmaps.plot(stars=stars,
                       axes=heatmaps_axes)
