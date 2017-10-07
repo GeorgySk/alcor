@@ -1,7 +1,5 @@
 import logging
-import uuid
-from typing import (Optional,
-                    Tuple,
+from typing import (Tuple,
                     List)
 
 import matplotlib
@@ -15,8 +13,8 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 from matplotlib.colors import Colormap
 import numpy as np
+import pandas as pd
 
-from alcor.models import Star
 from alcor.services.common import (PECULIAR_SOLAR_VELOCITY_U,
                                    PECULIAR_SOLAR_VELOCITY_V,
                                    PECULIAR_SOLAR_VELOCITY_W)
@@ -24,7 +22,7 @@ from alcor.services.common import (PECULIAR_SOLAR_VELOCITY_U,
 logger = logging.getLogger(__name__)
 
 
-def plot(stars: List[Star],
+def plot(stars: pd.DataFrame,
          *,
          axes: str,
          uv_filename: str = 'heatmap_uv.ps',
@@ -38,28 +36,25 @@ def plot(stars: List[Star],
         return
 
     # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
-    u_velocities = [star.u_velocity + PECULIAR_SOLAR_VELOCITY_U
-                    for star in stars]
-    v_velocities = [star.v_velocity + PECULIAR_SOLAR_VELOCITY_V
-                    for star in stars]
-    w_velocities = [star.w_velocity + PECULIAR_SOLAR_VELOCITY_W
-                    for star in stars]
+    stars['u_velocity'] += PECULIAR_SOLAR_VELOCITY_U
+    stars['v_velocity'] += PECULIAR_SOLAR_VELOCITY_V
+    stars['w_velocity'] += PECULIAR_SOLAR_VELOCITY_W
 
     # TODO: add option of plotting 3 heatmaps in one fig. at the same time
     draw_plot(xlabel=u_label,
               ylabel=v_label,
-              xdata=u_velocities,
-              ydata=v_velocities,
+              xdata=stars['u_velocity'],
+              ydata=stars['v_velocity'],
               filename=uv_filename)
     draw_plot(xlabel=u_label,
               ylabel=w_label,
-              xdata=u_velocities,
-              ydata=w_velocities,
+              xdata=stars['u_velocity'],
+              ydata=stars['w_velocity'],
               filename=uw_filename)
     draw_plot(xlabel=v_label,
               ylabel=w_label,
-              xdata=v_velocities,
-              ydata=w_velocities,
+              xdata=stars['v_velocity'],
+              ydata=stars['w_velocity'],
               filename=vw_filename)
 
 
