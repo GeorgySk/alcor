@@ -10,6 +10,7 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.axes import Axes
+import pandas as pd
 
 from alcor.models import Star
 
@@ -27,7 +28,7 @@ STD_POPULATION_V = 23
 STD_POPULATION_W = 18.1
 
 
-def plot(stars: List[Star],
+def plot(stars: pd.DataFrame,
          *,
          filename: str = 'velocity_clouds.ps',
          figure_size: Tuple[float, float] = (8, 12),
@@ -43,20 +44,13 @@ def plot(stars: List[Star],
              vw_subplot) = plt.subplots(nrows=3,
                                         figsize=figure_size)
 
-    u_velocities = [star.u_velocity
-                    for star in stars]
-    v_velocities = [star.v_velocity
-                    for star in stars]
-    w_velocities = [star.w_velocity
-                    for star in stars]
-
     draw_subplot(subplot=uv_subplot,
                  xlabel=u_label,
                  ylabel=v_label,
                  xlim=u_limits,
                  ylim=v_limits,
-                 x=u_velocities,
-                 y=v_velocities,
+                 x=stars['u_velocity'],
+                 y=stars['v_velocity'],
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_V,
                  x_std=STD_POPULATION_U,
@@ -66,8 +60,8 @@ def plot(stars: List[Star],
                  ylabel=w_label,
                  xlim=u_limits,
                  ylim=w_limits,
-                 x=u_velocities,
-                 y=w_velocities,
+                 x=stars['u_velocity'],
+                 y=stars['w_velocity'],
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_U,
@@ -77,8 +71,8 @@ def plot(stars: List[Star],
                  ylabel=w_label,
                  xlim=v_limits,
                  ylim=w_limits,
-                 x=v_velocities,
-                 y=w_velocities,
+                 x=stars['v_velocity'],
+                 y=stars['w_velocity'],
                  x_avg=AVERAGE_POPULATION_VELOCITY_V,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_V,
