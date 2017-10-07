@@ -1,6 +1,5 @@
 import logging
-from typing import (Tuple,
-                    List)
+from typing import Tuple
 
 import matplotlib
 from matplotlib.axes import Axes
@@ -10,13 +9,12 @@ from matplotlib.axes import Axes
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
-
-from alcor.models import Star
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
 
-def plot(stars: List[Star],
+def plot(stars: pd.DataFrame,
          *,
          filename: str = 'ugriz.ps',
          figure_size: Tuple[float, float] = (8, 8),
@@ -30,22 +28,18 @@ def plot(stars: List[Star],
              subplot_ri_vs_iz) = plt.subplots(nrows=3,
                                               figsize=figure_size)
 
-    # TODO: write a function? relative transformation happens in sampling.py
+    # TODO: write a function?
     # Transformation from UBVRI to ugriz. More info at:
     # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
-    ugriz_ug = [0.75 * float(star.u_abs_magnitude - star.b_abs_magnitude)
-                + 0.77 * float(star.b_abs_magnitude - star.v_abs_magnitude)
-                + 0.72
-                for star in stars]
-    ugriz_gr = [1.646 * float(star.v_abs_magnitude - star.r_abs_magnitude)
-                - 0.139
-                for star in stars]
-    ugriz_ri = [1.007 * float(star.r_abs_magnitude - star.i_abs_magnitude)
-                - 0.236
-                for star in stars]
-    ugriz_iz = [0.577 * float(star.r_abs_magnitude - star.i_abs_magnitude)
-                - 0.15
-                for star in stars]
+    ugriz_ug = (0.75 * (stars['u_abs_magnitude'] - stars['b_abs_magnitude'])
+                + 0.77 * (stars['b_abs_magnitude'] - stars['v_abs_magnitude'])
+                + 0.72)
+    ugriz_gr = (1.646 * (stars['v_abs_magnitude'] - stars['r_abs_magnitude'])
+                - 0.139)
+    ugriz_ri = (1.007 * (stars['r_abs_magnitude'] - stars['i_abs_magnitude'])
+                - 0.236)
+    ugriz_iz = (0.577 * (stars['r_abs_magnitude'] - stars['i_abs_magnitude'])
+                - 0.15)
 
     draw_subplot(subplot=subplot_ug_vs_gr,
                  xlabel=gr_label,
@@ -71,8 +65,8 @@ def plot(stars: List[Star],
 def draw_subplot(subplot: Axes,
                  xlabel: str,
                  ylabel: str,
-                 x: List[float],
-                 y: List[float],
+                 x: pd.Series,
+                 y: pd.Series,
                  color: str = 'b',
                  point_size: float = 0.5,
                  ratio: float = 10 / 13
