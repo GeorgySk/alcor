@@ -154,7 +154,6 @@ def draw(group_id: uuid.UUID,
         heatmaps.plot(stars=stars,
                       axes=heatmaps_axes)
 
-    # TODO: implement pandas
     if with_toomre_diagram:
         toomre_diagram.plot(stars=stars)
 
