@@ -24,8 +24,8 @@ from alcor.services.common import (PECULIAR_SOLAR_VELOCITY_U,
 logger = logging.getLogger(__name__)
 
 
-def plot(*,
-         stars: List[Star],
+def plot(stars: List[Star],
+         *,
          axes: str,
          uv_filename: str = 'heatmap_uv.ps',
          uw_filename: str = 'heatmap_uw.ps',

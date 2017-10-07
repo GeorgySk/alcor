@@ -28,6 +28,7 @@ STD_POPULATION_W = 18.1
 
 
 def plot(stars: List[Star],
+         *,
          filename: str = 'velocity_clouds.ps',
          figure_size: Tuple[float, float] = (8, 12),
          spacing: float = 0.25,
@@ -88,6 +89,7 @@ def plot(stars: List[Star],
 
 
 def plot_lepine_case(stars: List[Star],
+                     *,
                      filename: str = 'velocity_clouds.ps',
                      figure_size: Tuple[float, float] = (8, 12),
                      spacing: float = 0.25,
