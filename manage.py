@@ -173,17 +173,17 @@ def plot(ctx: click.Context,
             return
 
         for group in groups:
-            plots.draw(group.id,
-                       filtration_method,
-                       nullify_radial_velocity,
-                       luminosity_function,
-                       velocities_vs_magnitude,
-                       velocity_clouds,
-                       lepine_criterion,
-                       heatmap,
-                       toomre_diagram,
-                       ugriz_color_color_diagram,
-                       desired_stars_count,
+            plots.draw(group_id=group.id,
+                       filtration_method=filtration_method,
+                       nullify_radial_velocity=nullify_radial_velocity,
+                       with_luminosity_function=luminosity_function,
+                       with_velocities_vs_magnitude=velocities_vs_magnitude,
+                       with_velocity_clouds=velocity_clouds,
+                       lepine_criterion=lepine_criterion,
+                       heatmaps_axes=heatmap,
+                       with_toomre_diagram=toomre_diagram,
+                       with_ugriz_diagrams=ugriz_color_color_diagram,
+                       desired_stars_count=desired_stars_count,
                        session=session,
                        engine=engine)
 
