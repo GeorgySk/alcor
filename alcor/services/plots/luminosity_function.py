@@ -1,6 +1,5 @@
 from functools import partial
-from typing import (Callable,
-                    Tuple)
+from typing import Tuple
 
 import matplotlib
 
@@ -12,25 +11,15 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 
+from .utils import (bolometric_indexer,
+                    bolometric_magnitude,
+                    nan_array)
+
 OBSERVATIONAL_STARS_COUNTS = np.array(
         [3, 4, 5, 7, 12, 17, 17, 12, 20, 19, 37, 42, 52, 72, 96, 62, 20, 3, 1])
 
 # TODO: replace by # 2 * pi * radius ** 3 / 3
 FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
-SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
-nan_array = partial(np.full,
-                    fill_value=np.nan)
-
-
-def bolometric_indexer(*,
-                       min_magnitude: float,
-                       stars_bin_size: float) -> Callable[[np.ndarray],
-                                                          np.ndarray]:
-    def bolometric_index(magnitude: np.ndarray) -> np.ndarray:
-        magnitude_amplitude = magnitude - min_magnitude
-        return np.floor(magnitude_amplitude / stars_bin_size).astype(np.int32)
-
-    return bolometric_index
 
 
 def plot(stars: pd.DataFrame,
@@ -202,9 +191,3 @@ def replace_nans(df: pd.DataFrame,
                 & notnull_log_stars_count_rows_mask, :] = missing_values_rows
 
     return df_copy
-
-
-def bolometric_magnitude(luminosity: pd.Series) -> pd.Series:
-    # More info at
-    # https://en.wikipedia.org/wiki/Absolute_magnitude#Bolometric_magnitude
-    return 2.5 * luminosity + SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE
