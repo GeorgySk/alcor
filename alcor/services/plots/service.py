@@ -157,7 +157,6 @@ def draw(group_id: uuid.UUID,
     if with_toomre_diagram:
         toomre_diagram.plot(stars=stars)
 
-    # TODO: implement pandas
     if with_ugriz_diagrams:
         ugriz_diagrams.plot(stars=stars)
 
