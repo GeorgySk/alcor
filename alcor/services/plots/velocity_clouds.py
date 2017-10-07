@@ -10,9 +10,10 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.axes import Axes
+import numpy as np
 import pandas as pd
 
-from alcor.models import Star
+from .utils import to_cartesian_from_equatorial
 
 # Kinematic properties of the thin disk taken from the paper of
 # N.Rowell and N.C.Hambly (mean motions are relative to the Sun):
@@ -82,7 +83,7 @@ def plot(stars: pd.DataFrame,
     plt.savefig(filename)
 
 
-def plot_lepine_case(stars: List[Star],
+def plot_lepine_case(stars: pd.DataFrame,
                      *,
                      filename: str = 'velocity_clouds.ps',
                      figure_size: Tuple[float, float] = (8, 12),
@@ -92,38 +93,30 @@ def plot_lepine_case(stars: List[Star],
                      w_label: str = '$W(km/s)$',
                      u_limits: Tuple[float, float] = (-150, 150),
                      v_limits: Tuple[float, float] = (-150, 150),
-                     w_limits: Tuple[float, float] = (-150, 150)):
+                     w_limits: Tuple[float, float] = (-150, 150)) -> None:
+    x_coordinates, y_coordinates, z_coordinates = to_cartesian_from_equatorial(
+            stars)
+
+    highest_coordinates = np.maximum.reduce([np.abs(x_coordinates),
+                                             np.abs(y_coordinates),
+                                             np.abs(z_coordinates)])
+
+    uv_cloud_stars = stars[(highest_coordinates == z_coordinates)]
+    uw_cloud_stars = stars[(highest_coordinates == y_coordinates)]
+    vw_cloud_stars = stars[(highest_coordinates == x_coordinates)]
+
     figure, (uv_subplot,
              uw_subplot,
              vw_subplot) = plt.subplots(nrows=3,
                                         figsize=figure_size)
-
-    uv_cloud_u_velocities = []
-    uv_cloud_v_velocities = []
-    uw_cloud_u_velocities = []
-    uw_cloud_w_velocities = []
-    vw_cloud_v_velocities = []
-    vw_cloud_w_velocities = []
-
-    for star in stars:
-        max_coordinates_modulus = star.max_coordinates_modulus
-        if abs(star.x_coordinate) == max_coordinates_modulus:
-            vw_cloud_v_velocities.append(star.v_velocity)
-            vw_cloud_w_velocities.append(star.w_velocity)
-        elif abs(star.y_coordinate) == max_coordinates_modulus:
-            uw_cloud_u_velocities.append(star.u_velocity)
-            uw_cloud_w_velocities.append(star.w_velocity)
-        else:
-            uv_cloud_u_velocities.append(star.u_velocity)
-            uv_cloud_v_velocities.append(star.v_velocity)
 
     draw_subplot(subplot=uv_subplot,
                  xlabel=u_label,
                  ylabel=v_label,
                  xlim=u_limits,
                  ylim=v_limits,
-                 x=uv_cloud_u_velocities,
-                 y=uv_cloud_v_velocities,
+                 x=uv_cloud_stars['u_velocity'],
+                 y=uv_cloud_stars['v_velocity'],
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_V,
                  x_std=STD_POPULATION_U,
@@ -133,8 +126,8 @@ def plot_lepine_case(stars: List[Star],
                  ylabel=w_label,
                  xlim=u_limits,
                  ylim=w_limits,
-                 x=uw_cloud_u_velocities,
-                 y=uw_cloud_w_velocities,
+                 x=uw_cloud_stars['u_velocity'],
+                 y=uw_cloud_stars['w_velocity'],
                  x_avg=AVERAGE_POPULATION_VELOCITY_U,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_U,
@@ -144,8 +137,8 @@ def plot_lepine_case(stars: List[Star],
                  ylabel=w_label,
                  xlim=v_limits,
                  ylim=w_limits,
-                 x=vw_cloud_v_velocities,
-                 y=vw_cloud_w_velocities,
+                 x=vw_cloud_stars['v_velocity'],
+                 y=vw_cloud_stars['w_velocity'],
                  x_avg=AVERAGE_POPULATION_VELOCITY_V,
                  y_avg=AVERAGE_POPULATION_VELOCITY_W,
                  x_std=STD_POPULATION_V,
