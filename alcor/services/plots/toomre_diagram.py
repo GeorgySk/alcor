@@ -1,7 +1,5 @@
 import logging
-from math import sqrt
-from typing import (Tuple,
-                    List)
+from typing import Tuple
 
 import matplotlib
 
@@ -11,14 +9,14 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+import numpy as np
+import pandas as pd
 
-from alcor.models import (GalacticDiskType,
-                          Star)
 from alcor.services.common import PECULIAR_SOLAR_VELOCITY_V
 logger = logging.getLogger(__name__)
 
 
-def plot(stars: List[Star],
+def plot(stars: pd.DataFrame,
          *,
          filename: str = 'toomre_diagram.ps',
          figure_size: Tuple[float, float] = (8, 8),
@@ -27,17 +25,12 @@ def plot(stars: List[Star],
          ylabel: str = '$\sqrt{U^2+W^2}(km/s)$',
          thin_disk_color: str = 'r',
          thick_disk_color: str = 'b') -> None:
-    figure, subplot = plt.subplots(figsize=figure_size)
-
     # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
-    disks_types_stars = {}
-    for star in stars:
-        (disks_types_stars
-         .setdefault(star.galactic_disk_type, [])
-         .append(star))
+    # TODO: check how to work with categorical data in pandas
+    thin_disk_stars = stars[stars['galactic_disk_type'] == 'thin']
+    thick_disk_stars = stars[stars['galactic_disk_type'] == 'thick']
 
-    thin_disk_stars = disks_types_stars.get(GalacticDiskType.thin, [])
-    thick_disk_stars = disks_types_stars.get(GalacticDiskType.thick, [])
+    figure, subplot = plt.subplots(figsize=figure_size)
     plot_stars_by_galactic_disk_type(subplot=subplot,
                                      stars=thin_disk_stars,
                                      color=thin_disk_color)
@@ -61,20 +54,14 @@ def plot(stars: List[Star],
 
 def plot_stars_by_galactic_disk_type(*,
                                      subplot: Axes,
-                                     stars: List[Star],
+                                     stars: pd.DataFrame,
                                      color: str,
                                      point_size: float = 0.5) -> None:
-    # TODO: how to work with Decimal type? If I leave it I get:
-    # TypeError: Cannot cast array data from dtype('O') to dtype('float64')
-    # according to the rule 'safe'
-    v_velocities = [float(star.v_velocity)
-                    + PECULIAR_SOLAR_VELOCITY_V
-                    for star in stars]
-    uw_velocities_magnitudes = [sqrt(float(star.u_velocity) ** 2
-                                     + float(star.w_velocity) ** 2)
-                                for star in stars]
+    stars['v_velocity'] += PECULIAR_SOLAR_VELOCITY_V
+    uw_velocities_magnitudes = np.sqrt(np.power(stars['u_velocity'], 2)
+                                       + np.power(stars['w_velocity'], 2))
 
-    subplot.scatter(x=v_velocities,
+    subplot.scatter(x=stars['v_velocity'],
                     y=uw_velocities_magnitudes,
                     color=color,
                     s=point_size)
