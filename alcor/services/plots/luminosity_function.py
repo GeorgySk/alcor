@@ -77,13 +77,10 @@ def plot(stars: pd.DataFrame,
 
     observed_stars_counts = pd.Series(observed_stars_counts)
 
-    trusted_bins_stars_counter = partial(trusted_bins_stars_count,
-                                         trusted_bins=trusted_bins)
-
-    normalization_factor = (trusted_bins_stars_counter(observed_stars_counts)
-                            / trusted_bins_stars_counter(actual_stars_counts))
-
-    normalized_stars_counts = actual_stars_counts * normalization_factor
+    normalized_stars_counts = actual_stars_counts * normalization_factor(
+            actual_stars_counts=actual_stars_counts,
+            observed_stars_counts=observed_stars_counts,
+            trusted_bins=trusted_bins)
 
     synthetic_luminosity_function = luminosity_function(
             max_bolometric_magnitude=max_bolometric_magnitude,
@@ -171,8 +168,19 @@ def count_indexes(indexes: pd.Series,
 
 def trusted_bins_stars_count(stars_counts: pd.Series,
                              *,
-                             trusted_bins: frozenset):
+                             trusted_bins: frozenset) -> float:
     return stars_counts[stars_counts.index.isin(trusted_bins)].sum()
+
+
+def normalization_factor(*,
+                         trusted_bins: frozenset,
+                         observed_stars_counts: pd.Series,
+                         actual_stars_counts: pd.Series) -> float:
+    trusted_bins_stars_counter = partial(trusted_bins_stars_count,
+                                         trusted_bins=trusted_bins)
+
+    return (trusted_bins_stars_counter(observed_stars_counts)
+            / trusted_bins_stars_counter(actual_stars_counts))
 
 
 def replace_nans(df: pd.DataFrame,
