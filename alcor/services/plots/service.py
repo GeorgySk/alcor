@@ -63,9 +63,10 @@ def draw(group_id: uuid.UUID,
 
     eliminations_counter = Counter()
 
+    stars_count = stars.shape[0]
+    eliminations_counter['raw'] = stars_count
+
     if filtration_method != 'raw':
-        stars_count = stars.shape[0]
-        eliminations_counter['raw'] = stars_count
         distances_in_pc = stars['distance'] * 1e3
         parallaxes = 1 / distances_in_pc
         min_parallax = 0.025
@@ -137,7 +138,6 @@ def draw(group_id: uuid.UUID,
     if with_luminosity_function:
         luminosity_function.plot(stars=stars)
 
-    # TODO: implement pandas
     if with_velocities_vs_magnitude:
         if lepine_criterion:
             velocities_vs_magnitude.plot_lepine_case(stars=stars)
