@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def plot(stars: List[Star],
+         *,
          filename: str = 'ugriz.ps',
          figure_size: Tuple[float, float] = (8, 8),
          spacing: float = 0.25,

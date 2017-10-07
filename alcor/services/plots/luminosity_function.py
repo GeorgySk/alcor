@@ -23,6 +23,7 @@ FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME = 134041.29
 
 
 def plot(stars: pd.DataFrame,
+         *,
          min_bolometric_magnitude: float = 6.,
          max_bolometric_magnitude: float = 21.,
          bin_size: float = 0.5,

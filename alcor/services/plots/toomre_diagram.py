@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def plot(stars: List[Star],
+         *,
          filename: str = 'toomre_diagram.ps',
          figure_size: Tuple[float, float] = (8, 8),
          ratio: float = 10 / 13,

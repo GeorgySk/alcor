@@ -23,6 +23,7 @@ AUX_ANGLE = radians(122.932)
 
 
 def plot(stars: pd.DataFrame,
+         *,
          min_bolometric_magnitude: float = 6.,
          max_bolometric_magnitude: float = 30.,
          bin_size: float = 0.5,
@@ -108,6 +109,7 @@ def plot(stars: pd.DataFrame,
 
 
 def plot_lepine_case(stars: pd.DataFrame,
+                     *,
                      min_bolometric_magnitude: float = 6.,
                      max_bolometric_magnitude: float = 30.,
                      bin_size: float = 0.5,
