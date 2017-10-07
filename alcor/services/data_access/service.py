@@ -1,11 +1,9 @@
 import uuid
 from typing import List
 
-from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
-from alcor.models import (Group,
-                          Star)
+from alcor.models import Group
 from alcor.models.base import Base
 
 
@@ -13,25 +11,6 @@ def fetch_all(model: Base,
               *,
               session: Session) -> List[Base]:
     query = session.query(model)
-    return query.all()
-
-
-def fetch_group_stars(*,
-                      group_id: uuid.UUID,
-                      session: Session) -> List[Star]:
-    query = (session.query(Star)
-             .filter(Star.group_id == group_id))
-    return query.all()
-
-
-def fetch_random_group_stars(*,
-                             group_id: uuid.UUID,
-                             limit: int = None,
-                             session: Session) -> List[Base]:
-    query = (session.query(Star)
-             .filter(Star.group_id == group_id)
-             .order_by(func.random())
-             .limit(limit))
     return query.all()
 
 
