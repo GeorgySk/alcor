@@ -19,7 +19,8 @@ from . import (luminosity_function,
 ASTRONOMICAL_UNIT = 4.74
 
 
-def draw(group_id: uuid.UUID,
+def draw(*,
+         group_id: uuid.UUID,
          filtration_method: str,
          nullify_radial_velocity: bool,
          with_luminosity_function: bool,
@@ -49,13 +50,12 @@ def draw(group_id: uuid.UUID,
     fields_str = ", ".join(fields_to_fetch)
 
     # TODO: find out if it's possible to do without text
+    sql = text(f"SELECT {fields_str} FROM stars "
+               f"WHERE group_id='{group_id}'")
+
     if desired_stars_count:
-        sql = text(f"SELECT {fields_str} FROM stars " 
-                   f"WHERE group_id='{group_id}' "
-                   f"ORDER BY RANDOM() LIMIT {desired_stars_count}")
-    else:
-        sql = text(f"SELECT {fields_str} FROM stars " 
-                   f"WHERE group_id='{group_id}'")
+        sql = text(str(sql)
+                   + f" ORDER BY RANDOM() LIMIT {desired_stars_count}")
 
     stars = pd.read_sql_query(sql=sql,
                               con=engine,
