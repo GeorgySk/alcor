@@ -51,7 +51,7 @@ def plot(stars: pd.DataFrame,
 
     bins = pd.DataFrame(data=bins_template)
 
-    magnitudes = bolometric_magnitude(luminosity=stars['luminosity'])
+    magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
     bins_indexes = pd.Series(bolometric_index(magnitudes))
 
     # TODO: check cases when there are no stars in a bin

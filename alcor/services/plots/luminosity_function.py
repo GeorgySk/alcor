@@ -68,7 +68,7 @@ def plot(stars: pd.DataFrame,
             stars_bins_count=stars_bins_count,
             stars_counts=observed_stars_counts)
 
-    magnitudes = bolometric_magnitude(luminosity=stars['luminosity'])
+    magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
     bins_indexes = pd.Series(bolometric_index(magnitudes))
 
     actual_stars_counts = count_indexes(indexes=bins_indexes,
