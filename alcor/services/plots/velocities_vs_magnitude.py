@@ -1,4 +1,3 @@
-from math import radians
 from typing import Tuple
 
 import matplotlib
@@ -14,12 +13,8 @@ import pandas as pd
 
 from .utils import (bolometric_indexer,
                     bolometric_magnitude,
-                    nan_array)
-
-
-DEC_GPOLE = radians(27.128336)
-RA_GPOLE = radians(192.859508)
-AUX_ANGLE = radians(122.932)
+                    nan_array,
+                    to_cartesian_from_equatorial)
 
 
 def plot(stars: pd.DataFrame,
@@ -151,11 +146,11 @@ def plot_lepine_case(stars: pd.DataFrame,
                            | (highest_coordinates == y_coordinates)]
 
     u_magnitudes = bolometric_magnitude(
-            luminosity=u_vs_mag_stars['luminosity'])
+            luminosities=u_vs_mag_stars['luminosity'])
     v_magnitudes = bolometric_magnitude(
-            luminosity=v_vs_mag_stars['luminosity'])
+            luminosities=v_vs_mag_stars['luminosity'])
     w_magnitudes = bolometric_magnitude(
-            luminosity=w_vs_mag_stars['luminosity'])
+            luminosities=w_vs_mag_stars['luminosity'])
     u_bins_indexes = pd.Series(bolometric_index(u_magnitudes))
     v_bins_indexes = pd.Series(bolometric_index(v_magnitudes))
     w_bins_indexes = pd.Series(bolometric_index(w_magnitudes))
@@ -253,21 +248,3 @@ def draw_subplot(*,
     subplot.xaxis.set_ticks_position('both')
     subplot.yaxis.set_ticks_position('both')
     subplot.set_aspect(ratio / subplot.get_data_ratio())
-
-
-def to_cartesian_from_equatorial(stars: pd.DataFrame) -> Tuple[pd.Series,
-                                                               pd.Series,
-                                                               pd.Series]:
-    latitudes = (np.arcsin(np.cos(stars['declination']) * np.cos(DEC_GPOLE)
-                           * np.cos(stars['right_ascension'] - RA_GPOLE)
-                           + np.sin(stars['declination']) * np.sin(DEC_GPOLE)))
-    x = np.sin(stars['declination']) - np.sin(latitudes) * np.sin(DEC_GPOLE)
-    y = (np.cos(stars['declination'])
-         * np.sin(stars['right_ascension'] - RA_GPOLE) * np.cos(DEC_GPOLE))
-    longitudes = np.arctan(x / y) + AUX_ANGLE - np.pi / 2.
-    longitudes[((x > 0.) & (y < 0.)) | ((x <= 0.) & (y <= 0.))] += np.pi
-
-    x_coordinates = stars['distance'] * np.cos(latitudes) * np.cos(longitudes)
-    y_coordinates = stars['distance'] * np.cos(latitudes) * np.sin(longitudes)
-    z_coordinates = stars['distance'] * np.sin(latitudes)
-    return x_coordinates, y_coordinates, z_coordinates
