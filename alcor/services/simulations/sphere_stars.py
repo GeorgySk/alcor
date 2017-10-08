@@ -1,101 +1,124 @@
 import logging
+from math import pi, exp, log
+from random import random
 
 import numpy as np
 import sys
 
-from alcor.models.star import GalacticDiskEnum
+from alcor.models.star import GalacticStructureType
 
 logger = logging.getLogger(__name__)
 
 
 # TODO: take these consts to settings file
-def generate_stars_in_sphere(max_stars_count: int = 6E6,
-                             time_bins_count: int = 5000,
-                             scale_height_factor: float = 1.,
-                             thin_disk_scale_height_kpc: float = 0.25,
-                             thick_disk_scale_height_kpc: float = 0.9,
-                             ttdisk: float = 12.,  # TODO: what is ttdisk?
-                             tmdisk: float = 10.,  # TODO: what is tmdisk?
-                             tau: float = 2.,  # TODO: what is tau?,
-                             stars_birth_init_time_gyr: float = 0.,
-                             burst_formation_factor: float = 5.,
-                             star_formation_rate_param: float = 25.,
-                             sector_radius_kpc: float = 0.05,
-                             thin_disk_age_gyr: float = 9.2,
-                             burst_age_gyr: float = 0.6,
-                             mass_reduction_factor: float = 0.03,
-                             thick_disk_stars_fraction: float = 0.8,
-                             initial_mass_function_param: float = -2.35
-                             ) -> None:
-    max_t = tmdisk * np.exp(-tmdisk / tau)  # TODO: what is max_t?
-
-    time_increment = ((thin_disk_age_gyr - stars_birth_init_time_gyr)
-                      / time_bins_count)
-    sector_area = np.pi * sector_radius_kpc ** 2
+def generate_stars(max_stars_count: int = 6E6,
+                   time_bins_count: int = 5000,
+                   thin_disk_scale_height_kpc: float = 0.25,
+                   thick_disk_scale_height_kpc: float = 0.9,
+                   thick_disk_age: float = 12.,
+                   thick_disk_sfr_param: float = 2.,
+                   burst_formation_factor: float = 5.,
+                   star_formation_rate_param: float = 25.,
+                   sector_radius_kpc: float = 0.05,
+                   thin_disk_age: float = 9.2,
+                   burst_age: float = 0.6,
+                   mass_reduction_factor: float = 0.03,
+                   thick_disk_stars_fraction: float = 0.8,
+                   initial_mass_function_param: float = -2.35,
+                   halo_stars_formation_time: float = 1.,
+                   halo_stars_fraction: float = 0.05,
+                   halo_age: float = 14.,
+                   ) -> None:
+    time_increment = thin_disk_age / time_bins_count
+    sector_area = pi * sector_radius_kpc ** 2
     birth_rate = (time_increment * sector_area * 1E6  # TODO: what is 1E6?
                   * mass_reduction_factor
                   * normalization_const(
                         star_formation_rate_param=star_formation_rate_param,
-                        thin_disk_age_gyr=thin_disk_age_gyr))
-    burst_init_time_gyr = thin_disk_age_gyr - burst_age_gyr
+                        thin_disk_age_gyr=thin_disk_age))
+    burst_birth_rate = birth_rate * burst_formation_factor
+    max_age = max(thin_disk_age, thick_disk_age, halo_age)
+    burst_init_time = max_age - burst_age
+    thin_disk_birth_init_time = max_age - thin_disk_age
+    thick_disk_birth_init_time = max_age - thick_disk_age
+    halo_birth_init_time = max_age - halo_age
+    # This can be proved by taking derivative from y = t * exp(-t / tau)
+    thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
+    thick_disk_max_sfr = (thick_disk_max_sfr_relative_time
+                          * exp(-thick_disk_max_sfr_relative_time
+                                / thick_disk_sfr_param))
 
     stars_count = 0
 
     progenitors_masses = []
-    galactic_disk_types = []
+    galactic_structure_types = []
     birth_times = []
     z_coordinates = []
 
     for time_bin in range(time_bins_count):
         total_bin_mass = 0.
 
-        bin_init_time = stars_birth_init_time_gyr + time_bin * time_increment
+        current_bin_init_time = (thin_disk_birth_init_time
+                                 + time_bin * time_increment)
 
-        if bin_init_time >= burst_init_time_gyr:
-            birth_rate *= burst_formation_factor
+        # TODO: do smth about this
+        if current_bin_init_time >= burst_init_time:
+            birth_rate = burst_birth_rate
 
         while True:
-            star_mass = get_mass_from_salpeter_initial_mass_function(
-                initial_mass_function_param=initial_mass_function_param)
             stars_count += 1
 
             if stars_count > max_stars_count:
                 logger.error('Number of stars is too high - '
                              'decrease mass reduction factor')
+                # TODO: what to use instead of sys.exit?
                 sys.exit()
 
+            star_mass = get_mass_from_salpeter_initial_mass_function(
+                    initial_mass_function_param=initial_mass_function_param)
             progenitors_masses.append(star_mass)
-            total_bin_mass += star_mass
 
-            if np.random.rand() <= thick_disk_stars_fraction:
-                galactic_disk_types.append(GalacticDiskEnum.thick)
+            if random() <= thick_disk_stars_fraction:
+                galactic_structure_types.append(GalacticStructureType.thick)
 
+                # TODO: implement MonteCarlo method function/Smirnov transform
                 while True:
-                    # TODO: find out what is going on here
-                    ttry = ttdisk * np.random.rand()
-                    ft = ttry * np.exp(-ttry / tau)
-                    fz = max_t * np.random.rand()
-                    if fz <= ft:
-                        birth_times.append(ttry)
+                    time_try = thick_disk_age * random()
+                    time_try_sfr = (time_try
+                                    * exp(-time_try
+                                          / thick_disk_sfr_param))
+                    sfr_try = thick_disk_max_sfr * random()
+                    if sfr_try <= time_try_sfr:
+                        birth_times.append(time_try
+                                           + thick_disk_birth_init_time)
                         break
+            elif (thick_disk_stars_fraction < random()
+                  <= thick_disk_stars_fraction + halo_stars_fraction):
+                galactic_structure_types.append(GalacticStructureType.halo)
+                birth_times.append(halo_birth_init_time
+                                   + halo_stars_formation_time * random())
             else:
-                galactic_disk_types.append(GalacticDiskEnum.thin)
-                birth_times.append(stars_birth_init_time_gyr
+                galactic_structure_types.append(GalacticStructureType.thin)
+                birth_times.append(thin_disk_birth_init_time
                                    + time_bin * time_increment
-                                   + time_increment * np.random.rand())
+                                   + time_increment * random())
+                total_bin_mass += star_mass
 
-            scale_height = (thin_disk_scale_height_kpc
-                            if galactic_disk_types[-1] == GalacticDiskEnum.thin
-                            else thick_disk_scale_height_kpc)
+            # TODO: assigning coords should be done in another module
+            if galactic_structure_types[-1] == GalacticStructureType.thin:
+                scale_height = thin_disk_scale_height_kpc
+            elif galactic_structure_types[-1] == GalacticStructureType.thick:
+                scale_height = thick_disk_scale_height_kpc
 
-            # TODO: find out what is going on here
-            while True:
-                xx = scale_height_factor * scale_height * np.random.rand()
-                if xx != 0.:
-                    break
-            zz = scale_height * np.log(scale_height_factor * scale_height / xx)
-            in_param = int(2. * np.random.rand()[0])
-            z_coordinates.append(zz * float(1 - 2 * in_param))
+            # Halo stars coords will be generated in polar coords module
+            if galactic_structure_types[-1] != GalacticStructureType.halo:
+                # Inverse transform sampling for y = exp(-z / H)
+                z_coordinate = (-scale_height * log(
+                        1. - random() * (1.0 - exp(-sector_radius_kpc
+                                                   / scale_height))))
+                # TODO: change this
+                random_sign = float(1. - 2. * int(2.0 * random()))
+                z_coordinates.append(z_coordinate * random_sign)
 
             # TODO: find out what is going on here
             if total_bin_mass > birth_rate:
