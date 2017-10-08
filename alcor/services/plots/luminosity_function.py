@@ -96,24 +96,23 @@ def plot(stars: pd.DataFrame,
                 xlim=xlimits,
                 ylim=ylimits)
 
-    subplot.errorbar(x=synthetic_luminosity_function['magnitude'],
-                     y=synthetic_luminosity_function['log_stars_count'],
-                     yerr=[synthetic_luminosity_function['lower_errorbar'],
-                           synthetic_luminosity_function['upper_errorbar']],
-                     marker=marker,
-                     color=line_color,
-                     capsize=capsize,
-                     zorder=2)
+    draw_errorbar = partial(subplot.errorbar,
+                            marker=marker,
+                            capsize=capsize)
 
-    subplot.errorbar(x=observational_luminosity_function['magnitude'],
-                     y=observational_luminosity_function['log_stars_count'],
-                     yerr=[
-                         observational_luminosity_function['lower_errorbar'],
-                         observational_luminosity_function['upper_errorbar']],
-                     marker=marker,
-                     color=observational_line_color,
-                     capsize=capsize,
-                     zorder=1)
+    draw_errorbar(x=synthetic_luminosity_function['magnitude'],
+                  y=synthetic_luminosity_function['log_stars_count'],
+                  yerr=[synthetic_luminosity_function['lower_errorbar'],
+                        synthetic_luminosity_function['upper_errorbar']],
+                  color=line_color,
+                  zorder=2)
+
+    draw_errorbar(x=observational_luminosity_function['magnitude'],
+                  y=observational_luminosity_function['log_stars_count'],
+                  yerr=[observational_luminosity_function['lower_errorbar'],
+                        observational_luminosity_function['upper_errorbar']],
+                  color=observational_line_color,
+                  zorder=1)
 
     plt.minorticks_on()
 
