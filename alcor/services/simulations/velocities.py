@@ -47,27 +47,27 @@ def update_star_velocities(star: Star,
                            u_velocity_dispersion: float,
                            v_velocity_dispersion: float,
                            w_velocity_dispersion: float) -> Star:
-    new_star = copy.deepcopy(star)
-
     uop = uom(u_peculiar_solar_velocity,
               star.r_cylindric_coordinate,
               star.th_cylindric_coordinate,
               solar_galactocentric_distance,
               oort_a_const,
               oort_b_const)
-    new_star.u_velocity = uop + u_velocity_dispersion * np.random.normal()
+    u_velocity = uop + u_velocity_dispersion * np.random.normal()
     vop = vom(v_peculiar_solar_velocity,
               star.r_cylindric_coordinate,
               star.th_cylindric_coordinate,
               solar_galactocentric_distance,
               oort_a_const,
               oort_b_const)
-    new_star.v_velocity = (vop + v_velocity_dispersion * np.random.normal()
-                           - u_velocity_dispersion ** 2 / 120.)
-    new_star.w_velocity = (w_peculiar_solar_velocity
-                           + w_velocity_dispersion * np.random.normal())
+    v_velocity = (vop + v_velocity_dispersion * np.random.normal()
+                  - u_velocity_dispersion ** 2 / 120.)
+    w_velocity = (w_peculiar_solar_velocity
+                  + w_velocity_dispersion * np.random.normal())
 
-    return new_star
+    return star.modify(u_velocity=u_velocity,
+                       v_velocity=v_velocity,
+                       w_velocity=w_velocity)
 
 
 def uom(u_peculiar_solar_velocity: float,
