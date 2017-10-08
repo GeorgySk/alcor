@@ -1,12 +1,20 @@
+import logging
+import operator
+from functools import reduce
 from math import isclose
-from typing import (Union,
+from typing import (Any,
+                    Union,
                     Callable,
+                    Mapping,
+                    Hashable,
                     Tuple,
                     List)
 
 import numpy as np
 
 from alcor.types import CoolingSequencesType
+
+logger = logging.getLogger(__name__)
 
 
 # TODO: rename rows_count to max_rows_count
@@ -80,29 +88,65 @@ def values_by_metallicity_are_close(table: CoolingSequencesType,
                                     other_table: CoolingSequencesType,
                                     *,
                                     relative_tolerance: float = 1E-4) -> bool:
-    for metallicity, table_sequences in table.items():
-        other_table_sequences = other_table[metallicity]
-        for sequence_name, sequence_values in table_sequences.items():
-            other_sequence_values = other_table_sequences[sequence_name]
-
-            if sequence_values.ndim == 1:
-                for x_value, y_value in zip(sequence_values,
-                                            other_sequence_values):
-                    # NaN when compared with other NaN always gives False
-                    if np.isnan(x_value) and np.isnan(y_value):
-                        continue
-                    if not isclose(x_value,
-                                   y_value,
-                                   rel_tol=relative_tolerance):
-                        return False
+    for _, (table_sequences,
+            other_table_sequences) in zip_mappings(table,
+                                                   other_table):
+        for sequence_name, (sequence_values,
+                            other_sequence_values) in zip_mappings(
+                table_sequences,
+                other_table_sequences):
+            if sequence_values.ndim == 1 and other_sequence_values.ndim == 1:
+                if not one_dim_arrays_are_close(
+                        sequence_values,
+                        other_sequence_values,
+                        relative_tolerance=relative_tolerance):
+                    return False
+            elif sequence_values.ndim == 2 and other_sequence_values.ndim == 2:
+                if not two_dim_arrays_are_close(
+                        sequence_values,
+                        other_sequence_values,
+                        relative_tolerance=relative_tolerance):
+                    return False
             else:
-                for x_row, y_row in zip(sequence_values,
-                                        other_sequence_values):
-                    for x_value, y_value in zip(x_row, y_row):
-                        if np.isnan(x_value) and np.isnan(y_value):
-                            continue
-                        if not isclose(x_value,
-                                       y_value,
-                                       rel_tol=relative_tolerance):
-                            return False
+                logger.error(f'Dimensions mismatch for {sequence_name}')
+                return False
+    return True
+
+
+def zip_mappings(*mappings: Mapping[Hashable, Any]):
+    keys_sets = map(set, mappings)
+    common_keys = reduce(set.intersection, keys_sets)
+    for key in common_keys:
+        yield key, tuple(map(operator.itemgetter(key), mappings))
+
+
+# TODO: check if it's achievable by numpy functions
+def one_dim_arrays_are_close(x_values: np.ndarray,
+                             y_values: np.ndarray,
+                             *,
+                             relative_tolerance: float) -> bool:
+    # TODO: check for zip alternatives
+    for x_value, y_value in zip(x_values,
+                                y_values):
+        # NaN when compared with other NaN always gives False
+        if np.isnan(x_value) and np.isnan(y_value):
+            continue
+        if not isclose(x_value,
+                       y_value,
+                       rel_tol=relative_tolerance):
+            return False
+    return True
+
+
+# TODO: is it possible to use np.reduce here?
+def two_dim_arrays_are_close(x_matrix: np.ndarray,
+                             y_matrix: np.ndarray,
+                             *,
+                             relative_tolerance: float) -> bool:
+    for x_row, y_row in zip(x_matrix,
+                            y_matrix):
+        if not one_dim_arrays_are_close(x_row,
+                                        y_row,
+                                        relative_tolerance=relative_tolerance):
+            return False
     return True
