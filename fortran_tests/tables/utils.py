@@ -1,18 +1,15 @@
 import logging
-import operator
-from functools import reduce
 from math import isclose
 from typing import (Any,
                     Union,
                     Callable,
-                    Mapping,
-                    Hashable,
                     Tuple,
                     List)
 
 import numpy as np
 
 from alcor.types import CoolingSequencesType
+from alcor.utils import zip_mappings
 
 logger = logging.getLogger(__name__)
 
@@ -111,13 +108,6 @@ def values_by_metallicity_are_close(table: CoolingSequencesType,
                 logger.error(f'Dimensions mismatch for {sequence_name}')
                 return False
     return True
-
-
-def zip_mappings(*mappings: Mapping[Hashable, Any]):
-    keys_sets = map(set, mappings)
-    common_keys = reduce(set.intersection, keys_sets)
-    for key in common_keys:
-        yield key, tuple(map(operator.itemgetter(key), mappings))
 
 
 # TODO: check if it's achievable by numpy functions

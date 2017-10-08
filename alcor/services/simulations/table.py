@@ -14,6 +14,7 @@ from alcor.services.simulations import (da_color,
                                         one_table,
                                         da_cooling,
                                         db_cooling)
+from .utils import file_reader
 from alcor.types import CoolingSequencesType
 
 logger = logging.getLogger(__name__)
@@ -153,34 +154,35 @@ def read_files(files_paths: List[str],
                fill_type: int = None) -> None:
     rows_counts = table['rows_counts']
 
-    for file_path_index, file_path in enumerate(files_paths):
-        with open(file_path, 'r') as file:
-            rows = map(str.split, file)
-            for row_index, row in enumerate(rows):
-                if row_index == max_rows:
-                    break
-                # In Fortran indexation starts from 1
-                rows_counts[file_path_index] = row_index + 1
-                for sequence, fill_rule in fill_rules.items():
-                    if fill_type is None:
-                        if 'converting_method' in fill_rule:
-                            table[sequence][file_path_index, row_index] = (
-                                fill_rule['converting_method'](
-                                    float(row[fill_rule['column']])))
-                        else:
-                            table[sequence][file_path_index, row_index] = (
-                                float(row[fill_rule['column']]))
+    files = map(file_reader, files_paths)
+    for file_index, lines in enumerate(files):
+        file_rows = map(str.split, lines)
+        for row_index, row in enumerate(file_rows):
+            if row_index == max_rows:
+                break
+            # In Fortran indexation starts from 1
+            rows_counts[file_index] = row_index + 1
+            for sequence, fill_rule in fill_rules.items():
+                table_sequence = table[sequence]
+                if fill_type is None:
+                    if 'converting_method' in fill_rule:
+                        table_sequence[file_index, row_index] = (
+                            fill_rule['converting_method'](
+                                float(row[fill_rule['column']])))
                     else:
-                        if 'converting_method' in fill_rule:
-                            table[sequence][file_path_index, row_index] = (
-                                fill_rule['converting_method'](
-                                    float(row[fill_rule['column'][fill_type]]),
-                                    fill_type=fill_type,
-                                    pre_wd_lifetime=table['pre_wd_lifetime'][
-                                        file_path_index]))
-                        else:
-                            table[sequence][file_path_index, row_index] = (
-                                float(row[fill_rule['column'][fill_type]]))
+                        table_sequence[file_index, row_index] = (
+                            float(row[fill_rule['column']]))
+                else:
+                    if 'converting_method' in fill_rule:
+                        table_sequence[file_index, row_index] = (
+                            fill_rule['converting_method'](
+                                float(row[fill_rule['column'][fill_type]]),
+                                fill_type=fill_type,
+                                pre_wd_lifetime=table['pre_wd_lifetime'][
+                                    file_index]))
+                    else:
+                        table_sequence[file_index, row_index] = (
+                            float(row[fill_rule['column'][fill_type]]))
 
 if __name__ == '__main__':
     read(table_name='da_cooling')
