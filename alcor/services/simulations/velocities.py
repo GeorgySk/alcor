@@ -28,13 +28,12 @@ def modify(*,
         solar_galactocentric_distance=solar_galactocentric_distance,
         u_peculiar_solar_velocity=u_peculiar_solar_velocity,
         v_peculiar_solar_velocity=v_peculiar_solar_velocity,
-        w_peculiar_solar_velocity=w_peculiar_solar_velocity)
+        w_peculiar_solar_velocity=w_peculiar_solar_velocity,
+        u_velocity_dispersion=u_velocity_dispersion,
+        v_velocity_dispersion=v_velocity_dispersion,
+        w_velocity_dispersion=w_velocity_dispersion)
 
-    return [update_velocities(star,
-                              u_velocity_dispersion=u_velocity_dispersion,
-                              v_velocity_dispersion=v_velocity_dispersion,
-                              w_velocity_dispersion=w_velocity_dispersion)
-            for star in stars]
+    yield from map(update_velocities, stars)
 
 
 def update_star_velocities(star: Star,
