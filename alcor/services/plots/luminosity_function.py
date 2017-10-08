@@ -72,8 +72,7 @@ def plot(stars: pd.DataFrame,
     magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
     bins_indexes = pd.Series(bolometric_index(magnitudes))
 
-    actual_stars_counts = count_indexes(indexes=bins_indexes,
-                                        bins_count=stars_bins_count)
+    actual_stars_counts = bins_indexes.value_counts()
 
     observed_stars_counts = pd.Series(observed_stars_counts)
 
@@ -124,7 +123,8 @@ def plot(stars: pd.DataFrame,
     plt.savefig(filename)
 
 
-def luminosity_function(min_bolometric_magnitude: float,
+def luminosity_function(*,
+                        min_bolometric_magnitude: float,
                         max_bolometric_magnitude: float,
                         bin_size: float,
                         stars_bins_count: int,
@@ -153,16 +153,6 @@ def luminosity_function(min_bolometric_magnitude: float,
                        replacement=max_errorbar_len)
 
     return res
-
-
-def count_indexes(indexes: pd.Series,
-                  bins_count: int) -> pd.Series:
-    counts = pd.Series(np.zeros(shape=bins_count,
-                                dtype=int))
-    for index in range(bins_count):
-        counts.iloc[index] = indexes[indexes == index].count()
-
-    return counts
 
 
 def trusted_bins_stars_count(stars_counts: pd.Series,
