@@ -10,12 +10,15 @@ import numpy as np
 
 import da_color
 
+from alcor.services.simulations.da_color import (ROWS_COUNT,
+                                                 FILES_PATHS)
 
-def test_da_cooling_table() -> None:
+
+def test_da_color_table() -> None:
     da_color_table_by_python = table.read(table_name='da_color')
     da_color_table_by_fortran = read_colors_from_fortran(
-        rows_count=650,
-        files_count=10,
+        rows_count=ROWS_COUNT,
+        files_count=len(FILES_PATHS),
         fort_files_initial_unit=60,
         get_from_fortran=da_color.color)
 
