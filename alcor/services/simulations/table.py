@@ -155,7 +155,7 @@ def read_files(files_paths: List[str],
 
     for file_path_index, file_path in enumerate(files_paths):
         with open(file_path, 'r') as file:
-            lines = [line.split() for line in file]
+            lines = map(str.split, file)
             for row_index, row in enumerate(lines):
                 if row_index == max_rows:
                     break
