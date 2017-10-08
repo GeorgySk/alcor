@@ -31,8 +31,7 @@ def draw(*,
          with_toomre_diagram: bool,
          with_ugriz_diagrams: bool,
          desired_stars_count: int,
-         session: Session,
-         engine: Engine) -> None:
+         session: Session) -> None:
     fields_to_fetch = get_fields_to_fetch(
             filtration_method=filtration_method,
             nullify_radial_velocity=nullify_radial_velocity,
@@ -58,7 +57,7 @@ def draw(*,
                    + f" ORDER BY RANDOM() LIMIT {desired_stars_count}")
 
     stars = pd.read_sql_query(sql=sql,
-                              con=engine,
+                              con=session.get_bind(),
                               index_col='id')
 
     stars = filter_stars(stars,
