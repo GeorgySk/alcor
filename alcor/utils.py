@@ -1,9 +1,13 @@
 import logging
+import operator
 from collections import OrderedDict
+from functools import reduce
 from typing import (Any,
                     Union,
                     Iterable,
                     Iterator,
+                    Mapping,
+                    Hashable,
                     Dict)
 
 import yaml
@@ -47,3 +51,10 @@ def str_to_float(string: str) -> Union[str, float]:
         return float(string)
     except ValueError:
         return string
+
+
+def zip_mappings(*mappings: Mapping[Hashable, Any]):
+    keys_sets = map(set, mappings)
+    common_keys = reduce(set.intersection, keys_sets)
+    for key in common_keys:
+        yield key, tuple(map(operator.itemgetter(key), mappings))
