@@ -6,12 +6,11 @@ from math import (radians,
                   pi,
                   exp,
                   sqrt)
-from typing import (Callable,
-                    Iterable,
+from typing import (Iterable,
                     List)
 
 from alcor.models.star import (Star,
-                               GalacticDiskEnum)
+                               GalacticDiskType)
 
 
 # TODO: take all consts to settings file
@@ -59,7 +58,7 @@ def generate_stars(*,
             solar_galactocentric_distance=solar_galactocentric_distance_kpc,
             thick_disk_scale_length=thick_disk_scale_length_kpc,
             initial_mass_function_param=initial_mass_function_param,
-            disk_belonging=GalacticDiskEnum.thin)
+            disk_belonging=GalacticDiskType.thin)
 
         # TODO: find a way to include this in `generate`
         for star in thin_disk_stars:
@@ -82,7 +81,7 @@ def generate_stars(*,
             solar_galactocentric_distance=solar_galactocentric_distance_kpc,
             thick_disk_scale_length=thick_disk_scale_length_kpc,
             initial_mass_function_param=initial_mass_function_param,
-            disk_belonging=GalacticDiskEnum.thick)
+            disk_belonging=GalacticDiskType.thick)
 
         for star in thick_disk_stars:
             star.birth_time = thick_disk_star_birth_time(tmdisk=tmdisk,
@@ -106,7 +105,7 @@ def generate(cone_height_longitude: float,
              solar_galactocentric_distance: float,
              thick_disk_scale_length: float,
              initial_mass_function_param: float,
-             disk_belonging: GalacticDiskEnum
+             disk_belonging: GalacticDiskType
              ) -> Iterable[Star]:
     normalization_cone_mass = (cone_mass(latitude=cone_height_longitude,
                                          delta_latitude=delta_latitude,
@@ -165,7 +164,7 @@ def generate(cone_height_longitude: float,
                    r_cylindrical_coordinate=r_cylindrical_coordinate,
                    th_cylindrical_coordinate=th_cylindrical_coordinate,
                    z_coordinate=z_coordinate,
-                   disk_belonging=disk_belonging)
+                   galactic_disk_type=disk_belonging)
 
 
 def cone_mass(latitude: float,
