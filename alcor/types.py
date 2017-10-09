@@ -7,6 +7,8 @@ from typing import (Union,
                     Tuple,
                     List)
 
+import numpy as np
+
 from alcor.models import Star
 
 NumericType = Union[int, float]
@@ -24,3 +26,4 @@ StarBolometricIndexType = Callable[[Star], int]
 GridParametersInfoType = Dict[str, Union[NumericType,
                                          Dict[str, NumericType]]]
 CSVParametersInfoType = Dict[str, Dict[str, Union[str, int]]]
+CoolingSequencesType = Dict[int, Dict[str, np.ndarray]]

@@ -202,11 +202,11 @@ class Star(Base):
 
     @property
     def x_coordinate(self) -> float:
-        return float(self.cartesian_coordinates[0])
+        return float(self.to_cartesian_from_equatorial()[0])
 
     @property
     def y_coordinate(self) -> float:
-        return float(self.cartesian_coordinates[1])
+        return float(self.to_cartesian_from_equatorial()[1])
 
     # TODO: resolve the conflict
     # @property
