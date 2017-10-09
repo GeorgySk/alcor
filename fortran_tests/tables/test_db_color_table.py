@@ -8,23 +8,22 @@ from alcor.services.simulations import table
 
 import numpy as np
 
-import da_color
+import db_color
 
-from alcor.services.simulations.da_color import (ROWS_COUNT,
+from alcor.services.simulations.db_color import (ROWS_COUNT,
                                                  FILES_PATHS)
 
 
-# TODO: add J color
-def test_da_color_table() -> None:
-    da_color_table_by_python = table.read(table_name='da_color')
-    da_color_table_by_fortran = read_colors_from_fortran(
+def test_db_color_table() -> None:
+    db_color_table_by_python = table.read(table_name='db_color')
+    db_color_table_by_fortran = read_colors_from_fortran(
         rows_count=ROWS_COUNT,
         files_count=len(FILES_PATHS),
-        fort_files_initial_unit=60,
-        get_from_fortran=da_color.color)
+        fort_files_initial_unit=131,
+        get_from_fortran=db_color.colordb)
 
-    assert values_are_close(da_color_table_by_python,
-                            da_color_table_by_fortran)
+    assert values_are_close(db_color_table_by_python,
+                            db_color_table_by_fortran)
 
 
 def values_are_close(x: Dict[str, np.ndarray],
@@ -70,6 +69,8 @@ def read_colors_from_fortran(rows_count: int,
                          order='F')
     i_ubvri = nan_matrix(shape=(files_count, rows_count),
                          order='F')
+    j_ubvri = nan_matrix(shape=(files_count, rows_count),
+                         order='F')
 
     get_from_fortran(initlink=fort_files_initial_unit,
                      ntrk=rows_counts,
@@ -79,7 +80,8 @@ def read_colors_from_fortran(rows_count: int,
                      color_b=b_ubvri,
                      color_v=v_ubvri,
                      color_r=r_ubvri,
-                     color_i=i_ubvri)
+                     color_i=i_ubvri,
+                     color_j=j_ubvri)
 
     return dict(mass=masses,
                 luminosity=luminosities,
@@ -88,6 +90,7 @@ def read_colors_from_fortran(rows_count: int,
                 v_ubvri_absolute=v_ubvri,
                 r_ubvri_absolute=r_ubvri,
                 i_ubvri_absolute=i_ubvri,
+                j_ubvri_absolute=j_ubvri,
                 rows_counts=rows_counts)
 
 
