@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict, Callable
 
 import matplotlib
 
@@ -37,21 +37,11 @@ def plot(stars: pd.DataFrame,
             min_magnitude=min_bolometric_magnitude,
             stars_bin_size=bin_size)
 
-    stars_bins_count = np.asscalar(bolometric_index(max_bolometric_magnitude))
-
-    bins_template = dict(
-            magnitude=np.arange(min_bolometric_magnitude + bin_size / 2,
-                                max_bolometric_magnitude,
-                                bin_size),
-            avg_velocity=nan_array(stars_bins_count),
-            velocity_std=nan_array(stars_bins_count))
-
-    u_vs_mag_bins = pd.DataFrame(data=bins_template)
-    v_vs_mag_bins = pd.DataFrame(data=bins_template)
-    w_vs_mag_bins = pd.DataFrame(data=bins_template)
-    bins_by_velocity = dict(u_velocity=u_vs_mag_bins,
-                            v_velocity=v_vs_mag_bins,
-                            w_velocity=w_vs_mag_bins)
+    bins_by_velocity = get_empty_bins_by_velocity(
+            min_bolometric_magnitude=min_bolometric_magnitude,
+            max_bolometric_magnitude=max_bolometric_magnitude,
+            bin_size=bin_size,
+            bolometric_index=bolometric_index)
 
     figure, subplots = plt.subplots(nrows=3,
                                     figsize=figure_size)
@@ -67,13 +57,10 @@ def plot(stars: pd.DataFrame,
                    label) in zip_mappings(bins_by_velocity,
                                           subplots_by_velocity,
                                           labels_by_velocity):
-        # TODO: check cases when there are no stars in a bin
-        for index in range(stars_bins_count):
-            bins.loc[index, 'avg_velocity'] = stars[
-                bins_indexes == index][velocity].mean()
-            # FIXME: one star in a bin returns nothing for std
-            bins.loc[index, 'velocity_std'] = stars[
-                bins_indexes == index][velocity].std()
+        bins = fill_bins(bins,
+                         stars=stars,
+                         bins_indexes=bins_indexes,
+                         velocity=velocity)
 
         draw_subplot(subplot=subplot,
                      ylabel=label,
@@ -114,21 +101,11 @@ def plot_lepine_case(stars: pd.DataFrame,
             min_magnitude=min_bolometric_magnitude,
             stars_bin_size=bin_size)
 
-    stars_bins_count = np.asscalar(bolometric_index(max_bolometric_magnitude))
-
-    bins_template = dict(
-            magnitude=np.arange(min_bolometric_magnitude + bin_size / 2,
-                                max_bolometric_magnitude,
-                                bin_size),
-            avg_velocity=nan_array(stars_bins_count),
-            velocity_std=nan_array(stars_bins_count))
-
-    u_vs_mag_bins = pd.DataFrame(data=bins_template)
-    v_vs_mag_bins = pd.DataFrame(data=bins_template)
-    w_vs_mag_bins = pd.DataFrame(data=bins_template)
-    bins_by_velocity = dict(u_velocity=u_vs_mag_bins,
-                            v_velocity=v_vs_mag_bins,
-                            w_velocity=w_vs_mag_bins)
+    bins_by_velocity = get_empty_bins_by_velocity(
+            min_bolometric_magnitude=min_bolometric_magnitude,
+            max_bolometric_magnitude=max_bolometric_magnitude,
+            bin_size=bin_size,
+            bolometric_index=bolometric_index)
 
     x_coordinates, y_coordinates, z_coordinates = to_cartesian_from_equatorial(
             stars)
@@ -164,13 +141,10 @@ def plot_lepine_case(stars: pd.DataFrame,
         magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
         bins_indexes = pd.Series(bolometric_index(magnitudes))
 
-        # TODO: check cases when there are no stars in a bin
-        for index in range(stars_bins_count):
-            bins.loc[index, 'avg_velocity'] = stars[
-                bins_indexes == index][velocity].mean()
-            # FIXME: one star in a bin returns nothing for std
-            bins.loc[index, 'velocity_std'] = stars[
-                bins_indexes == index][velocity].std()
+        bins = fill_bins(bins,
+                         stars=stars,
+                         bins_indexes=bins_indexes,
+                         velocity=velocity)
 
         draw_subplot(subplot=subplot,
                      ylabel=label,
@@ -232,3 +206,42 @@ def draw_subplot(*,
     subplot.xaxis.set_ticks_position('both')
     subplot.yaxis.set_ticks_position('both')
     subplot.set_aspect(ratio / subplot.get_data_ratio())
+
+
+def get_empty_bins_by_velocity(min_bolometric_magnitude: float,
+                               max_bolometric_magnitude: float,
+                               bin_size: float,
+                               bolometric_index: Callable
+                               ) -> Dict[str, pd.DataFrame]:
+    stars_bins_count = np.asscalar(bolometric_index(max_bolometric_magnitude))
+
+    bins_template = dict(
+            magnitude=np.arange(min_bolometric_magnitude + bin_size / 2,
+                                max_bolometric_magnitude,
+                                bin_size),
+            avg_velocity=nan_array(stars_bins_count),
+            velocity_std=nan_array(stars_bins_count))
+
+    u_vs_mag_bins = pd.DataFrame(data=bins_template)
+    v_vs_mag_bins = pd.DataFrame(data=bins_template)
+    w_vs_mag_bins = pd.DataFrame(data=bins_template)
+
+    return dict(u_velocity=u_vs_mag_bins,
+                v_velocity=v_vs_mag_bins,
+                w_velocity=w_vs_mag_bins)
+
+
+def fill_bins(bins: pd.DataFrame,
+              *,
+              stars: pd.DataFrame,
+              bins_indexes: pd.Series,
+              velocity: str) -> pd.DataFrame:
+    # TODO: check cases when there are no stars in a bin
+    for index in range(bins.shape[0]):
+        bins.loc[index, 'avg_velocity'] = stars[
+            bins_indexes == index][velocity].mean()
+        # FIXME: one star in a bin returns nothing for std
+        bins.loc[index, 'velocity_std'] = stars[
+            bins_indexes == index][velocity].std()
+
+    return bins
