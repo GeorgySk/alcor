@@ -43,14 +43,14 @@ def plot(stars: pd.DataFrame,
             bin_size=bin_size,
             bolometric_index=bolometric_index)
 
+    magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
+    bins_indexes = pd.Series(bolometric_index(magnitudes))
+
     figure, subplots = plt.subplots(nrows=3,
                                     figsize=figure_size)
     subplots_by_velocity = dict(u_velocity=subplots[0],
                                 v_velocity=subplots[1],
                                 w_velocity=subplots[2])
-
-    magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
-    bins_indexes = pd.Series(bolometric_index(magnitudes))
 
     for velocity, (bins,
                    subplot,
@@ -107,26 +107,10 @@ def plot_lepine_case(stars: pd.DataFrame,
             bin_size=bin_size,
             bolometric_index=bolometric_index)
 
-    x_coordinates, y_coordinates, z_coordinates = to_cartesian_from_equatorial(
-            stars)
-
-    highest_coordinates = np.maximum.reduce([np.abs(x_coordinates),
-                                             np.abs(y_coordinates),
-                                             np.abs(z_coordinates)])
-
-    u_vs_mag_stars = stars[(highest_coordinates == y_coordinates)
-                           | (highest_coordinates == z_coordinates)]
-    v_vs_mag_stars = stars[(highest_coordinates == x_coordinates)
-                           | (highest_coordinates == z_coordinates)]
-    w_vs_mag_stars = stars[(highest_coordinates == x_coordinates)
-                           | (highest_coordinates == y_coordinates)]
-    stars_by_velocity = dict(u_velocity=u_vs_mag_stars,
-                             v_velocity=v_vs_mag_stars,
-                             w_velocity=w_vs_mag_stars)
+    stars_by_velocity = split_stars_by_velocities(stars)
 
     figure, subplots = plt.subplots(nrows=3,
                                     figsize=figure_size)
-
     subplots_by_velocity = dict(u_velocity=subplots[0],
                                 v_velocity=subplots[1],
                                 w_velocity=subplots[2])
@@ -245,3 +229,22 @@ def fill_bins(bins: pd.DataFrame,
             bins_indexes == index][velocity].std()
 
     return bins
+
+
+def split_stars_by_velocities(stars: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+    x_coordinates, y_coordinates, z_coordinates = to_cartesian_from_equatorial(
+            stars)
+
+    highest_coordinates = np.maximum.reduce([np.abs(x_coordinates),
+                                             np.abs(y_coordinates),
+                                             np.abs(z_coordinates)])
+
+    u_vs_mag_stars = stars[(highest_coordinates == y_coordinates)
+                           | (highest_coordinates == z_coordinates)]
+    v_vs_mag_stars = stars[(highest_coordinates == x_coordinates)
+                           | (highest_coordinates == z_coordinates)]
+    w_vs_mag_stars = stars[(highest_coordinates == x_coordinates)
+                           | (highest_coordinates == y_coordinates)]
+    return dict(u_velocity=u_vs_mag_stars,
+                v_velocity=v_vs_mag_stars,
+                w_velocity=w_vs_mag_stars)
