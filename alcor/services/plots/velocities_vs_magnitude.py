@@ -11,6 +11,7 @@ from matplotlib.axes import Axes
 import numpy as np
 import pandas as pd
 
+from alcor.utils import zip_mappings
 from .utils import (bolometric_indexer,
                     bolometric_magnitude,
                     nan_array,
@@ -114,6 +115,10 @@ def plot_lepine_case(stars: pd.DataFrame,
                      v_label: str = '$V_{LSR}(km/s)$',
                      w_label: str = '$W_{LSR}(km/s)$',
                      magnitude_label: str = '$M_{bol}$') -> None:
+    labels_by_velocity = dict(u_velocity=u_label,
+                              v_velocity=v_label,
+                              w_velocity=w_label)
+
     bolometric_index = bolometric_indexer(
             min_magnitude=min_bolometric_magnitude,
             stars_bin_size=bin_size)
@@ -131,6 +136,10 @@ def plot_lepine_case(stars: pd.DataFrame,
     v_vs_mag_bins = pd.DataFrame(data=bins_template)
     w_vs_mag_bins = pd.DataFrame(data=bins_template)
 
+    bins_by_velocity = dict(u_velocity=u_vs_mag_bins,
+                            v_velocity=v_vs_mag_bins,
+                            w_velocity=w_vs_mag_bins)
+
     x_coordinates, y_coordinates, z_coordinates = to_cartesian_from_equatorial(
             stars)
 
@@ -145,62 +154,48 @@ def plot_lepine_case(stars: pd.DataFrame,
     w_vs_mag_stars = stars[(highest_coordinates == x_coordinates)
                            | (highest_coordinates == y_coordinates)]
 
-    u_magnitudes = bolometric_magnitude(
-            luminosities=u_vs_mag_stars['luminosity'])
-    v_magnitudes = bolometric_magnitude(
-            luminosities=v_vs_mag_stars['luminosity'])
-    w_magnitudes = bolometric_magnitude(
-            luminosities=w_vs_mag_stars['luminosity'])
-    u_bins_indexes = pd.Series(bolometric_index(u_magnitudes))
-    v_bins_indexes = pd.Series(bolometric_index(v_magnitudes))
-    w_bins_indexes = pd.Series(bolometric_index(w_magnitudes))
+    stars_by_velocity = dict(u_velocity=u_vs_mag_stars,
+                             v_velocity=v_vs_mag_stars,
+                             w_velocity=w_vs_mag_stars)
 
-    # TODO: check cases when there are no stars in a bin
-    for index in range(stars_bins_count):
-        u_vs_mag_bins.loc[index, 'avg_velocity'] = u_vs_mag_stars[
-            u_bins_indexes == index]['u_velocity'].mean()
-        v_vs_mag_bins.loc[index, 'avg_velocity'] = v_vs_mag_stars[
-            v_bins_indexes == index]['v_velocity'].mean()
-        w_vs_mag_bins.loc[index, 'avg_velocity'] = w_vs_mag_stars[
-            w_bins_indexes == index]['w_velocity'].mean()
-        u_vs_mag_bins.loc[index, 'velocity_std'] = u_vs_mag_stars[
-            u_bins_indexes == index]['u_velocity'].std()
-        v_vs_mag_bins.loc[index, 'velocity_std'] = v_vs_mag_stars[
-            v_bins_indexes == index]['v_velocity'].std()
-        w_vs_mag_bins.loc[index, 'velocity_std'] = w_vs_mag_stars[
-            w_bins_indexes == index]['w_velocity'].std()
+    figure, subplots = plt.subplots(nrows=3,
+                                    figsize=figure_size)
 
-    figure, (subplot_u,
-             subplot_v,
-             subplot_w) = plt.subplots(nrows=3,
-                                       figsize=figure_size)
+    subplots_by_velocity = dict(u_velocity=subplots[0],
+                                v_velocity=subplots[1],
+                                w_velocity=subplots[2])
 
-    draw_subplot(subplot=subplot_u,
-                 ylabel=u_label,
-                 x_line=u_vs_mag_bins['magnitude'],
-                 y_line=u_vs_mag_bins['avg_velocity'],
-                 yerr=u_vs_mag_bins['velocity_std'],
-                 x_scatter=u_magnitudes,
-                 y_scatter=u_vs_mag_stars['u_velocity'])
-    draw_subplot(subplot=subplot_v,
-                 ylabel=v_label,
-                 x_line=v_vs_mag_bins['magnitude'],
-                 y_line=v_vs_mag_bins['avg_velocity'],
-                 yerr=v_vs_mag_bins['velocity_std'],
-                 x_scatter=v_magnitudes,
-                 y_scatter=v_vs_mag_stars['v_velocity'])
-    draw_subplot(subplot=subplot_w,
-                 xlabel=magnitude_label,
-                 ylabel=w_label,
-                 x_line=w_vs_mag_bins['magnitude'],
-                 y_line=w_vs_mag_bins['avg_velocity'],
-                 yerr=w_vs_mag_bins['velocity_std'],
-                 x_scatter=w_magnitudes,
-                 y_scatter=w_vs_mag_stars['w_velocity'])
+    for velocity, (bins,
+                   stars,
+                   subplot,
+                   label) in zip_mappings(bins_by_velocity,
+                                          stars_by_velocity,
+                                          subplots_by_velocity,
+                                          labels_by_velocity):
+        magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
+        bins_indexes = pd.Series(bolometric_index(magnitudes))
+
+        # TODO: check cases when there are no stars in a bin
+        for index in range(stars_bins_count):
+            bins.loc[index, 'avg_velocity'] = stars[
+                bins_indexes == index][velocity].mean()
+            # FIXME: one star in a bin returns nothing for std
+            bins.loc[index, 'velocity_std'] = stars[
+                bins_indexes == index][velocity].std()
+
+        draw_subplot(subplot=subplot,
+                     ylabel=label,
+                     x_line=bins['magnitude'],
+                     y_line=bins['avg_velocity'],
+                     yerr=bins['velocity_std'],
+                     x_scatter=magnitudes,
+                     y_scatter=stars[velocity])
 
     # Removing unnecessary x-labels for top and middle subplots
-    subplot_u.set_xticklabels([])
-    subplot_v.set_xticklabels([])
+    subplots[0].set_xticklabels([])
+    subplots[1].set_xticklabels([])
+
+    subplots[2].set_xlabel(magnitude_label)
 
     # TODO: delete overlapping y-labels
     figure.subplots_adjust(hspace=0)

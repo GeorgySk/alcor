@@ -1,10 +1,14 @@
 import decimal
 import logging
+import operator
 from collections import OrderedDict
 from decimal import Decimal
+from functools import reduce
 from typing import (Any,
                     Iterable,
                     Iterator,
+                    Mapping,
+                    Hashable,
                     Dict)
 
 import yaml
@@ -48,3 +52,10 @@ def str_to_decimal(string: str) -> Any:
         return Decimal(string)
     except decimal.InvalidOperation:
         return string
+
+
+def zip_mappings(*mappings: Mapping[Hashable, Any]):
+    keys_sets = map(set, mappings)
+    common_keys = reduce(set.intersection, keys_sets)
+    for key in common_keys:
+        yield key, tuple(map(operator.itemgetter(key), mappings))
