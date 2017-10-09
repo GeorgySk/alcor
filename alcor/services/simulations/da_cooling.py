@@ -1,5 +1,8 @@
 import csv
-from typing import List, Dict, Iterator, Tuple
+from typing import (Iterator,
+                    Dict,
+                    List,
+                    Tuple)
 
 import numpy as np
 

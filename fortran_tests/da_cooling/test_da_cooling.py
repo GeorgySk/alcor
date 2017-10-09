@@ -1,6 +1,7 @@
 from math import isclose
 from typing import (Union,
-                    Tuple, Dict)
+                    Dict,
+                    Tuple)
 
 import numpy as np
 
@@ -76,8 +77,8 @@ def nan_matrix(shape: Union[int, Tuple[int, ...]],
                    order=order)
 
 
-def values_are_close(x: CoolingSequencesType,
-                     y: CoolingSequencesType,
+def values_are_close(x: Dict,
+                     y: Dict,
                      rel_tol: float = 1E-4) -> bool:
     for metallicity, x_sequences in x.items():
         y_sequences = y[metallicity]
