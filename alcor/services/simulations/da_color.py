@@ -22,4 +22,5 @@ SEQUENCE_FILL_RULES = {'luminosity': {'column': 2},
                        'b_ubvri_absolute': {'column': 24},
                        'v_ubvri_absolute': {'column': 25},
                        'r_ubvri_absolute': {'column': 26},
-                       'i_ubvri_absolute': {'column': 27}}
+                       'i_ubvri_absolute': {'column': 27},
+                       'j_ubvri_absolute': {'column': 28}}
