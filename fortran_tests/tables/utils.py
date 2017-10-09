@@ -155,6 +155,7 @@ def values_by_metallicity_are_close(table: CoolingSequencesType,
     return True
 
 
+# TODO: refactor this
 def values_are_close(x: Dict[str, np.ndarray],
                      y: Dict[str, np.ndarray],
                      rel_tol: float = 1E-4) -> bool:

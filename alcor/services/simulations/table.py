@@ -1,5 +1,6 @@
 import logging
 import os
+from operator import itemgetter
 from typing import (Union,
                     Callable,
                     Iterator,
@@ -166,9 +167,17 @@ def read_files(files_paths: List[str],
                 table_sequence = table[sequence]
                 if fill_type is None:
                     if 'converting_method' in fill_rule:
-                        table_sequence[file_index, row_index] = (
-                            fill_rule['converting_method'](
-                                float(row[fill_rule['column']])))
+                        try:
+                            # For J color in ONe tables
+                            table_sequence[file_index, row_index] = (
+                                fill_rule['converting_method'](
+                                    list(map(float,
+                                             itemgetter(*fill_rule['column'])
+                                                       (row)))))
+                        except TypeError:
+                            table_sequence[file_index, row_index] = (
+                                fill_rule['converting_method'](
+                                        float(row[fill_rule['column']])))
                     else:
                         table_sequence[file_index, row_index] = (
                             float(row[fill_rule['column']]))
@@ -183,6 +192,8 @@ def read_files(files_paths: List[str],
                     else:
                         table_sequence[file_index, row_index] = (
                             float(row[fill_rule['column'][fill_type]]))
+
+
 
 if __name__ == '__main__':
     read(table_name='da_cooling')

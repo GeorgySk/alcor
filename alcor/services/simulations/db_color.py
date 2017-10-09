@@ -17,7 +17,7 @@ FILES_PATHS = ['Table_Mass_05_DB_sort.trk',
 FILES_DIR = 'db_color_tables'
 MASSES = np.array([0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2])
 SEQUENCE_FILL_RULES = {'luminosity': {'column': 2,
-                       'converting_method': convert_luminosity},
+                                      'converting_method': convert_luminosity},
                        'u_ubvri_absolute': {'column': 4},
                        'b_ubvri_absolute': {'column': 5},
                        'v_ubvri_absolute': {'column': 6},
