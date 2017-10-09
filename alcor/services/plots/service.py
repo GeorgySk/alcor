@@ -4,7 +4,6 @@ from typing import Set
 
 import numpy as np
 import pandas as pd
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql import text
 
@@ -172,30 +171,28 @@ def apparent_magnitude(abs_magnitude: pd.Series,
 
 
 def set_radial_velocity_to_zero(stars: pd.DataFrame) -> pd.DataFrame:
-    stars_copy = stars.copy()
-
     distances_in_pc = stars['distance'] * 1e3
 
     a1 = (-ASTRONOMICAL_UNIT * np.cos(stars['galactic_latitude'])
           * np.sin(stars['galactic_longitude']))
     b1 = (-ASTRONOMICAL_UNIT * np.sin(stars['galactic_latitude'])
           * np.cos(stars['galactic_longitude']))
-    stars_copy['u_velocity'] = ((a1 * stars['proper_motion_component_l']
-                                 + b1 * stars['proper_motion_component_b'])
-                                * distances_in_pc)
+    stars['u_velocity'] = ((a1 * stars['proper_motion_component_l']
+                            + b1 * stars['proper_motion_component_b'])
+                              * distances_in_pc)
 
     a2 = (ASTRONOMICAL_UNIT * np.cos(stars['galactic_latitude'])
           * np.cos(stars['galactic_longitude']))
     b2 = (-ASTRONOMICAL_UNIT * np.sin(stars['galactic_latitude'])
           * np.sin(stars['galactic_longitude']))
-    stars_copy['v_velocity'] = ((a2 * stars['proper_motion_component_l']
-                                 + b2 * stars['proper_motion_component_b'])
-                                * distances_in_pc)
+    stars['v_velocity'] = ((a2 * stars['proper_motion_component_l']
+                            + b2 * stars['proper_motion_component_b'])
+                              * distances_in_pc)
 
     b3 = ASTRONOMICAL_UNIT * np.cos(stars['galactic_latitude'])
-    stars_copy['w_velocity'] = (b3 * stars['proper_motion_component_b']
-                                * distances_in_pc)
-    return stars_copy
+    stars['w_velocity'] = (b3 * stars['proper_motion_component_b']
+                           * distances_in_pc)
+    return stars
 
 
 def filter_stars(stars: pd.DataFrame,
@@ -221,73 +218,71 @@ def filter_stars(stars: pd.DataFrame,
 
         return stars
 
-    stars_copy = stars.copy()
-
-    distances_in_pc = stars_copy['distance'] * 1e3
+    distances_in_pc = stars['distance'] * 1e3
     parallaxes = 1 / distances_in_pc
-    stars_copy = stars_copy[parallaxes > min_parallax]
-    eliminations_counter['by_parallax'] = stars_count - stars_copy.shape[0]
+    stars = stars[parallaxes > min_parallax]
+    eliminations_counter['by_parallax'] = stars_count - stars.shape[0]
 
-    stars_count = stars_copy.shape[0]
-    stars_copy = stars_copy[stars_copy['declination'] > min_declination]
+    stars_count = stars.shape[0]
+    stars = stars[stars['declination'] > min_declination]
     eliminations_counter['by_declination'] = (stars_count
-                                              - stars_copy.shape[0])
+                                              - stars.shape[0])
 
-    stars_count = stars_copy.shape[0]
-    stars_copy = stars_copy[np.power(stars_copy['u_velocity'], 2)
-                            + np.power(stars_copy['v_velocity'], 2)
-                            + np.power(stars_copy['w_velocity'], 2)
+    stars_count = stars.shape[0]
+    stars = stars[np.power(stars['u_velocity'], 2)
+                            + np.power(stars['v_velocity'], 2)
+                            + np.power(stars['w_velocity'], 2)
                             < max_velocity ** 2]
-    eliminations_counter['by_velocity'] = stars_count - stars_copy.shape[0]
+    eliminations_counter['by_velocity'] = stars_count - stars.shape[0]
 
     if method == 'restricted':
-        stars_count = stars_copy.shape[0]
-        stars_copy = stars_copy[stars_copy['proper_motion']
+        stars_count = stars.shape[0]
+        stars = stars[stars['proper_motion']
                                 > min_proper_motion]
         eliminations_counter['by_proper_motion'] = (stars_count
-                                                    - stars_copy.shape[0])
+                                                    - stars.shape[0])
 
-        stars_count = stars_copy.shape[0]
+        stars_count = stars.shape[0]
         # Transformation from UBVRI to ugriz. More info at:
         # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
-        g_ugriz_abs_magnitudes = (stars_copy['v_abs_magnitude'] - 0.124
-                                  + 0.63 * (stars_copy['b_abs_magnitude']
-                                            - stars_copy['v_abs_magnitude']))
+        g_ugriz_abs_magnitudes = (stars['v_abs_magnitude'] - 0.124
+                                  + 0.63 * (stars['b_abs_magnitude']
+                                            - stars['v_abs_magnitude']))
         z_ugriz_abs_magnitudes = (g_ugriz_abs_magnitudes
-                                  - 1.646 * (stars_copy['v_abs_magnitude']
-                                             - stars_copy['r_abs_magnitude'])
-                                  - 1.584 * (stars_copy['r_abs_magnitude']
-                                             - stars_copy['i_abs_magnitude'])
+                                  - 1.646 * (stars['v_abs_magnitude']
+                                             - stars['r_abs_magnitude'])
+                                  - 1.584 * (stars['r_abs_magnitude']
+                                             - stars['i_abs_magnitude'])
                                   + 0.525)
         g_apparent_magnitudes = apparent_magnitude(
                 g_ugriz_abs_magnitudes,
-                distance_kpc=stars_copy['distance'])
+                distance_kpc=stars['distance'])
         z_apparent_magnitudes = apparent_magnitude(
                 z_ugriz_abs_magnitudes,
-                distance_kpc=stars_copy['distance'])
+                distance_kpc=stars['distance'])
         # TODO: find out the meaning and check if the last 5 is correct
         hrms = g_apparent_magnitudes + (
-            5. * np.log10(stars_copy['proper_motion']) + 5.)
-        stars_copy = stars_copy[(g_apparent_magnitudes - z_apparent_magnitudes
+            5. * np.log10(stars['proper_motion']) + 5.)
+        stars = stars[(g_apparent_magnitudes - z_apparent_magnitudes
                                  > -0.33)
                                 | (hrms > 14.)]
-        stars_copy = stars_copy[hrms > 3.559 * (
+        stars = stars[hrms > 3.559 * (
             g_apparent_magnitudes - z_apparent_magnitudes) + 15.17]
         eliminations_counter['by_reduced_proper_motion'] = (
-            stars_count - stars_copy.shape[0])
+            stars_count - stars.shape[0])
 
-        stars_count = stars_copy.shape[0]
+        stars_count = stars.shape[0]
         v_apparent_magnitudes = apparent_magnitude(
-                stars_copy['v_abs_magnitude'],
-                distance_kpc=stars_copy['distance'])
-        stars_copy = stars_copy[v_apparent_magnitudes
+                stars['v_abs_magnitude'],
+                distance_kpc=stars['distance'])
+        stars = stars[v_apparent_magnitudes
                                 <= max_v_apparent_magnitude]
         eliminations_counter['by_apparent_magnitude'] = (stars_count -
-                                                         stars_copy.shape[0])
+                                                         stars.shape[0])
 
     counter = eliminations.StarsCounter(group_id=group_id,
                                         **eliminations_counter)
     session.add(counter)
     session.commit()
 
-    return stars_copy
+    return stars
