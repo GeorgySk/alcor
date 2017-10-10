@@ -1,4 +1,6 @@
-from typing import Tuple, Dict, Callable
+from typing import (Callable,
+                    Dict,
+                    Tuple)
 
 import matplotlib
 
@@ -29,9 +31,9 @@ def plot(stars: pd.DataFrame,
          v_label: str = '$V_{LSR}(km/s)$',
          w_label: str = '$W_{LSR}(km/s)$',
          magnitude_label: str = '$M_{bol}$') -> None:
-    labels_by_velocity = dict(u_velocity=u_label,
-                              v_velocity=v_label,
-                              w_velocity=w_label)
+    labels = dict(u_velocity=u_label,
+                  v_velocity=v_label,
+                  w_velocity=w_label)
 
     bolometric_index = bolometric_indexer(
             min_magnitude=min_bolometric_magnitude,
@@ -48,15 +50,15 @@ def plot(stars: pd.DataFrame,
 
     figure, subplots = plt.subplots(nrows=3,
                                     figsize=figure_size)
-    subplots_by_velocity = dict(u_velocity=subplots[0],
-                                v_velocity=subplots[1],
-                                w_velocity=subplots[2])
+    subplots = dict(u_velocity=subplots[0],
+                    v_velocity=subplots[1],
+                    w_velocity=subplots[2])
 
     for velocity, (bins,
                    subplot,
                    label) in zip_mappings(bins_by_velocity,
-                                          subplots_by_velocity,
-                                          labels_by_velocity):
+                                          subplots,
+                                          labels):
         bins = fill_bins(bins,
                          stars=stars,
                          bins_indexes=bins_indexes,
@@ -93,9 +95,9 @@ def plot_lepine_case(stars: pd.DataFrame,
                      v_label: str = '$V_{LSR}(km/s)$',
                      w_label: str = '$W_{LSR}(km/s)$',
                      magnitude_label: str = '$M_{bol}$') -> None:
-    labels_by_velocity = dict(u_velocity=u_label,
-                              v_velocity=v_label,
-                              w_velocity=w_label)
+    labels = dict(u_velocity=u_label,
+                  v_velocity=v_label,
+                  w_velocity=w_label)
 
     bolometric_index = bolometric_indexer(
             min_magnitude=min_bolometric_magnitude,
@@ -111,17 +113,17 @@ def plot_lepine_case(stars: pd.DataFrame,
 
     figure, subplots = plt.subplots(nrows=3,
                                     figsize=figure_size)
-    subplots_by_velocity = dict(u_velocity=subplots[0],
-                                v_velocity=subplots[1],
-                                w_velocity=subplots[2])
+    subplots = dict(u_velocity=subplots[0],
+                    v_velocity=subplots[1],
+                    w_velocity=subplots[2])
 
     for velocity, (bins,
                    stars,
                    subplot,
                    label) in zip_mappings(bins_by_velocity,
                                           stars_by_velocity,
-                                          subplots_by_velocity,
-                                          labels_by_velocity):
+                                          subplots,
+                                          labels):
         magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
         bins_indexes = pd.Series(bolometric_index(magnitudes))
 
