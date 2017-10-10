@@ -4,10 +4,10 @@ from collections import OrderedDict
 from functools import reduce
 from typing import (Any,
                     Union,
+                    Hashable,
+                    Mapping,
                     Iterable,
                     Iterator,
-                    Mapping,
-                    Hashable,
                     Dict)
 
 import yaml
