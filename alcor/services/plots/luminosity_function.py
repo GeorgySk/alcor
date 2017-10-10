@@ -142,17 +142,18 @@ def luminosity_function(*,
 
     res['log_stars_count'] = np.log10(
             stars_counts / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
-    res['upper_errorbar'] = np.log10(1. + 1. / np.sqrt(stars_counts))
-    res['lower_errorbar'] = -np.log10(1. - 1. / np.sqrt(stars_counts))
+
+    stars_counts_sqrt = np.sqrt(stars_counts)
+    inverse_stars_counts_sqrt = 1. / stars_counts_sqrt
+    res['upper_errorbar'] = np.log10(1. + inverse_stars_counts_sqrt)
+    res['lower_errorbar'] = -np.log10(1. - inverse_stars_counts_sqrt)
 
     res.replace(to_replace=[np.inf, -np.inf],
                 value=np.nan,
                 inplace=True)
 
-    res = replace_nans(df=res,
-                       replacement=max_errorbar_len)
-
-    return res
+    return replace_nans(df=res,
+                        replacement=max_errorbar_len)
 
 
 def trusted_bins_stars_count(stars_counts: pd.Series,
