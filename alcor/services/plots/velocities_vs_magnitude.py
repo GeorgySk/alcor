@@ -109,7 +109,7 @@ def plot_lepine_case(stars: pd.DataFrame,
             bin_size=bin_size,
             bolometric_index=bolometric_index)
 
-    stars_by_velocity = split_stars_by_velocities(stars)
+    stars_by_velocity = split_stars_by_velocity(stars)
 
     figure, subplots = plt.subplots(nrows=3,
                                     figsize=figure_size)
@@ -233,7 +233,7 @@ def fill_bins(bins: pd.DataFrame,
     return bins
 
 
-def split_stars_by_velocities(stars: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def split_stars_by_velocity(stars: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     x_coordinates, y_coordinates, z_coordinates = to_cartesian_from_equatorial(
             stars)
 
