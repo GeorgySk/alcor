@@ -208,13 +208,13 @@ def get_empty_bins_by_velocity(min_bolometric_magnitude: float,
             avg_velocity=nan_array(stars_bins_count),
             velocity_std=nan_array(stars_bins_count))
 
-    u_vs_mag_bins = pd.DataFrame(data=bins_template)
-    v_vs_mag_bins = pd.DataFrame(data=bins_template)
-    w_vs_mag_bins = pd.DataFrame(data=bins_template)
+    u_vs_magnitude_bins = pd.DataFrame(data=bins_template)
+    v_vs_magnitude_bins = pd.DataFrame(data=bins_template)
+    w_vs_magnitude_bins = pd.DataFrame(data=bins_template)
 
-    return dict(u_velocity=u_vs_mag_bins,
-                v_velocity=v_vs_mag_bins,
-                w_velocity=w_vs_mag_bins)
+    return dict(u_velocity=u_vs_magnitude_bins,
+                v_velocity=v_vs_magnitude_bins,
+                w_velocity=w_vs_magnitude_bins)
 
 
 def fill_bins(bins: pd.DataFrame,
@@ -241,12 +241,12 @@ def split_stars_by_velocities(stars: pd.DataFrame) -> Dict[str, pd.DataFrame]:
                                              np.abs(y_coordinates),
                                              np.abs(z_coordinates)])
 
-    u_vs_mag_stars = stars[(highest_coordinates == y_coordinates)
-                           | (highest_coordinates == z_coordinates)]
-    v_vs_mag_stars = stars[(highest_coordinates == x_coordinates)
-                           | (highest_coordinates == z_coordinates)]
-    w_vs_mag_stars = stars[(highest_coordinates == x_coordinates)
-                           | (highest_coordinates == y_coordinates)]
-    return dict(u_velocity=u_vs_mag_stars,
-                v_velocity=v_vs_mag_stars,
-                w_velocity=w_vs_mag_stars)
+    u_vs_magnitude_stars = stars[(highest_coordinates == y_coordinates)
+                                 | (highest_coordinates == z_coordinates)]
+    v_vs_magnitude_stars = stars[(highest_coordinates == x_coordinates)
+                                 | (highest_coordinates == z_coordinates)]
+    w_vs_magnitude_stars = stars[(highest_coordinates == x_coordinates)
+                                 | (highest_coordinates == y_coordinates)]
+    return dict(u_velocity=u_vs_magnitude_stars,
+                v_velocity=v_vs_magnitude_stars,
+                w_velocity=w_vs_magnitude_stars)
