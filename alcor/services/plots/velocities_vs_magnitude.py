@@ -39,7 +39,7 @@ def plot(stars: pd.DataFrame,
             min_magnitude=min_bolometric_magnitude,
             stars_bin_size=bin_size)
 
-    bins_by_velocity = get_empty_bins_by_velocity(
+    bins_by_velocities = get_empty_bins_by_velocities(
             min_bolometric_magnitude=min_bolometric_magnitude,
             max_bolometric_magnitude=max_bolometric_magnitude,
             bin_size=bin_size,
@@ -56,7 +56,7 @@ def plot(stars: pd.DataFrame,
 
     for velocity, (bins,
                    subplot,
-                   label) in zip_mappings(bins_by_velocity,
+                   label) in zip_mappings(bins_by_velocities,
                                           subplots,
                                           labels):
         bins = fill_bins(bins,
@@ -103,13 +103,13 @@ def plot_lepine_case(stars: pd.DataFrame,
             min_magnitude=min_bolometric_magnitude,
             stars_bin_size=bin_size)
 
-    bins_by_velocity = get_empty_bins_by_velocity(
+    bins_by_velocities = get_empty_bins_by_velocities(
             min_bolometric_magnitude=min_bolometric_magnitude,
             max_bolometric_magnitude=max_bolometric_magnitude,
             bin_size=bin_size,
             bolometric_index=bolometric_index)
 
-    stars_by_velocity = split_stars_by_velocity(stars)
+    stars_by_velocities = split_stars_by_velocities(stars)
 
     figure, subplots = plt.subplots(nrows=3,
                                     figsize=figure_size)
@@ -120,8 +120,8 @@ def plot_lepine_case(stars: pd.DataFrame,
     for velocity, (bins,
                    stars,
                    subplot,
-                   label) in zip_mappings(bins_by_velocity,
-                                          stars_by_velocity,
+                   label) in zip_mappings(bins_by_velocities,
+                                          stars_by_velocities,
                                           subplots,
                                           labels):
         magnitudes = bolometric_magnitude(luminosities=stars['luminosity'])
@@ -194,11 +194,11 @@ def draw_subplot(*,
     subplot.set_aspect(ratio / subplot.get_data_ratio())
 
 
-def get_empty_bins_by_velocity(min_bolometric_magnitude: float,
-                               max_bolometric_magnitude: float,
-                               bin_size: float,
-                               bolometric_index: Callable
-                               ) -> Dict[str, pd.DataFrame]:
+def get_empty_bins_by_velocities(min_bolometric_magnitude: float,
+                                 max_bolometric_magnitude: float,
+                                 bin_size: float,
+                                 bolometric_index: Callable
+                                 ) -> Dict[str, pd.DataFrame]:
     stars_bins_count = np.asscalar(bolometric_index(max_bolometric_magnitude))
 
     bins_template = dict(
@@ -233,7 +233,7 @@ def fill_bins(bins: pd.DataFrame,
     return bins
 
 
-def split_stars_by_velocity(stars: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def split_stars_by_velocities(stars: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     x_coordinates, y_coordinates, z_coordinates = to_cartesian_from_equatorial(
             stars)
 
