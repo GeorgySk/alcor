@@ -1,5 +1,6 @@
 import uuid
 from collections import Counter
+from functools import partial
 from typing import Set
 
 import numpy as np
@@ -206,79 +207,39 @@ def filter_stars(stars: pd.DataFrame,
                  min_proper_motion: float = 0.04,
                  max_v_apparent_magnitude: float = 19.) -> pd.DataFrame:
     eliminations_counter = Counter()
+    eliminations_counter['raw'] = stars.shape[0]
 
-    stars_count = stars.shape[0]
-    eliminations_counter['raw'] = stars_count
+    filtration_functions = {}
+    # TODO: fix geometry of a simulated region so that we don't need to use
+    # the 'full' filtration method
+    if method != 'raw':
+        by_parallax = partial(filter_by_parallax,
+                              min_parallax=min_parallax)
+        by_declination = partial(filter_by_declination,
+                                 min_declination=min_declination)
+        by_velocity = partial(filter_by_velocity,
+                              max_velocity=max_velocity)
 
-    if method == 'raw':
-        counter = eliminations.StarsCounter(group_id=group_id,
-                                            **eliminations_counter)
-        session.add(counter)
-        session.commit()
-
-        return stars
-
-    distances_in_pc = stars['distance'] * 1e3
-    parallaxes = 1 / distances_in_pc
-    stars = stars[parallaxes > min_parallax]
-    eliminations_counter['by_parallax'] = stars_count - stars.shape[0]
-
-    stars_count = stars.shape[0]
-    stars = stars[stars['declination'] > min_declination]
-    eliminations_counter['by_declination'] = (stars_count
-                                              - stars.shape[0])
-
-    stars_count = stars.shape[0]
-    stars = stars[np.power(stars['u_velocity'], 2)
-                            + np.power(stars['v_velocity'], 2)
-                            + np.power(stars['w_velocity'], 2)
-                            < max_velocity ** 2]
-    eliminations_counter['by_velocity'] = stars_count - stars.shape[0]
+        filtration_functions.update(by_parallax=by_parallax,
+                                    by_declination=by_declination,
+                                    by_velocity=by_velocity)
 
     if method == 'restricted':
-        stars_count = stars.shape[0]
-        stars = stars[stars['proper_motion']
-                                > min_proper_motion]
-        eliminations_counter['by_proper_motion'] = (stars_count
-                                                    - stars.shape[0])
+        by_proper_motion = partial(filter_by_proper_motion,
+                                   min_proper_motion=min_proper_motion)
+        by_apparent_magnitude = partial(
+                filter_by_apparent_magnitude,
+                max_v_apparent_magnitude=max_v_apparent_magnitude)
 
-        stars_count = stars.shape[0]
-        # Transformation from UBVRI to ugriz. More info at:
-        # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
-        g_ugriz_abs_magnitudes = (stars['v_abs_magnitude'] - 0.124
-                                  + 0.63 * (stars['b_abs_magnitude']
-                                            - stars['v_abs_magnitude']))
-        z_ugriz_abs_magnitudes = (g_ugriz_abs_magnitudes
-                                  - 1.646 * (stars['v_abs_magnitude']
-                                             - stars['r_abs_magnitude'])
-                                  - 1.584 * (stars['r_abs_magnitude']
-                                             - stars['i_abs_magnitude'])
-                                  + 0.525)
-        g_apparent_magnitudes = apparent_magnitude(
-                g_ugriz_abs_magnitudes,
-                distance_kpc=stars['distance'])
-        z_apparent_magnitudes = apparent_magnitude(
-                z_ugriz_abs_magnitudes,
-                distance_kpc=stars['distance'])
-        # TODO: find out the meaning and check if the last 5 is correct
-        hrms = g_apparent_magnitudes + (
-            5. * np.log10(stars['proper_motion']) + 5.)
-        stars = stars[(g_apparent_magnitudes - z_apparent_magnitudes
-                                 > -0.33)
-                                | (hrms > 14.)]
-        stars = stars[hrms > 3.559 * (
-            g_apparent_magnitudes - z_apparent_magnitudes) + 15.17]
-        eliminations_counter['by_reduced_proper_motion'] = (
-            stars_count - stars.shape[0])
+        filtration_functions.update(
+                by_proper_motion=by_proper_motion,
+                by_reduced_proper_motion=filter_by_reduced_proper_motion,
+                by_apparent_magnitude=by_apparent_magnitude)
 
+    for criterion, filtration_function in filtration_functions.items():
         stars_count = stars.shape[0]
-        v_apparent_magnitudes = apparent_magnitude(
-                stars['v_abs_magnitude'],
-                distance_kpc=stars['distance'])
-        stars = stars[v_apparent_magnitudes
-                                <= max_v_apparent_magnitude]
-        eliminations_counter['by_apparent_magnitude'] = (stars_count -
-                                                         stars.shape[0])
+        stars = filtration_function(stars)
+        eliminations_counter[criterion] = stars_count - stars.shape[0]
 
     counter = eliminations.StarsCounter(group_id=group_id,
                                         **eliminations_counter)
@@ -286,3 +247,67 @@ def filter_stars(stars: pd.DataFrame,
     session.commit()
 
     return stars
+
+
+def filter_by_parallax(stars: pd.DataFrame,
+                       *,
+                       min_parallax: float) -> pd.DataFrame:
+    distances_in_pc = stars['distance'] * 1e3
+    parallaxes = 1 / distances_in_pc
+    return stars[parallaxes > min_parallax]
+
+
+def filter_by_declination(stars: pd.DataFrame,
+                          *,
+                          min_declination: float) -> pd.DataFrame:
+    return stars[stars['declination'] > min_declination]
+
+
+def filter_by_velocity(stars: pd.DataFrame,
+                       *,
+                       max_velocity: float) -> pd.DataFrame:
+    return stars[np.power(stars['u_velocity'], 2)
+                 + np.power(stars['v_velocity'], 2)
+                 + np.power(stars['w_velocity'], 2)
+                 < max_velocity ** 2]
+
+
+def filter_by_proper_motion(stars: pd.DataFrame,
+                            *,
+                            min_proper_motion: float) -> pd.DataFrame:
+    return stars[stars['proper_motion'] > min_proper_motion]
+
+
+# TODO: find out what is going on here
+def filter_by_reduced_proper_motion(stars: pd.DataFrame) -> pd.DataFrame:
+    # Transformation from UBVRI to ugriz. More info at:
+    # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
+    g_ugriz_abs_magnitudes = (stars['v_abs_magnitude'] - 0.124
+                              + 0.63 * (stars['b_abs_magnitude']
+                                        - stars['v_abs_magnitude']))
+    z_ugriz_abs_magnitudes = (g_ugriz_abs_magnitudes
+                              - 1.646 * (stars['v_abs_magnitude']
+                                         - stars['r_abs_magnitude'])
+                              - 1.584 * (stars['r_abs_magnitude']
+                                         - stars['i_abs_magnitude'])
+                              + 0.525)
+    g_apparent_magnitudes = apparent_magnitude(g_ugriz_abs_magnitudes,
+                                               distance_kpc=stars['distance'])
+    z_apparent_magnitudes = apparent_magnitude(z_ugriz_abs_magnitudes,
+                                               distance_kpc=stars['distance'])
+    # TODO: find out the meaning and check if the last 5 is correct
+    hrms = g_apparent_magnitudes + 5. * np.log10(stars['proper_motion']) + 5.
+    stars = stars[(g_apparent_magnitudes - z_apparent_magnitudes > -0.33)
+                  | (hrms > 14.)]
+
+    return stars[hrms > 15.17 + 3.559 * (g_apparent_magnitudes
+                                         - z_apparent_magnitudes)]
+
+
+def filter_by_apparent_magnitude(stars: pd.DataFrame,
+                                 *,
+                                 max_v_apparent_magnitude: float
+                                 ) -> pd.DataFrame:
+    v_apparent_magnitudes = apparent_magnitude(stars['v_abs_magnitude'],
+                                               distance_kpc=stars['distance'])
+    return stars[v_apparent_magnitudes <= max_v_apparent_magnitude]
