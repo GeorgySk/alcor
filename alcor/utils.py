@@ -5,9 +5,9 @@ from functools import reduce
 from typing import (Any,
                     Union,
                     Hashable,
-                    Mapping,
                     Iterable,
                     Iterator,
+                    Mapping,
                     Dict)
 
 import yaml
