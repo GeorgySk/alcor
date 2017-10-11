@@ -6,9 +6,9 @@ from decimal import Decimal
 from functools import reduce
 from typing import (Any,
                     Hashable,
-                    Mapping,
                     Iterable,
                     Iterator,
+                    Mapping,
                     Dict)
 
 import yaml
