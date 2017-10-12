@@ -39,7 +39,7 @@ def plot(stars: pd.DataFrame,
             min_magnitude=min_bolometric_magnitude,
             stars_bin_size=bin_size)
 
-    bins_by_velocities = get_empty_bins_by_velocities(
+    bins_by_velocities = empty_bins_by_velocities(
             min_bolometric_magnitude=min_bolometric_magnitude,
             max_bolometric_magnitude=max_bolometric_magnitude,
             bin_size=bin_size,
@@ -103,7 +103,7 @@ def plot_lepine_case(stars: pd.DataFrame,
             min_magnitude=min_bolometric_magnitude,
             stars_bin_size=bin_size)
 
-    bins_by_velocities = get_empty_bins_by_velocities(
+    bins_by_velocities = empty_bins_by_velocities(
             min_bolometric_magnitude=min_bolometric_magnitude,
             max_bolometric_magnitude=max_bolometric_magnitude,
             bin_size=bin_size,
@@ -194,11 +194,11 @@ def draw_subplot(*,
     subplot.set_aspect(ratio / subplot.get_data_ratio())
 
 
-def get_empty_bins_by_velocities(min_bolometric_magnitude: float,
-                                 max_bolometric_magnitude: float,
-                                 bin_size: float,
-                                 bolometric_index: Callable
-                                 ) -> Dict[str, pd.DataFrame]:
+def empty_bins_by_velocities(min_bolometric_magnitude: float,
+                             max_bolometric_magnitude: float,
+                             bin_size: float,
+                             bolometric_index: Callable
+                             ) -> Dict[str, pd.DataFrame]:
     stars_bins_count = np.asscalar(bolometric_index(max_bolometric_magnitude))
 
     bins_template = dict(
