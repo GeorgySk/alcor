@@ -5,7 +5,6 @@ from math import (pi,
 from random import random
 
 import numpy as np
-import sys
 
 from alcor.models.star import GalacticStructureType
 
@@ -81,16 +80,11 @@ def generate_stars(max_stars_count: int = 6_000_000,
                 galactic_structure_types.append(GalacticStructureType.thick)
 
                 # TODO: implement MonteCarlo method function/Smirnov transform
-                while True:
-                    time_try = thick_disk_age * random()
-                    time_try_sfr = (time_try
-                                    * exp(-time_try
-                                          / thick_disk_sfr_param))
-                    sfr_try = thick_disk_max_sfr * random()
-                    if sfr_try <= time_try_sfr:
-                        birth_times.append(time_try
-                                           + thick_disk_birth_init_time)
-                        break
+                birth_times.append(birth_time(
+                        thick_disk_age=thick_disk_age,
+                        thick_disk_sfr_param=thick_disk_sfr_param,
+                        thick_disk_max_sfr=thick_disk_max_sfr,
+                        thick_disk_birth_init_time=thick_disk_birth_init_time))
             elif (thick_disk_stars_fraction < random()
                   <= thick_disk_stars_fraction + halo_stars_fraction):
                 galactic_structure_types.append(GalacticStructureType.halo)
@@ -150,3 +144,18 @@ def get_mass_from_salpeter_initial_mass_function(
         y_imf = mass ** initial_mass_function_param
         if y <= y_imf:
             return mass
+
+
+def birth_time(*,
+               thick_disk_age: float,
+               thick_disk_sfr_param: float,
+               thick_disk_max_sfr: float,
+               thick_disk_birth_init_time: float) -> float:
+    while True:
+        time_try = thick_disk_age * random()
+        time_try_sfr = (time_try
+                        * exp(-time_try
+                              / thick_disk_sfr_param))
+        sfr_try = thick_disk_max_sfr * random()
+        if sfr_try <= time_try_sfr:
+            return time_try + thick_disk_birth_init_time
