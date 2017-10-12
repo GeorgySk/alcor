@@ -22,3 +22,23 @@ def test_serialization(star: Star) -> None:
     assert all(getattr(deserialized_star, field_name)
                == getattr(star, field_name)
                for field_name in Star.fields_to_copy())
+
+
+def test_cartesian_coordinates(star: Star) -> None:
+    cartesian_coordinates = star.cartesian_coordinates
+
+    assert isinstance(cartesian_coordinates, tuple)
+    assert all(isinstance(field_name, float)
+               for field_name in cartesian_coordinates)
+    assert len(cartesian_coordinates) == 3
+
+
+def test_max_coordinates_modulus(star: Star) -> None:
+    max_coordinates_modulus = star.max_coordinates_modulus
+
+    min_cartesian_coordinates_modulus = min(map(abs,
+                                                star.cartesian_coordinates))
+
+    assert isinstance(max_coordinates_modulus, float)
+    assert max_coordinates_modulus >= 0.
+    assert max_coordinates_modulus >= min_cartesian_coordinates_modulus

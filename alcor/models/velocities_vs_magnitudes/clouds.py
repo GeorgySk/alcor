@@ -17,13 +17,13 @@ class Cloud(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    bolometric_magnitude = Column(Float(asdecimal=True),
+    bolometric_magnitude = Column(Float(),
                                   nullable=False)
-    u_velocity = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(),
                         nullable=False)
-    v_velocity = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(),
                         nullable=False)
-    w_velocity = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -48,9 +48,9 @@ class LepineCaseUCloud(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    bolometric_magnitude = Column(Float(asdecimal=True),
+    bolometric_magnitude = Column(Float(),
                                   nullable=False)
-    u_velocity = Column(Float(asdecimal=True),
+    u_velocity = Column(Float(),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -71,9 +71,9 @@ class LepineCaseVCloud(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    bolometric_magnitude = Column(Float(asdecimal=True),
+    bolometric_magnitude = Column(Float(),
                                   nullable=False)
-    v_velocity = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -94,9 +94,9 @@ class LepineCaseWCloud(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    bolometric_magnitude = Column(Float(asdecimal=True),
+    bolometric_magnitude = Column(Float(),
                                   nullable=False)
-    w_velocity = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(),
                         nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())

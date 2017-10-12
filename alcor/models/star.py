@@ -76,55 +76,55 @@ class Star(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    mass = Column(Float(asdecimal=True),
+    mass = Column(Float(),
                   nullable=True)
-    luminosity = Column(Float(asdecimal=True),
+    luminosity = Column(Float(),
                         nullable=True)
-    r_galactocentric = Column(Float(asdecimal=True),
+    r_galactocentric = Column(Float(),
                               nullable=True)
-    th_galactocentric = Column(Float(asdecimal=True),
+    th_galactocentric = Column(Float(),
                                nullable=True)
-    z_coordinate = Column(Float(asdecimal=True),
+    z_coordinate = Column(Float(),
                           nullable=True)
-    proper_motion = Column(Float(asdecimal=True),
+    proper_motion = Column(Float(),
                            nullable=True)
-    proper_motion_component_b = Column(Float(asdecimal=True),
+    proper_motion_component_b = Column(Float(),
                                        nullable=True)
-    proper_motion_component_l = Column(Float(asdecimal=True),
+    proper_motion_component_l = Column(Float(),
                                        nullable=True)
-    proper_motion_component_vr = Column(Float(asdecimal=True),
+    proper_motion_component_vr = Column(Float(),
                                         nullable=True)
-    right_ascension = Column(Float(asdecimal=True),
+    right_ascension = Column(Float(),
                              nullable=True)
-    declination = Column(Float(asdecimal=True),
+    declination = Column(Float(),
                          nullable=True)
-    right_ascension_proper_motion = Column(Float(asdecimal=True),
+    right_ascension_proper_motion = Column(Float(),
                                            nullable=True)
-    declination_proper_motion = Column(Float(asdecimal=True),
+    declination_proper_motion = Column(Float(),
                                        nullable=True)
-    distance = Column(Float(asdecimal=True),
+    distance = Column(Float(),
                       nullable=True)
-    galactic_latitude = Column(Float(asdecimal=True),
+    galactic_latitude = Column(Float(),
                                nullable=True)
-    galactic_longitude = Column(Float(asdecimal=True),
+    galactic_longitude = Column(Float(),
                                 nullable=True)
-    j_abs_magnitude = Column(Float(asdecimal=True),
+    j_abs_magnitude = Column(Float(),
                              nullable=True)
-    b_abs_magnitude = Column(Float(asdecimal=True),
-                             nullable = True)
-    r_abs_magnitude = Column(Float(asdecimal=True),
+    b_abs_magnitude = Column(Float(),
                              nullable=True)
-    v_abs_magnitude = Column(Float(asdecimal=True),
+    r_abs_magnitude = Column(Float(),
                              nullable=True)
-    i_abs_magnitude = Column(Float(asdecimal=True),
+    v_abs_magnitude = Column(Float(),
                              nullable=True)
-    u_velocity = Column(Float(asdecimal=True),
+    i_abs_magnitude = Column(Float(),
+                             nullable=True)
+    u_velocity = Column(Float(),
                         nullable=True)
-    v_velocity = Column(Float(asdecimal=True),
+    v_velocity = Column(Float(),
                         nullable=True)
-    w_velocity = Column(Float(asdecimal=True),
+    w_velocity = Column(Float(),
                         nullable=True)
-    birth_time = Column(Float(asdecimal=True),
+    birth_time = Column(Float(),
                         nullable=True)
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
@@ -202,11 +202,11 @@ class Star(Base):
 
     @property
     def x_coordinate(self) -> float:
-        return float(self.cartesian_coordinates[0])
+        return self.cartesian_coordinates[0]
 
     @property
     def y_coordinate(self) -> float:
-        return float(self.cartesian_coordinates[1])
+        return self.cartesian_coordinates[1]
 
     # TODO: resolve the conflict
     # @property
@@ -221,9 +221,9 @@ class Star(Base):
 
     @property
     def cartesian_coordinates(self) -> Tuple[float, float, float]:
-        right_ascension = float(self.right_ascension)
-        declination = float(self.declination)
-        distance = float(self.distance)
+        right_ascension = self.right_ascension
+        declination = self.declination
+        distance = self.distance
 
         latitude = (asin(cos(declination) * cos(DEC_GPOLE)
                          * cos(right_ascension - RA_GPOLE)
@@ -270,11 +270,11 @@ class Star(Base):
 
 def set_radial_velocity_to_zero(star: Star) -> Star:
     # TODO: implement pc/kpc units
-    distance = float(star.distance)
-    galactic_latitude = float(star.galactic_latitude)
-    galactic_longitude = float(star.galactic_longitude)
-    proper_motion_component_b = float(star.proper_motion_component_b)
-    proper_motion_component_l = float(star.proper_motion_component_l)
+    distance = star.distance
+    galactic_latitude = star.galactic_latitude
+    galactic_longitude = star.galactic_longitude
+    proper_motion_component_b = star.proper_motion_component_b
+    proper_motion_component_l = star.proper_motion_component_l
 
     distance_in_pc = distance * 1e3
 

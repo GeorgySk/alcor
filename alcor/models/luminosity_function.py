@@ -17,13 +17,13 @@ class Point(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    avg_bin_magnitude = Column(Float(asdecimal=True),
+    avg_bin_magnitude = Column(Float(),
                                nullable=False)
-    stars_count_logarithm = Column(Float(asdecimal=True),
+    stars_count_logarithm = Column(Float(),
                                    nullable=False)
-    upper_error_bar = Column(Float(asdecimal=True),
+    upper_error_bar = Column(Float(),
                              nullable=False)
-    lower_error_bar = Column(Float(asdecimal=True),
+    lower_error_bar = Column(Float(),
                              nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())

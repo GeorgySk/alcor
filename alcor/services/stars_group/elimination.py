@@ -1,7 +1,7 @@
-from collections import Counter
-from decimal import Decimal
 from fractions import Fraction
 from math import log10
+
+from collections import Counter
 
 from alcor.models import Star
 
@@ -19,7 +19,7 @@ def check(star: Star,
           max_velocity: float = 500.,
           min_proper_motion: float = 0.04) -> bool:
     # TODO: implement pc/kpc units
-    distance_in_pc = star.distance * Decimal(1e3)
+    distance_in_pc = star.distance * 1e3
     parallax = Fraction(1, Fraction(distance_in_pc))
 
     if parallax < min_parallax:

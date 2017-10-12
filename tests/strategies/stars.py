@@ -1,9 +1,8 @@
 import sys
-from decimal import Decimal
-from functools import partial
 from typing import (Iterator,
                     Tuple)
 
+from functools import partial
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 from hypothesis_sqlalchemy import tables
@@ -28,19 +27,18 @@ def stars_factory(nullable: bool) -> SearchStrategy:
 def fixed_stars_columns_values(nullable: bool
                                ) -> Iterator[Tuple[str, SearchStrategy]]:
     table = Star.__table__
-    positive_decimals = strategies.decimals(
-            min_value=Decimal(sys.float_info.epsilon),
-            allow_nan=False,
-            allow_infinity=False)
+    positive_floats = strategies.floats(min_value=sys.float_info.epsilon,
+                                        allow_nan=False,
+                                        allow_infinity=False)
     if nullable:
-        positive_decimals |= strategies.none()
+        positive_floats |= strategies.none()
     else:
-        decimals = strategies.decimals(allow_nan=False,
-                                       allow_infinity=False)
+        floats = strategies.floats(allow_nan=False,
+                                   allow_infinity=False)
         for column in table.columns:
             if isinstance(column.type, Float):
-                yield column.name, decimals
-    yield Star.proper_motion.name, positive_decimals
+                yield column.name, floats
+    yield Star.proper_motion.name, positive_floats
 
 
 defined_stars = stars_factory(nullable=False)

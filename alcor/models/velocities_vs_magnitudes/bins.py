@@ -17,19 +17,19 @@ class Bin(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    avg_magnitude = Column(Float(asdecimal=True),
+    avg_magnitude = Column(Float(),
                            nullable=False)
-    avg_u_velocity = Column(Float(asdecimal=True),
+    avg_u_velocity = Column(Float(),
                             nullable=False)
-    avg_v_velocity = Column(Float(asdecimal=True),
+    avg_v_velocity = Column(Float(),
                             nullable=False)
-    avg_w_velocity = Column(Float(asdecimal=True),
+    avg_w_velocity = Column(Float(),
                             nullable=False)
-    u_velocity_std = Column(Float(asdecimal=True),
+    u_velocity_std = Column(Float(),
                             nullable=False)
-    v_velocity_std = Column(Float(asdecimal=True),
+    v_velocity_std = Column(Float(),
                             nullable=False)
-    w_velocity_std = Column(Float(asdecimal=True),
+    w_velocity_std = Column(Float(),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -60,11 +60,11 @@ class LepineCaseUBin(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    avg_magnitude = Column(Float(asdecimal=True),
+    avg_magnitude = Column(Float(),
                            nullable=False)
-    avg_u_velocity = Column(Float(asdecimal=True),
+    avg_u_velocity = Column(Float(),
                             nullable=False)
-    u_velocity_std = Column(Float(asdecimal=True),
+    u_velocity_std = Column(Float(),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -87,11 +87,11 @@ class LepineCaseVBin(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    avg_magnitude = Column(Float(asdecimal=True),
+    avg_magnitude = Column(Float(),
                            nullable=False)
-    avg_v_velocity = Column(Float(asdecimal=True),
+    avg_v_velocity = Column(Float(),
                             nullable=False)
-    v_velocity_std = Column(Float(asdecimal=True),
+    v_velocity_std = Column(Float(),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
@@ -114,11 +114,11 @@ class LepineCaseWBin(Base):
                 primary_key=True)
     group_id = Column(UUID(as_uuid=True),
                       nullable=False)
-    avg_magnitude = Column(Float(asdecimal=True),
+    avg_magnitude = Column(Float(),
                            nullable=False)
-    avg_w_velocity = Column(Float(asdecimal=True),
+    avg_w_velocity = Column(Float(),
                             nullable=False)
-    w_velocity_std = Column(Float(asdecimal=True),
+    w_velocity_std = Column(Float(),
                             nullable=False)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
