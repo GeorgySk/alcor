@@ -219,7 +219,8 @@ class Star(Base):
                    abs(self.y_coordinate),
                    abs(self.z_coordinate))
 
-    def to_cartesian_from_equatorial(self) -> Tuple[float, float, float]:
+    @property
+    def cartesian_coordinates(self) -> Tuple[float, float, float]:
         right_ascension = float(self.right_ascension)
         declination = float(self.declination)
         distance = float(self.distance)
