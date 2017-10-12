@@ -7,7 +7,6 @@ import matplotlib
 # More info at
 # http://matplotlib.org/faq/usage_faq.html#what-is-a-backend for details
 # TODO: use this: https://stackoverflow.com/a/37605654/7851470
-from decimal import Decimal
 
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
@@ -91,9 +90,6 @@ def plot(session: Session,
         except ValueError:
             # Some number so that errorbar would go below the plot
             lower_errorbars.append(5.0)
-
-    upper_errorbars = [Decimal(errorbar) for errorbar in upper_errorbars]
-    lower_errorbars = [Decimal(errorbar) for errorbar in lower_errorbars]
 
     (avg_bin_magnitudes,
      stars_count_logarithms,

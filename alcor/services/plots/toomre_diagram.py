@@ -72,14 +72,10 @@ def plot_stars_by_galactic_disk_type(*,
                                      stars: List[Star],
                                      color: str,
                                      point_size: float = 0.5) -> None:
-    # TODO: how to work with Decimal type? If I leave it I get:
-    # TypeError: Cannot cast array data from dtype('O') to dtype('float64')
-    # according to the rule 'safe'
-    v_velocities = [float(star.v_velocity)
-                    + PECULIAR_SOLAR_VELOCITY_V
+    v_velocities = [star.v_velocity + PECULIAR_SOLAR_VELOCITY_V
                     for star in stars]
-    uw_velocities_magnitudes = [sqrt(float(star.u_velocity) ** 2
-                                     + float(star.w_velocity) ** 2)
+    uw_velocities_magnitudes = [sqrt(star.u_velocity ** 2
+                                     + star.w_velocity ** 2)
                                 for star in stars]
 
     subplot.scatter(x=v_velocities,

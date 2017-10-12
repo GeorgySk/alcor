@@ -1,13 +1,11 @@
-import decimal
 import logging
-from collections import OrderedDict
-from decimal import Decimal
 from typing import (Any,
                     Iterable,
                     Iterator,
-                    Dict)
+                    Dict, Union)
 
 import yaml
+from collections import OrderedDict
 
 from alcor.models import (STAR_PARAMETERS_NAMES,
                           Group,
@@ -36,15 +34,15 @@ def parse_stars(lines: Iterator[str],
                          f'STAR_PARAMETERS_NAMES')
     for line in lines:
         parts = line.split()
-        params = map(str_to_decimal, parts)
+        params = map(str_to_float, parts)
         values = OrderedDict(zip(headers,
                                  params))
         yield Star(group_id=group.id,
                    **values)
 
 
-def str_to_decimal(string: str) -> Any:
+def str_to_float(string: str) -> Union[str, float]:
     try:
-        return Decimal(string)
-    except decimal.InvalidOperation:
+        return float(string)
+    except ValueError:
         return string
