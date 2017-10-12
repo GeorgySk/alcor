@@ -224,11 +224,13 @@ def fill_bins(bins: pd.DataFrame,
               velocity: str) -> pd.DataFrame:
     # TODO: check cases when there are no stars in a bin
     for index in range(bins.shape[0]):
-        bins.loc[index, 'avg_velocity'] = stars[
-            bins_indexes == index][velocity].mean()
+        bin_corresponding_stars_mask = bins_indexes == index
+        bin_corresponding_stars = stars[bin_corresponding_stars_mask]
+        velocities = bin_corresponding_stars[velocity]
+
+        bins.loc[index, 'avg_velocity'] = velocities.mean()
         # FIXME: one star in a bin returns nothing for std
-        bins.loc[index, 'velocity_std'] = stars[
-            bins_indexes == index][velocity].std()
+        bins.loc[index, 'velocity_std'] = velocities.std()
 
     return bins
 
@@ -241,12 +243,16 @@ def split_stars_by_velocities(stars: pd.DataFrame) -> Dict[str, pd.DataFrame]:
                                              np.abs(y_coordinates),
                                              np.abs(z_coordinates)])
 
-    u_vs_magnitude_stars = stars[(highest_coordinates == y_coordinates)
-                                 | (highest_coordinates == z_coordinates)]
-    v_vs_magnitude_stars = stars[(highest_coordinates == x_coordinates)
-                                 | (highest_coordinates == z_coordinates)]
-    w_vs_magnitude_stars = stars[(highest_coordinates == x_coordinates)
-                                 | (highest_coordinates == y_coordinates)]
+    x_highest_coordinate_mask = highest_coordinates == x_coordinates
+    y_highest_coordinate_mask = highest_coordinates == y_coordinates
+    z_highest_coordinate_mask = highest_coordinates == z_coordinates
+
+    u_vs_magnitude_stars = stars[y_highest_coordinate_mask
+                                 | z_highest_coordinate_mask]
+    v_vs_magnitude_stars = stars[x_highest_coordinate_mask
+                                 | z_highest_coordinate_mask]
+    w_vs_magnitude_stars = stars[x_highest_coordinate_mask
+                                 | y_highest_coordinate_mask]
     return dict(u_velocity=u_vs_magnitude_stars,
                 v_velocity=v_vs_magnitude_stars,
                 w_velocity=w_vs_magnitude_stars)
