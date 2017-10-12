@@ -1,14 +1,17 @@
 import uuid
 from collections import Counter
 from functools import partial
-from typing import Set
+from typing import (Set,
+                    List)
 
 import numpy as np
 import pandas as pd
+from sqlalchemy import func
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.session import Session
-from sqlalchemy.sql import text
 
 from alcor.models import eliminations
+from alcor.models.star import Star
 from . import (luminosity_function,
                velocities_vs_magnitude,
                velocity_clouds,
@@ -32,7 +35,7 @@ def draw(*,
          with_ugriz_diagrams: bool,
          desired_stars_count: int,
          session: Session) -> None:
-    fields_to_fetch = get_fields_to_fetch(
+    entities = star_query_entities(
             filtration_method=filtration_method,
             nullify_radial_velocity=nullify_radial_velocity,
             lepine_criterion=lepine_criterion,
@@ -43,23 +46,23 @@ def draw(*,
             with_toomre_diagram=with_toomre_diagram,
             with_ugriz_diagrams=with_ugriz_diagrams)
 
-    if not fields_to_fetch:
+    if not entities:
         return
 
-    fields_str = ", ".join(fields_to_fetch)
-
-    # TODO: find out if it's possible to do without text
-    sql = text(f"SELECT {fields_str} FROM stars "
-               f"WHERE group_id='{group_id}'")
+    query = (session.query(Star)
+             .filter(Star.group_id == group_id))
 
     if desired_stars_count:
-        sql = text(str(sql)
-                   + f" ORDER BY RANDOM() LIMIT {desired_stars_count}")
+        query = (query.order_by(func.random())
+                 .limit(desired_stars_count))
 
-    stars = pd.read_sql_query(sql=sql,
+    query = query.with_entities(*entities)
+
+    statement = query.statement
+
+    stars = pd.read_sql_query(sql=statement,
                               con=session.get_bind(),
                               index_col='id')
-
     stars = filter_stars(stars,
                          method=filtration_method,
                          group_id=group_id,
@@ -311,3 +314,73 @@ def filter_by_apparent_magnitude(stars: pd.DataFrame,
     v_apparent_magnitudes = apparent_magnitude(stars['v_abs_magnitude'],
                                                distance_kpc=stars['distance'])
     return stars[v_apparent_magnitudes <= max_v_apparent_magnitude]
+
+
+def star_query_entities(filtration_method: str,
+                        nullify_radial_velocity: bool,
+                        lepine_criterion: bool,
+                        with_luminosity_function: bool,
+                        with_velocities_vs_magnitude: bool,
+                        with_velocity_clouds: bool,
+                        heatmaps_axes: str,
+                        with_toomre_diagram: bool,
+                        with_ugriz_diagrams: bool
+                        ) -> List[InstrumentedAttribute]:
+    entities = []
+
+    if filtration_method != 'raw':
+        entities += ['distance',
+                     'declination',
+                     'u_velocity',
+                     'v_velocity',
+                     'w_velocity']
+    if filtration_method == 'restricted':
+        entities += ['b_abs_magnitude',
+                     'v_abs_magnitude',
+                     'r_abs_magnitude',
+                     'i_abs_magnitude',
+                     'proper_motion']
+
+    if nullify_radial_velocity:
+        entities += ['galactic_longitude',
+                     'galactic_latitude',
+                     'proper_motion_component_l',
+                     'proper_motion_component_b',
+                     'distance']
+
+    if lepine_criterion:
+        entities += ['right_ascension',
+                     'declination',
+                     'distance']
+
+    if with_luminosity_function:
+        entities += ['luminosity']
+
+    if with_velocities_vs_magnitude:
+        entities += ['luminosity',
+                     'u_velocity',
+                     'v_velocity',
+                     'w_velocity']
+
+    if heatmaps_axes or with_velocity_clouds:
+        entities += ['u_velocity',
+                     'v_velocity',
+                     'w_velocity']
+
+    if with_toomre_diagram:
+        entities += ['u_velocity',
+                     'v_velocity',
+                     'w_velocity',
+                     'spectral_type']
+
+    if with_ugriz_diagrams:
+        entities += ['b_abs_magnitude',
+                     'v_abs_magnitude',
+                     'r_abs_magnitude',
+                     'i_abs_magnitude',
+                     'spectral_type']
+
+    if entities:
+        entities += ['id']
+
+    return entities
