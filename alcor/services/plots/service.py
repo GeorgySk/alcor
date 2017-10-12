@@ -104,7 +104,7 @@ def apparent_magnitude(abs_magnitude: pd.Series,
     return abs_magnitude - 5. + 5. * (np.log10(distance_kpc) + 3.)
 
 
-def set_radial_velocity_to_zero(stars: pd.DataFrame) -> pd.DataFrame:
+def set_radial_velocity_to_zero(stars: pd.DataFrame) -> None:
     distances_in_pc = stars['distance'] * 1e3
 
     a1 = (-ASTRONOMICAL_UNIT * np.cos(stars['galactic_latitude'])
@@ -126,7 +126,6 @@ def set_radial_velocity_to_zero(stars: pd.DataFrame) -> pd.DataFrame:
     b3 = ASTRONOMICAL_UNIT * np.cos(stars['galactic_latitude'])
     stars['w_velocity'] = (b3 * stars['proper_motion_component_b']
                            * distances_in_pc)
-    return stars
 
 
 def filter_stars(stars: pd.DataFrame,
