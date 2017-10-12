@@ -1,8 +1,7 @@
 import uuid
 from collections import Counter
 from functools import partial
-from typing import (Set,
-                    List)
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -260,58 +259,58 @@ def star_query_entities(filtration_method: str,
     entities = []
 
     if filtration_method != 'raw':
-        entities += ['distance',
-                     'declination',
-                     'u_velocity',
-                     'v_velocity',
-                     'w_velocity']
+        entities += [Star.distance,
+                     Star.declination,
+                     Star.u_velocity,
+                     Star.v_velocity,
+                     Star.w_velocity]
     if filtration_method == 'restricted':
-        entities += ['b_abs_magnitude',
-                     'v_abs_magnitude',
-                     'r_abs_magnitude',
-                     'i_abs_magnitude',
-                     'proper_motion']
+        entities += [Star.b_abs_magnitude,
+                     Star.v_abs_magnitude,
+                     Star.r_abs_magnitude,
+                     Star.i_abs_magnitude,
+                     Star.proper_motion]
 
     if nullify_radial_velocity:
-        entities += ['galactic_longitude',
-                     'galactic_latitude',
-                     'proper_motion_component_l',
-                     'proper_motion_component_b',
-                     'distance']
+        entities += [Star.galactic_longitude,
+                     Star.galactic_latitude,
+                     Star.proper_motion_component_l,
+                     Star.proper_motion_component_b,
+                     Star.distance]
 
     if lepine_criterion:
-        entities += ['right_ascension',
-                     'declination',
-                     'distance']
+        entities += [Star.right_ascension,
+                     Star.declination,
+                     Star.distance]
 
     if with_luminosity_function:
-        entities += ['luminosity']
+        entities += [Star.luminosity]
 
     if with_velocities_vs_magnitude:
-        entities += ['luminosity',
-                     'u_velocity',
-                     'v_velocity',
-                     'w_velocity']
+        entities += [Star.luminosity,
+                     Star.u_velocity,
+                     Star.v_velocity,
+                     Star.w_velocity]
 
     if heatmaps_axes or with_velocity_clouds:
-        entities += ['u_velocity',
-                     'v_velocity',
-                     'w_velocity']
+        entities += [Star.u_velocity,
+                     Star.v_velocity,
+                     Star.w_velocity]
 
     if with_toomre_diagram:
-        entities += ['u_velocity',
-                     'v_velocity',
-                     'w_velocity',
-                     'spectral_type']
+        entities += [Star.u_velocity,
+                     Star.v_velocity,
+                     Star.w_velocity,
+                     Star.spectral_type]
 
     if with_ugriz_diagrams:
-        entities += ['b_abs_magnitude',
-                     'v_abs_magnitude',
-                     'r_abs_magnitude',
-                     'i_abs_magnitude',
-                     'spectral_type']
+        entities += [Star.b_abs_magnitude,
+                     Star.v_abs_magnitude,
+                     Star.r_abs_magnitude,
+                     Star.i_abs_magnitude,
+                     Star.spectral_type]
 
     if entities:
-        entities += ['id']
+        entities += [Star.id]
 
     return entities
