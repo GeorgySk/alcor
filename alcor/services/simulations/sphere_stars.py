@@ -76,46 +76,39 @@ def generate_stars(max_stars_count: int = 6_000_000,
                     initial_mass_function_param=initial_mass_function_param)
             progenitors_masses.append(star_mass)
 
-            if random() <= thick_disk_stars_fraction:
-                galactic_structure_types.append(GalacticStructureType.thick)
+            galactic_structure_type = get_galactic_structure_type(
+                    thick_disk_stars_fraction=thick_disk_stars_fraction,
+                    halo_stars_fraction=halo_stars_fraction)
+            galactic_structure_types.append(galactic_structure_type)
 
+            if galactic_structure_type == GalacticStructureType.thick:
                 # TODO: implement MonteCarlo method function/Smirnov transform
                 birth_times.append(thick_disk_star_birth_time(
                         thick_disk_age=thick_disk_age,
                         thick_disk_sfr_param=thick_disk_sfr_param,
                         thick_disk_max_sfr=thick_disk_max_sfr,
                         thick_disk_birth_init_time=thick_disk_birth_init_time))
-            elif (thick_disk_stars_fraction < random()
-                  <= thick_disk_stars_fraction + halo_stars_fraction):
-                galactic_structure_types.append(GalacticStructureType.halo)
+                # TODO: assigning coords should be done in another module
+                scale_height = thick_disk_scale_height_kpc
+            elif galactic_structure_type == GalacticStructureType.halo:
                 birth_times.append(halo_birth_init_time
                                    + halo_stars_formation_time * random())
             else:
-                galactic_structure_types.append(GalacticStructureType.thin)
                 birth_times.append(thin_disk_birth_init_time
                                    + time_bin * time_increment
                                    + time_increment * random())
                 total_bin_mass += star_mass
+                # TODO: assigning coords should be done in another module
+                scale_height = thin_disk_scale_height_kpc
 
             # TODO: assigning coords should be done in another module
-            if galactic_structure_types[-1] == GalacticStructureType.thin:
-                scale_height = thin_disk_scale_height_kpc
-            elif galactic_structure_types[-1] == GalacticStructureType.thick:
-                scale_height = thick_disk_scale_height_kpc
-
             # Halo stars coords will be generated in polar coords module
-            if galactic_structure_types[-1] != GalacticStructureType.halo:
-                # Inverse transform sampling for y = exp(-z / H)
-                z_coordinate = (-scale_height * log(
-                        1. - random() * (1.0 - exp(-sector_radius_kpc
-                                                   / scale_height))))
-                # TODO: change this
-                random_sign = float(1. - 2. * int(2.0 * random()))
-                z_coordinates.append(z_coordinate * random_sign)
+            if galactic_structure_type != GalacticStructureType.halo:
+                z_coordinates.append(z_coordinate(
+                        scale_height=scale_height,
+                        sector_radius_kpc=sector_radius_kpc))
 
-            # TODO: find out what is going on here
             if total_bin_mass > birth_rate:
-                progenitors_masses[-1] -= total_bin_mass - birth_rate
                 break
 
 
@@ -159,3 +152,33 @@ def thick_disk_star_birth_time(*,
         sfr_try = thick_disk_max_sfr * random()
         if sfr_try <= time_try_sfr:
             return time_try + thick_disk_birth_init_time
+
+
+def get_galactic_structure_type(*,
+                                thick_disk_stars_fraction: float,
+                                halo_stars_fraction: float
+                                ) -> GalacticStructureType:
+    random_number = random()
+
+    if random_number <= thick_disk_stars_fraction:
+        return GalacticStructureType.thick
+
+    if (thick_disk_stars_fraction < random()
+            <= thick_disk_stars_fraction + halo_stars_fraction):
+        return GalacticStructureType.halo
+
+    return GalacticStructureType.thin
+
+
+def z_coordinate(*,
+                 scale_height: float,
+                 sector_radius_kpc: float) -> float:
+    # TODO: implement function for inverse transform sampling
+    # Inverse transform sampling for y = exp(-z / H)
+    coordinate = (-scale_height * log(
+            1. - random() * (1.0 - exp(-sector_radius_kpc
+                                       / scale_height))))
+    # TODO: change this
+    random_sign = float(1. - 2. * int(2.0 * random()))
+
+    return coordinate * random_sign
