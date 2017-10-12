@@ -70,10 +70,8 @@ def generate_stars(max_stars_count: int = 6_000_000,
             stars_count += 1
 
             if stars_count > max_stars_count:
-                logger.error('Number of stars is too high - '
-                             'decrease mass reduction factor')
-                # TODO: what to use instead of sys.exit?
-                sys.exit()
+                raise Exception('Number of stars is too high - '
+                                'decrease mass reduction factor')
 
             star_mass = get_mass_from_salpeter_initial_mass_function(
                     initial_mass_function_param=initial_mass_function_param)
