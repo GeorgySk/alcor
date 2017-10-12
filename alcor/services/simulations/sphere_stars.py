@@ -61,7 +61,7 @@ def generate_stars(max_stars_count: int = 6_000_000,
         current_bin_init_time = (thin_disk_birth_init_time
                                  + time_bin * time_increment)
 
-        # TODO: do smth about this
+        # TODO: implement birth rate function
         if current_bin_init_time >= burst_init_time:
             birth_rate = burst_birth_rate
 
@@ -178,7 +178,7 @@ def z_coordinate(*,
     coordinate = (-scale_height * log(
             1. - random() * (1.0 - exp(-sector_radius_kpc
                                        / scale_height))))
-    # TODO: change this
+    # TODO: find a better way to assign a random sign
     random_sign = float(1. - 2. * int(2.0 * random()))
 
     return coordinate * random_sign
