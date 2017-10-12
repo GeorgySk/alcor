@@ -70,8 +70,7 @@ def plot(session: Session,
     # corresponding normalized logN and 2) calculate new not squeezed error
     # bars corresponding to this number of stars
     normalized_stars_counts = [
-        FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME
-        * 10. ** float(stars_count_logarithm)
+        FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME * 10. ** stars_count_logarithm
         for stars_count_logarithm in stars_count_logarithms]
     upper_errorbars = [
         log10((stars_count + sqrt(stars_count))
