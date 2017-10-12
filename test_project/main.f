@@ -65,8 +65,6 @@ C     For terminal:
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: min_longitude, max_longitude, 
-     &        min_latitude, max_latitude
       real :: u_ubvrij(numberOfStars),
      &        b_ubvrij(numberOfStars),
      &        v_ubvrij(numberOfStars),
@@ -304,17 +302,20 @@ C     TODO: add choosing what output we want to get
      &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'j_abs_magnitude ',
+     &                  'u_abs_magnitude ',
      &                  'b_abs_magnitude ',
      &                  'v_abs_magnitude ',
      &                  'r_abs_magnitude ',
      &                  'i_abs_magnitude ',
+     &                  'j_abs_magnitude ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
      &                  'right_ascension_proper_motion ',
      &                  'declination_proper_motion ',
      &                  'proper_motion ',
+     &                  'proper_motion_component_l ',
+     &                  'proper_motion_component_b ',
      &                  'distance ',
      &                  'birth_time ',
      &                  'spectral_type ',
@@ -356,9 +357,9 @@ C         converting cone height parameters from deg to rad
      &                                 numberOfStarsInSample,iseed,
      &                                 thick_disk_stars_fraction,
      &                                 thin_disk_age,
-     &                                 min_longitude, max_longitude,
-     &                                 min_latitude, max_latitude,
-     &                                 massReductionFactor)
+     &                                 massReductionFactor,
+     &                                 thick_disk_age,
+     &                                 thick_disk_sfr_param)
           else 
               write(6,*) "wrong geometry name, use 'sphere' or 'cones'"
           end if
@@ -398,7 +399,6 @@ C         Calculating the trajectories according to/along z-coordinate
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
      &         cone_height_latitudes(i),
      &         u_ubvrij, b_ubvrij, v_ubvrij, r_ubvrij, i_ubvrij,
@@ -468,7 +468,6 @@ C***********************************************************************
       include 'code/colors/errors/errfot.f'
 
       subroutine printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitude,
      &         cone_height_latitude, u_ubvrij, b_ubvrij, v_ubvrij,
      &         r_ubvrij, i_ubvrij, j_ubvrij)
@@ -654,17 +653,20 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      bgac(i),
      &                      rightAscension(i),
      &                      declination(i),
-     &                      j_ubvrij(i),
+     &                      u_ubvrij(i),
      &                      b_ubvrij(i),
      &                      v_ubvrij(i),
      &                      r_ubvrij(i),
      &                      i_ubvrij(i),
+     &                      j_ubvrij(i),
      &                      uu(i),
      &                      vv(i),
      &                      ww(i),
      &                      right_ascension_prop_motion,
      &                      declination_prop_motion,
-     &                      total_prop_motion,
+     &                      properMotion(i),
+     &                      longitude_proper_motion(i),
+     &                      latitude_proper_motion(i),
      &                      rgac(i),
      &                      starBirthTime(i),
      &                      typeOfWD(i),
