@@ -80,7 +80,7 @@ def generate_stars(max_stars_count: int = 6_000_000,
                 galactic_structure_types.append(GalacticStructureType.thick)
 
                 # TODO: implement MonteCarlo method function/Smirnov transform
-                birth_times.append(birth_time(
+                birth_times.append(thick_disk_star_birth_time(
                         thick_disk_age=thick_disk_age,
                         thick_disk_sfr_param=thick_disk_sfr_param,
                         thick_disk_max_sfr=thick_disk_max_sfr,
@@ -146,11 +146,11 @@ def get_mass_from_salpeter_initial_mass_function(
             return mass
 
 
-def birth_time(*,
-               thick_disk_age: float,
-               thick_disk_sfr_param: float,
-               thick_disk_max_sfr: float,
-               thick_disk_birth_init_time: float) -> float:
+def thick_disk_star_birth_time(*,
+                               thick_disk_age: float,
+                               thick_disk_sfr_param: float,
+                               thick_disk_max_sfr: float,
+                               thick_disk_birth_init_time: float) -> float:
     while True:
         time_try = thick_disk_age * random()
         time_try_sfr = (time_try
