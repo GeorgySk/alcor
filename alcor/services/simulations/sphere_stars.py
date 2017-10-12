@@ -1,5 +1,7 @@
 import logging
-from math import pi, exp, log
+from math import (pi,
+                  exp,
+                  log)
 from random import random
 
 import numpy as np
@@ -11,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: take these consts to settings file
-def generate_stars(max_stars_count: int = 6E6,
-                   time_bins_count: int = 5000,
+def generate_stars(max_stars_count: int = 6_000_000,
+                   time_bins_count: int = 5_000,
                    thin_disk_scale_height_kpc: float = 0.25,
                    thick_disk_scale_height_kpc: float = 0.9,
                    thick_disk_age: float = 12.,
@@ -27,8 +29,7 @@ def generate_stars(max_stars_count: int = 6E6,
                    initial_mass_function_param: float = -2.35,
                    halo_stars_formation_time: float = 1.,
                    halo_stars_fraction: float = 0.05,
-                   halo_age: float = 14.,
-                   ) -> None:
+                   halo_age: float = 14.) -> None:
     time_increment = thin_disk_age / time_bins_count
     sector_area = pi * sector_radius_kpc ** 2
     birth_rate = (time_increment * sector_area * 1E6  # TODO: what is 1E6?
