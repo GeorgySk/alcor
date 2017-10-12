@@ -73,10 +73,10 @@ def plot(stars: pd.DataFrame,
                      y_scatter=stars[velocity])
 
     # Removing unnecessary x-labels for top and middle subplots
-    subplots[0].set_xticklabels([])
-    subplots[1].set_xticklabels([])
+    subplots['u_velocity'].set_xticklabels([])
+    subplots['v_velocity'].set_xticklabels([])
 
-    subplots[2].set_xlabel(magnitude_label)
+    subplots['w_velocity'].set_xlabel(magnitude_label)
 
     # TODO: delete overlapping y-labels
     figure.subplots_adjust(hspace=0)
@@ -141,10 +141,10 @@ def plot_lepine_case(stars: pd.DataFrame,
                      y_scatter=stars[velocity])
 
     # Removing unnecessary x-labels for top and middle subplots
-    subplots[0].set_xticklabels([])
-    subplots[1].set_xticklabels([])
+    subplots['u_velocity'].set_xticklabels([])
+    subplots['v_velocity'].set_xticklabels([])
 
-    subplots[2].set_xlabel(magnitude_label)
+    subplots['w_velocity'].set_xlabel(magnitude_label)
 
     # TODO: delete overlapping y-labels
     figure.subplots_adjust(hspace=0)
