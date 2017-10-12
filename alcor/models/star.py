@@ -208,11 +208,6 @@ class Star(Base):
     def y_coordinate(self) -> float:
         return self.cartesian_coordinates[1]
 
-    # TODO: resolve the conflict
-    # @property
-    # def z_coordinate(self) -> float:
-    #     return float(self.to_cartesian_from_equatorial()[2])
-
     @property
     def max_coordinates_modulus(self) -> float:
         return max(abs(self.x_coordinate),
