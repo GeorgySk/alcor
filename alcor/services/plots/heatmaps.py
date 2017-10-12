@@ -50,11 +50,11 @@ def plot(*,
         return
 
     # TODO: add choosing frame: relative to Sun/LSR. Now it's rel. to LSR
-    u_velocities = [float(star.u_velocity) + PECULIAR_SOLAR_VELOCITY_U
+    u_velocities = [star.u_velocity + PECULIAR_SOLAR_VELOCITY_U
                     for star in stars]
-    v_velocities = [float(star.v_velocity) + PECULIAR_SOLAR_VELOCITY_V
+    v_velocities = [star.v_velocity + PECULIAR_SOLAR_VELOCITY_V
                     for star in stars]
-    w_velocities = [float(star.w_velocity) + PECULIAR_SOLAR_VELOCITY_W
+    w_velocities = [star.w_velocity + PECULIAR_SOLAR_VELOCITY_W
                     for star in stars]
 
     # TODO: add option of plotting 3 heatmaps in one fig. at the same time

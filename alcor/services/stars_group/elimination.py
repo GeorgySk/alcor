@@ -43,49 +43,50 @@ def check(star: Star,
         # TODO: add properties or function for converting?
         # Transformation from UBVRI to ugriz. More info at:
         # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
-        g_ugriz_abs_magnitude = (float(star.v_abs_magnitude) - 0.124
-                                 + 0.63 * float(star.b_abs_magnitude
-                                                - star.v_abs_magnitude))
+        g_ugriz_abs_magnitude = (star.v_abs_magnitude - 0.124
+                                 + 0.63 * (star.b_abs_magnitude
+                                           - star.v_abs_magnitude))
         z_ugriz_abs_magnitude = (g_ugriz_abs_magnitude
-                                 - 1.646 * float(star.v_abs_magnitude
-                                                 - star.r_abs_magnitude)
-                                 - 1.584 * float(star.r_abs_magnitude
-                                                 - star.i_abs_magnitude)
+                                 - 1.646 * (star.v_abs_magnitude
+                                            - star.r_abs_magnitude)
+                                 - 1.584 * (star.r_abs_magnitude
+                                            - star.i_abs_magnitude)
                                  + 0.525)
         g_apparent_magnitude = apparent_magnitude(
-                g_ugriz_abs_magnitude,
-                distance_kpc=float(star.distance))
+            abs_magnitude=g_ugriz_abs_magnitude,
+            distance_kpc=star.distance)
         z_apparent_magnitude = apparent_magnitude(
-                z_ugriz_abs_magnitude,
-                distance_kpc=float(star.distance))
+            abs_magnitude=z_ugriz_abs_magnitude,
+            distance_kpc=star.distance)
         # TODO: find out the meaning and check if the last 5 is correct
-        hrm = g_apparent_magnitude + float(
-                5. * log10(star.proper_motion) + 5.)
+        hrm = g_apparent_magnitude + 5. * log10(star.proper_motion) + 5.
         v_apparent_magnitude = apparent_magnitude(
-                float(star.v_abs_magnitude),
-                distance_kpc=float(star.distance))
+            abs_magnitude=star.v_abs_magnitude,
+            distance_kpc=star.distance)
 
         if star.proper_motion < min_proper_motion:
             eliminations_counter['by_proper_motion'] += 1
             return True
+
+        g_z_magnitudes_difference = g_apparent_magnitude - z_apparent_magnitude
         # TODO: find out the meaning of the following constants
-        elif (g_apparent_magnitude - z_apparent_magnitude < -0.33
-              and hrm < 14.):
+        if g_z_magnitudes_difference < -0.33 and hrm < 14.:
             eliminations_counter['by_reduced_proper_motion'] += 1
             return True
         # TODO: find out the meaning of the following constants
-        elif (hrm < 3.559 * (g_apparent_magnitude - z_apparent_magnitude)
-              + 15.17):
+        elif hrm < 3.559 * g_z_magnitudes_difference + 15.17:
             eliminations_counter['by_reduced_proper_motion'] += 1
             return True
+
         # TODO: find out the meaning of the following constant
-        elif v_apparent_magnitude >= 19.:
+        if v_apparent_magnitude >= 19.:
             eliminations_counter['by_apparent_magnitude'] += 1
             return True
     return False
 
 
-def apparent_magnitude(abs_magnitude: float,
+def apparent_magnitude(*,
+                       abs_magnitude: float,
                        distance_kpc: float
                        ) -> float:
     # More info at (2nd formula, + 3.0 because the distance is in kpc):
