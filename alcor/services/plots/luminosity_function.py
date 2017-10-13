@@ -186,7 +186,6 @@ def replace_nans(df: pd.DataFrame,
 
     missing_values_rows.fillna(value=replacement,
                                inplace=True)
-    result.loc[missing_values_rows_mask
-               & notnull_log_stars_count_rows_mask, :] = missing_values_rows
+    result.loc[missing_values_rows_mask, :] = missing_values_rows
 
     return result
