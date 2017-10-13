@@ -1,12 +1,12 @@
 import sys
+from functools import partial
 from typing import (Iterator,
                     Tuple)
 
-from functools import partial
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 from hypothesis_sqlalchemy import tables
-from sqlalchemy import Float
+from sqlalchemy.sql.sqltypes import Float
 
 from alcor.models import Star
 
