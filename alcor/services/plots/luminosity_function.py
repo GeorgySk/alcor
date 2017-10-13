@@ -140,8 +140,8 @@ def luminosity_function(*,
 
     res = pd.DataFrame(data=luminosity_function_template)
 
-    res['log_stars_count'] = np.log10(
-            stars_counts / FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
+    res['log_stars_count'] = np.log10(stars_counts /
+                                      FORTY_PARSEC_NORTHERN_HEMISPHERE_VOLUME)
 
     stars_counts_sqrt = np.sqrt(stars_counts)
     inverse_stars_counts_sqrt = 1. / stars_counts_sqrt
