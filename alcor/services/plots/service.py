@@ -72,6 +72,7 @@ def draw(*,
             filtration_functions=filtration_functions,
             group_id=group_id)
     session.add(eliminations_counter)
+    session.commit()
 
     stars = filtered_stars(stars,
                            filtration_functions=filtration_functions)
@@ -103,8 +104,6 @@ def draw(*,
 
     if with_ugriz_diagrams:
         ugriz_diagrams.plot(stars=stars)
-
-    session.commit()
 
 
 def set_radial_velocity_to_zero(stars: pd.DataFrame) -> None:
