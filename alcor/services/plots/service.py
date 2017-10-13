@@ -69,7 +69,7 @@ def draw(*,
                          session=session)
 
     if nullify_radial_velocity:
-        stars = set_radial_velocity_to_zero(stars)
+        set_radial_velocity_to_zero(stars)
 
     if with_luminosity_function:
         luminosity_function.plot(stars=stars)
