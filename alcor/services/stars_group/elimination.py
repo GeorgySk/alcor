@@ -1,7 +1,6 @@
+from collections import Counter
 from fractions import Fraction
 from math import log10
-
-from collections import Counter
 
 from alcor.models import Star
 
@@ -53,16 +52,16 @@ def check(star: Star,
                                             - star.i_abs_magnitude)
                                  + 0.525)
         g_apparent_magnitude = apparent_magnitude(
-            abs_magnitude=g_ugriz_abs_magnitude,
-            distance_kpc=star.distance)
+                abs_magnitude=g_ugriz_abs_magnitude,
+                distance_kpc=star.distance)
         z_apparent_magnitude = apparent_magnitude(
-            abs_magnitude=z_ugriz_abs_magnitude,
-            distance_kpc=star.distance)
+                abs_magnitude=z_ugriz_abs_magnitude,
+                distance_kpc=star.distance)
         # TODO: find out the meaning and check if the last 5 is correct
         hrm = g_apparent_magnitude + 5. * log10(star.proper_motion) + 5.
         v_apparent_magnitude = apparent_magnitude(
-            abs_magnitude=star.v_abs_magnitude,
-            distance_kpc=star.distance)
+                abs_magnitude=star.v_abs_magnitude,
+                distance_kpc=star.distance)
 
         if star.proper_motion < min_proper_motion:
             eliminations_counter['by_proper_motion'] += 1

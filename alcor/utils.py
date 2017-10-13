@@ -1,11 +1,12 @@
 import logging
+from collections import OrderedDict
 from typing import (Any,
+                    Union,
                     Iterable,
                     Iterator,
-                    Dict, Union)
+                    Dict)
 
 import yaml
-from collections import OrderedDict
 
 from alcor.models import (STAR_PARAMETERS_NAMES,
                           Group,
