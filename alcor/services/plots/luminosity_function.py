@@ -175,18 +175,18 @@ def normalization_factor(*,
 
 def replace_nans(df: pd.DataFrame,
                  replacement: float) -> pd.DataFrame:
-    df_copy = pd.DataFrame(data=df,
-                           copy=True)
+    result = pd.DataFrame(data=df,
+                          copy=True)
 
-    missing_values_rows_mask = df_copy.isnull().any(axis=1)
-    notnull_log_stars_count_rows_mask = df_copy['log_stars_count'].notnull()
+    missing_values_rows_mask = result.isnull().any(axis=1)
+    notnull_log_stars_count_rows_mask = result['log_stars_count'].notnull()
+    missing_values_rows_mask &= notnull_log_stars_count_rows_mask
 
-    missing_values_rows = df_copy.loc[
-                          missing_values_rows_mask
-                          & notnull_log_stars_count_rows_mask, :].copy()
+    missing_values_rows = result.loc[missing_values_rows_mask, :].copy()
+
     missing_values_rows.fillna(value=replacement,
                                inplace=True)
-    df_copy.loc[missing_values_rows_mask
-                & notnull_log_stars_count_rows_mask, :] = missing_values_rows
+    result.loc[missing_values_rows_mask
+               & notnull_log_stars_count_rows_mask, :] = missing_values_rows
 
-    return df_copy
+    return result
