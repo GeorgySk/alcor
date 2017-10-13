@@ -138,29 +138,25 @@ def filter_stars(stars: pd.DataFrame,
     # TODO: fix geometry of a simulated region so that we don't need to use
     # the 'full' filtration method
     if method != 'raw':
-        by_parallax = partial(filters.filter_by_parallax,
-                              min_parallax=min_parallax)
-        by_declination = partial(filters.filter_by_declination,
-                                 min_declination=min_declination)
-        by_velocity = partial(filters.filter_by_velocity,
-                              max_velocity=max_velocity)
-
-        filtration_functions.update(by_parallax=by_parallax,
-                                    by_declination=by_declination,
-                                    by_velocity=by_velocity)
+        filtration_functions['by_parallax'] = partial(
+                filters.filter_by_parallax,
+                min_parallax=min_parallax)
+        filtration_functions['by_declination'] = partial(
+                filters.filter_by_declination,
+                min_declination=min_declination)
+        filtration_functions['by_velocity'] = partial(
+                filters.filter_by_velocity,
+                max_velocity=max_velocity)
 
     if method == 'restricted':
-        by_proper_motion = partial(filters.filter_by_proper_motion,
-                                   min_proper_motion=min_proper_motion)
-        by_apparent_magnitude = partial(
+        filtration_functions['by_proper_motion'] = partial(
+                filters.filter_by_proper_motion,
+                min_proper_motion=min_proper_motion)
+        filtration_functions['by_reduced_proper_motion'] = (
+            filters.filter_by_reduced_proper_motion)
+        filtration_functions['by_apparent_magnitude'] = partial(
                 filters.filter_by_apparent_magnitude,
                 max_v_apparent_magnitude=max_v_apparent_magnitude)
-
-        filtration_functions.update(
-                by_proper_motion=by_proper_motion,
-                by_reduced_proper_motion=(
-                    filters.filter_by_reduced_proper_motion),
-                by_apparent_magnitude=by_apparent_magnitude)
 
     for criterion, filtration_function in filtration_functions.items():
         stars_count_before_filtration = stars.shape[0]
