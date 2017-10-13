@@ -1,7 +1,9 @@
 import uuid
 from collections import Counter
 from functools import partial
-from typing import List
+from typing import (Callable,
+                    Dict,
+                    List)
 
 import numpy as np
 import pandas as pd
@@ -63,10 +65,16 @@ def draw(*,
     stars = pd.read_sql_query(sql=statement,
                               con=session.get_bind(),
                               index_col='id')
-    stars = filter_stars(stars,
-                         method=filtration_method,
-                         group_id=group_id,
-                         session=session)
+
+    filtration_functions = stars_filtration_functions(method=filtration_method)
+    eliminations_counter = stars_eliminations_counter(
+            stars,
+            filtration_functions=filtration_functions,
+            group_id=group_id)
+    session.add(eliminations_counter)
+
+    filter_stars(stars,
+                 filtration_functions=filtration_functions)
 
     if nullify_radial_velocity:
         set_radial_velocity_to_zero(stars)
@@ -96,6 +104,8 @@ def draw(*,
     if with_ugriz_diagrams:
         ugriz_diagrams.plot(stars=stars)
 
+    session.commit()
+
 
 def set_radial_velocity_to_zero(stars: pd.DataFrame) -> None:
     distances_in_pc = stars['distance'] * 1e3
@@ -119,57 +129,6 @@ def set_radial_velocity_to_zero(stars: pd.DataFrame) -> None:
     b3 = ASTRONOMICAL_UNIT * np.cos(stars['galactic_latitude'])
     stars['w_velocity'] = (b3 * stars['proper_motion_component_b']
                            * distances_in_pc)
-
-
-def filter_stars(stars: pd.DataFrame,
-                 *,
-                 method: str,
-                 group_id: uuid.UUID,
-                 session: Session,
-                 min_parallax: float = 0.025,
-                 min_declination: float = 0.,
-                 max_velocity: float = 500.,
-                 min_proper_motion: float = 0.04,
-                 max_v_apparent_magnitude: float = 19.) -> pd.DataFrame:
-    eliminations_counter = Counter()
-    eliminations_counter['raw'] = stars.shape[0]
-
-    filtration_functions = {}
-    # TODO: fix geometry of a simulated region so that we don't need to use
-    # the 'full' filtration method
-    if method != 'raw':
-        filtration_functions['by_parallax'] = partial(
-                filters.filter_by_parallax,
-                min_parallax=min_parallax)
-        filtration_functions['by_declination'] = partial(
-                filters.filter_by_declination,
-                min_declination=min_declination)
-        filtration_functions['by_velocity'] = partial(
-                filters.filter_by_velocity,
-                max_velocity=max_velocity)
-
-    if method == 'restricted':
-        filtration_functions['by_proper_motion'] = partial(
-                filters.filter_by_proper_motion,
-                min_proper_motion=min_proper_motion)
-        filtration_functions['by_reduced_proper_motion'] = (
-            filters.filter_by_reduced_proper_motion)
-        filtration_functions['by_apparent_magnitude'] = partial(
-                filters.filter_by_apparent_magnitude,
-                max_v_apparent_magnitude=max_v_apparent_magnitude)
-
-    for criterion, filtration_function in filtration_functions.items():
-        stars_count_before_filtration = stars.shape[0]
-        stars = filtration_function(stars)
-        eliminations_counter[criterion] = (stars_count_before_filtration
-                                           - stars.shape[0])
-
-    counter = eliminations.StarsCounter(group_id=group_id,
-                                        **eliminations_counter)
-    session.add(counter)
-    session.commit()
-
-    return stars
 
 
 def star_query_entities(*,
@@ -241,3 +200,60 @@ def star_query_entities(*,
         entities += [Star.id]
 
     return entities
+
+
+def stars_filtration_functions(*,
+                               method: str,
+                               min_parallax: float = 0.025,
+                               min_declination: float = 0.,
+                               max_velocity: float = 500.,
+                               min_proper_motion: float = 0.04,
+                               max_v_apparent_magnitude: float = 19.
+                               ) -> Dict[str, Callable]:
+    result = {}
+    # TODO: fix geometry of a simulated region so that we don't need to use
+    # the 'full' filtration method
+    if method != 'raw':
+        result['by_parallax'] = partial(filters.filter_by_parallax,
+                                        min_parallax=min_parallax)
+        result['by_declination'] = partial(filters.filter_by_declination,
+                                           min_declination=min_declination)
+        result['by_velocity'] = partial(filters.filter_by_velocity,
+                                        max_velocity=max_velocity)
+
+    if method == 'restricted':
+        result['by_proper_motion'] = partial(
+                filters.filter_by_proper_motion,
+                min_proper_motion=min_proper_motion)
+        result['by_reduced_proper_motion'] = (
+            filters.filter_by_reduced_proper_motion)
+        result['by_apparent_magnitude'] = partial(
+                filters.filter_by_apparent_magnitude,
+                max_v_apparent_magnitude=max_v_apparent_magnitude)
+
+    return result
+
+
+def stars_eliminations_counter(stars: pd.DataFrame,
+                               filtration_functions: Dict[str, Callable],
+                               group_id: uuid.UUID
+                               ) -> eliminations.StarsCounter:
+    stars_copy = stars.copy()
+
+    eliminations_counter = Counter()
+    eliminations_counter['raw'] = stars_copy.shape[0]
+
+    for criterion, filtration_function in filtration_functions.items():
+        stars_count_before_filtration = stars_copy.shape[0]
+        stars_copy = filtration_function(stars_copy)
+        eliminations_counter[criterion] = (stars_count_before_filtration
+                                           - stars_copy.shape[0])
+
+    return eliminations.StarsCounter(group_id=group_id,
+                                     **eliminations_counter)
+
+
+def filter_stars(stars: pd.DataFrame,
+                 filtration_functions: Dict[str, Callable]) -> None:
+    for criterion, filtration_function in filtration_functions.items():
+        stars = filtration_function(stars)
