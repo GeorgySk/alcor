@@ -175,7 +175,8 @@ def filter_stars(stars: pd.DataFrame,
     return stars
 
 
-def star_query_entities(filtration_method: str,
+def star_query_entities(*,
+                        filtration_method: str,
                         nullify_radial_velocity: bool,
                         lepine_criterion: bool,
                         with_luminosity_function: bool,
