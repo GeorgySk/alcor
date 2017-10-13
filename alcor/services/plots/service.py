@@ -73,8 +73,8 @@ def draw(*,
             group_id=group_id)
     session.add(eliminations_counter)
 
-    filter_stars(stars,
-                 filtration_functions=filtration_functions)
+    stars = filtered_stars(stars,
+                           filtration_functions=filtration_functions)
 
     if nullify_radial_velocity:
         set_radial_velocity_to_zero(stars)
@@ -253,7 +253,9 @@ def stars_eliminations_counter(stars: pd.DataFrame,
                                      **eliminations_counter)
 
 
-def filter_stars(stars: pd.DataFrame,
-                 filtration_functions: Dict[str, Callable]) -> None:
+def filtered_stars(stars: pd.DataFrame,
+                   filtration_functions: Dict[str, Callable]) -> pd.DataFrame:
     for criterion, filtration_function in filtration_functions.items():
         stars = filtration_function(stars)
+
+    return stars
