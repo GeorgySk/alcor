@@ -163,9 +163,10 @@ def filter_stars(stars: pd.DataFrame,
                 by_apparent_magnitude=by_apparent_magnitude)
 
     for criterion, filtration_function in filtration_functions.items():
-        stars_count = stars.shape[0]
+        stars_count_before_filtration = stars.shape[0]
         stars = filtration_function(stars)
-        eliminations_counter[criterion] = stars_count - stars.shape[0]
+        eliminations_counter[criterion] = (stars_count_before_filtration
+                                           - stars.shape[0])
 
     counter = eliminations.StarsCounter(group_id=group_id,
                                         **eliminations_counter)
