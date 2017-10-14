@@ -237,16 +237,14 @@ def stars_eliminations_counter(stars: pd.DataFrame,
                                filtration_functions: Dict[str, Callable],
                                group_id: uuid.UUID
                                ) -> eliminations.StarsCounter:
-    stars_copy = stars.copy()
-
     eliminations_counter = Counter()
-    eliminations_counter['raw'] = stars_copy.shape[0]
+    eliminations_counter['raw'] = stars.shape[0]
 
     for criterion, filtration_function in filtration_functions.items():
-        stars_count_before_filtration = stars_copy.shape[0]
-        stars_copy = filtration_function(stars_copy)
+        stars_count_before_filtration = stars.shape[0]
+        stars = filtration_function(stars)
         eliminations_counter[criterion] = (stars_count_before_filtration
-                                           - stars_copy.shape[0])
+                                           - stars.shape[0])
 
     return eliminations.StarsCounter(group_id=group_id,
                                      **eliminations_counter)
