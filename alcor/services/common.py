@@ -62,10 +62,12 @@ def stars_packer(*,
             if stars_bins_count > index >= 0:
                 res[index].append(star)
             else:
-                logger.warning(
-                        f'Bolometric magnitude {star.bolometric_magnitude} '
-                        'is out of bounds '
-                        f'for star with id {star.id}.')
+                warn_msg = ('Bolometric magnitude {magnitude} '
+                            'is out of bounds '
+                            'for star with id {id}.'
+                            .format(id=star.id,
+                                    magnitude=star.bolometric_magnitude))
+                logger.warning(warn_msg)
         return res
 
     return pack_stars
