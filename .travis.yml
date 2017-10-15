@@ -1,0 +1,26 @@
+sudo: required
+
+language: python
+
+python:
+  - "3.5"
+
+env:
+  - PYTHON3_VERSION=3.5
+  - PYTHON3_VERSION=3.6
+
+before_install:
+  - ./install-docker.sh
+  - ./install-docker-compose.sh
+  - docker -v
+  - docker-compose -v
+  - printenv
+
+install:
+  - pip install codecov
+
+script:
+  - ./run-tests.sh
+
+after_success:
+  - codecov
