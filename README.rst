@@ -41,6 +41,30 @@ Download and install the latest version from ``GitHub`` repository
   cd alcor
   python3 setup.py install
 
+Bumping version
+---------------
+Install `bumpversion <https://github.com/peritus/bumpversion#installation>`__.
+
+Choose which version number category to bump following `semver specification <http://semver.org/>`__.
+
+Test bumping version
+
+.. code-block:: bash
+
+    bumpversion --dry-run --verbose $VERSION
+
+where ``$VERSION`` is the target version number category name,
+possible values are ``patch``/``minor``/``major``.
+
+Bump version
+
+.. code-block:: bash
+
+    bumpversion --verbose $VERSION
+
+**Note**: to avoid inconsistency between branches and pull requests,
+bumping version should be merged into ``master`` branch as separate pull request.
+
 Running tests
 -------------
 Plain
