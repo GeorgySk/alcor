@@ -213,21 +213,21 @@ def stars_filtration_functions(*,
     # TODO: fix geometry of a simulated region so that we don't need to use
     # the 'full' filtration method
     if method != 'raw':
-        result['by_parallax'] = partial(filters.filter_by_parallax,
+        result['by_parallax'] = partial(filters.by_parallax,
                                         min_parallax=min_parallax)
-        result['by_declination'] = partial(filters.filter_by_declination,
+        result['by_declination'] = partial(filters.by_declination,
                                            min_declination=min_declination)
-        result['by_velocity'] = partial(filters.filter_by_velocity,
+        result['by_velocity'] = partial(filters.by_velocity,
                                         max_velocity=max_velocity)
 
     if method == 'restricted':
         result['by_proper_motion'] = partial(
-                filters.filter_by_proper_motion,
+                filters.by_proper_motion,
                 min_proper_motion=min_proper_motion)
         result['by_reduced_proper_motion'] = (
-            filters.filter_by_reduced_proper_motion)
+            filters.by_reduced_proper_motion)
         result['by_apparent_magnitude'] = partial(
-                filters.filter_by_apparent_magnitude,
+                filters.by_apparent_magnitude,
                 max_v_apparent_magnitude=max_v_apparent_magnitude)
 
     return result
