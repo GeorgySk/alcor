@@ -77,10 +77,10 @@ Inside ``Docker`` container
 
 .. code-block:: bash
 
-    docker-compose up
+    docker-compose -f docker-compose.db.yml -f docker-compose.yml up
 
 Inside ``Docker`` container with remote debugger
 
 .. code-block:: bash
 
-    ./set-dockerhost.sh docker-compose -f docker-compose.debug.yml up
+    ./set-dockerhost.sh docker-compose -f docker-compose.db.yml -f docker-compose.debug.yml up
