@@ -12,10 +12,3 @@ services:
     command: setup.py test
     environment:
       - POSTGRES_URI=postgresql://username:password@postgres/alcor
-
-  postgres:
-    image: postgres:latest
-    environment:
-      - POSTGRES_DB=alcor
-      - POSTGRES_USER=username
-      - POSTGRES_PASSWORD=password

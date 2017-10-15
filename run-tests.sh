@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-docker-compose up --exit-code-from alcor
+docker-compose -f docker-compose.db.yml -f docker-compose.yml up --exit-code-from alcor
 STATUS=$?
 
 docker-compose down
