@@ -3,7 +3,7 @@ version: '3'
 services:
   alcor:
     build: .
-    image: lycantropos/alcor:latest
+    image: lycantropos/alcor:0.0.0
     entrypoint: "/alcor/docker-entrypoint.sh"
     volumes:
       - .:/alcor/
