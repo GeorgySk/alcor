@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -e
+
+set -ex
 
 cd test_project
 # unzipping seed files
