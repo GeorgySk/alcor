@@ -35,8 +35,9 @@ def parse_stars(lines: Iterator[str],
     headers = next(lines).split()
     for header in headers:
         if not (header in STAR_PARAMETERS_NAMES):
-            logger.error(f'There is no parameter {header} in '
-                         f'STAR_PARAMETERS_NAMES')
+            logger.error('There is no parameter {header} in '
+                         'STAR_PARAMETERS_NAMES'
+                         .format(header=header))
     for line in lines:
         parts = line.split()
         params = map(str_to_float, parts)

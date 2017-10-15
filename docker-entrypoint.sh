@@ -8,4 +8,4 @@ unzip -o forts.zip
 gfortran main.f -o main.e ${FORTRAN_COMPILER_OPTIONS}
 cd -
 
-python3.6 manage.py "$@"
+python3 manage.py "$@"

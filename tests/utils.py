@@ -10,6 +10,6 @@ def example(strategy: SearchStrategy) -> Any:
     return find(specifier=strategy,
                 condition=lambda x: True,
                 settings=settings(max_shrinks=0,
-                                  max_iterations=10_000,
+                                  max_iterations=10000,
                                   database=None,
                                   verbosity=Verbosity.quiet))

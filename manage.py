@@ -109,7 +109,7 @@ def simulate(ctx: click.Context,
                    '"restricted" - apply all criteria (default)')
 @click.option('--nullify-radial-velocity', '-nrv',
               is_flag=True,
-              help='Sets radial velocities to zero.')
+              help='Set radial velocities to zero.')
 @click.option('--luminosity-function', '-lf',
               is_flag=True,
               help='Plot luminosity function.')
@@ -187,17 +187,6 @@ def plot(ctx: click.Context,
                        session=session)
 
 
-@main.command(name='clean_db')
-@click.pass_context
-def clean_db(ctx: click.Context) -> None:
-    """Removes Postgres database."""
-    db_uri = ctx.obj
-    db_uri_str = db_uri_to_str(db_uri)
-    if database_exists(db_uri):
-        logging.info(f'Cleaning "{db_uri_str}" database.')
-        drop_database(db_uri)
-
-
 @main.command(name='init_db')
 @click.pass_context
 def init_db(ctx: click.Context) -> None:
@@ -206,12 +195,26 @@ def init_db(ctx: click.Context) -> None:
     db_uri_str = db_uri_to_str(db_uri)
 
     if not database_exists(db_uri):
-        logging.info(f'Creating "{db_uri_str}" database.')
+        logging.info('Creating "{db_uri_str}" database.'
+                     .format(db_uri_str=db_uri_str))
         create_database(db_uri)
 
     with create_engine(db_uri) as engine:
-        logging.info(f'Creating "{db_uri_str}" database schema.')
+        logging.info('Creating "{db_uri_str}" database schema.'
+                     .format(db_uri_str=db_uri_str))
         Base.metadata.create_all(bind=engine)
+
+
+@main.command()
+@click.pass_context
+def clean_db(ctx: click.Context) -> None:
+    """Removes Postgres database."""
+    db_uri = ctx.obj
+    db_uri_str = db_uri_to_str(db_uri)
+    if database_exists(db_uri):
+        logging.info('Cleaning "{db_uri_str}" database.'
+                     .format(db_uri_str=db_uri_str))
+        drop_database(db_uri)
 
 
 if __name__ == '__main__':

@@ -87,6 +87,6 @@ def run_simulation(*,
                          '-cbcol', latitudes_dict['column']])
 
     args = list(map(str, args))
-    args_str = ' '.join(args)
-    logger.info(f'Invoking simulation with command "{args_str}".')
+    logger.info('Invoking simulation with command "{args_str}".'
+                .format(args_str=' '.join(args)))
     check_call(args)
