@@ -49,7 +49,7 @@ def draw(*,
             with_ugriz_diagrams=with_ugriz_diagrams)
 
     if not entities:
-        return
+        raise ValueError('No plotting options were chosen')
 
     query = (session.query(Star)
              .filter(Star.group_id == group_id))
