@@ -1,13 +1,6 @@
 import enum
 import inspect
 import uuid
-from collections import OrderedDict
-from math import (radians,
-                  cos,
-                  sin,
-                  pi,
-                  asin,
-                  atan)
 from typing import (Any,
                     Dict,
                     Tuple)
@@ -23,12 +16,6 @@ from sqlalchemy.sql.sqltypes import (BigInteger,
 
 from .base import Base
 from .utils import memoize_properties
-
-DEC_GPOLE = radians(27.128336)
-RA_GPOLE = radians(192.859508)
-AUX_ANGLE = radians(122.932)
-
-SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 
 # Description of ugriz color scheme:
 # https://en.wikipedia.org/wiki/Photometric_system
