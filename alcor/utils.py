@@ -5,7 +5,6 @@ from functools import reduce
 from typing import (Any,
                     Union,
                     Hashable,
-                    Iterable,
                     Iterator,
                     Container,
                     Mapping,
@@ -25,11 +24,6 @@ def load_settings(path: str
                   ) -> Dict[str, Any]:
     with open(path) as file:
         return yaml.safe_load(file)
-
-
-def join_str(items: Iterable[Any],
-             sep: str = ', ') -> str:
-    return sep.join(map(str, items))
 
 
 def parse_stars(lines: Iterator[str],
