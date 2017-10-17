@@ -1,4 +1,5 @@
 import os
+from contextlib import closing
 from functools import partial
 from typing import (Dict,
                     List)
@@ -9,36 +10,33 @@ import pandas as pd
 
 def read_da_cooling(path: str = 'input_data/da_cooling.hdf5'
                     ) -> Dict[int, Dict[int, pd.DataFrame]]:
-    file = open_hdf5(path)
-    da_cooling_tracks_by_metallicities = {1: {},
-                                          10: {},
-                                          30: {},
-                                          60: {}}
-    fill_cooling_tracks(da_cooling_tracks_by_metallicities,
-                        file=file)
-
-    return da_cooling_tracks_by_metallicities
+    with closing(open_hdf5(path)) as file:
+        da_cooling_tracks_by_metallicities = {1: {},
+                                              10: {},
+                                              30: {},
+                                              60: {}}
+        fill_cooling_tracks(da_cooling_tracks_by_metallicities,
+                            file=file)
+        return da_cooling_tracks_by_metallicities
 
 
 def read_db_cooling(path: str = 'input_data/db_cooling.hdf5'
                     ) -> Dict[int, Dict[int, pd.DataFrame]]:
-    file = open_hdf5(path)
-    db_cooling_tracks_by_metallicities = {1: {},
-                                          10: {},
-                                          60: {}}
-    fill_cooling_tracks(db_cooling_tracks_by_metallicities,
-                        file=file)
-
-    return db_cooling_tracks_by_metallicities
+    with closing(open_hdf5(path)) as file:
+        db_cooling_tracks_by_metallicities = {1: {},
+                                              10: {},
+                                              60: {}}
+        fill_cooling_tracks(db_cooling_tracks_by_metallicities,
+                            file=file)
+        return db_cooling_tracks_by_metallicities
 
 
 def read_colors(path: str) -> Dict[int, pd.DataFrame]:
-    file = open_hdf5(path)
-    colors = {}
-    fill_colors(colors,
-                file=file)
-
-    return colors
+    with closing(open_hdf5(path)) as file:
+        colors = {}
+        fill_colors(colors,
+                    file=file)
+        return colors
 
 
 read_da_colors = partial(read_colors,
@@ -50,12 +48,11 @@ read_db_colors = partial(read_colors,
 
 def read_one_tables(path: str = 'input_data/one_wds_tracks.hdf5'
                     ) -> Dict[int, pd.DataFrame]:
-    file = open_hdf5(path)
-    one_tables = {}
-    fill_one_table(one_tables,
-                   file=file)
-
-    return one_tables
+    with closing(open_hdf5(path)) as file:
+        one_tables = {}
+        fill_one_table(one_tables,
+                       file=file)
+        return one_tables
 
 
 def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
