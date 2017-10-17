@@ -59,6 +59,8 @@ STAR_PARAMETERS_NAMES = ['mass',
                          'v_velocity',
                          'w_velocity',
                          'birth_time',
+                         'effective_temperature',
+                         'surface_gravity',
                          'spectral_type',
                          'galactic_disk_type']
 
@@ -129,6 +131,10 @@ class Star(Base):
                         nullable=True)
     birth_time = Column(Float(),
                         nullable=True)
+    effective_temperature = Column(Float(),
+                                   nullable=True)
+    surface_gravity = Column(Float(),
+                             nullable=True)
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
                            nullable=True)
@@ -165,6 +171,8 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
+                 effective_temperature: float = None,
+                 surface_gravity: float = None,
                  spectral_type: int = None,
                  galactic_disk_type: GalacticDiskType = None):
         self.id = None
@@ -195,6 +203,8 @@ class Star(Base):
         self.v_velocity = v_velocity
         self.w_velocity = w_velocity
         self.birth_time = birth_time
+        self.effective_temperature = effective_temperature
+        self.surface_gravity = surface_gravity
         self.spectral_type = spectral_type
         self.galactic_disk_type = galactic_disk_type
 

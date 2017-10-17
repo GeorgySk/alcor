@@ -314,8 +314,6 @@ C     TODO: add choosing what output we want to get
      &                  'proper_motion_component_b ',
      &                  'proper_motion_component_l ',
      &                  'proper_motion ',
-     &                  'proper_motion_component_l ',
-     &                  'proper_motion_component_b ',
      &                  'distance ',
      &                  'birth_time ',
      &                  'spectral_type ',
@@ -343,6 +341,8 @@ C     TODO: add choosing what output we want to get
      &                  'proper_motion_component_b ',
      &                  'distance ',
      &                  'birth_time ',
+     &                  'effective_temperature ',
+     &                  'surface_gravity ',
      &                  'spectral_type ',
      &                  'galactic_disk_type '
       end if
@@ -536,7 +536,8 @@ C     Parameters of mass histograms
       real luminosityOfWD(numberOfStars),
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
-     &                 effTempOfWD(numberOfStars)
+     &                 effTempOfWD(numberOfStars),
+     &                 log_g(numberOfStars)
       integer :: flagOfWD(numberOfStars)
 C     rgac - galactocentric distance to WD TODO: give a better name
       real rgac(numberOfStars)
@@ -617,7 +618,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real :: m(numberOfStars), 
      &        starBirthTime(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
-     &                effTempOfWD
+     &                effTempOfWD, log_g
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
       common /mad/ properMotion,rightAscension,declination
       common /mopro/ latitude_proper_motion,
@@ -866,6 +867,8 @@ C                if cone crosses 2pi, move it -2pi
      &                            latitude_proper_motion(i),
      &                            rgac(i),
      &                            starBirthTime(i),
+     &                            effTempOfWD(i),
+     &                            log_g(i),
      &                            typeOfWD(i),
      &                            disk_str
                  else
