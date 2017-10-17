@@ -1,4 +1,5 @@
 import os
+from functools import partial
 from typing import (Dict,
                     List)
 
@@ -40,14 +41,11 @@ def read_colors(path: str) -> Dict[int, pd.DataFrame]:
     return colors
 
 
-def read_da_colors(path: str = 'input_data/da_colors.hdf5'
-                   ) -> Dict[int, pd.DataFrame]:
-    return read_colors(path)
+read_da_colors = partial(read_colors,
+                         path='input_data/da_colors.hdf5')
 
-
-def read_db_colors(path: str = 'input_data/db_colors.hdf5'
-                   ) -> Dict[int, pd.DataFrame]:
-    return read_colors(path)
+read_db_colors = partial(read_colors,
+                         path='input_data/db_colors.hdf5')
 
 
 def read_one_tables(path: str = 'input_data/one_wds_tracks.hdf5'
