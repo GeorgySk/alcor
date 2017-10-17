@@ -33,10 +33,7 @@ def read_db_cooling(path: str = 'input_data/db_cooling.hdf5'
 
 def read_colors(path: str) -> Dict[int, pd.DataFrame]:
     with closing(open_hdf5(path)) as file:
-        colors = {}
-        fill_colors(colors,
-                    file=file)
-        return colors
+        return fill_colors(file=file)
 
 
 read_da_colors = partial(read_colors,
@@ -49,10 +46,7 @@ read_db_colors = partial(read_colors,
 def read_one_tables(path: str = 'input_data/one_wds_tracks.hdf5'
                     ) -> Dict[int, pd.DataFrame]:
     with closing(open_hdf5(path)) as file:
-        one_tables = {}
-        fill_one_table(one_tables,
-                       file=file)
-        return one_tables
+        return fill_one_table(file=file)
 
 
 def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
@@ -72,9 +66,9 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
                          luminosity=file[mass_group + 'luminosity']))
 
 
-def fill_colors(color_table: Dict,
-                *,
-                file: h5py.File) -> None:
+def fill_colors(*,
+                file: h5py.File) -> Dict[int, pd.DataFrame]:
+    color_table = {}
     for mass in file:
         mass_group = mass + '/'
         color_table[int(mass)] = pd.DataFrame(dict(
@@ -85,11 +79,12 @@ def fill_colors(color_table: Dict,
                 color_r=file[mass_group + 'color_r'],
                 color_i=file[mass_group + 'color_i'],
                 color_j=file[mass_group + 'color_j']))
+    return color_table
 
 
-def fill_one_table(table: Dict,
-                   *,
-                   file: h5py.File) -> None:
+def fill_one_table(*,
+                   file: h5py.File) -> Dict[int, pd.DataFrame]:
+    table = {}
     for mass in file:
         mass_group = mass + '/'
         table[int(mass)] = pd.DataFrame(dict(
@@ -103,6 +98,7 @@ def fill_one_table(table: Dict,
                 color_r=file[mass_group + 'color_r'],
                 color_i=file[mass_group + 'color_i'],
                 color_j=file[mass_group + 'color_j']))
+    return table
 
 
 def open_hdf5(path: str) -> h5py.File:
