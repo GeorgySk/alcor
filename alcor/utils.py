@@ -9,7 +9,8 @@ from typing import (Any,
                     Iterator,
                     Container,
                     Mapping,
-                    Dict, Tuple)
+                    Dict,
+                    Tuple)
 
 import yaml
 
