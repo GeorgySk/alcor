@@ -33,7 +33,7 @@ SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 
 # Description of ugriz color scheme:
 # https://en.wikipedia.org/wiki/Photometric_system
-STAR_PARAMETERS_NAMES = ['mass',
+STAR_PARAMETERS_NAMES = {'mass',
                          'luminosity',
                          'proper_motion',
                          'proper_motion_component_b',
@@ -59,7 +59,7 @@ STAR_PARAMETERS_NAMES = ['mass',
                          'w_velocity',
                          'birth_time',
                          'spectral_type',
-                         'galactic_disk_type']
+                         'galactic_disk_type'}
 
 
 class GalacticDiskType(enum.IntEnum):
