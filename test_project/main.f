@@ -557,6 +557,7 @@ C     NOTE: this 70 comes from nowhere
       real errora(70),ndfa(70)
       real massInBin(70)
       integer :: typeOfWD(numberOfStars)
+      logical :: eliminated(numberOfStars)
 C     values of LF in each bin. o-observational
       real xfl(19),xflo(19),xflcut(3),xflocut(3)
       real xflhot(11),xflohot(11)
@@ -628,7 +629,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       common /lb/ lgac,bgac
       common /coorcil/ coordinate_R,coordinate_Theta,coordinate_Zcylindr
       common /cool/ coolingTime
-      common /indexdb/ typeOfWD
+      common /indexdb/ typeOfWD, eliminated
       common /vel/ uu,vv,ww
       common /tm/ starBirthTime, 
      &            m
@@ -845,32 +846,35 @@ C                if cone crosses 2pi, move it -2pi
                      else if (disk_belonging(i) == 2) then
                          disk_str = 'thick'
                      end if
-                     write(421,*) massOfWD(i),
-     &                            luminosityOfWD(i),
-     &                            coordinate_R(i),
-     &                            coordinate_Theta(i),
-     &                            coordinate_Zcylindr(i),
-     &                            longitude,
-     &                            latitude,
-     &                            rightAscension(i),
-     &                            declination(i),
-     &                            u_ubvrij(i),
-     &                            b_ubvrij(i),
-     &                            v_ubvrij(i),
-     &                            r_ubvrij(i),
-     &                            i_ubvrij(i),
-     &                            j_ubvrij(i),
-     &                            uu(i),
-     &                            vv(i),
-     &                            ww(i),
-     &                            longitude_proper_motion(i),
-     &                            latitude_proper_motion(i),
-     &                            rgac(i),
-     &                            starBirthTime(i),
-     &                            effTempOfWD(i),
-     &                            log_g(i),
-     &                            typeOfWD(i),
-     &                            disk_str
+
+                     if (eliminated(i) == .false.) then
+                         write(421,*) massOfWD(i),
+     &                                luminosityOfWD(i),
+     &                                coordinate_R(i),
+     &                                coordinate_Theta(i),
+     &                                coordinate_Zcylindr(i),
+     &                                longitude,
+     &                                latitude,
+     &                                rightAscension(i),
+     &                                declination(i),
+     &                                u_ubvrij(i),
+     &                                b_ubvrij(i),
+     &                                v_ubvrij(i),
+     &                                r_ubvrij(i),
+     &                                i_ubvrij(i),
+     &                                j_ubvrij(i),
+     &                                uu(i),
+     &                                vv(i),
+     &                                ww(i),
+     &                                longitude_proper_motion(i),
+     &                                latitude_proper_motion(i),
+     &                                rgac(i),
+     &                                starBirthTime(i),
+     &                                effTempOfWD(i),
+     &                                log_g(i),
+     &                                typeOfWD(i),
+     &                                disk_str
+                     end if
                  else
                      eliminations_counter = eliminations_counter + 1
                  end if
