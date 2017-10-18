@@ -36,6 +36,5 @@ def initializer_parameters(cls: type) -> List[str]:
 def sub_dict(dictionary: Dict[Hashable, Any],
              *,
              keys: Iterable[Hashable]) -> Dict[Hashable, Any]:
-    return {key: value
-            for key, value in dictionary.items()
-            if key in keys}
+    return {key: dictionary[key]
+            for key in keys}
