@@ -9,15 +9,15 @@ env:
   - PYTHON3_VERSION=3.5
   - PYTHON3_VERSION=3.6
 
-before_install:
+install:
   - ./install-docker.sh
   - ./install-docker-compose.sh
+  - pip install codecov
+
+before_script:
   - docker -v
   - docker-compose -v
   - printenv
-
-install:
-  - pip install codecov
 
 script:
   - ./run-tests.sh
