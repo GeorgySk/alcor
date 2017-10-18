@@ -10,12 +10,12 @@ from typing import (Any,
                     Container,
                     Mapping,
                     Dict,
-                    Tuple)
+                    Tuple,
+                    List)
 
 import yaml
 
-from alcor.models import (STAR_PARAMETERS_NAMES,
-                          Group,
+from alcor.models import (Group,
                           Star)
 
 logger = logging.getLogger(__name__)
@@ -35,18 +35,14 @@ def join_str(items: Iterable[Any],
 def parse_stars(lines: Iterator[str],
                 *,
                 group: Group,
-                possible_columns_names: Container[str] = STAR_PARAMETERS_NAMES
-                ) -> Iterator[Star]:
-    header = next(lines).split()
-    validate_header(header,
-                    possible_columns_names=possible_columns_names)
-
+                columns_names: List[str]) -> Iterator[Star]:
+    group_id = group.id
     for line in lines:
         parts = line.split()
         params = map(str_to_float, parts)
-        values = OrderedDict(zip(header,
+        values = OrderedDict(zip(columns_names,
                                  params))
-        yield Star(group_id=group.id,
+        yield Star(group_id=group_id,
                    **values)
 
 
