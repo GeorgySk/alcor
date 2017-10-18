@@ -1,9 +1,5 @@
 import enum
-import inspect
 import uuid
-from typing import (Any,
-                    Dict,
-                    Tuple)
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
@@ -178,22 +174,3 @@ class Star(Base):
         self.birth_time = birth_time
         self.spectral_type = spectral_type
         self.galactic_disk_type = galactic_disk_type
-
-    @classmethod
-    def deserialize(cls, serialized: Dict[str, Any]) -> 'Star':
-        fields_to_copy = cls.fields_to_copy()
-        serialized = {key: value
-                      for key, value in serialized.items()
-                      if key in fields_to_copy}
-        star_id = serialized.pop('id', None)
-        star = cls(**serialized)
-        star.id = star_id
-        return star
-
-    # TODO: memoize this
-    @classmethod
-    def fields_to_copy(cls) -> Tuple[str, ...]:
-        initializer_signature = inspect.signature(cls.__init__)
-        parameters = dict(initializer_signature.parameters)
-        parameters.pop('self')
-        return ('id',) + tuple(parameters)

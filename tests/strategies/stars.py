@@ -9,6 +9,9 @@ from hypothesis_sqlalchemy import tables
 from sqlalchemy.sql.sqltypes import Float
 
 from alcor.models import Star
+from tests.utils import (double_star_map,
+                         initializer_parameters,
+                         sub_dict)
 
 
 def stars_factory(nullable: bool) -> SearchStrategy:
@@ -18,10 +21,13 @@ def stars_factory(nullable: bool) -> SearchStrategy:
 
     columns_names = [column.name
                      for column in table.columns]
+    star_initializer_parameters = initializer_parameters(Star)
     return (records
             .map(partial(zip, columns_names))
             .map(dict)
-            .map(Star.deserialize))
+            .map(partial(sub_dict,
+                         keys=star_initializer_parameters))
+            .map(partial(double_star_map, Star)))
 
 
 def fixed_stars_columns_values(nullable: bool
