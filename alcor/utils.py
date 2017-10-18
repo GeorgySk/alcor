@@ -32,16 +32,16 @@ def join_str(items: Iterable[Any],
 
 def parse_stars(lines: Iterator[str],
                 group: Group) -> Iterator[Star]:
-    headers = next(lines).split()
-    for header in headers:
-        if not (header in STAR_PARAMETERS_NAMES):
-            logger.error('There is no parameter {header} in '
+    header = next(lines).split()
+    for column_name in header:
+        if column_name not in STAR_PARAMETERS_NAMES:
+            logger.error('There is no parameter "{column_name}" in '
                          'STAR_PARAMETERS_NAMES'
-                         .format(header=header))
+                         .format(column_name=column_name))
     for line in lines:
         parts = line.split()
         params = map(str_to_float, parts)
-        values = OrderedDict(zip(headers,
+        values = OrderedDict(zip(header,
                                  params))
         yield Star(group_id=group.id,
                    **values)
