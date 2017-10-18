@@ -6,12 +6,14 @@ from typing import Dict
 
 from sqlalchemy.orm.session import Session
 
-from alcor.models import Group
+from alcor.models import (STAR_PARAMETERS_NAMES,
+                          Group)
 from alcor.models.simulation import Parameter
 from alcor.services.common import group_output_file_name
 from alcor.types import (GridParametersInfoType,
                          CSVParametersInfoType)
-from alcor.utils import parse_stars
+from alcor.utils import (parse_stars,
+                         validate_header)
 from . import grid
 
 logger = logging.getLogger(__name__)
@@ -34,8 +36,12 @@ def run(*,
                        output_file_name=output_file_name)
 
         with open(output_file_name) as output_file:
+            header = next(output_file).split()
+            validate_header(header,
+                            possible_columns_names=STAR_PARAMETERS_NAMES)
             stars = list(parse_stars(output_file,
-                                     group=group))
+                                     group=group,
+                                     columns_names=header))
         os.remove(output_file_name)
 
         parameters = [Parameter(group_id=group.id,
