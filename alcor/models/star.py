@@ -11,7 +11,6 @@ from sqlalchemy.sql.sqltypes import (BigInteger,
                                      Enum)
 
 from .base import Base
-from .utils import memoize_properties
 
 # Description of ugriz color scheme:
 # https://en.wikipedia.org/wiki/Photometric_system
@@ -50,7 +49,6 @@ class GalacticDiskType(enum.IntEnum):
     halo = 3
 
 
-@memoize_properties
 class Star(Base):
     __tablename__ = 'stars'
 
