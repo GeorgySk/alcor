@@ -1,5 +1,10 @@
 import inspect
-from typing import Any, Callable, Dict, List, Hashable, Iterable
+from typing import (Any,
+                    Callable,
+                    Iterable,
+                    Hashable,
+                    Dict,
+                    List)
 
 from hypothesis import (Verbosity,
                         find,
