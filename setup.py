@@ -35,6 +35,8 @@ setup(name=PROJECT_NAME,
           'psycopg2>=2.7.1',  # PostgreSQL driver
           'sqlalchemy>=1.1.14',  # ORM
           'PyYAML>=3.12.0',  # settings loading
+          'pandas>=0.20.3',  # data analysis
+          'numpy>=1.11.3',  # multidimensional arrays computations
           'matplotlib>=2.0.2',  # plotting
       ],
       setup_requires=['pytest-runner>=2.11.1'],
