@@ -55,6 +55,10 @@ STAR_PARAMETERS_NAMES = ['mass',
                          'r_abs_magnitude',
                          'i_abs_magnitude',
                          'j_abs_magnitude',
+                         'ug_ugriz',
+                         'gr_ugriz',
+                         'ri_ugriz',
+                         'iz_ugriz',
                          'u_velocity',
                          'v_velocity',
                          'w_velocity',
@@ -123,6 +127,14 @@ class Star(Base):
                              nullable=True)
     j_abs_magnitude = Column(Float(),
                              nullable=True)
+    ug_ugriz = Column(Float(),
+                      nullable=True)
+    gr_ugriz = Column(Float(),
+                      nullable=True)
+    ri_ugriz = Column(Float(),
+                      nullable=True)
+    iz_ugriz = Column(Float(),
+                      nullable=True)
     u_velocity = Column(Float(),
                         nullable=True)
     v_velocity = Column(Float(),
@@ -167,6 +179,10 @@ class Star(Base):
                  r_abs_magnitude: float = None,
                  i_abs_magnitude: float = None,
                  j_abs_magnitude: float = None,
+                 ug_ugriz: float = None,
+                 gr_ugriz: float = None,
+                 ri_ugriz: float = None,
+                 iz_ugriz: float = None,
                  u_velocity: float = None,
                  v_velocity: float = None,
                  w_velocity: float = None,
@@ -199,6 +215,10 @@ class Star(Base):
         self.r_abs_magnitude = r_abs_magnitude
         self.i_abs_magnitude = i_abs_magnitude
         self.j_abs_magnitude = j_abs_magnitude
+        self.ug_ugriz = ug_ugriz
+        self.gr_ugriz = gr_ugriz
+        self.ri_ugriz = ri_ugriz
+        self.iz_ugriz = iz_ugriz
         self.u_velocity = u_velocity
         self.v_velocity = v_velocity
         self.w_velocity = w_velocity

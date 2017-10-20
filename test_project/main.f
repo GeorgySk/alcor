@@ -65,12 +65,10 @@ C     For terminal:
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: u_ubvrij(numberOfStars),
-     &        b_ubvrij(numberOfStars),
-     &        v_ubvrij(numberOfStars),
-     &        r_ubvrij(numberOfStars),
-     &        i_ubvrij(numberOfStars),
-     &        j_ubvrij(numberOfStars)
+      real :: ug(numberOfStars),
+     &        gr(numberOfStars),
+     &        ri(numberOfStars),
+     &        iz(numberOfStars)
       logical :: is_numeric, longitudes_from_csv, latitudes_from_csv
       integer :: iterations_count, getNumberOfLines
 
@@ -302,12 +300,10 @@ C     TODO: add choosing what output we want to get
      &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'u_abs_magnitude ',
-     &                  'b_abs_magnitude ',
-     &                  'v_abs_magnitude ',
-     &                  'r_abs_magnitude ',
-     &                  'i_abs_magnitude ',
-     &                  'j_abs_magnitude ',
+     &                  'ug_ugriz ',
+     &                  'gr_ugriz ',
+     &                  'ri_ugriz ',
+     &                  'iz_ugriz ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
@@ -328,12 +324,10 @@ C     TODO: add choosing what output we want to get
      &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'u_abs_magnitude ',
-     &                  'b_abs_magnitude ',
-     &                  'v_abs_magnitude ',
-     &                  'r_abs_magnitude ',
-     &                  'i_abs_magnitude ',
-     &                  'j_abs_magnitude ',
+     &                  'ug_ugriz ',
+     &                  'gr_ugriz ',
+     &                  'ri_ugriz ',
+     &                  'iz_ugriz ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
@@ -409,19 +403,16 @@ C         Calculating the trajectories according to/along z-coordinate
           write(6,*) '8. Determinating visual magnitudes (8/9)'
           call magi(fractionOfDB,
      &              table,
-     &              u_ubvrij,
-     &              b_ubvrij,
-     &              v_ubvrij,
-     &              r_ubvrij,
-     &              i_ubvrij,
-     &              j_ubvrij) 
+     &              ug,
+     &              gr,
+     &              ri,
+     &              iz) 
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
      &         cone_height_latitudes(i),
-     &         u_ubvrij, b_ubvrij, v_ubvrij, r_ubvrij, i_ubvrij,
-     &         j_ubvrij)
+     &         ug, gr, ri, iz)
           open(765, file='processed_cones.txt')
           write(unit=765,fmt=*) cone_height_longitudes(i),
      &                          cone_height_latitudes(i)
@@ -488,8 +479,7 @@ C***********************************************************************
 
       subroutine printForProcessing(output_filename, geometry, iseed,
      &         solarGalactocentricDistance,cone_height_longitude,
-     &         cone_height_latitude, u_ubvrij, b_ubvrij, v_ubvrij,
-     &         r_ubvrij, i_ubvrij, j_ubvrij)
+     &         cone_height_latitude, ug, gr, ri, iz)
       implicit none
       external ran
       real ran
@@ -524,12 +514,10 @@ C     Minimum proper motion
       parameter (minimumProperMotion=0.04)
 C     Parameters of mass histograms
       
-      real :: u_ubvrij(numberOfStars),
-     &        b_ubvrij(numberOfStars),
-     &        v_ubvrij(numberOfStars),
-     &        r_ubvrij(numberOfStars),
-     &        i_ubvrij(numberOfStars),
-     &        j_ubvrij(numberOfStars)
+      real :: ug(numberOfStars),
+     &        gr(numberOfStars),
+     &        ri(numberOfStars),
+     &        iz(numberOfStars)
       double precision :: properMotion(numberOfStars),
      &                    rightAscension(numberOfStars),
      &                    declination(numberOfStars)
@@ -674,12 +662,10 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      bgac(i),
      &                      rightAscension(i),
      &                      declination(i),
-     &                      u_ubvrij(i),
-     &                      b_ubvrij(i),
-     &                      v_ubvrij(i),
-     &                      r_ubvrij(i),
-     &                      i_ubvrij(i),
-     &                      j_ubvrij(i),
+     &                      ug(i),
+     &                      gr(i),
+     &                      ri(i),
+     &                      iz(i),
      &                      uu(i),
      &                      vv(i),
      &                      ww(i),
@@ -847,7 +833,7 @@ C                if cone crosses 2pi, move it -2pi
                          disk_str = 'thick'
                      end if
 
-                     if (eliminated(i) == .false.) then
+                     if (eliminated(i) .eqv. .false.) then
                          write(421,*) massOfWD(i),
      &                                luminosityOfWD(i),
      &                                coordinate_R(i),
@@ -857,12 +843,10 @@ C                if cone crosses 2pi, move it -2pi
      &                                latitude,
      &                                rightAscension(i),
      &                                declination(i),
-     &                                u_ubvrij(i),
-     &                                b_ubvrij(i),
-     &                                v_ubvrij(i),
-     &                                r_ubvrij(i),
-     &                                i_ubvrij(i),
-     &                                j_ubvrij(i),
+     &                                ug(i),
+     &                                gr(i),
+     &                                ri(i),
+     &                                iz(i),
      &                                uu(i),
      &                                vv(i),
      &                                ww(i),
