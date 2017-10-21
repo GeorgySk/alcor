@@ -9,13 +9,6 @@ services:
       - POSTGRES_DB=alcor
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
-    networks:
-      - alcor_default
 
 volumes:
   postgres-data:
-
-networks:
-  alcor_default:
-    external:
-      name: alcor_default
