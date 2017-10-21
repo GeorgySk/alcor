@@ -1,6 +1,6 @@
-============================================
-``hypothesis`` strategies for ``SQLAlchemy``
-============================================
+=====
+alcor
+=====
 
 .. image:: https://travis-ci.org/wolvespack/alcor.svg?branch=master
   :target:  https://travis-ci.org/wolvespack/alcor
