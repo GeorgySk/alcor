@@ -1,5 +1,6 @@
 import os
-from contextlib import closing
+from contextlib import (contextmanager,
+                        closing)
 from functools import partial
 from typing import (Dict,
                     List)
@@ -10,7 +11,7 @@ import pandas as pd
 
 def read_da_cooling(path: str = 'input_data/da_cooling.hdf5'
                     ) -> Dict[int, Dict[int, pd.DataFrame]]:
-    with closing(open_hdf5(path)) as file:
+    with open_hdf5(path) as file:
         da_cooling_tracks_by_metallicities = {1: {},
                                               10: {},
                                               30: {},
@@ -22,7 +23,7 @@ def read_da_cooling(path: str = 'input_data/da_cooling.hdf5'
 
 def read_db_cooling(path: str = 'input_data/db_cooling.hdf5'
                     ) -> Dict[int, Dict[int, pd.DataFrame]]:
-    with closing(open_hdf5(path)) as file:
+    with open_hdf5(path) as file:
         db_cooling_tracks_by_metallicities = {1: {},
                                               10: {},
                                               60: {}}
@@ -32,7 +33,7 @@ def read_db_cooling(path: str = 'input_data/db_cooling.hdf5'
 
 
 def read_colors(path: str) -> Dict[int, pd.DataFrame]:
-    with closing(open_hdf5(path)) as file:
+    with open_hdf5(path) as file:
         return fill_colors(file=file)
 
 
@@ -45,7 +46,7 @@ read_db_colors = partial(read_colors,
 
 def read_one_tables(path: str = 'input_data/one_wds_tracks.hdf5'
                     ) -> Dict[int, pd.DataFrame]:
-    with closing(open_hdf5(path)) as file:
+    with open_hdf5(path) as file:
         return fill_one_table(file=file)
 
 
@@ -107,6 +108,15 @@ def open_hdf5(path: str) -> h5py.File:
 
     return h5py.File(path,
                      mode='r')
+
+
+@contextmanager
+def open_hdf5(path: str) -> h5py.File:
+    base_dir = os.path.dirname(__file__)
+    path = os.path.join(base_dir, path)
+    with closing(h5py.File(path,
+                           mode='r')) as file:
+        yield file
 
 
 def sort_mass_indexes(indexes: List[str]) -> List[str]:
