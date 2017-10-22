@@ -4,62 +4,103 @@ from typing import (Iterator,
                     List)
 
 import pandas as pd
+import pytest
 
 from alcor.services.simulations import tracks
 
 
-def test_tracks() -> None:
-    da_cooling_tracks_by_metallicities = tracks.read_da_cooling()
-    db_cooling_tracks_by_metallicities = tracks.read_db_cooling()
-    da_colors = tracks.read_da_colors()
-    db_colors = tracks.read_db_colors()
-    one_tables = tracks.read_one_tables()
+@pytest.fixture
+def da_cooling_tracks_lengths() -> List[int]:
+    cooling_tracks_by_metallicities = tracks.read_da_cooling()
+    return tracks_by_metallicities_lengths(
+            cooling_tracks=cooling_tracks_by_metallicities)
 
+
+@pytest.fixture
+def db_cooling_tracks_lengths() -> List[int]:
+    cooling_tracks_by_metallicities = tracks.read_db_cooling()
+    return tracks_by_metallicities_lengths(
+            cooling_tracks=cooling_tracks_by_metallicities)
+
+
+@pytest.fixture
+def da_colors_tracks_lengths() -> List[int]:
+    characteristics = tracks.read_da_colors()
+    return tracks_lengths(sequences=characteristics)
+
+
+@pytest.fixture
+def db_colors_tracks_lengths() -> List[int]:
+    characteristics = tracks.read_db_colors()
+    return tracks_lengths(sequences=characteristics)
+
+
+@pytest.fixture
+def one_tables_lengths() -> List[int]:
+    characteristics = tracks.read_one_tables()
+    return tracks_lengths(sequences=characteristics)
+
+
+@pytest.fixture
+def da_cooling_fort_files_lengths():
     da_cooling_fort_links = {1: range(11, 18),
                              10: range(21, 31),
                              30: range(31, 39),
                              60: range(41, 49)}
+    return fort_files_by_metallicities_lengths(
+            fort_links=da_cooling_fort_links,
+            base_dir=os.path.dirname(__file__))
+
+
+@pytest.fixture
+def db_cooling_fort_files_lengths():
     db_cooling_fort_links = {1: range(91, 98),
                              10: range(101, 110),
                              60: range(111, 120)}
-    da_colors_fort_links = range(61, 71)
-    db_colors_fort_links = range(132, 139)
-    one_tables_fort_links = range(121, 127)
-
-    base_dir = os.path.dirname(__file__)
-
-    da_cooling_tracks_lengths = tracks_by_metallicities_lengths(
-            cooling_tracks=da_cooling_tracks_by_metallicities)
-    db_cooling_tracks_lengths = tracks_by_metallicities_lengths(
-            cooling_tracks=db_cooling_tracks_by_metallicities)
-
-    da_cooling_fort_files_lengths = fort_files_by_metallicities_lengths(
-            fort_links=da_cooling_fort_links,
-            base_dir=base_dir)
-    db_cooling_fort_files_lengths = fort_files_by_metallicities_lengths(
+    return fort_files_by_metallicities_lengths(
             fort_links=db_cooling_fort_links,
-            base_dir=base_dir)
+            base_dir=os.path.dirname(__file__))
 
-    da_colors_tracks_lengths = tracks_lengths(sequences=da_colors)
-    db_colors_tracks_lengths = tracks_lengths(sequences=db_colors)
 
-    da_colors_fort_files_lengths = fort_files_lengths(
+@pytest.fixture
+def da_colors_fort_files_lengths():
+    da_colors_fort_links = range(61, 71)
+    return fort_files_lengths(
             fort_links=da_colors_fort_links,
-            base_dir=base_dir)
-    db_colors_fort_files_lengths = fort_files_lengths(
+            base_dir=os.path.dirname(__file__))
+
+
+@pytest.fixture
+def db_colors_fort_files_lengths():
+    db_colors_fort_links = range(132, 139)
+    return fort_files_lengths(
             fort_links=db_colors_fort_links,
-            base_dir=base_dir)
+            base_dir=os.path.dirname(__file__))
 
-    one_tracks_lengths = tracks_lengths(sequences=one_tables)
-    one_fort_files_lengths = fort_files_lengths(
+
+@pytest.fixture
+def one_fort_files_lengths():
+    one_tables_fort_links = range(121, 127)
+    return fort_files_lengths(
             fort_links=one_tables_fort_links,
-            base_dir=base_dir)
+            base_dir=os.path.dirname(__file__))
 
+
+def test_tracks(da_cooling_tracks_lengths,
+                db_cooling_tracks_lengths,
+                da_colors_tracks_lengths,
+                db_colors_tracks_lengths,
+                one_tables_lengths,
+                da_cooling_fort_files_lengths,
+                db_cooling_fort_files_lengths,
+                da_colors_fort_files_lengths,
+                db_colors_fort_files_lengths,
+                one_fort_files_lengths) -> None:
     assert da_cooling_tracks_lengths == da_cooling_fort_files_lengths
     assert db_cooling_tracks_lengths == db_cooling_fort_files_lengths
     assert da_colors_tracks_lengths == da_colors_fort_files_lengths
     assert db_colors_tracks_lengths == db_colors_fort_files_lengths
-    assert one_tracks_lengths == one_fort_files_lengths
+    assert one_tables_lengths == one_fort_files_lengths
 
 
 def tracks_by_metallicities_lengths(
