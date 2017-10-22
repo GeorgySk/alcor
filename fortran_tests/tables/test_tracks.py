@@ -134,9 +134,10 @@ def fort_files_lengths(fort_links: Iterator,
                        *,
                        base_dir: str) -> List[int]:
     lengths = []
-    for fort_link in fort_links:
-        fort_link_dir = os.path.join(base_dir,
-                                     './fort_files/fort.' + str(fort_link))
+    fort_link_dirs = [os.path.join(base_dir,
+                                   './fort_files/fort.' + str(fort_link))
+                      for fort_link in fort_links]
+    for fort_link_dir in fort_link_dirs:
         lengths.append(sum(1 for line in open(fort_link_dir)))
 
     return lengths
