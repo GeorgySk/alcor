@@ -120,6 +120,5 @@ def open_hdf5(path: str) -> h5py.File:
 
 
 def sort_mass_indexes(indexes: List[str]) -> List[str]:
-    indexes = [int(index) for index in indexes]
-    indexes.sort()
-    return list(map(str, indexes))
+    integer_indexes = sorted(map(int, indexes))
+    return list(map(str, integer_indexes))
