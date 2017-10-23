@@ -91,7 +91,7 @@ C     TODO: find out the meaning of psi, mrep and 1.0e6
       halo_birth_init_time = max_age - halo_age
 C     This can be easily proved by taking derivative from
 C     y = t * exp(-t / tau)
-      thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
+      thick_disk_max_sfr_relative_time = thick_disk_sfr_param
       thick_disk_max_sfr = (thick_disk_max_sfr_relative_time 
      &                      * exp(-thick_disk_max_sfr_relative_time 
      &                              / thick_disk_sfr_param))
