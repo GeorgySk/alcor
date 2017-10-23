@@ -51,51 +51,51 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
                         *,
                         file: h5py.File) -> None:
     for metallicity in cooling_tracks.keys():
-        metallicity_group = str(metallicity) + '/'
+        metallicity_group = str(metallicity)
         masses = sort_mass_indexes(indexes=file[metallicity_group])
 
         for mass in masses:
-            mass_group = metallicity_group + mass + '/'
+            mass_group = os.path.join(metallicity_group, mass)
             cooling_tracks_by_metallicity = cooling_tracks[metallicity]
             cooling_tracks_by_metallicity[int(mass)] = pd.DataFrame(
-                    dict(cooling_time=file[mass_group + 'cooling_time'],
-                         effective_temperature=file[mass_group
-                                                    + 'effective_temperature'],
-                         luminosity=file[mass_group + 'luminosity']))
+                    dict(cooling_time=file[os.path.join(mass_group,
+                                                        'cooling_time')],
+                         effective_temperature=file[os.path.join(
+                                 mass_group, 'effective_temperature')],
+                         luminosity=file[os.path.join(mass_group,
+                                                      'luminosity')]))
 
 
 def fill_colors(*,
                 file: h5py.File) -> Dict[int, pd.DataFrame]:
     color_table = {}
-    for mass in file:
-        mass_group = mass + '/'
-        color_table[int(mass)] = pd.DataFrame(dict(
-                luminosity=file[mass_group + 'luminosity'],
-                color_u=file[mass_group + 'color_u'],
-                color_b=file[mass_group + 'color_b'],
-                color_v=file[mass_group + 'color_v'],
-                color_r=file[mass_group + 'color_r'],
-                color_i=file[mass_group + 'color_i'],
-                color_j=file[mass_group + 'color_j']))
+    for mass_group in file:
+        color_table[int(mass_group)] = pd.DataFrame(dict(
+                luminosity=file[os.path.join(mass_group, 'luminosity')],
+                color_u=file[os.path.join(mass_group, 'color_u')],
+                color_b=file[os.path.join(mass_group, 'color_b')],
+                color_v=file[os.path.join(mass_group, 'color_v')],
+                color_r=file[os.path.join(mass_group, 'color_r')],
+                color_i=file[os.path.join(mass_group, 'color_i')],
+                color_j=file[os.path.join(mass_group, 'color_j')]))
     return color_table
 
 
 def fill_one_table(*,
                    file: h5py.File) -> Dict[int, pd.DataFrame]:
     table = {}
-    for mass in file:
-        mass_group = mass + '/'
-        table[int(mass)] = pd.DataFrame(dict(
-                luminosity=file[mass_group + 'luminosity'],
-                cooling_time=file[mass_group + 'cooling_time'],
-                effective_temperature=file[mass_group
-                                           + 'effective_temperature'],
-                color_u=file[mass_group + 'color_u'],
-                color_b=file[mass_group + 'color_b'],
-                color_v=file[mass_group + 'color_v'],
-                color_r=file[mass_group + 'color_r'],
-                color_i=file[mass_group + 'color_i'],
-                color_j=file[mass_group + 'color_j']))
+    for mass_group in file:
+        table[int(mass_group)] = pd.DataFrame(dict(
+                luminosity=file[os.path.join(mass_group, 'luminosity')],
+                cooling_time=file[os.path.join(mass_group, 'cooling_time')],
+                effective_temperature=file[os.path.join(
+                        mass_group, 'effective_temperature')],
+                color_u=file[os.path.join(mass_group, 'color_u')],
+                color_b=file[os.path.join(mass_group, 'color_b')],
+                color_v=file[os.path.join(mass_group, 'color_v')],
+                color_r=file[os.path.join(mass_group, 'color_r')],
+                color_i=file[os.path.join(mass_group, 'color_i')],
+                color_j=file[os.path.join(mass_group, 'color_j')]))
     return table
 
 
