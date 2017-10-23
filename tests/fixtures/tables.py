@@ -102,7 +102,7 @@ def tracks_by_metallicities_lengths(
 @pytest.fixture
 def tracks_lengths(sequences: Dict[int, pd.DataFrame]) -> List[int]:
     lengths = []
-    for mass, sequence in sequences.items():
+    for mass, sequence in sorted(sequences.items()):
         lengths.append(sequence.shape[0])
 
     return lengths
