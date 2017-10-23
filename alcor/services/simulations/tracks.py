@@ -3,33 +3,30 @@ from contextlib import (contextmanager,
                         closing)
 from functools import partial
 from typing import (Dict,
+                    Tuple,
                     List)
 
 import h5py
 import pandas as pd
 
 
-def read_da_cooling(path: str = 'input_data/da_cooling.hdf5'
-                    ) -> Dict[int, Dict[int, pd.DataFrame]]:
+def read_cooling(path: str,
+                 metallicities: Tuple[int]
+                 ) -> Dict[int, Dict[int, pd.DataFrame]]:
     with open_hdf5(path) as file:
-        da_cooling_tracks_by_metallicities = {1: {},
-                                              10: {},
-                                              30: {},
-                                              60: {}}
-        fill_cooling_tracks(da_cooling_tracks_by_metallicities,
+        cooling_tracks_by_metallicities = {metallicity: {}
+                                           for metallicity in metallicities}
+        fill_cooling_tracks(cooling_tracks_by_metallicities,
                             file=file)
-        return da_cooling_tracks_by_metallicities
+        return cooling_tracks_by_metallicities
 
 
-def read_db_cooling(path: str = 'input_data/db_cooling.hdf5'
-                    ) -> Dict[int, Dict[int, pd.DataFrame]]:
-    with open_hdf5(path) as file:
-        db_cooling_tracks_by_metallicities = {1: {},
-                                              10: {},
-                                              60: {}}
-        fill_cooling_tracks(db_cooling_tracks_by_metallicities,
-                            file=file)
-        return db_cooling_tracks_by_metallicities
+read_da_cooling = partial(read_cooling,
+                          path='input_data/da_cooling.hdf5',
+                          metallicities=(1, 10, 30, 60))
+read_db_cooling = partial(read_cooling,
+                          path='input_data/db_cooling.hdf5',
+                          metallicities=(1, 10, 60))
 
 
 def read_colors(path: str) -> Dict[int, pd.DataFrame]:
