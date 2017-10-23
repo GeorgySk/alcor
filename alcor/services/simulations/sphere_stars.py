@@ -163,7 +163,7 @@ def get_galactic_structure_type(*,
     if random_number <= thick_disk_stars_fraction:
         return GalacticStructureType.thick
 
-    if (thick_disk_stars_fraction < random()
+    if (thick_disk_stars_fraction < random_number
             <= thick_disk_stars_fraction + halo_stars_fraction):
         return GalacticStructureType.halo
 
