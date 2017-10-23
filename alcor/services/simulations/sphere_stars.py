@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 # TODO: take these consts to settings file
 def generate_stars(*,
-                   max_stars_count: int = 6_000_000,
-                   time_bins_count: int = 5_000,
+                   max_stars_count: int = 6000000,
+                   time_bins_count: int = 5000,
                    thin_disk_scale_height_kpc: float = 0.25,
                    thick_disk_scale_height_kpc: float = 0.9,
                    thick_disk_age: float = 12.,
