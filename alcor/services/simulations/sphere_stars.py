@@ -70,8 +70,8 @@ def generate_stars(*,
             stars_count += 1
 
             if stars_count > max_stars_count:
-                raise Exception('Number of stars is too high - '
-                                'decrease mass reduction factor')
+                raise OverflowError('Number of stars is too high - '
+                                    'decrease mass reduction factor.')
 
             star_mass = salpeter_initial_mass_function(
                     parameter=initial_mass_function_param)
