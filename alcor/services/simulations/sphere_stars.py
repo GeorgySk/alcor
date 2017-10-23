@@ -70,7 +70,7 @@ def generate_stars(*,
                                 'decrease mass reduction factor')
 
             star_mass = salpeter_initial_mass_function(
-                    initial_mass_function_param=initial_mass_function_param)
+                    parameter=initial_mass_function_param)
             progenitors_masses.append(star_mass)
 
             galactic_structure_type = get_galactic_structure_type(
@@ -120,19 +120,18 @@ def normalization_const(*,
 
 
 # TODO: implement inverse transform sampling
-def salpeter_initial_mass_function(
-        *,
-        initial_mass_function_param: float,
-        min_mass: float = 0.4,
-        max_mass: float = 50.) -> float:
-    y_max = min_mass ** initial_mass_function_param
+def salpeter_initial_mass_function(*,
+                                   parameter: float,
+                                   min_mass: float = 0.4,
+                                   max_mass: float = 50.) -> float:
+    y_max = min_mass ** parameter
 
     mass_amplitude = max_mass - min_mass
     while True:
         # TODO: implement seeds tracking
         y = y_max * random()
         mass = min_mass + mass_amplitude * random()
-        y_imf = mass ** initial_mass_function_param
+        y_imf = mass ** parameter
         if y <= y_imf:
             return mass
 
