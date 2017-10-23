@@ -1,5 +1,8 @@
 import logging
 import math
+from typing import (Union,
+                    Dict,
+                    List)
 from random import random
 
 from alcor.models.star import GalacticStructureType
@@ -25,7 +28,8 @@ def generate_stars(*,
                    initial_mass_function_param: float = -2.35,
                    halo_stars_formation_time: float = 1.,
                    halo_stars_fraction: float = 0.05,
-                   halo_age: float = 14.) -> None:
+                   halo_age: float = 14.
+                   ) -> Dict[str, List[Union[float, GalacticStructureType]]]:
     time_increment = thin_disk_age / time_bins_count
     sector_area = math.pi * sector_radius_kpc ** 2
     birth_rate = (time_increment * sector_area * 1E6  # TODO: what is 1E6?
@@ -107,6 +111,11 @@ def generate_stars(*,
 
             if total_bin_mass > birth_rate:
                 break
+
+    return dict(progenitors_masses=progenitors_masses,
+                galactic_structure_types=galactic_structure_types,
+                birth_times=birth_times,
+                z_coordinates=z_coordinates)
 
 
 def normalization_const(*,
