@@ -69,7 +69,7 @@ def generate_stars(*,
                 raise Exception('Number of stars is too high - '
                                 'decrease mass reduction factor')
 
-            star_mass = get_mass_from_salpeter_initial_mass_function(
+            star_mass = salpeter_initial_mass_function(
                     initial_mass_function_param=initial_mass_function_param)
             progenitors_masses.append(star_mass)
 
@@ -120,7 +120,7 @@ def normalization_const(*,
 
 
 # TODO: implement inverse transform sampling
-def get_mass_from_salpeter_initial_mass_function(
+def salpeter_initial_mass_function(
         *,
         initial_mass_function_param: float,
         min_mass: float = 0.4,
