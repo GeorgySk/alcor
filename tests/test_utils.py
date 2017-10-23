@@ -5,7 +5,7 @@ from alcor.utils import str_to_float
 
 def test_str_to_float(float_value: float,
                       float_value_str: str,
-                      non_float_string: str):
+                      non_float_string: str) -> None:
     float_result = str_to_float(float_value_str)
     non_float_result = str_to_float(non_float_string)
 
