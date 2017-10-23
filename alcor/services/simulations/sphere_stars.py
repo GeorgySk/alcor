@@ -1,10 +1,6 @@
 import logging
-from math import (pi,
-                  exp,
-                  log)
+import math
 from random import random
-
-import numpy as np
 
 from alcor.models.star import GalacticStructureType
 
@@ -30,7 +26,7 @@ def generate_stars(max_stars_count: int = 6_000_000,
                    halo_stars_fraction: float = 0.05,
                    halo_age: float = 14.) -> None:
     time_increment = thin_disk_age / time_bins_count
-    sector_area = pi * sector_radius_kpc ** 2
+    sector_area = math.pi * sector_radius_kpc ** 2
     birth_rate = (time_increment * sector_area * 1E6  # TODO: what is 1E6?
                   * mass_reduction_factor
                   * normalization_const(
@@ -45,8 +41,8 @@ def generate_stars(max_stars_count: int = 6_000_000,
     # This can be proved by taking derivative from y = t * exp(-t / tau)
     thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
     thick_disk_max_sfr = (thick_disk_max_sfr_relative_time
-                          * exp(-thick_disk_max_sfr_relative_time
-                                / thick_disk_sfr_param))
+                          * math.exp(-thick_disk_max_sfr_relative_time
+                                     / thick_disk_sfr_param))
 
     stars_count = 0
 
@@ -117,8 +113,8 @@ def normalization_const(star_formation_rate_param: float,
                         sigma: float = 51.  # TODO: what is sigma?
                         ) -> float:
     return sigma / (star_formation_rate_param
-                    * (1 - np.exp(-thin_disk_age_gyr
-                                  / star_formation_rate_param)))
+                    * (1 - math.exp(-thin_disk_age_gyr
+                                    / star_formation_rate_param)))
 
 
 # TODO: implement inverse transform sampling
@@ -132,8 +128,8 @@ def get_mass_from_salpeter_initial_mass_function(
     mass_amplitude = max_mass - min_mass
     while True:
         # TODO: implement seeds tracking
-        y = y_max * np.random.rand()
-        mass = min_mass + mass_amplitude * np.random.rand()[0]
+        y = y_max * random()
+        mass = min_mass + mass_amplitude * random()
         y_imf = mass ** initial_mass_function_param
         if y <= y_imf:
             return mass
@@ -146,9 +142,7 @@ def thick_disk_star_birth_time(*,
                                thick_disk_birth_init_time: float) -> float:
     while True:
         time_try = thick_disk_age * random()
-        time_try_sfr = (time_try
-                        * exp(-time_try
-                              / thick_disk_sfr_param))
+        time_try_sfr = time_try * math.exp(-time_try / thick_disk_sfr_param)
         sfr_try = thick_disk_max_sfr * random()
         if sfr_try <= time_try_sfr:
             return time_try + thick_disk_birth_init_time
@@ -175,9 +169,9 @@ def z_coordinate(*,
                  sector_radius_kpc: float) -> float:
     # TODO: implement function for inverse transform sampling
     # Inverse transform sampling for y = exp(-z / H)
-    coordinate = (-scale_height * log(
-            1. - random() * (1.0 - exp(-sector_radius_kpc
-                                       / scale_height))))
+    coordinate = (-scale_height * math.log(
+            1. - random() * (1.0 - math.exp(-sector_radius_kpc
+                                            / scale_height))))
     # TODO: find a better way to assign a random sign
     random_sign = float(1. - 2. * int(2.0 * random()))
 
