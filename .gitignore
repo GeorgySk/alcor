@@ -51,6 +51,3 @@ main.e
 
 # plots
 *.ps
-
-# inputs
-*.hdf5
