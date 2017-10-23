@@ -136,6 +136,8 @@ def salpeter_initial_mass_function(*,
             return mass
 
 
+# SFR - star formation rate. More info at:
+# https://www.google.es/search?q=star+formation+rate
 def thick_disk_star_birth_time(*,
                                thick_disk_age: float,
                                thick_disk_sfr_param: float,
