@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: take these consts to settings file
-def generate_stars(max_stars_count: int = 6_000_000,
+def generate_stars(*,
+                   max_stars_count: int = 6_000_000,
                    time_bins_count: int = 5_000,
                    thin_disk_scale_height_kpc: float = 0.25,
                    thick_disk_scale_height_kpc: float = 0.9,
@@ -108,7 +109,8 @@ def generate_stars(max_stars_count: int = 6_000_000,
                 break
 
 
-def normalization_const(star_formation_rate_param: float,
+def normalization_const(*,
+                        star_formation_rate_param: float,
                         thin_disk_age_gyr: float,
                         sigma: float = 51.  # TODO: what is sigma?
                         ) -> float:
@@ -119,10 +121,10 @@ def normalization_const(star_formation_rate_param: float,
 
 # TODO: implement inverse transform sampling
 def get_mass_from_salpeter_initial_mass_function(
+        *,
         initial_mass_function_param: float,
         min_mass: float = 0.4,
-        max_mass: float = 50.
-        ) -> float:
+        max_mass: float = 50.) -> float:
     y_max = min_mass ** initial_mass_function_param
 
     mass_amplitude = max_mass - min_mass
