@@ -1,4 +1,3 @@
-numpy
 click>=6.7 # command-line options and arguments
 pydevd>=1.1.1 # debugging
 sqlalchemy>=1.1.11
