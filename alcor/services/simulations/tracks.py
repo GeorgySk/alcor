@@ -103,14 +103,6 @@ def fill_one_table(*,
     return table
 
 
-def open_hdf5(path: str) -> h5py.File:
-    base_dir = os.path.dirname(__file__)
-    path = os.path.join(base_dir, path)
-
-    return h5py.File(path,
-                     mode='r')
-
-
 @contextmanager
 def open_hdf5(path: str) -> h5py.File:
     base_dir = os.path.dirname(__file__)
