@@ -1,16 +1,5 @@
 import enum
-import inspect
 import uuid
-from collections import OrderedDict
-from math import (radians,
-                  cos,
-                  sin,
-                  pi,
-                  asin,
-                  atan)
-from typing import (Any,
-                    Dict,
-                    Tuple)
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
@@ -22,14 +11,6 @@ from sqlalchemy.sql.sqltypes import (BigInteger,
                                      Enum)
 
 from .base import Base
-from .utils import memoize_properties
-
-ASTRONOMICAL_UNIT = 4.74
-DEC_GPOLE = radians(27.128336)
-RA_GPOLE = radians(192.859508)
-AUX_ANGLE = radians(122.932)
-
-SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE = 4.75
 
 # Description of ugriz color scheme:
 # https://en.wikipedia.org/wiki/Photometric_system
@@ -68,7 +49,6 @@ class GalacticDiskType(enum.IntEnum):
     halo = 3
 
 
-@memoize_properties
 class Star(Base):
     __tablename__ = 'stars'
 
@@ -192,71 +172,3 @@ class Star(Base):
         self.birth_time = birth_time
         self.spectral_type = spectral_type
         self.galactic_disk_type = galactic_disk_type
-
-    @property
-    def bolometric_magnitude(self) -> float:
-        # More info at
-        # https://en.wikipedia.org/wiki/Absolute_magnitude#Bolometric_magnitude
-        return 2.5 * self.luminosity + SOLAR_ABSOLUTE_BOLOMETRIC_MAGNITUDE
-
-    @property
-    def x_coordinate(self) -> float:
-        return self.cartesian_coordinates[0]
-
-    @property
-    def y_coordinate(self) -> float:
-        return self.cartesian_coordinates[1]
-
-    @property
-    def max_coordinates_modulus(self) -> float:
-        return max(abs(self.x_coordinate),
-                   abs(self.y_coordinate),
-                   abs(self.z_coordinate))
-
-    @property
-    def cartesian_coordinates(self) -> Tuple[float, float, float]:
-        right_ascension = self.right_ascension
-        declination = self.declination
-        distance = self.distance
-
-        latitude = (asin(cos(declination) * cos(DEC_GPOLE)
-                         * cos(right_ascension - RA_GPOLE)
-                         + sin(declination) * sin(DEC_GPOLE)))
-        x = sin(declination) - sin(latitude) * sin(DEC_GPOLE)
-        y = cos(declination) * sin(right_ascension - RA_GPOLE) * cos(DEC_GPOLE)
-        longitude = atan(x / y) + AUX_ANGLE - pi / 2.
-        if x > 0. and 0. > y or x <= 0. and y <= 0.:
-            longitude += pi
-
-        x_coordinate = distance * cos(latitude) * cos(longitude)
-        y_coordinate = distance * cos(latitude) * sin(longitude)
-        z_coordinate = distance * sin(latitude)
-        return x_coordinate, y_coordinate, z_coordinate
-
-    def modify(self, **fields: Any) -> 'Star':
-        serialized_star = self.serialize()
-        serialized_star.update(fields)
-        return self.deserialize(serialized_star)
-
-    def serialize(self) -> Dict[str, Any]:
-        return OrderedDict((field_name, getattr(self, field_name))
-                           for field_name in self.fields_to_copy())
-
-    @classmethod
-    def deserialize(cls, serialized: Dict[str, Any]) -> 'Star':
-        fields_to_copy = cls.fields_to_copy()
-        serialized = {key: value
-                      for key, value in serialized.items()
-                      if key in fields_to_copy}
-        star_id = serialized.pop('id', None)
-        star = cls(**serialized)
-        star.id = star_id
-        return star
-
-    # TODO: memoize this
-    @classmethod
-    def fields_to_copy(cls) -> Tuple[str, ...]:
-        initializer_signature = inspect.signature(cls.__init__)
-        parameters = dict(initializer_signature.parameters)
-        parameters.pop('self')
-        return ('id',) + tuple(parameters)
