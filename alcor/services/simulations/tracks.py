@@ -70,8 +70,7 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
                                                     'luminosity')]))
 
 
-def fill_colors(*,
-                file: h5py.File) -> Dict[int, pd.DataFrame]:
+def fill_colors(file: h5py.File) -> Dict[int, pd.DataFrame]:
     color_table = {}
     for mass_group in file:
         color_table[int(mass_group)] = pd.DataFrame(dict(
@@ -85,8 +84,7 @@ def fill_colors(*,
     return color_table
 
 
-def fill_one_table(*,
-                   file: h5py.File) -> Dict[int, pd.DataFrame]:
+def fill_one_table(file: h5py.File) -> Dict[int, pd.DataFrame]:
     table = {}
     for mass_group in file:
         table[int(mass_group)] = pd.DataFrame(dict(
