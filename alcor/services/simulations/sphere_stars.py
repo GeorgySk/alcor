@@ -145,13 +145,15 @@ def salpeter_initial_mass_function(*,
             return mass
 
 
-# SFR - star formation rate. More info at:
-# https://www.google.es/search?q=star+formation+rate
 def thick_disk_star_birth_time(*,
                                thick_disk_age: float,
                                thick_disk_sfr_param: float,
                                thick_disk_max_sfr: float,
                                thick_disk_birth_init_time: float) -> float:
+    """Return birth time of a thick disk star by using Monte Carlo method.
+    SFR - star formation rate. More info at:
+    https://www.google.es/search?q=star+formation+rate
+    """
     while True:
         time_try = thick_disk_age * random()
         time_try_sfr = time_try * math.exp(-time_try / thick_disk_sfr_param)
