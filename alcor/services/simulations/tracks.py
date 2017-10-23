@@ -1,4 +1,5 @@
 import os
+import posixpath
 from contextlib import (contextmanager,
                         closing)
 from functools import partial
@@ -8,6 +9,9 @@ from typing import (Dict,
 
 import h5py
 import pandas as pd
+
+
+join_group = posixpath.join
 
 
 def read_cooling(path: str,
@@ -55,15 +59,15 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
         masses = sort_mass_indexes(indexes=file[metallicity_group])
 
         for mass in masses:
-            mass_group = os.path.join(metallicity_group, mass)
+            mass_group = join_group(metallicity_group, mass)
             cooling_tracks_by_metallicity = cooling_tracks[metallicity]
             cooling_tracks_by_metallicity[int(mass)] = pd.DataFrame(
-                    dict(cooling_time=file[os.path.join(mass_group,
-                                                        'cooling_time')],
-                         effective_temperature=file[os.path.join(
+                    dict(cooling_time=file[join_group(mass_group,
+                                                      'cooling_time')],
+                         effective_temperature=file[join_group(
                                  mass_group, 'effective_temperature')],
-                         luminosity=file[os.path.join(mass_group,
-                                                      'luminosity')]))
+                         luminosity=file[join_group(mass_group,
+                                                    'luminosity')]))
 
 
 def fill_colors(*,
@@ -71,13 +75,13 @@ def fill_colors(*,
     color_table = {}
     for mass_group in file:
         color_table[int(mass_group)] = pd.DataFrame(dict(
-                luminosity=file[os.path.join(mass_group, 'luminosity')],
-                color_u=file[os.path.join(mass_group, 'color_u')],
-                color_b=file[os.path.join(mass_group, 'color_b')],
-                color_v=file[os.path.join(mass_group, 'color_v')],
-                color_r=file[os.path.join(mass_group, 'color_r')],
-                color_i=file[os.path.join(mass_group, 'color_i')],
-                color_j=file[os.path.join(mass_group, 'color_j')]))
+                luminosity=file[join_group(mass_group, 'luminosity')],
+                color_u=file[join_group(mass_group, 'color_u')],
+                color_b=file[join_group(mass_group, 'color_b')],
+                color_v=file[join_group(mass_group, 'color_v')],
+                color_r=file[join_group(mass_group, 'color_r')],
+                color_i=file[join_group(mass_group, 'color_i')],
+                color_j=file[join_group(mass_group, 'color_j')]))
     return color_table
 
 
@@ -86,16 +90,16 @@ def fill_one_table(*,
     table = {}
     for mass_group in file:
         table[int(mass_group)] = pd.DataFrame(dict(
-                luminosity=file[os.path.join(mass_group, 'luminosity')],
-                cooling_time=file[os.path.join(mass_group, 'cooling_time')],
-                effective_temperature=file[os.path.join(
+                luminosity=file[join_group(mass_group, 'luminosity')],
+                cooling_time=file[join_group(mass_group, 'cooling_time')],
+                effective_temperature=file[join_group(
                         mass_group, 'effective_temperature')],
-                color_u=file[os.path.join(mass_group, 'color_u')],
-                color_b=file[os.path.join(mass_group, 'color_b')],
-                color_v=file[os.path.join(mass_group, 'color_v')],
-                color_r=file[os.path.join(mass_group, 'color_r')],
-                color_i=file[os.path.join(mass_group, 'color_i')],
-                color_j=file[os.path.join(mass_group, 'color_j')]))
+                color_u=file[join_group(mass_group, 'color_u')],
+                color_b=file[join_group(mass_group, 'color_b')],
+                color_v=file[join_group(mass_group, 'color_v')],
+                color_r=file[join_group(mass_group, 'color_r')],
+                color_i=file[join_group(mass_group, 'color_i')],
+                color_j=file[join_group(mass_group, 'color_j')]))
     return table
 
 
