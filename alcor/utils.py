@@ -5,6 +5,7 @@ from functools import reduce
 from typing import (Any,
                     Union,
                     Hashable,
+                    Iterable,
                     Iterator,
                     Container,
                     Mapping,
