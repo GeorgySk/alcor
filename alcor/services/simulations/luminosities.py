@@ -11,22 +11,59 @@ def get_white_dwarfs(stars: pd.DataFrame,
                      max_mass: float = 10.5,
                      solar_metallicity: float = 0.01,
                      subsolar_metallicity: float = 0.001) -> pd.DataFrame:
-    valid_mass_stars = stars[stars['progenitor_mass'] < max_mass]
+    stars = filter_by_max_mass(stars,
+                               max_mass=max_mass)
+    set_metallicities(stars,
+                      subsolar_metallicity=subsolar_metallicity,
+                      solar_metallicity=solar_metallicity)
+    set_cooling_times(stars,
+                      max_galactic_structure_age=max_galactic_structure_age)
+    stars = filter_by_cooling_time(stars)
+    set_masses(stars,
+               ifmr_parameter=ifmr_parameter)
 
-    # TODO: find out if this comparison will work
-    halo_stars_mask = (valid_mass_stars['galactic_disk_type']
+    return filter_by_chandrasekhar_limit(stars,
+                                         limit=chandrasekhar_limit)
+
+
+def filter_by_chandrasekhar_limit(stars: pd.DataFrame,
+                                  limit: float) -> pd.DataFrame:
+    return stars[stars['mass'] <= limit]
+
+
+def set_masses(stars: pd.DataFrame,
+               ifmr_parameter: float) -> None:
+    stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
+            progenitor_masses=stars['progenitor_mass'])
+
+
+def filter_by_cooling_time(stars: pd.DataFrame,
+                           min_cooling_time: float = 0.) -> pd.DataFrame:
+    return stars[stars['cooling_times'] > min_cooling_time]
+
+
+def filter_by_max_mass(stars: pd.DataFrame,
+                       max_mass: float) -> pd.DataFrame:
+    return stars[stars['progenitor_mass'] < max_mass]
+
+
+def set_metallicities(stars: pd.DataFrame,
+                      subsolar_metallicity: float,
+                      solar_metallicity: float) -> None:
+    stars['metallicity'] = np.empty(stars.shape[0])
+
+    halo_stars_mask = (stars['galactic_disk_type']
                        == GalacticDiskType.halo)
-    halo_stars = valid_mass_stars[halo_stars_mask]
-    non_halo_stars_mask = (valid_mass_stars['galactic_disk_type']
+    non_halo_stars_mask = (stars['galactic_disk_type']
                            != GalacticDiskType.halo)
-    non_halo_stars = valid_mass_stars[non_halo_stars_mask]
 
-    halo_stars['metallicity'] = subsolar_metallicity
-    non_halo_stars['metallicity'] = solar_metallicity
+    stars[halo_stars_mask] = subsolar_metallicity
+    stars[non_halo_stars_mask] = solar_metallicity
 
-    stars = pd.concat(halo_stars, non_halo_stars)
 
-    # TODO: fix this part
+# TODO: avoid iteration by rows of pandas DataFrame
+def set_cooling_times(stars: pd.DataFrame,
+                      max_galactic_structure_age: float) -> None:
     main_sequence_lifetimes = []
     for progenitor_mass, metallicity in zip(stars['progenitor_mass'],
                                             stars['metallicity']):
@@ -37,16 +74,6 @@ def get_white_dwarfs(stars: pd.DataFrame,
 
     stars['cooling_times'] = (max_galactic_structure_age - stars['birth_time']
                               - main_sequence_lifetimes)
-
-    valid_cooling_time_stars = stars[stars['cooling_times'] > 0.]
-
-    valid_cooling_time_stars = ifmr_parameter * get_white_dwarf_masses(
-            progenitor_masses=valid_cooling_time_stars['progenitor_mass'])
-
-    white_dwarfs_mask = valid_cooling_time_stars['mass'] <= chandrasekhar_limit
-    white_dwarfs = valid_cooling_time_stars[white_dwarfs_mask]
-
-    return white_dwarfs
 
 
 # TODO: use pandas
