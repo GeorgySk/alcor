@@ -1,69 +1,58 @@
-from typing import (Union,
-                    Dict,
-                    List)
-
 import numpy as np
+import pandas as pd
 
 from alcor.models.star import GalacticDiskType
 
 
-def get_white_dwarfs(stars: Dict[str, List[Union[float, GalacticDiskType]]],
-                     thin_disk_age: float,
-                     thick_disk_age: float,
-                     halo_age: float,
+def get_white_dwarfs(stars: pd.DataFrame,
+                     max_galactic_structure_age: float,
                      ifmr_parameter: float,
                      chandrasekhar_limit: float = 1.4,
                      max_mass: float = 10.5,
                      solar_metallicity: float = 0.01,
-                     subsolar_metallicity: float = 0.001
-                     ) -> Dict[str, List[Union[float, GalacticDiskType]]]:
-    max_age = max(thin_disk_age, thick_disk_age, halo_age)
+                     subsolar_metallicity: float = 0.001) -> pd.DataFrame:
+    valid_mass_stars = stars[stars['progenitor_mass'] < max_mass]
 
-    metallicities = []
-    cooling_times = []
-    masses = []
+    # TODO: find out if this comparison will work
+    halo_stars_mask = (valid_mass_stars['galactic_disk_type']
+                       == GalacticDiskType.halo)
+    halo_stars = valid_mass_stars[halo_stars_mask]
+    non_halo_stars_mask = (valid_mass_stars['galactic_disk_type']
+                           != GalacticDiskType.halo)
+    non_halo_stars = valid_mass_stars[non_halo_stars_mask]
 
-    for (progenitor_mass,
-         galactic_structure_type,
-         birth_time) in zip(stars['progenitor_masses'],
-                            stars['galactic_structure_types'],
-                            stars['birth_times']):
-        if progenitor_mass > max_mass:
-            continue
+    halo_stars['metallicity'] = subsolar_metallicity
+    non_halo_stars['metallicity'] = solar_metallicity
 
-        if galactic_structure_type == GalacticDiskType.halo:
-            metallicity = subsolar_metallicity
-        else:
-            metallicity = solar_metallicity
+    stars = pd.concat(halo_stars, non_halo_stars)
 
-        main_sequence_lifetime = get_main_sequence_life_time(
+    # TODO: fix this part
+    main_sequence_lifetimes = []
+    for progenitor_mass, metallicity in zip(stars['progenitor_mass'],
+                                            stars['metallicity']):
+        main_sequence_lifetimes.append(get_main_sequence_lifetime(
                 mass=progenitor_mass,
-                metallicity=metallicity)
+                metallicity=metallicity))
+    main_sequence_lifetimes = np.array(main_sequence_lifetimes)
 
-        cooling_time = (max_age - birth_time - main_sequence_lifetime)
+    stars['cooling_times'] = (max_galactic_structure_age - stars['birth_time']
+                              - main_sequence_lifetimes)
 
-        if cooling_time < 0.:
-            continue
+    valid_cooling_time_stars = stars[stars['cooling_times'] > 0.]
 
-        mass = get_white_dwarf_mass(progenitor_mass) * ifmr_parameter
+    valid_cooling_time_stars = ifmr_parameter * get_white_dwarf_masses(
+            progenitor_masses=valid_cooling_time_stars['progenitor_mass'])
 
-        if mass > chandrasekhar_limit:
-            continue
+    white_dwarfs_mask = valid_cooling_time_stars['mass'] <= chandrasekhar_limit
+    white_dwarfs = valid_cooling_time_stars[white_dwarfs_mask]
 
-        metallicities.append(metallicity)
-        cooling_times.append(cooling_time)
-        masses.append(mass)
-
-    stars['metallicities'] = metallicities
-    stars['cooling_times'] = cooling_times
-    stars['masses'] = masses
-
-    return stars
+    return white_dwarfs
 
 
+# TODO: use pandas
 # According to model by Leandro & Renedo et al.(2010)
-def get_main_sequence_life_time(mass: float,
-                                metallicity: float) -> float:
+def get_main_sequence_lifetime(mass: float,
+                               metallicity: float) -> float:
     main_sequence_masses = np.array([1.00, 1.50, 1.75, 2.00, 2.25,
                                      2.50, 3.00, 3.50, 4.00, 5.00])
     # Althaus priv. comm X = 0.725, Y = 0.265
@@ -119,10 +108,23 @@ def get_main_sequence_life_time(mass: float,
     return tsub + ((tsol - tsub) / (0.01 - 0.001)) * (metallicity - 0.001)
 
 
-def get_white_dwarf_mass(progenitor_mass: float) -> float:
-    if progenitor_mass < 2.7:
-        return 0.096 * progenitor_mass + 0.429
-    elif 2.7 <= progenitor_mass <= 6.:
-        return 0.137 * progenitor_mass + 0.3183
-    else:
-        return 0.1057 * progenitor_mass + 0.5061
+def get_white_dwarf_masses(progenitor_masses: pd.Series) -> np.ndarray:
+    masses = np.empty(progenitor_masses.shape[0])
+
+    low_progenitor_masses_mask = progenitor_masses < 2.7
+    low_progenitor_masses = progenitor_masses[low_progenitor_masses_mask]
+
+    medium_progenitor_masses_mask = ((progenitor_masses >= 2.7)
+                                     & (progenitor_masses <= 6.))
+    medium_progenitor_masses = progenitor_masses[medium_progenitor_masses_mask]
+
+    high_progenitor_masses_mask = (progenitor_masses > 6.)
+    high_progenitor_masses = progenitor_masses[high_progenitor_masses_mask]
+
+    masses[low_progenitor_masses_mask] = 0.096 * low_progenitor_masses + 0.429
+    masses[medium_progenitor_masses_mask] = (0.137 * medium_progenitor_masses
+                                             + 0.3183)
+    masses[high_progenitor_masses_mask] = (0.1057 * high_progenitor_masses
+                                           + 0.5061)
+
+    return masses
