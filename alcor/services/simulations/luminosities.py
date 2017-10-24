@@ -1,38 +1,64 @@
-from typing import (Iterator,
+from typing import (Union,
+                    Dict,
                     List)
 
 import numpy as np
 
-from alcor.models import Star
+from alcor.models.star import GalacticDiskType
 
 
-def get_white_dwarfs(stars: List[Star],
+def get_white_dwarfs(stars: Dict[str, List[Union[float, GalacticDiskType]]],
                      thin_disk_age: float,
+                     thick_disk_age: float,
+                     halo_age: float,
                      ifmr_parameter: float,
                      chandrasekhar_limit: float = 1.4,
                      max_mass: float = 10.5,
-                     solar_metallicity: float = 0.01) -> Iterator[Star]:
-    for star in stars:
-        if star.progenitor_mass > max_mass:
+                     solar_metallicity: float = 0.01,
+                     subsolar_metallicity: float = 0.001
+                     ) -> Dict[str, List[Union[float, GalacticDiskType]]]:
+    max_age = max(thin_disk_age, thick_disk_age, halo_age)
+
+    metallicities = []
+    cooling_times = []
+    masses = []
+
+    for (progenitor_mass,
+         galactic_structure_type,
+         birth_time) in zip(stars['progenitor_masses'],
+                            stars['galactic_structure_types'],
+                            stars['birth_times']):
+        if progenitor_mass > max_mass:
             continue
 
-        end_evolution_star = Star()
-
-        end_evolution_star.metallicity = solar_metallicity
+        if galactic_structure_type == GalacticDiskType.halo:
+            metallicity = subsolar_metallicity
+        else:
+            metallicity = solar_metallicity
 
         main_sequence_lifetime = get_main_sequence_life_time(
-            mass=star.progenitor_mass,
-            metallicity=end_evolution_star.metallicity)
-        # FIXME: this is only for thin disk stars
-        end_evolution_star.cooling_time = (thin_disk_age - star.birth_time
-                                           - main_sequence_lifetime)
+                mass=progenitor_mass,
+                metallicity=metallicity)
 
-        if end_evolution_star.cooling_time > 0.:
-            end_evolution_star.mass = (
-                get_white_dwarf_mass(star.progenitor_mass) * ifmr_parameter)
+        cooling_time = (max_age - birth_time - main_sequence_lifetime)
 
-        if end_evolution_star.mass <= chandrasekhar_limit:
-            yield end_evolution_star
+        if cooling_time < 0.:
+            continue
+
+        mass = get_white_dwarf_mass(progenitor_mass) * ifmr_parameter
+
+        if mass > chandrasekhar_limit:
+            continue
+
+        metallicities.append(metallicity)
+        cooling_times.append(cooling_time)
+        masses.append(mass)
+
+    stars['metallicities'] = metallicities
+    stars['cooling_times'] = cooling_times
+    stars['masses'] = masses
+
+    return stars
 
 
 # According to model by Leandro & Renedo et al.(2010)
