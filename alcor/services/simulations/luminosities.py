@@ -116,36 +116,29 @@ def get_main_sequence_lifetime(*,
     return spline(metallicity)
 
 
+# TODO: use pandas
 def estimated_time(*,
                    mass: float,
                    model_masses: np.ndarray,
                    model_times: np.ndarray) -> float:
-    if mass < model_masses[0]:
-        spline = InterpolatedUnivariateSpline(
-                x=(model_masses[0], model_masses[1]),
-                y=(model_times[0], model_times[1]),
-                k=1)
+    if mass < model_masses[-1]:
+        spline = InterpolatedUnivariateSpline(x=model_masses,
+                                              y=model_times,
+                                              k=1)
         return spline(mass)
 
-    # TODO: find out what kind of extrapolation this is
-    if mass > model_masses[-1]:
-        return (model_masses[-1] / mass) * model_times[-1]
-
-    return interpolated_time(mass=mass,
-                             model_masses=model_masses,
-                             model_times=model_times)
+    return extrapolated_time(mass=mass,
+                             rightmost_mass=model_masses[-1],
+                             rightmost_time=model_times[-1])
 
 
-# TODO: implement scipy spline
-def interpolated_time(*,
+def extrapolated_time(*,
                       mass: float,
-                      model_masses: np.ndarray,
-                      model_times: np.ndarray) -> float:
-    index = np.searchsorted(model_masses, mass)
-
-    pen = ((model_times[index] - model_times[index - 1])
-           / (model_masses[index] - model_masses[index - 1]))
-    return pen * mass + (model_masses[index] - pen * model_masses[index])
+                      rightmost_mass: float,
+                      rightmost_time: float) -> float:
+    """Extrapolate main sequence stars (progenitors) lifetime vs mass to the
+    right. Make sure that no negative values will be produced."""
+    return rightmost_time * rightmost_mass / mass
 
 
 def filter_by_cooling_time(stars: pd.DataFrame,
