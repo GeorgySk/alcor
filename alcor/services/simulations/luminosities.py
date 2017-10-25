@@ -80,46 +80,53 @@ def set_cooling_times(stars: pd.DataFrame,
 # According to model by Leandro & Renedo et al.(2010)
 def get_main_sequence_lifetime(*,
                                mass: float,
-                               metallicity: float) -> float:
-    main_sequence_masses = np.array([1.00, 1.50, 1.75, 2.00, 2.25,
-                                     2.50, 3.00, 3.50, 4.00, 5.00])
+                               metallicity: float,
+                               solar_metallicity: float = 0.01,
+                               subsolar_metallicity: float = 0.001) -> float:
+    model_solar_masses = np.array([1.00, 1.50, 1.75, 2.00, 2.25,
+                                   2.50, 3.00, 3.50, 4.00, 5.00])
     # Althaus priv. comm X = 0.725, Y = 0.265
-    main_sequence_times = np.array([8.614, 1.968, 1.249, 0.865, 0.632,
-                                    0.480, 0.302, 0.226, 0.149, 0.088])
-
-    if mass < main_sequence_masses[0]:
-        pen = ((main_sequence_times[1] - main_sequence_times[0])
-               / (main_sequence_masses[1] - main_sequence_masses[0]))
-        tsol = pen * mass + (main_sequence_times[0]
-                             - pen * main_sequence_masses[0])
-    else:
-        if mass > main_sequence_masses[-1]:
-            tsol = (main_sequence_masses[-1] / mass) * main_sequence_times[-1]
-        else:
-            tsol = interpolated_time(mass=mass,
-                                     model_masses=main_sequence_masses,
-                                     model_times=main_sequence_times)
-
-    main_sequence_masses = np.array([0.85, 1.00, 1.25, 1.50, 1.75, 2.00, 3.00])
+    model_solar_times = np.array([8.614, 1.968, 1.249, 0.865, 0.632,
+                                  0.480, 0.302, 0.226, 0.149, 0.088])
+    model_subsolar_masses = np.array([0.85, 1.00, 1.25, 1.50,
+                                      1.75, 2.00, 3.00])
     # Althaus priv. comm X = 0.752, Y = 0.247
-    main_sequence_times = np.array([10.34, 5.756, 2.623, 1.412,
-                                    0.905, 0.639, 0.245])
+    model_subsolar_times = np.array([10.34, 5.756, 2.623, 1.412,
+                                     0.905, 0.639, 0.245])
 
-    # TODO: put this in a function as it is the same if as before
-    if mass < main_sequence_masses[0]:
-        pen = ((main_sequence_times[1] - main_sequence_times[0])
-               / (main_sequence_masses[1] - main_sequence_masses[0]))
-        tsub = pen * mass + (main_sequence_times[0]
-                             - pen * main_sequence_masses[0])
-    else:
-        if mass > main_sequence_masses[-1]:
-            tsub = (main_sequence_masses[-1] / mass) * main_sequence_times[-1]
-        else:
-            tsub = interpolated_time(mass=mass,
-                                     model_masses=main_sequence_masses,
-                                     model_times=main_sequence_times)
+    solar_main_sequence_lifetime = estimated_time(
+            mass=mass,
+            model_masses=model_solar_masses,
+            model_times=model_solar_times)
+    subsolar_main_sequence_lifetime = estimated_time(
+            mass=mass,
+            model_masses=model_subsolar_masses,
+            model_times=model_subsolar_times)
 
-    return tsub + ((tsol - tsub) / (0.01 - 0.001)) * (metallicity - 0.001)
+    # TODO: this is linear extrapolation
+    return (subsolar_main_sequence_lifetime
+            + ((solar_main_sequence_lifetime - subsolar_main_sequence_lifetime)
+               / (solar_metallicity - subsolar_metallicity))
+            * (metallicity - subsolar_metallicity))
+
+
+def estimated_time(*,
+                   mass: float,
+                   model_masses: np.ndarray,
+                   model_times: np.ndarray) -> float:
+    # TODO: find a function for linear extrapolation
+    if mass < model_masses[0]:
+        pen = ((model_times[1] - model_times[0])
+               / (model_masses[1] - model_masses[0]))
+        return pen * mass + model_times[0] - pen * model_masses[0]
+
+    # TODO: find out what kind of extrapolation this is
+    if mass > model_masses[-1]:
+        return (model_masses[-1] / mass) * model_times[-1]
+
+    return interpolated_time(mass=mass,
+                             model_masses=model_masses,
+                             model_times=model_times)
 
 
 def interpolated_time(*,
