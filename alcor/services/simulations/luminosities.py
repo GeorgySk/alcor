@@ -5,7 +5,8 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 from alcor.models.star import GalacticDiskType
 
 
-def get_white_dwarfs(stars: pd.DataFrame,
+def get_white_dwarfs(*,
+                     stars: pd.DataFrame,
                      max_galactic_structure_age: float,
                      ifmr_parameter: float,
                      chandrasekhar_limit: float = 1.4,
@@ -28,27 +29,32 @@ def get_white_dwarfs(stars: pd.DataFrame,
 
 
 def filter_by_chandrasekhar_limit(stars: pd.DataFrame,
+                                  *,
                                   limit: float) -> pd.DataFrame:
     return stars[stars['mass'] <= limit]
 
 
 def set_masses(stars: pd.DataFrame,
+               *,
                ifmr_parameter: float) -> None:
     stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
             progenitor_masses=stars['progenitor_mass'])
 
 
 def filter_by_cooling_time(stars: pd.DataFrame,
+                           *,
                            min_cooling_time: float = 0.) -> pd.DataFrame:
     return stars[stars['cooling_times'] > min_cooling_time]
 
 
 def filter_by_max_mass(stars: pd.DataFrame,
+                       *,
                        max_mass: float) -> pd.DataFrame:
     return stars[stars['progenitor_mass'] < max_mass]
 
 
 def set_metallicities(stars: pd.DataFrame,
+                      *,
                       subsolar_metallicity: float,
                       solar_metallicity: float) -> None:
     stars['metallicity'] = np.empty(stars.shape[0])
@@ -64,6 +70,7 @@ def set_metallicities(stars: pd.DataFrame,
 
 # TODO: avoid iteration by rows of pandas DataFrame
 def set_cooling_times(stars: pd.DataFrame,
+                      *,
                       max_galactic_structure_age: float) -> None:
     main_sequence_lifetimes = []
     for progenitor_mass, metallicity in zip(stars['progenitor_mass'],
