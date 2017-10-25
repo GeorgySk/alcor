@@ -3,10 +3,10 @@ import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 
-def get_white_dwarfs(*,
-                     stars: pd.DataFrame,
+def get_white_dwarfs(stars: pd.DataFrame,
+                     *,
                      max_galactic_structure_age: float,
-                     ifmr_parameter: float == 1.,
+                     ifmr_parameter: float = 1.,
                      chandrasekhar_limit: float = 1.4,
                      max_mass: float = 10.5,
                      solar_metallicity: float = 0.01,
@@ -75,14 +75,14 @@ def set_cooling_times(stars: pd.DataFrame,
             solar_metallicity=solar_metallicity,
             subsolar_metallicity=subsolar_metallicity)
 
-    stars['cooling_times'] = (max_galactic_structure_age - stars['birth_time']
-                              - main_sequence_lifetimes)
+    stars['cooling_time'] = (max_galactic_structure_age - stars['birth_time']
+                             - main_sequence_lifetimes)
 
 
 def filter_by_cooling_time(stars: pd.DataFrame,
                            *,
                            min_cooling_time: float = 0.) -> pd.DataFrame:
-    return stars[stars['cooling_times'] > min_cooling_time]
+    return stars[stars['cooling_time'] > min_cooling_time]
 
 
 def set_masses(stars: pd.DataFrame,
@@ -170,7 +170,7 @@ def estimate_lifetime(metallicity: float,
                       subsolar_main_sequence_lifetime: float,
                       solar_main_sequence_lifetime: float,
                       subsolar_metallicity: float,
-                      solar_metallicity: float):
+                      solar_metallicity: float) -> float:
     spline = InterpolatedUnivariateSpline(
             x=(subsolar_metallicity, solar_metallicity),
             y=(subsolar_main_sequence_lifetime, solar_main_sequence_lifetime),
@@ -178,7 +178,7 @@ def estimate_lifetime(metallicity: float,
     return spline(metallicity)
 
 
-def get_white_dwarf_masses(progenitor_masses: pd.Series) -> np.ndarray:
+def get_white_dwarf_masses(progenitor_masses: np.ndarray) -> np.ndarray:
     masses = np.empty(progenitor_masses.shape[0])
 
     low_progenitor_masses_mask = progenitor_masses < 2.7
