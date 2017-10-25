@@ -57,14 +57,11 @@ def set_metallicities(stars: pd.DataFrame,
                       solar_metallicity: float) -> None:
     stars['metallicity'] = np.empty(stars.shape[0])
 
-    # TODO: check if this comparison will work
-    halo_stars_mask = (stars['galactic_disk_type']
-                       == GalacticDiskType.halo)
-    non_halo_stars_mask = (stars['galactic_disk_type']
-                           != GalacticDiskType.halo)
+    halo_stars_mask = (stars['galactic_disk_type'] == 'halo')
+    non_halo_stars_mask = (stars['galactic_disk_type'] != 'halo')
 
-    stars[halo_stars_mask] = subsolar_metallicity
-    stars[non_halo_stars_mask] = solar_metallicity
+    stars.loc[halo_stars_mask, 'metallicity'] = subsolar_metallicity
+    stars.loc[non_halo_stars_mask, 'metallicity'] = solar_metallicity
 
 
 # TODO: avoid iteration by rows of pandas DataFrame
