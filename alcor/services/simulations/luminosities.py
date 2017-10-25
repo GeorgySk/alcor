@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy.interpolate import InterpolatedUnivariateSpline
 
 from alcor.models.star import GalacticDiskType
 
@@ -103,22 +104,23 @@ def get_main_sequence_lifetime(*,
             model_masses=model_subsolar_masses,
             model_times=model_subsolar_times)
 
-    # TODO: this is linear extrapolation
-    return (subsolar_main_sequence_lifetime
-            + ((solar_main_sequence_lifetime - subsolar_main_sequence_lifetime)
-               / (solar_metallicity - subsolar_metallicity))
-            * (metallicity - subsolar_metallicity))
+    spline = InterpolatedUnivariateSpline(
+            x=(subsolar_metallicity, solar_metallicity),
+            y=(subsolar_main_sequence_lifetime, solar_main_sequence_lifetime),
+            k=1)
+    return spline(metallicity)
 
 
 def estimated_time(*,
                    mass: float,
                    model_masses: np.ndarray,
                    model_times: np.ndarray) -> float:
-    # TODO: find a function for linear extrapolation
     if mass < model_masses[0]:
-        pen = ((model_times[1] - model_times[0])
-               / (model_masses[1] - model_masses[0]))
-        return pen * mass + model_times[0] - pen * model_masses[0]
+        spline = InterpolatedUnivariateSpline(
+                x=(model_masses[0], model_masses[1]),
+                y=(model_times[0], model_times[1]),
+                k=1)
+        return spline(mass)
 
     # TODO: find out what kind of extrapolation this is
     if mass > model_masses[-1]:
