@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
-from alcor.models.star import GalacticDiskType
-
 
 def get_white_dwarfs(*,
                      stars: pd.DataFrame,
@@ -36,7 +34,9 @@ def get_white_dwarfs(*,
                       subsolar_metallicity=subsolar_metallicity,
                       solar_metallicity=solar_metallicity)
     set_cooling_times(stars,
-                      max_galactic_structure_age=max_galactic_structure_age)
+                      max_galactic_structure_age=max_galactic_structure_age,
+                      subsolar_metallicity=subsolar_metallicity,
+                      solar_metallicity=solar_metallicity)
     stars = filter_by_cooling_time(stars)
     set_masses(stars,
                ifmr_parameter=ifmr_parameter)
@@ -64,28 +64,45 @@ def set_metallicities(stars: pd.DataFrame,
     stars.loc[non_halo_stars_mask, 'metallicity'] = solar_metallicity
 
 
-# TODO: avoid iteration by rows of pandas DataFrame
 def set_cooling_times(stars: pd.DataFrame,
                       *,
-                      max_galactic_structure_age: float) -> None:
-    main_sequence_lifetimes = []
-    for progenitor_mass, metallicity in zip(stars['progenitor_mass'],
-                                            stars['metallicity']):
-        main_sequence_lifetimes.append(get_main_sequence_lifetime(
-                mass=progenitor_mass,
-                metallicity=metallicity))
-    main_sequence_lifetimes = np.array(main_sequence_lifetimes)
+                      max_galactic_structure_age: float,
+                      solar_metallicity: float,
+                      subsolar_metallicity: float) -> None:
+    main_sequence_lifetimes = get_main_sequence_lifetimes(
+            masses=stars['progenitor_mass'],
+            metallicities=stars['metallicity'],
+            solar_metallicity=solar_metallicity,
+            subsolar_metallicity=subsolar_metallicity)
 
     stars['cooling_times'] = (max_galactic_structure_age - stars['birth_time']
                               - main_sequence_lifetimes)
 
 
-# TODO: use pandas
-def get_main_sequence_lifetime(*,
-                               mass: float,
-                               metallicity: float,
-                               solar_metallicity: float = 0.01,
-                               subsolar_metallicity: float = 0.001) -> float:
+def filter_by_cooling_time(stars: pd.DataFrame,
+                           *,
+                           min_cooling_time: float = 0.) -> pd.DataFrame:
+    return stars[stars['cooling_times'] > min_cooling_time]
+
+
+def set_masses(stars: pd.DataFrame,
+               *,
+               ifmr_parameter: float) -> None:
+    stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
+            progenitor_masses=stars['progenitor_mass'])
+
+
+def filter_by_chandrasekhar_limit(stars: pd.DataFrame,
+                                  *,
+                                  limit: float) -> pd.DataFrame:
+    return stars[stars['mass'] <= limit]
+
+
+def get_main_sequence_lifetimes(*,
+                                masses: np.ndarray,
+                                metallicities: np.ndarray,
+                                solar_metallicity: float,
+                                subsolar_metallicity: float) -> np.ndarray:
     """Calculate lifetime of a main sequence star
     according to model by Leandro & Renedo et al.(2010).
     Solar metallicity values from Althaus priv. comm (X = 0.725, Y = 0.265)
@@ -100,58 +117,65 @@ def get_main_sequence_lifetime(*,
     model_subsolar_times = np.array([10.34, 5.756, 2.623, 1.412,
                                      0.905, 0.639, 0.245])
 
-    solar_main_sequence_lifetime = estimated_time(
-            mass=mass,
+    solar_main_sequence_lifetimes = estimated_times(
+            masses=masses,
             model_masses=model_solar_masses,
             model_times=model_solar_times)
-    subsolar_main_sequence_lifetime = estimated_time(
-            mass=mass,
+    subsolar_main_sequence_lifetimes = estimated_times(
+            masses=masses,
             model_masses=model_subsolar_masses,
             model_times=model_subsolar_times)
 
+    estimate_lifetimes = np.vectorize(estimate_lifetime)
+
+    return estimate_lifetimes(
+            metallicity=metallicities,
+            subsolar_main_sequence_lifetime=subsolar_main_sequence_lifetimes,
+            solar_main_sequence_lifetime=solar_main_sequence_lifetimes,
+            subsolar_metallicity=subsolar_metallicity,
+            solar_metallicity=solar_metallicity)
+
+
+def estimated_times(*,
+                    masses: np.ndarray,
+                    model_masses: np.ndarray,
+                    model_times: np.ndarray) -> np.ndarray:
+    times = np.empty(masses.shape[0])
+
+    spline = InterpolatedUnivariateSpline(x=model_masses,
+                                          y=model_times,
+                                          k=1)
+
+    masses_lt_max_mask = masses < model_masses[-1]
+    masses_ge_max_mask = ~masses_lt_max_mask
+    times[masses_lt_max_mask] = spline(masses[masses_lt_max_mask])
+    times[masses_ge_max_mask] = extrapolated_times(
+            masses=masses[masses_ge_max_mask],
+            rightmost_mass=model_masses[-1],
+            rightmost_time=model_times[-1])
+
+    return times
+
+
+def extrapolated_times(*,
+                       masses: np.ndarray,
+                       rightmost_mass: float,
+                       rightmost_time: float) -> np.ndarray:
+    """Extrapolate main sequence stars (progenitors) lifetime vs mass to the
+    right. Make sure that no negative values will be produced."""
+    return rightmost_time * rightmost_mass / masses
+
+
+def estimate_lifetime(metallicity: float,
+                      subsolar_main_sequence_lifetime: float,
+                      solar_main_sequence_lifetime: float,
+                      subsolar_metallicity: float,
+                      solar_metallicity: float):
     spline = InterpolatedUnivariateSpline(
             x=(subsolar_metallicity, solar_metallicity),
             y=(subsolar_main_sequence_lifetime, solar_main_sequence_lifetime),
             k=1)
     return spline(metallicity)
-
-
-# TODO: use pandas
-def estimated_time(*,
-                   mass: float,
-                   model_masses: np.ndarray,
-                   model_times: np.ndarray) -> float:
-    if mass < model_masses[-1]:
-        spline = InterpolatedUnivariateSpline(x=model_masses,
-                                              y=model_times,
-                                              k=1)
-        return spline(mass)
-
-    return extrapolated_time(mass=mass,
-                             rightmost_mass=model_masses[-1],
-                             rightmost_time=model_times[-1])
-
-
-def extrapolated_time(*,
-                      mass: float,
-                      rightmost_mass: float,
-                      rightmost_time: float) -> float:
-    """Extrapolate main sequence stars (progenitors) lifetime vs mass to the
-    right. Make sure that no negative values will be produced."""
-    return rightmost_time * rightmost_mass / mass
-
-
-def filter_by_cooling_time(stars: pd.DataFrame,
-                           *,
-                           min_cooling_time: float = 0.) -> pd.DataFrame:
-    return stars[stars['cooling_times'] > min_cooling_time]
-
-
-def set_masses(stars: pd.DataFrame,
-               *,
-               ifmr_parameter: float) -> None:
-    stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
-            progenitor_masses=stars['progenitor_mass'])
 
 
 def get_white_dwarf_masses(progenitor_masses: pd.Series) -> np.ndarray:
@@ -174,9 +198,3 @@ def get_white_dwarf_masses(progenitor_masses: pd.Series) -> np.ndarray:
                                            + 0.5061)
 
     return masses
-
-
-def filter_by_chandrasekhar_limit(stars: pd.DataFrame,
-                                  *,
-                                  limit: float) -> pd.DataFrame:
-    return stars[stars['mass'] <= limit]
