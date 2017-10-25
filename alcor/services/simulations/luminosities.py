@@ -81,20 +81,22 @@ def set_cooling_times(stars: pd.DataFrame,
 
 
 # TODO: use pandas
-# According to model by Leandro & Renedo et al.(2010)
 def get_main_sequence_lifetime(*,
                                mass: float,
                                metallicity: float,
                                solar_metallicity: float = 0.01,
                                subsolar_metallicity: float = 0.001) -> float:
+    """Calculate lifetime of a main sequence star
+    according to model by Leandro & Renedo et al.(2010).
+    Solar metallicity values from Althaus priv. comm (X = 0.725, Y = 0.265)
+    Sub-solar metallicity values from Althaus priv. comm (X = 0.752, Y = 0.247)
+    """
     model_solar_masses = np.array([1.00, 1.50, 1.75, 2.00, 2.25,
                                    2.50, 3.00, 3.50, 4.00, 5.00])
-    # Althaus priv. comm X = 0.725, Y = 0.265
     model_solar_times = np.array([8.614, 1.968, 1.249, 0.865, 0.632,
                                   0.480, 0.302, 0.226, 0.149, 0.088])
     model_subsolar_masses = np.array([0.85, 1.00, 1.25, 1.50,
                                       1.75, 2.00, 3.00])
-    # Althaus priv. comm X = 0.752, Y = 0.247
     model_subsolar_times = np.array([10.34, 5.756, 2.623, 1.412,
                                      0.905, 0.639, 0.245])
 
