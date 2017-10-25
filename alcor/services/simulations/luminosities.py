@@ -57,6 +57,7 @@ def set_metallicities(stars: pd.DataFrame,
                       solar_metallicity: float) -> None:
     stars['metallicity'] = np.empty(stars.shape[0])
 
+    # TODO: check if this comparison will work
     halo_stars_mask = (stars['galactic_disk_type']
                        == GalacticDiskType.halo)
     non_halo_stars_mask = (stars['galactic_disk_type']
