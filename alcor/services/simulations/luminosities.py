@@ -8,11 +8,28 @@ from alcor.models.star import GalacticDiskType
 def get_white_dwarfs(*,
                      stars: pd.DataFrame,
                      max_galactic_structure_age: float,
-                     ifmr_parameter: float,
+                     ifmr_parameter: float == 1.,
                      chandrasekhar_limit: float = 1.4,
                      max_mass: float = 10.5,
                      solar_metallicity: float = 0.01,
                      subsolar_metallicity: float = 0.001) -> pd.DataFrame:
+    """Filter white dwarfs stars(WD) from initial sample of main sequence stars
+    and assign metallicities, cooling times and masses.
+
+    Keyword arguments:
+    stars -- data frame with main sequence stars
+    max_galactic_structure_age -- the highest age of thin disk, thick disk
+                                  and halo
+    ifmr_parameter -- factor by which WD mass (calculated from Initial-to-Final
+                      Mass Relation (IFMR)) is multiplied (default 1.)
+    chandrasekhar_limit -- maximum mass of a stable WD (default 1.4)
+    max_mass -- maximum mass of a main sequence star that can generate a WD
+                (default 10.5)
+    solar_metallicity -- metallicity assigned to all thin and thick disks WDs
+                         due to relatively young ages (default 0.01)
+    subsolar_metallicity -- metallicity assigned to all halo WDs
+                            (default 0.001)
+    """
     stars = filter_by_max_mass(stars,
                                max_mass=max_mass)
     set_metallicities(stars,
