@@ -45,25 +45,6 @@ def get_white_dwarfs(*,
                                          limit=chandrasekhar_limit)
 
 
-def filter_by_chandrasekhar_limit(stars: pd.DataFrame,
-                                  *,
-                                  limit: float) -> pd.DataFrame:
-    return stars[stars['mass'] <= limit]
-
-
-def set_masses(stars: pd.DataFrame,
-               *,
-               ifmr_parameter: float) -> None:
-    stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
-            progenitor_masses=stars['progenitor_mass'])
-
-
-def filter_by_cooling_time(stars: pd.DataFrame,
-                           *,
-                           min_cooling_time: float = 0.) -> pd.DataFrame:
-    return stars[stars['cooling_times'] > min_cooling_time]
-
-
 def filter_by_max_mass(stars: pd.DataFrame,
                        *,
                        max_mass: float) -> pd.DataFrame:
@@ -155,6 +136,7 @@ def estimated_time(*,
                              model_times=model_times)
 
 
+# TODO: implement scipy spline
 def interpolated_time(*,
                       mass: float,
                       model_masses: np.ndarray,
@@ -164,6 +146,19 @@ def interpolated_time(*,
     pen = ((model_times[index] - model_times[index - 1])
            / (model_masses[index] - model_masses[index - 1]))
     return pen * mass + (model_masses[index] - pen * model_masses[index])
+
+
+def filter_by_cooling_time(stars: pd.DataFrame,
+                           *,
+                           min_cooling_time: float = 0.) -> pd.DataFrame:
+    return stars[stars['cooling_times'] > min_cooling_time]
+
+
+def set_masses(stars: pd.DataFrame,
+               *,
+               ifmr_parameter: float) -> None:
+    stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
+            progenitor_masses=stars['progenitor_mass'])
 
 
 def get_white_dwarf_masses(progenitor_masses: pd.Series) -> np.ndarray:
@@ -186,3 +181,9 @@ def get_white_dwarf_masses(progenitor_masses: pd.Series) -> np.ndarray:
                                            + 0.5061)
 
     return masses
+
+
+def filter_by_chandrasekhar_limit(stars: pd.DataFrame,
+                                  *,
+                                  limit: float) -> pd.DataFrame:
+    return stars[stars['mass'] <= limit]
