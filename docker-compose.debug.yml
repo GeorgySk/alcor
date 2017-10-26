@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  alcor:
+    build: .
+    image: lycantropos/alcor:0.0.0
+    entrypoint: "/alcor/docker-entrypoint.debug.sh"
+    volumes:
+      - .:/alcor/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"  # for debugging
+    environment:
+      - POSTGRES_URI=postgresql://username:password@postgres/alcor
