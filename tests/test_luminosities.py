@@ -2,18 +2,19 @@ import math
 import numpy as np
 import pandas as pd
 
-from alcor.services.simulations.luminosities import (filter_by_max_mass,
-                                                     set_metallicities,
-                                                     extrapolated_times,
-                                                     estimated_times,
-                                                     estimate_lifetime,
-                                                     get_main_sequence_lifetimes,
-                                                     set_cooling_times,
-                                                     filter_by_cooling_time,
-                                                     set_masses,
-                                                     get_white_dwarf_masses,
-                                                     filter_by_chandrasekhar_limit,
-                                                     get_white_dwarfs)
+from alcor.services.simulations.luminosities import (
+    filter_by_max_mass,
+    set_metallicities,
+    extrapolated_times,
+    estimated_times,
+    estimate_lifetime,
+    get_main_sequence_lifetimes,
+    set_cooling_times,
+    filter_by_cooling_time,
+    set_masses,
+    get_white_dwarf_masses,
+    filter_by_chandrasekhar_limit,
+    get_white_dwarfs)
 
 
 def test_filter_by_max_mass(stars_w_progenitor_masses: pd.DataFrame,
@@ -31,17 +32,18 @@ def test_set_metallicities(stars_w_galactic_disk_types: pd.DataFrame,
     set_metallicities(stars_w_galactic_disk_types,
                       subsolar_metallicity=subsolar_metallicity,
                       solar_metallicity=solar_metallicity)
-    thin_disk_stars_metallicities = (stars_w_galactic_disk_types[
-                stars_w_galactic_disk_types['galactic_disk_type'] == 'thin']
-            ['metallicity'])
-    thick_disk_stars_metallicities = (stars_w_galactic_disk_types[
-                                         stars_w_galactic_disk_types[
-                                             'galactic_disk_type'] == 'thick']
-                                      ['metallicity'])
-    halo_disk_stars_metallicities = (stars_w_galactic_disk_types[
-                                         stars_w_galactic_disk_types[
-                                             'galactic_disk_type'] == 'halo']
-                                     ['metallicity'])
+    thin_disk_stars_mask = (stars_w_galactic_disk_types['galactic_disk_type']
+                            == 'thin')
+    thin_disk_stars = stars_w_galactic_disk_types[thin_disk_stars_mask]
+    thin_disk_stars_metallicities = thin_disk_stars['metallicity']
+    thick_disk_stars_mask = (stars_w_galactic_disk_types['galactic_disk_type']
+                             == 'thick')
+    thick_disk_stars = stars_w_galactic_disk_types[thick_disk_stars_mask]
+    thick_disk_stars_metallicities = thick_disk_stars['metallicity']
+    halo_stars_mask = (stars_w_galactic_disk_types['galactic_disk_type']
+                       == 'halo')
+    halo_stars = stars_w_galactic_disk_types[halo_stars_mask]
+    halo_stars_metallicities = halo_stars['metallicity']
 
     assert isinstance(stars_w_galactic_disk_types, pd.DataFrame)
     assert stars_w_galactic_disk_types.shape[0] > 0
@@ -49,7 +51,7 @@ def test_set_metallicities(stars_w_galactic_disk_types: pd.DataFrame,
     assert 'metallicity' in stars_w_galactic_disk_types.columns
     assert (thin_disk_stars_metallicities == solar_metallicity).all()
     assert (thick_disk_stars_metallicities == solar_metallicity).all()
-    assert (halo_disk_stars_metallicities == subsolar_metallicity).all()
+    assert (halo_stars_metallicities == subsolar_metallicity).all()
 
 
 def test_extrapolated_times(masses: np.ndarray,
@@ -58,6 +60,7 @@ def test_extrapolated_times(masses: np.ndarray,
     times = extrapolated_times(masses=masses,
                                rightmost_mass=rightmost_mass,
                                rightmost_time=rightmost_time)
+
     assert isinstance(times, np.ndarray)
     assert masses.shape == times.shape
     assert (times > 0.).all()
@@ -92,6 +95,7 @@ def test_estimate_lifetime() -> None:
                                            solar_main_sequence_lifetime=2.,
                                            subsolar_metallicity=1.,
                                            solar_metallicity=2.)
+
     assert math.isclose(estimated_lifetime, 3.)
 
 

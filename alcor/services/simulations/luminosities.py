@@ -75,7 +75,8 @@ def set_cooling_times(stars: pd.DataFrame,
             solar_metallicity=solar_metallicity,
             subsolar_metallicity=subsolar_metallicity)
 
-    stars['cooling_time'] = (max_galactic_structure_age - stars['birth_time']
+    stars['cooling_time'] = (max_galactic_structure_age
+                             - stars['birth_time']
                              - main_sequence_lifetimes)
 
 
