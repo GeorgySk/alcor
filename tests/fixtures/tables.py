@@ -1,13 +1,13 @@
 import os
-from typing import (Iterator,
-                    Dict,
+from typing import (Dict,
                     List)
 
 import pandas as pd
 import pytest
 
 from alcor.services.simulations import tracks
-
+from tests.utils import (fort_files_by_metallicities_lengths,
+                         fort_files_lengths)
 
 FORT_FILES_PATH = os.path.abspath('/alcor/tests/tables')
 
@@ -104,30 +104,5 @@ def tracks_lengths(sequences: Dict[int, pd.DataFrame]) -> List[int]:
     lengths = []
     for mass, sequence in sorted(sequences.items()):
         lengths.append(sequence.shape[0])
-
-    return lengths
-
-
-@pytest.fixture
-def fort_files_by_metallicities_lengths(fort_links: Dict[int, Iterator],
-                                        *,
-                                        base_dir: str) -> List[int]:
-    lengths = []
-    for metallicity, fort_links_range in fort_links.items():
-        lengths.extend(fort_files_lengths(fort_links=fort_links_range,
-                                          base_dir=base_dir))
-    return lengths
-
-
-@pytest.fixture
-def fort_files_lengths(fort_links: Iterator,
-                       *,
-                       base_dir: str) -> List[int]:
-    lengths = []
-    fort_link_dirs = [os.path.join(base_dir,
-                                   'fort_files/fort.' + str(fort_link))
-                      for fort_link in fort_links]
-    for fort_link_dir in fort_link_dirs:
-        lengths.append(sum(1 for line in open(fort_link_dir)))
 
     return lengths
