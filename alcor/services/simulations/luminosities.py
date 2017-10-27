@@ -78,7 +78,7 @@ def set_cooling_times(stars: pd.DataFrame,
 def set_masses(stars: pd.DataFrame,
                *,
                ifmr_parameter: float) -> None:
-    stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
+    stars['mass'] = ifmr_parameter * white_dwarf_masses(
             progenitor_masses=stars['progenitor_mass'])
 
 
@@ -147,13 +147,14 @@ def extrapolated_times(*,
                        rightmost_mass: float,
                        rightmost_time: float) -> np.ndarray:
     """
-    Extrapolates main sequence stars (progenitors) lifetime vs mass to the
-    right. Makes sure that no negative values will be produced.
+    Extrapolates main sequence stars (progenitors) lifetime vs mass
+    to the right. Makes sure that no negative values will be produced.
     """
     return rightmost_time * rightmost_mass / masses
 
 
-def estimate_lifetime(metallicity: float,
+def estimate_lifetime(*,
+                      metallicity: float,
                       subsolar_main_sequence_lifetime: float,
                       solar_main_sequence_lifetime: float,
                       subsolar_metallicity: float,
@@ -165,7 +166,7 @@ def estimate_lifetime(metallicity: float,
     return spline(metallicity)
 
 
-def get_white_dwarf_masses(progenitor_masses: np.ndarray) -> np.ndarray:
+def white_dwarf_masses(progenitor_masses: np.ndarray) -> np.ndarray:
     masses = np.empty(progenitor_masses.shape[0])
 
     low_progenitor_masses_mask = progenitor_masses < 2.7

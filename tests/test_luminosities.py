@@ -10,7 +10,7 @@ from alcor.services.simulations.luminosities import (
     get_main_sequence_lifetimes,
     set_cooling_times,
     set_masses,
-    get_white_dwarf_masses,
+    white_dwarf_masses,
     get_white_dwarfs)
 
 
@@ -20,6 +20,7 @@ def test_set_metallicities(stars_w_galactic_disk_types: pd.DataFrame,
     set_metallicities(stars_w_galactic_disk_types,
                       subsolar_metallicity=subsolar_metallicity,
                       solar_metallicity=solar_metallicity)
+
     thin_disk_stars_mask = (stars_w_galactic_disk_types['galactic_disk_type']
                             == 'thin')
     thin_disk_stars = stars_w_galactic_disk_types[thin_disk_stars_mask]
@@ -109,7 +110,7 @@ def test_set_cooling_times(stars_without_cooling_times: pd.DataFrame) -> None:
 
 
 def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
-    masses = get_white_dwarf_masses(progenitor_masses)
+    masses = white_dwarf_masses(progenitor_masses)
 
     assert isinstance(masses, np.ndarray)
     assert progenitor_masses.shape[0] == masses.shape[0]
