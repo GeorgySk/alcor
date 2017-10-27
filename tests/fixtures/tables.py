@@ -82,7 +82,7 @@ def db_colors_fort_files_lengths() -> List[int]:
 
 
 @pytest.fixture(scope='function')
-def one_fort_files_lengths() -> List[int]:
+def one_tables_fort_files_lengths() -> List[int]:
     one_tables_fort_links = range(121, 127)
     return list(fort_files_lengths(
             fort_links=one_tables_fort_links,
