@@ -8,10 +8,23 @@ RUN apt-get update && \
 
 WORKDIR /alcor
 
-COPY ./requirements.txt /alcor/requirements.txt
+ARG FORTRAN_COMPILER_OPTIONS
+COPY ./test_project test_project
+RUN cd test_project && \
+    # unzipping seed files
+    unzip -o forts.zip && \
+    gfortran main.f -o main.e ${FORTRAN_COMPILER_OPTIONS}
+
+COPY ./requirements.txt requirements.txt
 RUN python3 -m pip install -r requirements.txt
 
-COPY . /alcor/
+COPY ./alcor alcor
+COPY ./tests tests
+COPY ./README.rst README.rst
+COPY ./setup.py setup.py
+COPY ./setup.cfg setup.cfg
 RUN python3 -m pip install .
+
+COPY ./manage.py manage.py
 
 ENTRYPOINT ["python3", "manage.py"]
