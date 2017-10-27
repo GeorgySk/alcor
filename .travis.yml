@@ -5,14 +5,13 @@ language: python
 
 python:
   - "3.5"
-  - "3.6"
 
 install:
   - python3 -m pip install .
   - python3 -m pip install codecov
 
 script:
-  - python3 setup.py test
+  - ./run-tests.sh
 
 after_success:
   - codecov
