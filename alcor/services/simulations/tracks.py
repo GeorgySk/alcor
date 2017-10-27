@@ -35,7 +35,7 @@ read_db_cooling = partial(read_cooling,
 
 def read_colors(path: str) -> Dict[int, pd.DataFrame]:
     with open_hdf5(path) as file:
-        return fill_colors(file=file)
+        return dict(fill_colors(file=file))
 
 
 read_da_colors = partial(read_colors,
@@ -48,7 +48,7 @@ read_db_colors = partial(read_colors,
 def read_one_tables(path: str = 'input_data/one_wds_tracks.hdf5'
                     ) -> Dict[int, pd.DataFrame]:
     with open_hdf5(path) as file:
-        return fill_one_table(file=file)
+        return dict(fill_one_table(file=file))
 
 
 def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
@@ -72,9 +72,8 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
 
 
 def fill_colors(file: h5py.File) -> Dict[int, pd.DataFrame]:
-    color_table = {}
     for mass_group in file:
-        color_table[int(mass_group)] = pd.DataFrame(dict(
+        yield int(mass_group), pd.DataFrame(dict(
                 luminosity=file[join_group(mass_group, 'luminosity')],
                 color_u=file[join_group(mass_group, 'color_u')],
                 color_b=file[join_group(mass_group, 'color_b')],
@@ -82,13 +81,11 @@ def fill_colors(file: h5py.File) -> Dict[int, pd.DataFrame]:
                 color_r=file[join_group(mass_group, 'color_r')],
                 color_i=file[join_group(mass_group, 'color_i')],
                 color_j=file[join_group(mass_group, 'color_j')]))
-    return color_table
 
 
 def fill_one_table(file: h5py.File) -> Dict[int, pd.DataFrame]:
-    table = {}
     for mass_group in file:
-        table[int(mass_group)] = pd.DataFrame(dict(
+        yield int(mass_group), pd.DataFrame(dict(
                 luminosity=file[join_group(mass_group, 'luminosity')],
                 cooling_time=file[join_group(mass_group, 'cooling_time')],
                 effective_temperature=file[join_group(
@@ -99,7 +96,6 @@ def fill_one_table(file: h5py.File) -> Dict[int, pd.DataFrame]:
                 color_r=file[join_group(mass_group, 'color_r')],
                 color_i=file[join_group(mass_group, 'color_i')],
                 color_j=file[join_group(mass_group, 'color_j')]))
-    return table
 
 
 @contextmanager
