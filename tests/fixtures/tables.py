@@ -45,48 +45,48 @@ def one_tables_lengths() -> List[int]:
 
 
 @pytest.fixture
-def da_cooling_fort_files_lengths():
+def da_cooling_fort_files_lengths() -> List[int]:
     da_cooling_fort_links = {1: range(11, 18),
                              10: range(21, 31),
                              30: range(31, 39),
                              60: range(41, 49)}
-    return fort_files_by_metallicities_lengths(
+    return list(fort_files_by_metallicities_lengths(
             fort_links=da_cooling_fort_links,
-            base_dir=FORT_FILES_PATH)
+            base_dir=FORT_FILES_PATH))
 
 
 @pytest.fixture
-def db_cooling_fort_files_lengths():
+def db_cooling_fort_files_lengths() -> List[int]:
     db_cooling_fort_links = {1: range(91, 98),
                              10: range(101, 110),
                              60: range(111, 120)}
-    return fort_files_by_metallicities_lengths(
+    return list(fort_files_by_metallicities_lengths(
             fort_links=db_cooling_fort_links,
-            base_dir=FORT_FILES_PATH)
+            base_dir=FORT_FILES_PATH))
 
 
 @pytest.fixture
-def da_colors_fort_files_lengths():
+def da_colors_fort_files_lengths() -> List[int]:
     da_colors_fort_links = range(61, 71)
-    return fort_files_lengths(
+    return list(fort_files_lengths(
             fort_links=da_colors_fort_links,
-            base_dir=FORT_FILES_PATH)
+            base_dir=FORT_FILES_PATH))
 
 
 @pytest.fixture
-def db_colors_fort_files_lengths():
+def db_colors_fort_files_lengths() -> List[int]:
     db_colors_fort_links = range(132, 139)
-    return fort_files_lengths(
+    return list(fort_files_lengths(
             fort_links=db_colors_fort_links,
-            base_dir=FORT_FILES_PATH)
+            base_dir=FORT_FILES_PATH))
 
 
 @pytest.fixture
-def one_fort_files_lengths():
+def one_fort_files_lengths() -> List[int]:
     one_tables_fort_links = range(121, 127)
-    return fort_files_lengths(
+    return list(fort_files_lengths(
             fort_links=one_tables_fort_links,
-            base_dir=FORT_FILES_PATH)
+            base_dir=FORT_FILES_PATH))
 
 
 @pytest.fixture
