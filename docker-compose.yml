@@ -8,7 +8,6 @@ services:
       args:
         - PYTHON3_VERSION=$PYTHON3_VERSION
     image: lycantropos/alcor-tests:0.0.0
-    container_name: alcor
     volumes:
       - ./alcor:/alcor/alcor
       - ./tests:/alcor/tests
