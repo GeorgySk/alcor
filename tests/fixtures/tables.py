@@ -1,4 +1,5 @@
 import os
+from functools import partial
 from typing import List
 
 import pytest
@@ -65,25 +66,23 @@ def db_cooling_fort_files_lengths() -> List[int]:
             base_dir=FORT_FILES_PATH))
 
 
+forts_lengths = partial(fort_files_lengths,
+                        base_dir=FORT_FILES_PATH)
+
+
 @pytest.fixture(scope='function')
 def da_colors_fort_files_lengths() -> List[int]:
     da_colors_fort_links = range(61, 71)
-    return list(fort_files_lengths(
-            fort_links=da_colors_fort_links,
-            base_dir=FORT_FILES_PATH))
+    return list(forts_lengths(fort_links=da_colors_fort_links))
 
 
 @pytest.fixture(scope='function')
 def db_colors_fort_files_lengths() -> List[int]:
     db_colors_fort_links = range(132, 139)
-    return list(fort_files_lengths(
-            fort_links=db_colors_fort_links,
-            base_dir=FORT_FILES_PATH))
+    return list(forts_lengths(fort_links=db_colors_fort_links))
 
 
 @pytest.fixture(scope='function')
 def one_tables_fort_files_lengths() -> List[int]:
     one_tables_fort_links = range(121, 127)
-    return list(fort_files_lengths(
-            fort_links=one_tables_fort_links,
-            base_dir=FORT_FILES_PATH))
+    return list(forts_lengths(fort_links=one_tables_fort_links))
