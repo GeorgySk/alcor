@@ -8,7 +8,6 @@ services:
         - PYTHON3_VERSION=$PYTHON3_VERSION
         - FORTRAN_COMPILER_OPTIONS=$FORTRAN_COMPILER_OPTIONS
     image: lycantropos/alcor:0.0.0
-    entrypoint: "/alcor/docker-entrypoint.sh"
     volumes:
       - ./test_project:/alcor/test_project
       - ./alcor:/alcor/alcor
