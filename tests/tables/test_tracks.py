@@ -16,4 +16,3 @@ def test_tracks(da_cooling_tracks_lengths: List[int],
     assert da_colors_tracks_lengths == da_colors_fort_files_lengths
     assert db_colors_tracks_lengths == db_colors_fort_files_lengths
     assert one_tables_lengths == one_fort_files_lengths
-
