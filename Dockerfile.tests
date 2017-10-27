@@ -1,0 +1,14 @@
+ARG PYTHON3_VERSION=3
+
+FROM python:${PYTHON3_VERSION}
+
+WORKDIR /alcor
+
+COPY ./alcor alcor
+COPY ./tests tests
+COPY ./README.rst README.rst
+COPY ./setup.py setup.py
+COPY ./setup.cfg setup.cfg
+RUN python3 -m pip install .
+
+CMD ["python3", "setup.py", "test"]
