@@ -95,7 +95,11 @@ def generate_stars(*,
                         thin_disk_birth_init_time=thin_disk_birth_init_time,
                         time_bin=time_bin,
                         time_increment=time_increment))
-                total_bin_mass += star_mass
+
+            if galactic_structure_type != GalacticStructureType.thin:
+                continue
+
+            total_bin_mass += star_mass
 
             if total_bin_mass > birth_rate:
                 break
