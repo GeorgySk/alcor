@@ -9,7 +9,7 @@ from tests.utils import (fort_files_lengths,
                          tracks_lengths,
                          tracks_by_metallicities_lengths)
 
-FORT_FILES_PATH = os.path.abspath('/alcor/tests/tables')
+FORT_FILES_PATH = os.path.abspath('tests/tables')
 
 
 @pytest.fixture(scope='function')
