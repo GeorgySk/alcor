@@ -7,6 +7,7 @@ from typing import (Any,
                     Dict,
                     List)
 
+import pandas as pd
 from hypothesis import (Verbosity,
                         find,
                         settings)
@@ -61,3 +62,14 @@ def fort_files_lengths(fort_links: Iterable[int],
 def file_lines_count(file_path: str) -> int:
     with open(file_path) as file:
         return sum(1 for _ in file)
+
+
+def tracks_by_metallicities_lengths(
+        cooling_tracks: Dict[int, Dict[int, pd.DataFrame]]) -> List[int]:
+    for sequences in cooling_tracks.values():
+        yield from tracks_lengths(sequences=sequences)
+
+
+def tracks_lengths(sequences: Dict[int, pd.DataFrame]) -> List[int]:
+    for mass, sequence in sorted(sequences.items()):
+        yield sequence.shape[0]
