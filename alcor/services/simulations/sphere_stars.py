@@ -173,7 +173,7 @@ def halo_star_birth_time(*,
 
 def thin_disk_star_birth_time(*,
                               thin_disk_birth_init_time: float,
-                              time_bin: float,
+                              time_bin: int,
                               time_increment: float) -> float:
     return (thin_disk_birth_init_time
             + time_bin * time_increment
