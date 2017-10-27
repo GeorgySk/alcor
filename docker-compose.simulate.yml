@@ -2,13 +2,16 @@ version: '3'
 
 services:
   alcor:
-    build: .
+    build:
+      context: .
+      args:
+        - PYTHON3_VERSION=$PYTHON3_VERSION
     image: lycantropos/alcor:0.0.0
     entrypoint: "/alcor/docker-entrypoint.sh"
     volumes:
       - .:/alcor/
     extra_hosts:
-      - "dockerhost:$DOCKERHOST"  # for debugging
+      dockerhost: $DOCKERHOST  # for debugging
     command:
       # Generating stars:
       - simulate
@@ -16,7 +19,7 @@ services:
       - test_project
       - --clean
     environment:
-      POSTGRES_URI: "postgresql://username:password@postgres/alcor"
+      POSTGRES_URI: $POSTGRES_URI
       FORTRAN_COMPILER_OPTIONS: "
       -g -fbacktrace -ffpe-trap=zero,overflow,invalid -Wall
       -Wextra -Wconversion -fbounds-check -fcheck=all -fmax-errors=5"

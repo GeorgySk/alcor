@@ -10,6 +10,8 @@ services:
     entrypoint: python3
     volumes:
       - .:/alcor/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"  # for debugging
     command: setup.py test
     environment:
-      - POSTGRES_URI=postgresql://username:password@postgres/alcor
+      POSTGRES_URI: $POSTGRES_URI
