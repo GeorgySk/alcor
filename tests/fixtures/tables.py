@@ -67,7 +67,8 @@ def db_cooling_fort_files_lengths() -> List[int]:
 
 
 forts_lengths = partial(fort_files_lengths,
-                        base_dir=FORT_FILES_PATH)
+                        fort_files_dir=os.path.join(FORT_FILES_PATH,
+                                                    'fort_files'))
 
 
 @pytest.fixture(scope='function')
