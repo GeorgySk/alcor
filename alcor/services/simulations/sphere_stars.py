@@ -92,12 +92,14 @@ def generate_stars(*,
                 # TODO: assigning coords should be done in another module
                 scale_height = thick_disk_scale_height_kpc
             elif galactic_structure_type == GalacticStructureType.halo:
-                birth_times.append(halo_birth_init_time
-                                   + halo_stars_formation_time * random())
+                birth_times.append(halo_star_birth_time(
+                        halo_birth_init_time=halo_birth_init_time,
+                        halo_stars_formation_time=halo_stars_formation_time))
             else:
-                birth_times.append(thin_disk_birth_init_time
-                                   + time_bin * time_increment
-                                   + time_increment * random())
+                birth_times.append(thin_disk_star_birth_time(
+                        thin_disk_birth_init_time=thin_disk_birth_init_time,
+                        time_bin=time_bin,
+                        time_increment=time_increment))
                 total_bin_mass += star_mass
                 # TODO: assigning coords should be done in another module
                 scale_height = thin_disk_scale_height_kpc
@@ -161,6 +163,21 @@ def thick_disk_star_birth_time(*,
         sfr_try = thick_disk_max_sfr * random()
         if sfr_try <= time_try_sfr:
             return time_try + thick_disk_birth_init_time
+
+
+def halo_star_birth_time(*,
+                         halo_birth_init_time: float,
+                         halo_stars_formation_time: float) -> float:
+    return halo_birth_init_time + halo_stars_formation_time * random()
+
+
+def thin_disk_star_birth_time(*,
+                              thin_disk_birth_init_time: float,
+                              time_bin: float,
+                              time_increment: float) -> float:
+    return (thin_disk_birth_init_time
+            + time_bin * time_increment
+            + time_increment * random())
 
 
 def get_galactic_structure_type(*,
