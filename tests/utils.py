@@ -3,10 +3,9 @@ import os
 from typing import (Any,
                     Callable,
                     Iterable,
-                    Iterator,
                     Hashable,
                     Dict,
-                    List,)
+                    List)
 
 from hypothesis import (Verbosity,
                         find,
@@ -42,24 +41,23 @@ def sub_dict(dictionary: Dict[Hashable, Any],
             for key in keys}
 
 
-def fort_files_by_metallicities_lengths(fort_links: Dict[int, Iterator],
+def fort_files_by_metallicities_lengths(fort_links: Dict[int, Iterable[int]],
                                         *,
                                         base_dir: str) -> List[int]:
-    lengths = []
-    for metallicity, fort_links_range in fort_links.items():
-        lengths.extend(fort_files_lengths(fort_links=fort_links_range,
-                                          base_dir=base_dir))
-    return lengths
+    for fort_links_range in fort_links.values():
+        yield from fort_files_lengths(fort_links=fort_links_range,
+                                      base_dir=base_dir)
 
 
-def fort_files_lengths(fort_links: Iterator,
+def fort_files_lengths(fort_links: Iterable[int],
                        *,
                        base_dir: str) -> List[int]:
-    lengths = []
     fort_link_dirs = [os.path.join(base_dir,
                                    'fort_files/fort.' + str(fort_link))
                       for fort_link in fort_links]
-    for fort_link_dir in fort_link_dirs:
-        lengths.append(sum(1 for line in open(fort_link_dir)))
+    yield from map(file_lines_count, fort_link_dirs)
 
-    return lengths
+
+def file_lines_count(file_path: str) -> int:
+    with open(file_path) as file:
+        return sum(1 for _ in file)
