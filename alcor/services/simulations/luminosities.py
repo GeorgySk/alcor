@@ -10,10 +10,12 @@ def get_white_dwarfs(stars: pd.DataFrame,
                      chandrasekhar_limit: float = 1.4,
                      max_mass: float = 10.5,
                      solar_metallicity: float = 0.01,
-                     subsolar_metallicity: float = 0.001) -> pd.DataFrame:
+                     subsolar_metallicity: float = 0.001,
+                     min_cooling_time: float = 0.) -> pd.DataFrame:
     """
     Filters white dwarfs stars(WD) from initial sample of main sequence stars
     and assigns metallicities, cooling times and masses.
+
     :param stars: data frame with main sequence stars
     :param max_galactic_structure_age: the highest age of thin disk, thick disk
     and halo
@@ -26,10 +28,10 @@ def get_white_dwarfs(stars: pd.DataFrame,
     WDs due to relatively young ages (default 0.01)
     :param subsolar_metallicity: metallicity assigned to all halo WDs
     (default 0.001)
+    :param min_cooling_time: natural lower limit for cooling time (default 0.0)
     :return: data frame with white of white dwarfs
     """
-    stars = filter_by_max_mass(stars,
-                               max_mass=max_mass)
+    stars = stars[stars['progenitor_mass'] < max_mass]
     set_metallicities(stars,
                       subsolar_metallicity=subsolar_metallicity,
                       solar_metallicity=solar_metallicity)
@@ -37,18 +39,11 @@ def get_white_dwarfs(stars: pd.DataFrame,
                       max_galactic_structure_age=max_galactic_structure_age,
                       subsolar_metallicity=subsolar_metallicity,
                       solar_metallicity=solar_metallicity)
-    stars = filter_by_cooling_time(stars)
+    stars = stars[stars['cooling_time'] > min_cooling_time]
     set_masses(stars,
                ifmr_parameter=ifmr_parameter)
 
-    return filter_by_chandrasekhar_limit(stars,
-                                         limit=chandrasekhar_limit)
-
-
-def filter_by_max_mass(stars: pd.DataFrame,
-                       *,
-                       max_mass: float) -> pd.DataFrame:
-    return stars[stars['progenitor_mass'] < max_mass]
+    return stars[stars['mass'] <= chandrasekhar_limit]
 
 
 def set_metallicities(stars: pd.DataFrame,
@@ -80,23 +75,11 @@ def set_cooling_times(stars: pd.DataFrame,
                              - main_sequence_lifetimes)
 
 
-def filter_by_cooling_time(stars: pd.DataFrame,
-                           *,
-                           min_cooling_time: float = 0.) -> pd.DataFrame:
-    return stars[stars['cooling_time'] > min_cooling_time]
-
-
 def set_masses(stars: pd.DataFrame,
                *,
                ifmr_parameter: float) -> None:
     stars['mass'] = ifmr_parameter * get_white_dwarf_masses(
             progenitor_masses=stars['progenitor_mass'])
-
-
-def filter_by_chandrasekhar_limit(stars: pd.DataFrame,
-                                  *,
-                                  limit: float) -> pd.DataFrame:
-    return stars[stars['mass'] <= limit]
 
 
 def get_main_sequence_lifetimes(*,

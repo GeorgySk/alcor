@@ -3,27 +3,15 @@ import numpy as np
 import pandas as pd
 
 from alcor.services.simulations.luminosities import (
-    filter_by_max_mass,
     set_metallicities,
     extrapolated_times,
     estimated_times,
     estimate_lifetime,
     get_main_sequence_lifetimes,
     set_cooling_times,
-    filter_by_cooling_time,
     set_masses,
     get_white_dwarf_masses,
-    filter_by_chandrasekhar_limit,
     get_white_dwarfs)
-
-
-def test_filter_by_max_mass(stars_w_progenitor_masses: pd.DataFrame,
-                            max_mass: float) -> None:
-    filtered_stars = filter_by_max_mass(stars_w_progenitor_masses,
-                                        max_mass=max_mass)
-
-    assert isinstance(filtered_stars, pd.DataFrame)
-    assert filtered_stars.shape[0] == 1
 
 
 def test_set_metallicities(stars_w_galactic_disk_types: pd.DataFrame,
@@ -120,13 +108,6 @@ def test_set_cooling_times(stars_without_cooling_times: pd.DataFrame) -> None:
     assert 'cooling_time' in stars_without_cooling_times.columns
 
 
-def test_filter_by_cooling_time(stars_w_cooling_time: pd.DataFrame) -> None:
-    stars = filter_by_cooling_time(stars_w_cooling_time)
-
-    assert isinstance(stars, pd.DataFrame)
-    assert stars.shape[0] == 1
-
-
 def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
     masses = get_white_dwarf_masses(progenitor_masses)
 
@@ -140,14 +121,6 @@ def test_set_masses(stars_without_masses: pd.DataFrame) -> None:
 
     assert isinstance(stars_without_masses, pd.DataFrame)
     assert 'mass' in stars_without_masses.columns
-
-
-def test_filter_by_chandrasekhar_limit(stars_w_masses: pd.DataFrame) -> None:
-    stars = filter_by_chandrasekhar_limit(stars_w_masses,
-                                          limit=1.4)
-
-    assert isinstance(stars, pd.DataFrame)
-    assert stars.shape[0] == 1
 
 
 def test_get_white_dwarfs(main_sequence_stars: pd.DataFrame) -> None:
