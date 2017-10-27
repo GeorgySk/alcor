@@ -14,8 +14,6 @@ logger = logging.getLogger(__name__)
 def generate_stars(*,
                    max_stars_count: int = 6000000,
                    time_bins_count: int = 5000,
-                   thin_disk_scale_height_kpc: float = 0.25,
-                   thick_disk_scale_height_kpc: float = 0.9,
                    thick_disk_age: float = 12.,
                    thick_disk_sfr_param: float = 2.,
                    burst_formation_factor: float = 5.,
@@ -54,7 +52,6 @@ def generate_stars(*,
     progenitors_masses = []
     galactic_structure_types = []
     birth_times = []
-    z_coordinates = []
 
     for time_bin in range(time_bins_count):
         total_bin_mass = 0.
@@ -89,8 +86,6 @@ def generate_stars(*,
                         thick_disk_sfr_param=thick_disk_sfr_param,
                         thick_disk_max_sfr=thick_disk_max_sfr,
                         thick_disk_birth_init_time=thick_disk_birth_init_time))
-                # TODO: assigning coords should be done in another module
-                scale_height = thick_disk_scale_height_kpc
             elif galactic_structure_type == GalacticStructureType.halo:
                 birth_times.append(halo_star_birth_time(
                         halo_birth_init_time=halo_birth_init_time,
@@ -101,23 +96,13 @@ def generate_stars(*,
                         time_bin=time_bin,
                         time_increment=time_increment))
                 total_bin_mass += star_mass
-                # TODO: assigning coords should be done in another module
-                scale_height = thin_disk_scale_height_kpc
-
-            # TODO: assigning coords should be done in another module
-            # Halo stars coords will be generated in polar coords module
-            if galactic_structure_type != GalacticStructureType.halo:
-                z_coordinates.append(z_coordinate(
-                        scale_height=scale_height,
-                        sector_radius_kpc=sector_radius_kpc))
 
             if total_bin_mass > birth_rate:
                 break
 
     return dict(progenitors_masses=progenitors_masses,
                 galactic_structure_types=galactic_structure_types,
-                birth_times=birth_times,
-                z_coordinates=z_coordinates)
+                birth_times=birth_times)
 
 
 def normalization_const(*,
@@ -196,6 +181,9 @@ def get_galactic_structure_type(*,
     return GalacticStructureType.thin
 
 
+# TODO: move this to 'polar' module
+# thin_disk_scale_height_kpc: float = 0.25,
+# thick_disk_scale_height_kpc: float = 0.9,
 def z_coordinate(*,
                  scale_height: float,
                  sector_radius_kpc: float) -> float:
