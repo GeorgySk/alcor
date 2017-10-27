@@ -100,13 +100,17 @@ def test_get_main_sequence_lifetimes(masses: np.ndarray,
 
 
 def test_set_cooling_times(stars_without_cooling_times: pd.DataFrame) -> None:
+    columns_before = stars_without_cooling_times.columns
     set_cooling_times(stars_without_cooling_times,
                       max_galactic_structure_age=12.,
                       subsolar_metallicity=0.001,
                       solar_metallicity=0.01)
+    columns_after = stars_without_cooling_times.columns
 
     assert isinstance(stars_without_cooling_times, pd.DataFrame)
-    assert 'cooling_time' in stars_without_cooling_times.columns
+    assert len(columns_after) == len(columns_before) + 1
+    assert 'cooling_time' not in columns_before
+    assert 'cooling_time' in columns_after
 
 
 def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
