@@ -6,14 +6,21 @@ services:
       context: .
       args:
         - PYTHON3_VERSION=$PYTHON3_VERSION
+        - FORTRAN_COMPILER_OPTIONS=$FORTRAN_COMPILER_OPTIONS
     image: lycantropos/alcor:0.0.0
-    entrypoint: "/alcor/docker-entrypoint.sh"
     volumes:
-      - .:/alcor/
+      - ./test_project:/alcor/test_project
+      - ./alcor:/alcor/alcor
+      - ./tests:/alcor/tests
+      - ./README.rst:/alcor/README.rst
+      - ./setup.py:/alcor/setup.py
+      - ./setup.cfg:/alcor/setup.cfg
+      - ./settings.yml:/alcor/settings.yml
+      - ./requirements.txt:/alcor/requirements.txt
+      - ./manage.py:/alcor/manage.py
     extra_hosts:
       dockerhost: $DOCKERHOST  # for debugging
     command:
-      # Plotting
       - plot
 #      - --group_id=77066762-28da-4c62-b0cc-18e73a942f97
       - --filtration-method
