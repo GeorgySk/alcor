@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-docker-compose -f docker-compose.db.yml -f docker-compose.yml up --exit-code-from alcor
+set -e
+
+docker-compose up --exit-code-from alcor
+
 STATUS=$?
 
-docker-compose down
+docker-compose down --remove-orphans
 
 if [ "$STATUS" -eq "0" ]; then
 	echo "Tests passed";
