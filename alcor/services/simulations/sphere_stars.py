@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 def generate_stars(*,
                    max_stars_count: int = 6000000,
                    time_bins_count: int = 5000,
+                   thin_disk_age: float = 9.2,
                    thick_disk_age: float = 12.,
-                   thick_disk_sfr_param: float = 2.,
+                   halo_age: float = 14.,
+                   halo_stars_formation_time: float = 1.,
+                   burst_age: float = 0.6,
                    burst_formation_factor: float = 5.,
                    star_formation_rate_param: float = 25.,
-                   sector_radius_kpc: float = 0.05,
-                   thin_disk_age: float = 9.2,
-                   burst_age: float = 0.6,
-                   mass_reduction_factor: float = 0.03,
+                   thick_disk_sfr_param: float = 2.,
                    thick_disk_stars_fraction: float = 0.8,
-                   initial_mass_function_param: float = -2.35,
-                   halo_stars_formation_time: float = 1.,
                    halo_stars_fraction: float = 0.05,
-                   halo_age: float = 14.
+                   sector_radius_kpc: float = 0.05,
+                   mass_reduction_factor: float = 0.03,
+                   initial_mass_function_param: float = -2.35
                    ) -> Dict[str, List[Union[float, GalacticStructureType]]]:
     time_increment = thin_disk_age / time_bins_count
     sector_area = math.pi * sector_radius_kpc ** 2
