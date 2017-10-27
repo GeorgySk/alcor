@@ -117,11 +117,15 @@ def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
 
 
 def test_set_masses(stars_without_masses: pd.DataFrame) -> None:
+    columns_before = stars_without_masses.columns
     set_masses(stars_without_masses,
                ifmr_parameter=1.)
+    columns_after = stars_without_masses.columns
 
     assert isinstance(stars_without_masses, pd.DataFrame)
-    assert 'mass' in stars_without_masses.columns
+    assert len(columns_after) == len(columns_before) + 1
+    assert 'mass' not in columns_before
+    assert 'mass' in columns_after
 
 
 def test_get_white_dwarfs(main_sequence_stars: pd.DataFrame) -> None:
