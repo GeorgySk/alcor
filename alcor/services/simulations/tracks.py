@@ -55,12 +55,13 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
                         *,
                         file: h5py.File) -> None:
     for metallicity in cooling_tracks.keys():
+        cooling_tracks_by_metallicity = cooling_tracks[metallicity]
+
         metallicity_group = str(metallicity)
         masses = sort_mass_indexes(indexes=file[metallicity_group])
 
         for mass in masses:
             mass_group = join_group(metallicity_group, mass)
-            cooling_tracks_by_metallicity = cooling_tracks[metallicity]
             cooling_tracks_by_metallicity[int(mass)] = pd.DataFrame(
                     dict(cooling_time=file[join_group(mass_group,
                                                       'cooling_time')],
