@@ -41,7 +41,7 @@ setup(name=PROJECT_NAME,
       ],
       setup_requires=['pytest-runner>=2.11.1'],
       tests_require=[
-          'pydevd>=1.0.0',  # debugging
+          'pydevd>=1.1.1',  # debugging
           'pytest>=3.2.1',
           'pytest-cov>=2.4.0',
           'hypothesis>=3.28.0',
