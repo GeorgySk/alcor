@@ -12,4 +12,4 @@ def stars_without_theta() -> pd.DataFrame:
 
 @pytest.fixture(scope='function')
 def angle_covering_sector() -> float:
-    return random.uniform(-math.tau, math.tau)
+    return random.uniform(-2. * math.pi, 2. * math.pi)

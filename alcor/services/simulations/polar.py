@@ -164,6 +164,6 @@ def set_thetas_cylindrical(stars: pd.DataFrame,
     thetas_cylindrical = np.random.uniform(low=-angle_covering_sector / 2.,
                                            high=angle_covering_sector / 2.,
                                            size=stars_count)
-    thetas_cylindrical[thetas_cylindrical < 0.] += math.tau
+    thetas_cylindrical[thetas_cylindrical < 0.] += 2. * math.pi
 
     stars['theta_cylindrical'] = thetas_cylindrical
