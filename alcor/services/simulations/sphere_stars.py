@@ -1,4 +1,3 @@
-import logging
 import math
 from typing import (Union,
                     Dict,
@@ -6,8 +5,6 @@ from typing import (Union,
 from random import random
 
 from alcor.models.star import GalacticStructureType
-
-logger = logging.getLogger(__name__)
 
 
 # TODO: take these consts to settings file
