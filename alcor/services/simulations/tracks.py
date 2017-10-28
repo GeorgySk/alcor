@@ -1,5 +1,6 @@
 import os
 import posixpath
+from collections import OrderedDict
 from contextlib import (contextmanager,
                         closing)
 from functools import partial
@@ -18,8 +19,9 @@ def read_cooling(path: str,
                  metallicities: Tuple[int]
                  ) -> Dict[int, Dict[int, pd.DataFrame]]:
     with open_hdf5(path) as file:
-        cooling_tracks_by_metallicities = {metallicity: {}
-                                           for metallicity in metallicities}
+        cooling_tracks_by_metallicities = OrderedDict(
+                (metallicity, OrderedDict())
+                for metallicity in metallicities)
         fill_cooling_tracks(cooling_tracks_by_metallicities,
                             file=file)
         return cooling_tracks_by_metallicities
@@ -36,7 +38,7 @@ read_db_cooling = partial(read_cooling,
 
 def read_colors(path: str) -> Dict[int, pd.DataFrame]:
     with open_hdf5(path) as file:
-        return dict(fill_colors(file=file))
+        return OrderedDict(fill_colors(file=file))
 
 
 read_da_colors = partial(read_colors,
@@ -49,7 +51,7 @@ read_db_colors = partial(read_colors,
 def read_one_tables(path: str = 'input_data/one_wds_tracks.hdf5'
                     ) -> Dict[int, pd.DataFrame]:
     with open_hdf5(path) as file:
-        return dict(fill_one_table(file=file))
+        return OrderedDict(fill_one_table(file=file))
 
 
 def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
@@ -64,17 +66,17 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
         for mass in masses:
             mass_group = join_group(metallicity_group, mass)
             cooling_tracks_by_metallicity[int(mass)] = pd.DataFrame(
-                    dict(cooling_time=file[join_group(mass_group,
-                                                      'cooling_time')],
-                         effective_temperature=file[join_group(
-                                 mass_group, 'effective_temperature')],
-                         luminosity=file[join_group(mass_group,
-                                                    'luminosity')]))
+                    OrderedDict(cooling_time=file[join_group(mass_group,
+                                                             'cooling_time')],
+                                effective_temperature=file[join_group(
+                                        mass_group, 'effective_temperature')],
+                                luminosity=file[join_group(mass_group,
+                                                           'luminosity')]))
 
 
 def fill_colors(file: h5py.File) -> Dict[int, pd.DataFrame]:
     for mass_group in file:
-        yield int(mass_group), pd.DataFrame(dict(
+        yield int(mass_group), pd.DataFrame(OrderedDict(
                 luminosity=file[join_group(mass_group, 'luminosity')],
                 color_u=file[join_group(mass_group, 'color_u')],
                 color_b=file[join_group(mass_group, 'color_b')],
@@ -86,7 +88,7 @@ def fill_colors(file: h5py.File) -> Dict[int, pd.DataFrame]:
 
 def fill_one_table(file: h5py.File) -> Dict[int, pd.DataFrame]:
     for mass_group in file:
-        yield int(mass_group), pd.DataFrame(dict(
+        yield int(mass_group), pd.DataFrame(OrderedDict(
                 luminosity=file[join_group(mass_group, 'luminosity')],
                 cooling_time=file[join_group(mass_group, 'cooling_time')],
                 effective_temperature=file[join_group(
