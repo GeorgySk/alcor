@@ -10,7 +10,9 @@ from tests.utils import (fort_files_lengths,
                          tracks_lengths,
                          tracks_by_metallicities_lengths)
 
-FORT_FILES_PATH = os.path.abspath('tests/tables')
+FORT_FILES_PATH = os.path.abspath(os.path.join('tests',
+                                               'tables',
+                                               'fort_files'))
 
 
 @pytest.fixture(scope='function')
@@ -67,8 +69,7 @@ def db_cooling_fort_files_lengths() -> List[int]:
 
 
 forts_lengths = partial(fort_files_lengths,
-                        fort_files_dir=os.path.join(FORT_FILES_PATH,
-                                                    'fort_files'))
+                        fort_files_dir=FORT_FILES_PATH)
 
 
 @pytest.fixture(scope='function')
