@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 from functools import partial
 from typing import List
 
@@ -49,10 +50,10 @@ def one_tables_lengths() -> List[int]:
 
 @pytest.fixture(scope='function')
 def da_cooling_fort_files_lengths() -> List[int]:
-    da_cooling_fort_links = {1: range(11, 18),
-                             10: range(21, 31),
-                             30: range(31, 39),
-                             60: range(41, 49)}
+    da_cooling_fort_links = OrderedDict([(1, range(11, 18)),
+                                         (10, range(21, 31)),
+                                         (30, range(31, 39)),
+                                         (60, range(41, 49))])
     return list(fort_files_by_metallicities_lengths(
             fort_links=da_cooling_fort_links,
             base_dir=FORT_FILES_PATH))
@@ -60,9 +61,9 @@ def da_cooling_fort_files_lengths() -> List[int]:
 
 @pytest.fixture(scope='function')
 def db_cooling_fort_files_lengths() -> List[int]:
-    db_cooling_fort_links = {1: range(91, 98),
-                             10: range(101, 110),
-                             60: range(111, 120)}
+    db_cooling_fort_links = OrderedDict([(1, range(91, 98)),
+                                         (10, range(101, 110)),
+                                         (60, range(111, 120))])
     return list(fort_files_by_metallicities_lengths(
             fort_links=db_cooling_fort_links,
             base_dir=FORT_FILES_PATH))
