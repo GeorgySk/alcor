@@ -5,7 +5,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
 from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.sqltypes import (BigInteger,
-                                     Integer,
                                      Float,
                                      DateTime,
                                      Enum)
@@ -49,7 +48,7 @@ class GalacticDiskType(enum.IntEnum):
     halo = 3
 
 
-class SpectralTypeEnum(enum.Enum):
+class SpectralType(enum.Enum):
     DA = 0
     DB = 1
     ONe = 2
@@ -112,7 +111,7 @@ class Star(Base):
                         nullable=True)
     birth_time = Column(Float(),
                         nullable=True)
-    spectral_type = Column(Enum(SpectralTypeEnum),
+    spectral_type = Column(Enum(SpectralType),
                            nullable=True)
     galactic_disk_type = Column(Enum(GalacticDiskType),
                                 nullable=True)

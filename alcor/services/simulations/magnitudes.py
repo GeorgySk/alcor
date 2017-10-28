@@ -7,7 +7,7 @@ from typing import (Dict,
 import numpy as np
 
 from alcor.models import Star
-from alcor.models.star import SpectralTypeEnum
+from alcor.models.star import SpectralType
 from alcor.types import CoolingSequencesType
 
 GRAVITATIONAL_CONST_CM_S_KG = 6.67e-5
@@ -32,8 +32,8 @@ def assign_magnitudes(*,
                if star.mass >= max_carbon_oxygen_core_wd_mass]
 
     for star in co_wds:
-        if get_spectral_type(db_to_da_fraction) == SpectralTypeEnum.DA:
-            star.spectral_type = SpectralTypeEnum.DA
+        if get_spectral_type(db_to_da_fraction) == SpectralType.DA:
+            star.spectral_type = SpectralType.DA
             (luminosity,
              effective_temperature,
              u_ubvri_absolute,
@@ -47,7 +47,7 @@ def assign_magnitudes(*,
                 # TODO. can they be taken from cool.seq. keys?
                 metallicities=[0.001, 0.01, 0.03, 0.06])
         else:
-            star.spectral_type = SpectralTypeEnum.DB
+            star.spectral_type = SpectralType.DB
             (luminosity,
              effective_temperature,
              u_ubvri_absolute,
@@ -69,7 +69,7 @@ def assign_magnitudes(*,
         star.i_ubvri_absolute = i_ubvri_absolute
 
     for star in one_wds:
-        star.spectral_type = SpectralTypeEnum.ONe
+        star.spectral_type = SpectralType.ONe
         (luminosity,
          effective_temperature,
          u_ubvri_absolute,
@@ -92,8 +92,8 @@ def assign_magnitudes(*,
 
 def get_spectral_type(db_to_da_fraction: float) -> enum.Enum:
     if np.random.rand() < db_to_da_fraction:
-        return SpectralTypeEnum.DB
-    return SpectralTypeEnum.DA
+        return SpectralType.DB
+    return SpectralType.DA
 
 
 def one_interpolation(star: Star,
