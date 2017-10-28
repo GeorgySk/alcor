@@ -47,9 +47,7 @@ def fort_files_by_metallicities_lengths(fort_links: Dict[int, Iterable[int]],
                                         base_dir: str) -> List[int]:
     for fort_links_range in fort_links.values():
         yield from fort_files_lengths(fort_links=fort_links_range,
-                                      fort_files_dir=os.path.join(
-                                              base_dir,
-                                              'fort_files'))
+                                      fort_files_dir=base_dir)
 
 
 def fort_files_lengths(fort_links: Iterable[int],

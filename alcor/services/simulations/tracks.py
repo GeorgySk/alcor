@@ -25,6 +25,7 @@ def read_cooling(path: str,
         return cooling_tracks_by_metallicities
 
 
+# TODO: all the paths must be passed from upper level module
 read_da_cooling = partial(read_cooling,
                           path='input_data/da_cooling.hdf5',
                           metallicities=(1, 10, 30, 60))
