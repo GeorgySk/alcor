@@ -8,7 +8,6 @@ import numpy as np
 
 from alcor.models import Star
 from alcor.models.star import SpectralType
-from alcor.types import CoolingSequencesType
 
 GRAVITATIONAL_CONST_CM_S_KG = 6.67e-5
 SOLAR_MASS_KG = 1.989e30
@@ -18,9 +17,9 @@ def assign_magnitudes(*,
                       stars: List[Star],
                       max_carbon_oxygen_core_wd_mass: float = 1.14,
                       db_to_da_fraction: float = 0.2,
-                      da_cooling_sequences: CoolingSequencesType,
+                      da_cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                       da_color_table: Dict[str, np.ndarray],
-                      db_cooling_sequences: CoolingSequencesType,
+                      db_cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                       db_color_table: Dict[str, np.ndarray],
                       one_color_table: Dict[str, np.ndarray]
                       ) -> List[Star]:
@@ -158,7 +157,7 @@ def one_interpolation(star: Star,
 
 
 def da_db_interpolation(star: Star,
-                        cooling_sequences: CoolingSequencesType,
+                        cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                         color_table: Dict[str, np.ndarray],
                         metallicities: List[float]
                         ) -> Tuple[float, ...]:
@@ -208,7 +207,7 @@ def da_db_interpolation(star: Star,
 
 def get_luminosity_effective_temperature_limits(
         star: Star,
-        cooling_sequences: CoolingSequencesType,
+        cooling_sequences: Dict[int, Dict[str, np.ndarray]],
         min_metallicity_by_thousand: int,
         max_metallicity_by_thousand: int) -> Tuple[float, ...]:
     min_luminosity = interpolate(

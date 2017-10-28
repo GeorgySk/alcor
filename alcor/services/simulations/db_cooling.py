@@ -7,11 +7,9 @@ from typing import (Iterator,
 
 import numpy as np
 
-from alcor.types import CoolingSequencesType
-
 
 def initialize_sequences(rows_count: int = 400
-                         ) -> CoolingSequencesType:
+                         ) -> Dict[int, Dict[str, np.ndarray]]:
     # Metallicities were multiplied by 1000 in order to keep dict.keys as ints
     files_paths_by_metallicities = {1: ['05047_db_Z=0.001',
                                         '05527_db_Z=0.001',
