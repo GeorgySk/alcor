@@ -30,5 +30,4 @@ RUN python3 -m pip install .
 COPY ./manage.py manage.py
 
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
-
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["/alcor/docker-entrypoint.sh"]
