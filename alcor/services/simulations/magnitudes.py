@@ -459,7 +459,7 @@ def get_xm(star: pd.Series,
             return x1 + deltf * (x2 - x1)
 
 
-def get_extrapolated_xm(star: Star,
+def get_extrapolated_xm(star: pd.Series,
                         cooling_time: np.ndarray,
                         pre_wd_lifetime: np.ndarray,
                         interest_sequence: np.ndarray,
@@ -474,7 +474,7 @@ def get_extrapolated_xm(star: Star,
               - interest_sequence[mass_index, min_row_index]) / deltf)
         b = (interest_sequence[mass_index, min_row_index + 1]
              - s * cooling_time[mass_index, min_row_index + 1])
-        return s * star.cooling_time + b
+        return s * star['cooling_time'] + b
 
     deltf = log10((cooling_time[mass_index, min_row_index + 1]
                    + pre_wd_lifetime[mass_index])
@@ -487,7 +487,7 @@ def get_extrapolated_xm(star: Star,
         b = (log10(interest_sequence[mass_index, min_row_index + 1])
              - s * log10(cooling_time[mass_index, min_row_index + 1]
                          + pre_wd_lifetime[mass_index]))
-        return 10.0 ** (s * log10(star.cooling_time
+        return 10.0 ** (s * log10(star['cooling_time']
                                   + pre_wd_lifetime[mass_index]) + b)
 
     s = ((interest_sequence[mass_index, min_row_index + 1]
@@ -495,7 +495,7 @@ def get_extrapolated_xm(star: Star,
     b = (interest_sequence[mass_index, min_row_index + 1]
          - s * log10(cooling_time[mass_index, min_row_index + 1]
                      + pre_wd_lifetime[mass_index]))
-    return s * log10(star.cooling_time + pre_wd_lifetime[mass_index]) + b
+    return s * log10(star['cooling_time'] + pre_wd_lifetime[mass_index]) + b
 
 
 def interpolate_magnitudes(star: pd.Series,
