@@ -517,7 +517,7 @@ def interpolate_magnitudes(star: pd.Series,
                 min_mass_index = mass_index
                 break
 
-    return get_magnitudes(star=star,
+    return get_magnitudes(star_mass=star['mass'],
                           luminosity=luminosity,
                           color_table=color_table,
                           rows_count_1=rows_count_1,
@@ -525,7 +525,8 @@ def interpolate_magnitudes(star: pd.Series,
                           min_mass_index=min_mass_index)
 
 
-def get_magnitudes(star: pd.Series,
+def get_magnitudes(*,
+                   star_mass: float,
                    luminosity: float,
                    color_table: Dict[str, np.ndarray],
                    rows_count_1: int,
@@ -534,7 +535,7 @@ def get_magnitudes(star: pd.Series,
     if (luminosity > color_table['luminosity'][min_mass_index, 0]
             or luminosity > color_table['luminosity'][min_mass_index + 1, 0]):
         return get_extrapolated_magnitudes_by_luminosity(
-            star_mass=star['mass'],
+            star_mass=star_mass,
             luminosity=luminosity,
             color_table=color_table,
             row_index_1=0,
@@ -545,7 +546,7 @@ def get_magnitudes(star: pd.Series,
         or luminosity < color_table['luminosity'][min_mass_index + 1,
                                                   rows_count_2]):
         return get_extrapolated_magnitudes_by_luminosity(
-            star_mass=star['mass'],
+            star_mass=star_mass,
             luminosity=luminosity,
             color_table=color_table,
             row_index_1=rows_count_1,
@@ -553,7 +554,7 @@ def get_magnitudes(star: pd.Series,
             mass_index=min_mass_index)
 
     return get_interpolated_magnitudes_by_luminosity(
-        star_mass=star['mass'],
+        star_mass=star_mass,
         rows_count_1=rows_count_1,
         rows_count_2=rows_count_2,
         color_table=color_table,
@@ -562,6 +563,7 @@ def get_magnitudes(star: pd.Series,
 
 
 def get_interpolated_magnitudes_by_luminosity(
+        *,
         star_mass: float,
         rows_count_1: int,
         rows_count_2: int,
