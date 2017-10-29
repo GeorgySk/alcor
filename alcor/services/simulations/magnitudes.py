@@ -273,7 +273,7 @@ def interpolate(star: pd.Series,
         one_model=one_model)
 
 
-def extrapolate_by_mass(star: Star,
+def extrapolate_by_mass(star: pd.Series,
                         min_mass_index: int,
                         mass: np.ndarray,
                         cooling_time: np.ndarray,
@@ -304,7 +304,7 @@ def extrapolate_by_mass(star: Star,
 
     s = (xm2 - xm1) / (max_mass - min_mass)
     t = xm2 - s * max_mass
-    return s * star.mass + t
+    return s * star['mass'] + t
 
 
 def interpolate_by_mass(star: Star,
