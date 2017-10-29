@@ -158,46 +158,55 @@ def one_interpolation(star: pd.Series,
             i_ubvri_absolute)
 
 
-def da_db_interpolation(star: pd.Series,
+def get_min_metallicity_index(*,
+                              star_metallicity: float,
+                              grid_metallicities: List[float]) -> int:
+    for metallicity_index in range(len(grid_metallicities) - 1):
+        if (grid_metallicities[metallicity_index]
+                <= star_metallicity
+                < grid_metallicities[metallicity_index + 1]):
+            return metallicity_index
+
+
+def da_db_interpolation(*,
+                        star: pd.Series,
                         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                         color_table: Dict[str, np.ndarray],
                         metallicities: List[float]) -> Tuple[float, ...]:
-    for metallicity_index in range(len(metallicities) - 1):
-        if (metallicities[metallicity_index] <= star['metallicity']
-                < metallicities[metallicity_index + 1]):
-            min_metallicity = metallicities[metallicity_index]
-            max_metallicity = metallicities[metallicity_index + 1]
+    star_metallicity = star['metallicity']
 
-            (min_luminosity,
-             max_luminosity,
-             min_effective_temperature,
-             max_effective_temperature) = (
-                get_luminosity_effective_temperature_limits(
-                    star=star,
-                    cooling_sequences=cooling_sequences,
-                    min_metallicity_by_thousand=int(min_metallicity * 1e3),
-                    max_metallicity_by_thousand=int(max_metallicity * 1e3)))
-            break
+    min_metallicity_index = get_min_metallicity_index(
+            star_metallicity=star_metallicity,
+            grid_metallicities=metallicities)
+    min_metallicity = metallicities[min_metallicity_index]
+    max_metallicity = metallicities[min_metallicity_index + 1]
 
-    # TODO: this looks like linear extrapolation. implement function
-    luminosity = (min_luminosity
-                  + (max_luminosity - min_luminosity)
-                    * (star['metallicity'] - min_metallicity)
-                    / (max_metallicity - min_metallicity))
-    effective_temperature = (min_effective_temperature
-                             + (max_effective_temperature
-                                - min_effective_temperature)
-                               * (star['metallicity'] - min_metallicity)
-                               / (max_metallicity - min_metallicity))
+    (min_luminosity,
+     max_luminosity,
+     min_effective_temperature,
+     max_effective_temperature) = (
+        get_luminosity_effective_temperature_limits(
+            star=star,
+            cooling_sequences=cooling_sequences,
+            min_metallicity_by_thousand=int(min_metallicity * 1e3),
+            max_metallicity_by_thousand=int(max_metallicity * 1e3)))
+
+    spline = linear_estimation(x=(min_metallicity, max_metallicity),
+                               y=(min_luminosity, max_luminosity))
+    luminosity = spline(star_metallicity)
+
+    spline = linear_estimation(x=(min_metallicity, max_metallicity),
+                               y=(min_effective_temperature,
+                                  max_effective_temperature))
+    effective_temperature = spline(star_metallicity)
 
     (u_ubvri_absolute,
      b_ubvri_absolute,
      v_ubvri_absolute,
      r_ubvri_absolute,
-     i_ubvri_absolute) = interpolate_magnitudes(star_mass=star,
+     i_ubvri_absolute) = interpolate_magnitudes(star_mass=star['mass'],
                                                 color_table=color_table,
                                                 luminosity=luminosity)
-
     return (luminosity,
             effective_temperature,
             u_ubvri_absolute,
