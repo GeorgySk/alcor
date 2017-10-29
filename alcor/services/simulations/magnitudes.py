@@ -160,13 +160,12 @@ def one_interpolation(star: Star,
             i_ubvri_absolute)
 
 
-def da_db_interpolation(star: Star,
+def da_db_interpolation(star: pd.Series,
                         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                         color_table: Dict[str, np.ndarray],
-                        metallicities: List[float]
-                        ) -> Tuple[float, ...]:
+                        metallicities: List[float]) -> Tuple[float, ...]:
     for metallicity_index in range(len(metallicities) - 1):
-        if (metallicities[metallicity_index] <= star.metallicity
+        if (metallicities[metallicity_index] <= star['metallicity']
                 < metallicities[metallicity_index + 1]):
             min_metallicity = metallicities[metallicity_index]
             max_metallicity = metallicities[metallicity_index + 1]
@@ -178,18 +177,19 @@ def da_db_interpolation(star: Star,
                 get_luminosity_effective_temperature_limits(
                     star=star,
                     cooling_sequences=cooling_sequences,
-                    min_metallicity_by_thousand=int(min_metallicity * 1000),
-                    max_metallicity_by_thousand=int(max_metallicity * 1000)))
+                    min_metallicity_by_thousand=int(min_metallicity * 1e3),
+                    max_metallicity_by_thousand=int(max_metallicity * 1e3)))
             break
 
+    # TODO: this looks like linear extrapolation. implement function
     luminosity = (min_luminosity
                   + (max_luminosity - min_luminosity)
-                    * (star.metallicity - min_metallicity)
+                    * (star['metallicity'] - min_metallicity)
                     / (max_metallicity - min_metallicity))
     effective_temperature = (min_effective_temperature
                              + (max_effective_temperature
                                 - min_effective_temperature)
-                               * (star.metallicity - min_metallicity)
+                               * (star['metallicity'] - min_metallicity)
                                / (max_metallicity - min_metallicity))
 
     (u_ubvri_absolute,
