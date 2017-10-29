@@ -238,7 +238,7 @@ def get_luminosity_effective_temperature_limits(
             min_effective_temperature, max_effective_temperature)
 
 
-def interpolate(star: Star,
+def interpolate(star: pd.Series,
                 cooling_or_color_sequence: Dict[str, np.ndarray],
                 interest_sequence: str,
                 by_logarithm: bool,
@@ -255,10 +255,10 @@ def interpolate(star: Star,
             by_logarithm=by_logarithm,
             one_model=one_model)
 
-    if star.mass < grid_masses[0]:
+    if star['mass'] < grid_masses[0]:
         return extrapolate_by_mass_partial(min_mass_index=0)
 
-    if star.mass >= grid_masses[-1]:
+    if star['mass'] >= grid_masses[-1]:
         return extrapolate_by_mass_partial(
                 min_mass_index=grid_masses.size() - 1)
 
