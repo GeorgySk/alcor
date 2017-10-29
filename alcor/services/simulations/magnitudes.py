@@ -282,7 +282,7 @@ def extrapolate_by_mass(star: pd.Series,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
     min_mass = mass[min_mass_index]
-    xm1 = get_xm(star=star,
+    xm1 = get_xm(star_cooling_time=star,
                  cooling_time=cooling_time,
                  pre_wd_lifetime=pre_wd_lifetime,
                  interest_sequence=interest_sequence,
@@ -292,7 +292,7 @@ def extrapolate_by_mass(star: pd.Series,
                  one_model=one_model)
 
     max_mass = mass[min_mass_index + 1]
-    xm2 = get_xm(star=star,
+    xm2 = get_xm(star_cooling_time=star,
                  cooling_time=cooling_time,
                  pre_wd_lifetime=pre_wd_lifetime,
                  interest_sequence=interest_sequence,
@@ -414,7 +414,8 @@ def interpolate_by_mass(star: pd.Series,
     return x1 + (x3 - x1) * den
 
 
-def get_xm(star: pd.Series,
+def get_xm(*,
+           star_cooling_time: float,
            cooling_time: np.ndarray,
            pre_wd_lifetime: np.ndarray,
            interest_sequence: np.ndarray,
@@ -422,38 +423,31 @@ def get_xm(star: pd.Series,
            mass_index: int,
            by_logarithm: bool,
            one_model: bool = False) -> float:
-    if star['cooling_time'] < cooling_time[mass_index, 0]:
-        return get_extrapolated_xm(
-            star_cooling_time=star['cooling_time'],
-            cooling_time=cooling_time,
-            pre_wd_lifetime=pre_wd_lifetime,
-            interest_sequence=interest_sequence,
-            mass_index=mass_index,
-            min_row_index=0,
-            by_logarithm=by_logarithm,
-            one_model=one_model)
+    extrapolated_xm = partial(get_extrapolated_xm,
+                              star_cooling_time=star_cooling_time,
+                              cooling_time=cooling_time,
+                              pre_wd_lifetime=pre_wd_lifetime,
+                              interest_sequence=interest_sequence,
+                              mass_index=mass_index,
+                              by_logarithm=by_logarithm,
+                              one_model=one_model)
+
+    if star_cooling_time < cooling_time[mass_index, 0]:
+        return extrapolated_xm(min_row_index=0)
 
     rows_count = rows_counts[mass_index]
 
-    if star['cooling_time'] > cooling_time[mass_index, rows_count]:
-        return get_extrapolated_xm(
-            star_cooling_time=star['cooling_time'],
-            cooling_time=cooling_time,
-            pre_wd_lifetime=pre_wd_lifetime,
-            interest_sequence=interest_sequence,
-            mass_index=mass_index,
-            min_row_index=rows_count - 1,
-            by_logarithm=by_logarithm,
-            one_model=one_model)
+    if star_cooling_time > cooling_time[mass_index, rows_count]:
+        return extrapolated_xm(min_row_index=rows_count - 1)
 
     for row_index in range(rows_count - 1):
-        if (cooling_time[mass_index, row_index] <= star['cooling_time']
+        if (cooling_time[mass_index, row_index] <= star_cooling_time
                 <= cooling_time[mass_index, row_index + 1]):
             y1 = cooling_time[mass_index, row_index]
             y2 = cooling_time[mass_index, row_index + 1]
             x1 = interest_sequence[mass_index, row_index]
             x2 = interest_sequence[mass_index, row_index + 1]
-            deltf = (star['cooling_time'] - y1) / (y2 - y1)
+            deltf = (star_cooling_time - y1) / (y2 - y1)
 
             return x1 + deltf * (x2 - x1)
 
