@@ -306,7 +306,16 @@ def extrapolate_by_mass(star: pd.Series,
     return s * star['mass'] + t
 
 
-def interpolate_by_mass(star: pd.Series,
+def get_mass_index(*,
+                   star_mass: float,
+                   grid_masses: np.ndarray) -> int:
+    for row_index in range(grid_masses.size() - 1):
+        if grid_masses[row_index] <= star_mass < grid_masses[row_index + 1]:
+            return row_index
+
+
+def interpolate_by_mass(*,
+                        star: pd.Series,
                         mass: np.ndarray,
                         cooling_time: np.ndarray,
                         pre_wd_lifetime: np.ndarray,
@@ -314,104 +323,103 @@ def interpolate_by_mass(star: pd.Series,
                         rows_counts: np.ndarray,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
-    for row_index in range(mass.size() - 1):
-        if mass[row_index] <= star['mass'] < mass[row_index + 1]:
-            min_mass_index = row_index
-            max_mass_index = row_index + 1
-            break
+    star_mass = star['mass']
+    star_cooling_time = star['cooling_time']
 
-    if star['cooling_time'] < cooling_time[min_mass_index, 0]:
-        x1 = get_extrapolated_xm(
-            star_cooling_time=star['cooling_time'],
-            cooling_time=cooling_time,
-            pre_wd_lifetime=pre_wd_lifetime,
-            interest_sequence=interest_sequence,
-            mass_index=min_mass_index,
-            min_row_index=1,
-            by_logarithm=by_logarithm,
-            one_model=one_model)
+    min_mass_index = get_mass_index(star_mass=star_mass,
+                                    grid_masses=mass)
+    max_mass_index = min_mass_index + 1
+
+    extrapolated_xm = partial(get_extrapolated_xm,
+                              star_cooling_time=star_cooling_time,
+                              cooling_time=cooling_time,
+                              pre_wd_lifetime=pre_wd_lifetime,
+                              interest_sequence=interest_sequence,
+                              by_logarithm=by_logarithm,
+                              one_model=one_model)
+
+    if star_cooling_time < cooling_time[min_mass_index, 0]:
+        x1 = extrapolated_xm(min_row_index=1,
+                             mass_index=min_mass_index)
+        case_1 = 1
+    elif star_cooling_time >= cooling_time[min_mass_index,
+                                           rows_counts[min_mass_index]]:
+        rows_count = rows_counts[min_mass_index]
+        x1 = extrapolated_xm(min_row_index=rows_count,
+                             mass_index=min_mass_index)
         case_1 = 1
     else:
-        if star['cooling_time'] >= cooling_time[min_mass_index,
-                                                rows_counts[min_mass_index]]:
-            rows_count = rows_counts[min_mass_index]
-            x1 = get_extrapolated_xm(
-                star_cooling_time=star['cooling_time'],
-                cooling_time=cooling_time,
-                pre_wd_lifetime=pre_wd_lifetime,
-                interest_sequence=interest_sequence,
-                mass_index=min_mass_index,
-                min_row_index=rows_count,
-                by_logarithm=by_logarithm,
-                one_model=one_model)
-            case_1 = 1
-        else:
-            for row_index in range(rows_counts[min_mass_index] - 1):
-                if (cooling_time[min_mass_index, row_index]
-                        <= star['cooling_time']
-                        <= cooling_time[min_mass_index, row_index + 1]):
-                    y1 = cooling_time[min_mass_index, row_index]
-                    y2 = cooling_time[min_mass_index, row_index + 1]
-                    x1 = interest_sequence[min_mass_index, row_index]
-                    x2 = interest_sequence[min_mass_index, row_index + 1]
-                    case_1 = 0
+        for row_index in range(rows_counts[min_mass_index] - 1):
+            if (cooling_time[min_mass_index, row_index]
+                    <= star_cooling_time
+                    <= cooling_time[min_mass_index, row_index + 1]):
+                y1 = cooling_time[min_mass_index, row_index]
+                y2 = cooling_time[min_mass_index, row_index + 1]
+                x1 = interest_sequence[min_mass_index, row_index]
+                x2 = interest_sequence[min_mass_index, row_index + 1]
+                case_1 = 0
 
-    if star['cooling_time'] < cooling_time[max_mass_index, 0]:
-        x3 = get_extrapolated_xm(
-            star_cooling_time=star['cooling_time'],
-            cooling_time=cooling_time,
-            pre_wd_lifetime=pre_wd_lifetime,
-            interest_sequence=interest_sequence,
-            mass_index=max_mass_index,
-            min_row_index=1,
-            by_logarithm=by_logarithm,
-            one_model=one_model)
+    if star_cooling_time < cooling_time[max_mass_index, 0]:
+        x3 = extrapolated_xm(min_row_index=1,
+                             mass_index=max_mass_index)
+        case_2 = 1
+    elif star_cooling_time >= cooling_time[max_mass_index,
+                                           rows_counts[max_mass_index]]:
+        rows_count = rows_counts[max_mass_index]
+        x3 = extrapolated_xm(min_row_index=rows_count,
+                             mass_index=max_mass_index)
         case_2 = 1
     else:
-        if star['cooling_time'] >= cooling_time[max_mass_index,
-                                                rows_counts[max_mass_index]]:
-            rows_count = rows_counts[max_mass_index]
-            x3 = get_extrapolated_xm(
-                star_cooling_time=star['cooling_time'],
-                cooling_time=cooling_time,
-                pre_wd_lifetime=pre_wd_lifetime,
-                interest_sequence=interest_sequence,
-                mass_index=max_mass_index,
-                min_row_index=rows_count,
-                by_logarithm=by_logarithm,
-                one_model=one_model)
-            case_2 = 1
-        else:
-            for row_index in range(rows_counts[max_mass_index] - 1):
-                if (cooling_time[max_mass_index, row_index]
-                        <= star['cooling_time']
-                        <= cooling_time[max_mass_index, row_index + 1]):
-                    y3 = cooling_time[max_mass_index, row_index]
-                    y4 = cooling_time[max_mass_index, row_index + 1]
-                    x3 = interest_sequence[max_mass_index, row_index]
-                    x4 = interest_sequence[max_mass_index, row_index + 1]
-                    case_2 = 0
+        for row_index in range(rows_counts[max_mass_index] - 1):
+            if (cooling_time[max_mass_index, row_index]
+                    <= star_cooling_time
+                    <= cooling_time[max_mass_index, row_index + 1]):
+                y3 = cooling_time[max_mass_index, row_index]
+                y4 = cooling_time[max_mass_index, row_index + 1]
+                x3 = interest_sequence[max_mass_index, row_index]
+                x4 = interest_sequence[max_mass_index, row_index + 1]
+                case_2 = 0
 
     min_mass = mass[min_mass_index]
     max_mass = mass[max_mass_index]
-    den = (star['mass'] - min_mass) / (max_mass - min_mass)
+    get_linear_estimation = partial(linear_estimation,
+                                    x=(min_mass, max_mass))
 
     if case_1 == 0 and case_2 == 0:
-        ym1 = y1 + (y3 - y1) * den
-        ym2 = y2 + (y4 - y2) * den
-        xm1 = x1 + (x3 - x1) * den
-        xm2 = x2 + (x4 - x2) * den
-        return xm1 + (star['cooling_time'] - ym1) / (ym2 - ym1) * (xm2 - xm1)
+        spline = get_linear_estimation(y=(y1, y3))
+        ym1 = spline(star_mass)
+
+        spline = get_linear_estimation(y=(y2, y4))
+        ym2 = spline(star_mass)
+
+        spline = get_linear_estimation(y=(x1, x3))
+        xm1 = spline(star_mass)
+
+        spline = get_linear_estimation(y=(x2, x4))
+        xm2 = spline(star_mass)
+
+        spline = linear_estimation(x=(ym1, ym2),
+                                   y=(xm1, xm2))
+        return spline(star_cooling_time)
 
     if case_1 == 0 and case_2 == 1:
-        xm1 = x1 + (x2 - x1) * (star['cooling_time'] - y1) / (y2 - y1)
-        return xm1 + (x3 - xm1) * den
+        spline = linear_estimation(x=(y1, y2),
+                                   y=(x1, x2))
+        xm1 = spline(star_cooling_time)
+
+        spline = get_linear_estimation(y=(xm1, x3))
+        return spline(star_mass)
 
     if case_1 == 1 and case_2 == 0:
-        xm2 = x3 + (x4 - x3) * (star['cooling_time'] - y3) / (y4 - y3)
-        return x1 + (xm2 - x1) * den
+        spline = linear_estimation(x=(y3, y4),
+                                   y=(x3, x4))
+        xm2 = spline(star_cooling_time)
 
-    return x1 + (x3 - x1) * den
+        spline = get_linear_estimation(y=(x1, xm2))
+        return spline(star_mass)
+
+    spline = get_linear_estimation(y=(x1, x3))
+    return spline(star_mass)
 
 
 def get_xm(*,
