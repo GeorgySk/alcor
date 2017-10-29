@@ -6,6 +6,7 @@ from typing import (Dict,
                     List)
 
 import numpy as np
+import pandas as pd
 
 from alcor.models import Star
 from alcor.models.star import SpectralType
@@ -14,8 +15,8 @@ GRAVITATIONAL_CONST_CM_S_KG = 6.67e-5
 SOLAR_MASS_KG = 1.989e30
 
 
-def assign_magnitudes(*,
-                      stars: List[Star],
+def assign_magnitudes(stars: pd.DataFrame,
+                      *,
                       max_carbon_oxygen_core_wd_mass: float = 1.14,
                       db_to_da_fraction: float = 0.2,
                       da_cooling_sequences: Dict[int, Dict[str, np.ndarray]],
@@ -23,18 +24,20 @@ def assign_magnitudes(*,
                       db_cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                       db_color_table: Dict[str, np.ndarray],
                       one_color_table: Dict[str, np.ndarray]
-                      ) -> List[Star]:
+                      # TODO: we should return DataFrame
+                      ) -> List[pd.Series]:
     carbon_oxygen_white_dwarfs = [
         star
-        for star in stars
-        if star.mass < max_carbon_oxygen_core_wd_mass]
-    oxygen_neon_white_dwarfs = [star
-                                for star in stars
-                                if star.mass >= max_carbon_oxygen_core_wd_mass]
+        for _, star in stars.iterrows()
+        if star['mass'] < max_carbon_oxygen_core_wd_mass]
+    oxygen_neon_white_dwarfs = [
+        star
+        for _, star in stars.iterrows()
+        if star['mass'] >= max_carbon_oxygen_core_wd_mass]
 
     for star in carbon_oxygen_white_dwarfs:
         if get_spectral_type(db_to_da_fraction) == SpectralType.DA:
-            star.spectral_type = SpectralType.DA
+            star['spectral_type'] = SpectralType.DA
             (luminosity,
              effective_temperature,
              u_ubvri_absolute,
@@ -48,7 +51,7 @@ def assign_magnitudes(*,
                 # TODO. can they be taken from cool.seq. keys?
                 metallicities=[0.001, 0.01, 0.03, 0.06])
         else:
-            star.spectral_type = SpectralType.DB
+            star['spectral_type'] = SpectralType.DB
             (luminosity,
              effective_temperature,
              u_ubvri_absolute,
@@ -61,16 +64,16 @@ def assign_magnitudes(*,
                 color_table=db_color_table,
                 metallicities=[0.001, 0.01, 0.06])
 
-        star.luminosity = -luminosity
-        star.effective_temperature = effective_temperature
-        star.u_ubvri_absolute = u_ubvri_absolute
-        star.b_ubvri_absolute = b_ubvri_absolute
-        star.v_ubvri_absolute = v_ubvri_absolute
-        star.r_ubvri_absolute = r_ubvri_absolute
-        star.i_ubvri_absolute = i_ubvri_absolute
+        star['luminosity'] = -luminosity
+        star['effective_temperature'] = effective_temperature
+        star['u_ubvri_absolute'] = u_ubvri_absolute
+        star['b_ubvri_absolute'] = b_ubvri_absolute
+        star['v_ubvri_absolute'] = v_ubvri_absolute
+        star['r_ubvri_absolute'] = r_ubvri_absolute
+        star['i_ubvri_absolute'] = i_ubvri_absolute
 
     for star in oxygen_neon_white_dwarfs:
-        star.spectral_type = SpectralType.ONe
+        star['spectral_type'] = SpectralType.ONe
         (luminosity,
          effective_temperature,
          u_ubvri_absolute,
@@ -80,13 +83,13 @@ def assign_magnitudes(*,
          i_ubvri_absolute) = one_interpolation(star=star,
                                                color_table=one_color_table)
 
-        star.luminosity = -luminosity
-        star.effective_temperature = effective_temperature
-        star.u_ubvri_absolute = u_ubvri_absolute
-        star.b_ubvri_absolute = b_ubvri_absolute
-        star.v_ubvri_absolute = v_ubvri_absolute
-        star.r_ubvri_absolute = r_ubvri_absolute
-        star.i_ubvri_absolute = i_ubvri_absolute
+        star['luminosity'] = -luminosity
+        star['effective_temperature'] = effective_temperature
+        star['u_ubvri_absolute'] = u_ubvri_absolute
+        star['b_ubvri_absolute'] = b_ubvri_absolute
+        star['v_ubvri_absolute'] = v_ubvri_absolute
+        star['r_ubvri_absolute'] = r_ubvri_absolute
+        star['i_ubvri_absolute'] = i_ubvri_absolute
 
     return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
 
