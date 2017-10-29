@@ -718,7 +718,7 @@ def get_extrapolated_magnitudes_by_luminosity(
             i_ubvri_absolute)
 
 
-def get_interpolated_magnitude(star: Star,
+def get_interpolated_magnitude(star: pd.Series,
                                table_magnitude: np.ndarray,
                                table_mass: np.ndarray,
                                row_index_1: int,
@@ -736,7 +736,7 @@ def get_interpolated_magnitude(star: Star,
            + (table_magnitude[mass_index + 1, row_index_2 + 1]
               - table_magnitude[mass_index + 1, row_index_2]) * a2
            / b2)
-    return extrapolate(luminosity_or_mass=star.mass,
+    return extrapolate(luminosity_or_mass=star['mass'],
                        interest_value_1=c_1,
                        interest_value_2=c_2,
                        table_luminosity_or_mass_1=table_mass[0],
