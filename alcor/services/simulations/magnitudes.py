@@ -570,17 +570,13 @@ def get_interpolated_magnitudes_by_luminosity(
         mass_index: int) -> Tuple[float, ...]:
     luminosity_grid = color_table['luminosity']
 
-    for row_index in range(rows_count_1 - 1):
-        if (luminosity_grid[mass_index, row_index + 1] <= luminosity
-                <= luminosity_grid[mass_index, row_index]):
-            row_index_1 = row_index
-            break
-
-    for row_index in range(rows_count_2 - 1):
-        if (luminosity_grid[mass_index + 1, row_index + 1] <= luminosity
-                <= luminosity_grid[mass_index + 1, row_index]):
-            row_index_2 = row_index
-            break
+    find_row_index = partial(find_index,
+                             luminosity=luminosity,
+                             luminosity_grid=luminosity_grid)
+    row_index_1 = find_row_index(rows_count=rows_count_1,
+                                 mass_index=mass_index)
+    row_index_2 = find_row_index(rows_count=rows_count_2,
+                                 mass_index=mass_index + 1)
 
     get_magnitude = partial(get_interpolated_magnitude,
                             star_mass=star_mass,
@@ -598,7 +594,20 @@ def get_interpolated_magnitudes_by_luminosity(
             get_magnitude(table_magnitude=color_table['i_ubvri_absolute']))
 
 
+def find_index(*,
+               rows_count: int,
+               luminosity: float,
+               luminosity_grid: np.ndarray,
+               mass_index: int) -> int:
+    for row_index in range(rows_count - 1):
+        if (luminosity_grid[mass_index, row_index + 1]
+                <= luminosity
+                <= luminosity_grid[mass_index, row_index]):
+            return row_index
+
+
 def get_extrapolated_magnitudes_by_luminosity(
+        *,
         star_mass: float,
         luminosity: float,
         color_table: Dict[str, np.ndarray],
