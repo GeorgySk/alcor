@@ -498,20 +498,20 @@ def get_extrapolated_xm(star: Star,
     return s * log10(star.cooling_time + pre_wd_lifetime[mass_index]) + b
 
 
-def interpolate_magnitudes(star: Star,
+def interpolate_magnitudes(star: pd.Series,
                            color_table: Dict[str, np.ndarray],
                            luminosity: float) -> Tuple[float, ...]:
-    if star.mass <= color_table['mass'][0]:
+    if star['mass'] <= color_table['mass'][0]:
         rows_count_1 = color_table['rows_counts'][0]
         rows_count_2 = color_table['rows_counts'][1]
         min_mass_index = 0
-    elif star.mass > color_table['mass'][-1]:
+    elif star['mass'] > color_table['mass'][-1]:
         rows_count_1 = color_table['rows_counts'][-2]
         rows_count_2 = color_table['rows_counts'][-1]
         min_mass_index = color_table['mass'].size() - 1
     else:
         for mass_index in range(color_table['mass'].size() - 1):
-            if (color_table['mass'][mass_index] < star.mass
+            if (color_table['mass'][mass_index] < star['mass']
                     <= color_table['mass'][mass_index + 1]):
                 rows_count_1 = color_table['rows_counts'][mass_index]
                 rows_count_2 = color_table['rows_counts'][mass_index + 1]
