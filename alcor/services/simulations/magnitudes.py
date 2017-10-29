@@ -532,8 +532,10 @@ def get_magnitudes(*,
                    rows_count_1: int,
                    rows_count_2: int,
                    min_mass_index: int) -> Tuple[float, ...]:
-    if (luminosity > color_table['luminosity'][min_mass_index, 0]
-            or luminosity > color_table['luminosity'][min_mass_index + 1, 0]):
+    luminosity_grid = color_table['luminosity']
+
+    if (luminosity > luminosity_grid[min_mass_index, 0]
+            or luminosity > luminosity_grid[min_mass_index + 1, 0]):
         return get_extrapolated_magnitudes_by_luminosity(
             star_mass=star_mass,
             luminosity=luminosity,
@@ -542,9 +544,8 @@ def get_magnitudes(*,
             row_index_2=0,
             mass_index=min_mass_index)
 
-    if (luminosity < color_table['luminosity'][min_mass_index, rows_count_1]
-        or luminosity < color_table['luminosity'][min_mass_index + 1,
-                                                  rows_count_2]):
+    if (luminosity < luminosity_grid[min_mass_index, rows_count_1]
+            or luminosity < luminosity_grid[min_mass_index + 1, rows_count_2]):
         return get_extrapolated_magnitudes_by_luminosity(
             star_mass=star_mass,
             luminosity=luminosity,
