@@ -659,13 +659,12 @@ def get_interpolated_magnitudes_by_luminosity(
 
 
 def get_extrapolated_magnitudes_by_luminosity(
-        star: Star,
+        star: pd.Series,
         luminosity: float,
         color_table: Dict[str, np.ndarray],
         row_index_1: int,
         row_index_2: int,
-        mass_index: int
-        ) -> Tuple[float, ...]:
+        mass_index: int) -> Tuple[float, ...]:
     u_ubvri_absolute = get_abs_magnitude(
         star=star,
         luminosity=luminosity,
