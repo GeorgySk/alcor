@@ -307,7 +307,7 @@ def extrapolate_by_mass(star: pd.Series,
     return s * star['mass'] + t
 
 
-def interpolate_by_mass(star: Star,
+def interpolate_by_mass(star: pd.Series,
                         mass: np.ndarray,
                         cooling_time: np.ndarray,
                         pre_wd_lifetime: np.ndarray,
@@ -316,12 +316,12 @@ def interpolate_by_mass(star: Star,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
     for row_index in range(mass.size() - 1):
-        if mass[row_index] <= star.mass < mass[row_index + 1]:
+        if mass[row_index] <= star['mass'] < mass[row_index + 1]:
             min_mass_index = row_index
             max_mass_index = row_index + 1
             break
 
-    if star.cooling_time < cooling_time[min_mass_index, 0]:
+    if star['cooling_time'] < cooling_time[min_mass_index, 0]:
         x1 = get_extrapolated_xm(
             star=star,
             cooling_time=cooling_time,
@@ -333,8 +333,8 @@ def interpolate_by_mass(star: Star,
             one_model=one_model)
         case_1 = 1
     else:
-        if star.cooling_time >= cooling_time[min_mass_index,
-                                             rows_counts[min_mass_index]]:
+        if star['cooling_time'] >= cooling_time[min_mass_index,
+                                                rows_counts[min_mass_index]]:
             rows_count = rows_counts[min_mass_index]
             x1 = get_extrapolated_xm(
                 star=star,
@@ -349,7 +349,7 @@ def interpolate_by_mass(star: Star,
         else:
             for row_index in range(rows_counts[min_mass_index] - 1):
                 if (cooling_time[min_mass_index, row_index]
-                        <= star.cooling_time
+                        <= star['cooling_time']
                         <= cooling_time[min_mass_index, row_index + 1]):
                     y1 = cooling_time[min_mass_index, row_index]
                     y2 = cooling_time[min_mass_index, row_index + 1]
@@ -357,7 +357,7 @@ def interpolate_by_mass(star: Star,
                     x2 = interest_sequence[min_mass_index, row_index + 1]
                     case_1 = 0
 
-    if star.cooling_time < cooling_time[max_mass_index, 0]:
+    if star['cooling_time'] < cooling_time[max_mass_index, 0]:
         x3 = get_extrapolated_xm(
             star=star,
             cooling_time=cooling_time,
@@ -369,8 +369,8 @@ def interpolate_by_mass(star: Star,
             one_model=one_model)
         case_2 = 1
     else:
-        if star.cooling_time >= cooling_time[max_mass_index,
-                                             rows_counts[max_mass_index]]:
+        if star['cooling_time'] >= cooling_time[max_mass_index,
+                                                rows_counts[max_mass_index]]:
             rows_count = rows_counts[max_mass_index]
             x3 = get_extrapolated_xm(
                 star=star,
@@ -385,7 +385,7 @@ def interpolate_by_mass(star: Star,
         else:
             for row_index in range(rows_counts[max_mass_index] - 1):
                 if (cooling_time[max_mass_index, row_index]
-                        <= star.cooling_time
+                        <= star['cooling_time']
                         <= cooling_time[max_mass_index, row_index + 1]):
                     y3 = cooling_time[max_mass_index, row_index]
                     y4 = cooling_time[max_mass_index, row_index + 1]
@@ -395,21 +395,21 @@ def interpolate_by_mass(star: Star,
 
     min_mass = mass[min_mass_index]
     max_mass = mass[max_mass_index]
-    den = (star.mass - min_mass) / (max_mass - min_mass)
+    den = (star['mass'] - min_mass) / (max_mass - min_mass)
 
     if case_1 == 0 and case_2 == 0:
         ym1 = y1 + (y3 - y1) * den
         ym2 = y2 + (y4 - y2) * den
         xm1 = x1 + (x3 - x1) * den
         xm2 = x2 + (x4 - x2) * den
-        return xm1 + (star.cooling_time - ym1) / (ym2 - ym1) * (xm2 - xm1)
+        return xm1 + (star['cooling_time'] - ym1) / (ym2 - ym1) * (xm2 - xm1)
 
     if case_1 == 0 and case_2 == 1:
-        xm1 = x1 + (x2 - x1) * (star.cooling_time - y1) / (y2 - y1)
+        xm1 = x1 + (x2 - x1) * (star['cooling_time'] - y1) / (y2 - y1)
         return xm1 + (x3 - xm1) * den
 
     if case_1 == 1 and case_2 == 0:
-        xm2 = x3 + (x4 - x3) * (star.cooling_time - y3) / (y4 - y3)
+        xm2 = x3 + (x4 - x3) * (star['cooling_time'] - y3) / (y4 - y3)
         return x1 + (xm2 - x1) * den
 
     return x1 + (x3 - x1) * den
