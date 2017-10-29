@@ -99,48 +99,26 @@ def get_spectral_type(db_to_da_fraction: float) -> enum.Enum:
     return SpectralType.DA
 
 
-def one_interpolation(star: pd.Series,
+def one_interpolation(*,
+                      star: pd.Series,
                       color_table: Dict[str, np.ndarray],
                       one_model: bool = True,
                       by_logarithm: bool = False) -> Tuple[float, ...]:
     star['cooling_time'] = log10(star['cooling_time']) + 9.
 
-    luminosity = interpolate(star=star,
-                             cooling_or_color_sequence=color_table,
-                             interest_sequence='luminosity',
-                             by_logarithm=by_logarithm,
-                             one_model=one_model)
-    v_ubvri_absolute = interpolate(star=star,
-                                   cooling_or_color_sequence=color_table,
-                                   interest_sequence='v_ubvri_absolute',
-                                   by_logarithm=by_logarithm,
-                                   one_model=one_model)
-    bv_ubvri = interpolate(star=star,
-                           cooling_or_color_sequence=color_table,
-                           interest_sequence='bv_ubvri',
-                           by_logarithm=by_logarithm,
-                           one_model=one_model)
-    vi_ubvri = interpolate(star=star,
-                           cooling_or_color_sequence=color_table,
-                           interest_sequence='vi_ubvri',
-                           by_logarithm=by_logarithm,
-                           one_model=one_model)
-    vr_ubvri = interpolate(star=star,
-                           cooling_or_color_sequence=color_table,
-                           interest_sequence='vr_ubvri',
-                           by_logarithm=by_logarithm,
-                           one_model=one_model)
-    uv_ubvri = interpolate(star=star,
-                           cooling_or_color_sequence=color_table,
-                           interest_sequence='uv_ubvri',
-                           by_logarithm=by_logarithm,
-                           one_model=one_model)
-    log_effective_temperature = interpolate(
-        star=star,
-        cooling_or_color_sequence=color_table,
-        interest_sequence='log_effective_temperature',
-        by_logarithm=by_logarithm,
-        one_model=one_model)
+    do_interpolation = partial(interpolate,
+                               star=star,
+                               cooling_or_color_sequence=color_table,
+                               by_logarithm=by_logarithm,
+                               one_model=one_model)
+    luminosity = do_interpolation(interest_sequence='luminosity')
+    v_ubvri_absolute = do_interpolation(interest_sequence='v_ubvri_absolute')
+    bv_ubvri = do_interpolation(interest_sequence='bv_ubvri')
+    vi_ubvri = do_interpolation(interest_sequence='vi_ubvri')
+    vr_ubvri = do_interpolation(interest_sequence='vr_ubvri')
+    uv_ubvri = do_interpolation(interest_sequence='uv_ubvri')
+    log_effective_temperature = do_interpolation(
+            interest_sequence='log_effective_temperature')
 
     effective_temperature = 10. ** log_effective_temperature
 
