@@ -194,7 +194,7 @@ def da_db_interpolation(star: pd.Series,
      b_ubvri_absolute,
      v_ubvri_absolute,
      r_ubvri_absolute,
-     i_ubvri_absolute) = interpolate_magnitudes(star=star,
+     i_ubvri_absolute) = interpolate_magnitudes(star_mass=star,
                                                 color_table=color_table,
                                                 luminosity=luminosity)
 
@@ -497,27 +497,28 @@ def get_extrapolated_xm(star: pd.Series,
     return s * log10(star['cooling_time'] + pre_wd_lifetime[mass_index]) + b
 
 
-def interpolate_magnitudes(star: pd.Series,
+def interpolate_magnitudes(*,
+                           star_mass: float,
                            color_table: Dict[str, np.ndarray],
                            luminosity: float) -> Tuple[float, ...]:
-    if star['mass'] <= color_table['mass'][0]:
+    if star_mass <= color_table['mass'][0]:
         rows_count_1 = color_table['rows_counts'][0]
         rows_count_2 = color_table['rows_counts'][1]
         min_mass_index = 0
-    elif star['mass'] > color_table['mass'][-1]:
+    elif star_mass > color_table['mass'][-1]:
         rows_count_1 = color_table['rows_counts'][-2]
         rows_count_2 = color_table['rows_counts'][-1]
         min_mass_index = color_table['mass'].size() - 1
     else:
         for mass_index in range(color_table['mass'].size() - 1):
-            if (color_table['mass'][mass_index] < star['mass']
+            if (color_table['mass'][mass_index] < star_mass
                     <= color_table['mass'][mass_index + 1]):
                 rows_count_1 = color_table['rows_counts'][mass_index]
                 rows_count_2 = color_table['rows_counts'][mass_index + 1]
                 min_mass_index = mass_index
                 break
 
-    return get_magnitudes(star_mass=star['mass'],
+    return get_magnitudes(star_mass=star_mass,
                           luminosity=luminosity,
                           color_table=color_table,
                           rows_count_1=rows_count_1,
