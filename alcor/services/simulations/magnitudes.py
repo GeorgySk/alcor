@@ -595,7 +595,7 @@ def get_interpolated_magnitudes_by_luminosity(
         b2 = (color_table['luminosity'][mass_index + 1, row_index_2 + 1]
               - color_table['luminosity'][mass_index + 1, row_index_2])
         u_ubvri_absolute = get_interpolated_magnitude(
-            star=star,
+            star_mass=star['mass'],
             table_magnitude=color_table['u_ubvri_absolute'],
             table_mass=color_table['mass'],
             row_index_1=row_index_1,
@@ -606,7 +606,7 @@ def get_interpolated_magnitudes_by_luminosity(
             b1=b1,
             b2=b2)
         b_ubvri_absolute = get_interpolated_magnitude(
-            star=star,
+            star_mass=star['mass'],
             table_magnitude=color_table['b_ubvri_absolute'],
             table_mass=color_table['mass'],
             row_index_1=row_index_1,
@@ -617,7 +617,7 @@ def get_interpolated_magnitudes_by_luminosity(
             b1=b1,
             b2=b2)
         v_ubvri_absolute = get_interpolated_magnitude(
-            star=star,
+            star_mass=star['mass'],
             table_magnitude=color_table['v_ubvri_absolute'],
             table_mass=color_table['mass'],
             row_index_1=row_index_1,
@@ -628,7 +628,7 @@ def get_interpolated_magnitudes_by_luminosity(
             b1=b1,
             b2=b2)
         r_ubvri_absolute = get_interpolated_magnitude(
-            star=star,
+            star_mass=star['mass'],
             table_magnitude=color_table['r_ubvri_absolute'],
             table_mass=color_table['mass'],
             row_index_1=row_index_1,
@@ -639,7 +639,7 @@ def get_interpolated_magnitudes_by_luminosity(
             b1=b1,
             b2=b2)
         i_ubvri_absolute = get_interpolated_magnitude(
-            star=star,
+            star_mass=star['mass'],
             table_magnitude=color_table['i_ubvri_absolute'],
             table_mass=color_table['mass'],
             row_index_1=row_index_1,
@@ -717,7 +717,8 @@ def get_extrapolated_magnitudes_by_luminosity(
             i_ubvri_absolute)
 
 
-def get_interpolated_magnitude(star: pd.Series,
+def get_interpolated_magnitude(*,
+                               star_mass: float,
                                table_magnitude: np.ndarray,
                                table_mass: np.ndarray,
                                row_index_1: int,
@@ -739,7 +740,7 @@ def get_interpolated_magnitude(star: pd.Series,
     extrapolation_spline = linear_extrapolation(
             x=(table_mass[0], table_mass[1]),
             y=(c_1, c_2))
-    return extrapolation_spline(star['mass'])
+    return extrapolation_spline(star_mass)
 
 
 def get_abs_magnitude(*,
