@@ -18,6 +18,7 @@ services:
       - ./settings.yml:/alcor/settings.yml
       - ./requirements.txt:/alcor/requirements.txt
       - ./manage.py:/alcor/manage.py
+      - ./docker-entrypoint.sh:/alcor/docker-entrypoint.sh
     extra_hosts:
       dockerhost: $DOCKERHOST  # for debugging
     command:
