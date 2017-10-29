@@ -237,37 +237,45 @@ def get_luminosity_effective_temperature_limits(
             min_effective_temperature, max_effective_temperature)
 
 
-def interpolate(star: pd.Series,
+def interpolate(*,
+                star: pd.Series,
                 cooling_or_color_sequence: Dict[str, np.ndarray],
                 interest_sequence: str,
                 by_logarithm: bool,
                 one_model: bool = False) -> float:
     grid_masses = cooling_or_color_sequence['mass']
+    grid_cooling_times = cooling_or_color_sequence['cooling_time']
+    grid_pre_wd_lifetimes = cooling_or_color_sequence['pre_wd_lifetime']
+    rows_counts = cooling_or_color_sequence['rows_counts']
+    grid_interest_sequence = cooling_or_color_sequence[interest_sequence]
+
     extrapolate_by_mass_partial = partial(
             extrapolate_by_mass,
             star=star,
             mass=grid_masses,
-            cooling_time=cooling_or_color_sequence['cooling_time'],
-            pre_wd_lifetime=cooling_or_color_sequence['pre_wd_lifetime'],
-            interest_sequence=cooling_or_color_sequence[interest_sequence],
-            rows_counts=cooling_or_color_sequence['rows_counts'],
+            cooling_time=grid_cooling_times,
+            pre_wd_lifetime=grid_pre_wd_lifetimes,
+            interest_sequence=grid_interest_sequence,
+            rows_counts=rows_counts,
             by_logarithm=by_logarithm,
             one_model=one_model)
 
-    if star['mass'] < grid_masses[0]:
+    star_mass = star['mass']
+
+    if star_mass < grid_masses[0]:
         return extrapolate_by_mass_partial(min_mass_index=0)
 
-    if star['mass'] >= grid_masses[-1]:
+    if star_mass >= grid_masses[-1]:
         return extrapolate_by_mass_partial(
                 min_mass_index=grid_masses.size() - 1)
 
     return interpolate_by_mass(
         star=star,
         mass=grid_masses,
-        cooling_time=cooling_or_color_sequence['cooling_time'],
-        pre_wd_lifetime=cooling_or_color_sequence['pre_wd_lifetime'],
-        interest_sequence=cooling_or_color_sequence[interest_sequence],
-        rows_counts=cooling_or_color_sequence['rows_counts'],
+        cooling_time=grid_cooling_times,
+        pre_wd_lifetime=grid_pre_wd_lifetimes,
+        interest_sequence=grid_interest_sequence,
+        rows_counts=rows_counts,
         by_logarithm=by_logarithm,
         one_model=one_model)
 
