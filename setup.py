@@ -38,6 +38,7 @@ setup(name=PROJECT_NAME,
           'pandas>=0.20.3',  # data analysis
           'numpy>=1.11.3',  # multidimensional arrays computations
           'matplotlib>=2.0.2',  # plotting
+          'scipy>=1.0.0',  # numerical routines
           'h5py>=2.7.1',  # hdf5 files support
       ],
       setup_requires=['pytest-runner>=2.11.1'],

@@ -7,11 +7,15 @@ from typing import (Dict,
 
 import numpy as np
 import pandas as pd
+from scipy.interpolate import InterpolatedUnivariateSpline
 
 from alcor.models.star import SpectralType
 
 GRAVITATIONAL_CONST_CM_S_KG = 6.67e-5
 SOLAR_MASS_KG = 1.989e30
+
+linear_extrapolation = partial(InterpolatedUnivariateSpline,
+                               k=1)
 
 
 def assign_magnitudes(stars: pd.DataFrame,
@@ -731,11 +735,11 @@ def get_interpolated_magnitude(star: pd.Series,
            + (table_magnitude[mass_index + 1, row_index_2 + 1]
               - table_magnitude[mass_index + 1, row_index_2]) * a2
            / b2)
-    return extrapolate(luminosity_or_mass=star['mass'],
-                       interest_value_1=c_1,
-                       interest_value_2=c_2,
-                       table_luminosity_or_mass_1=table_mass[0],
-                       table_luminosity_or_mass_2=table_mass[1])
+
+    extrapolation_spline = linear_extrapolation(
+            x=(table_mass[0], table_mass[1]),
+            y=(c_1, c_2))
+    return extrapolation_spline(star['mass'])
 
 
 def get_abs_magnitude(star: pd.Series,
@@ -746,41 +750,23 @@ def get_abs_magnitude(star: pd.Series,
                       row_index_1: int,
                       row_index_2: int,
                       mass_index: int) -> float:
-    c_1 = extrapolate(
-        luminosity_or_mass=luminosity,
-        interest_value_1=table_absolute_magnitude[mass_index, row_index_1],
-        interest_value_2=table_absolute_magnitude[mass_index, row_index_1 + 1],
-        table_luminosity_or_mass_1=table_luminosity[mass_index, row_index_1],
-        table_luminosity_or_mass_2=table_luminosity[mass_index,
-                                                    row_index_1 + 1])
-    c_2 = extrapolate(
-        luminosity_or_mass=luminosity,
-        interest_value_1=table_absolute_magnitude[mass_index + 1,
-                                                  row_index_2],
-        interest_value_2=table_absolute_magnitude[mass_index + 1,
-                                                  row_index_2 + 1],
-        table_luminosity_or_mass_1=table_luminosity[mass_index + 1,
-                                                    row_index_2],
-        table_luminosity_or_mass_2=table_luminosity[mass_index + 1,
-                                                    row_index_2 + 1])
-    abs_magnitude = extrapolate(
-        luminosity_or_mass=star['mass'],
-        interest_value_1=c_1,
-        interest_value_2=c_2,
-        table_luminosity_or_mass_1=table_mass[mass_index],
-        table_luminosity_or_mass_2=table_mass[mass_index + 1])
-    if abs_magnitude < 0.:
-        abs_magnitude = 0.
+    c_1_extrapolation_spline = linear_extrapolation(
+            x=(table_luminosity[mass_index, row_index_1],
+               table_luminosity[mass_index, row_index_1 + 1]),
+            y=(table_absolute_magnitude[mass_index, row_index_1],
+               table_absolute_magnitude[mass_index, row_index_1 + 1]))
+    c_1 = c_1_extrapolation_spline(luminosity)
 
-    return abs_magnitude
+    c_2_extrapolation_spline = linear_extrapolation(
+            x=(table_luminosity[mass_index + 1, row_index_2],
+               table_luminosity[mass_index + 1, row_index_2 + 1]),
+            y=(table_absolute_magnitude[mass_index + 1, row_index_2],
+               table_absolute_magnitude[mass_index + 1, row_index_2 + 1]))
+    c_2 = c_2_extrapolation_spline(luminosity)
 
+    abs_magnitude_extrapolation_spline = linear_extrapolation(
+            x=(table_mass[mass_index], table_mass[mass_index + 1]),
+            y=(c_1, c_2))
+    abs_magnitude = abs_magnitude_extrapolation_spline(star['mass'])
 
-def extrapolate(luminosity_or_mass: float,
-                interest_value_1: float,
-                interest_value_2: float,
-                table_luminosity_or_mass_1: float,
-                table_luminosity_or_mass_2: float) -> float:
-    s = (interest_value_2 - interest_value_1) / (table_luminosity_or_mass_2
-                                                 - table_luminosity_or_mass_1)
-    b = interest_value_1 - s * table_luminosity_or_mass_1
-    return s * luminosity_or_mass + b
+    return max(0, abs_magnitude)
