@@ -209,7 +209,7 @@ def da_db_interpolation(star: pd.Series,
 
 
 def get_luminosity_effective_temperature_limits(
-        star: Star,
+        star: pd.Series,
         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
         min_metallicity_by_thousand: int,
         max_metallicity_by_thousand: int) -> Tuple[float, ...]:
