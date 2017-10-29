@@ -526,13 +526,12 @@ def interpolate_magnitudes(star: pd.Series,
                           min_mass_index=min_mass_index)
 
 
-def get_magnitudes(star: Star,
+def get_magnitudes(star: pd.Series,
                    luminosity: float,
                    color_table: Dict[str, np.ndarray],
                    rows_count_1: int,
                    rows_count_2: int,
-                   min_mass_index: int
-                   ) -> Tuple[float, ...]:
+                   min_mass_index: int) -> Tuple[float, ...]:
     if (luminosity > color_table['luminosity'][min_mass_index, 0]
             or luminosity > color_table['luminosity'][min_mass_index + 1, 0]):
         return get_extrapolated_magnitudes_by_luminosity(
