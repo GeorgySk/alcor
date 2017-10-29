@@ -563,7 +563,7 @@ def get_magnitudes(star: pd.Series,
 
 
 def get_interpolated_magnitudes_by_luminosity(
-        star: Star,
+        star: pd.Series,
         rows_count_1: int,
         rows_count_2: int,
         color_table: Dict[str, np.ndarray],
