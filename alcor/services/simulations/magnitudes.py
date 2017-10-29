@@ -322,7 +322,7 @@ def interpolate_by_mass(star: pd.Series,
 
     if star['cooling_time'] < cooling_time[min_mass_index, 0]:
         x1 = get_extrapolated_xm(
-            star=star,
+            star_cooling_time=star,
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
@@ -336,7 +336,7 @@ def interpolate_by_mass(star: pd.Series,
                                                 rows_counts[min_mass_index]]:
             rows_count = rows_counts[min_mass_index]
             x1 = get_extrapolated_xm(
-                star=star,
+                star_cooling_time=star,
                 cooling_time=cooling_time,
                 pre_wd_lifetime=pre_wd_lifetime,
                 interest_sequence=interest_sequence,
@@ -358,7 +358,7 @@ def interpolate_by_mass(star: pd.Series,
 
     if star['cooling_time'] < cooling_time[max_mass_index, 0]:
         x3 = get_extrapolated_xm(
-            star=star,
+            star_cooling_time=star,
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
@@ -372,7 +372,7 @@ def interpolate_by_mass(star: pd.Series,
                                                 rows_counts[max_mass_index]]:
             rows_count = rows_counts[max_mass_index]
             x3 = get_extrapolated_xm(
-                star=star,
+                star_cooling_time=star,
                 cooling_time=cooling_time,
                 pre_wd_lifetime=pre_wd_lifetime,
                 interest_sequence=interest_sequence,
@@ -424,7 +424,7 @@ def get_xm(star: pd.Series,
            one_model: bool = False) -> float:
     if star['cooling_time'] < cooling_time[mass_index, 0]:
         return get_extrapolated_xm(
-            star=star,
+            star_cooling_time=star,
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
@@ -437,7 +437,7 @@ def get_xm(star: pd.Series,
 
     if star['cooling_time'] > cooling_time[mass_index, rows_count]:
         return get_extrapolated_xm(
-            star=star,
+            star_cooling_time=star,
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
@@ -458,7 +458,8 @@ def get_xm(star: pd.Series,
             return x1 + deltf * (x2 - x1)
 
 
-def get_extrapolated_xm(star: pd.Series,
+def get_extrapolated_xm(*,
+                        star_cooling_time: float,
                         cooling_time: np.ndarray,
                         pre_wd_lifetime: np.ndarray,
                         interest_sequence: np.ndarray,
@@ -467,34 +468,30 @@ def get_extrapolated_xm(star: pd.Series,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
     if one_model:
-        deltf = (cooling_time[mass_index, min_row_index + 1]
-                 - cooling_time[mass_index, min_row_index])
-        s = ((interest_sequence[mass_index, min_row_index + 1]
-              - interest_sequence[mass_index, min_row_index]) / deltf)
-        b = (interest_sequence[mass_index, min_row_index + 1]
-             - s * cooling_time[mass_index, min_row_index + 1])
-        return s * star['cooling_time'] + b
+        spline = linear_estimation(
+                x=(cooling_time[mass_index, min_row_index],
+                   cooling_time[mass_index, min_row_index + 1]),
+                y=(interest_sequence[mass_index, min_row_index],
+                   interest_sequence[mass_index, min_row_index + 1]))
+        return spline(star_cooling_time)
 
-    deltf = log10((cooling_time[mass_index, min_row_index + 1]
-                   + pre_wd_lifetime[mass_index])
-                  / (cooling_time[mass_index, min_row_index]
-                     + pre_wd_lifetime[mass_index]))
+    x0 = log10(cooling_time[mass_index, min_row_index]
+               + pre_wd_lifetime[mass_index])
+    x1 = log10(cooling_time[mass_index, min_row_index + 1]
+               + pre_wd_lifetime[mass_index])
 
     if by_logarithm:
-        s = log10(interest_sequence[mass_index, min_row_index + 1]
-                  / interest_sequence[mass_index, min_row_index]) / deltf
-        b = (log10(interest_sequence[mass_index, min_row_index + 1])
-             - s * log10(cooling_time[mass_index, min_row_index + 1]
-                         + pre_wd_lifetime[mass_index]))
-        return 10.0 ** (s * log10(star['cooling_time']
-                                  + pre_wd_lifetime[mass_index]) + b)
+        y0 = log10(interest_sequence[mass_index, min_row_index])
+        y1 = log10(interest_sequence[mass_index, min_row_index + 1])
+        spline = linear_estimation(x=(x0, x1),
+                                   y=(y0, y1))
+        return 10.0 ** spline(star_cooling_time)
 
-    s = ((interest_sequence[mass_index, min_row_index + 1]
-          - interest_sequence[mass_index, min_row_index]) / deltf)
-    b = (interest_sequence[mass_index, min_row_index + 1]
-         - s * log10(cooling_time[mass_index, min_row_index + 1]
-                     + pre_wd_lifetime[mass_index]))
-    return s * log10(star['cooling_time'] + pre_wd_lifetime[mass_index]) + b
+    spline = linear_estimation(
+            x=(x0, x1),
+            y=(interest_sequence[mass_index, min_row_index],
+               interest_sequence[mass_index, min_row_index + 1]))
+    return spline(star_cooling_time)
 
 
 def interpolate_magnitudes(*,
