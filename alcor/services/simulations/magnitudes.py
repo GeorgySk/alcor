@@ -568,23 +568,24 @@ def get_interpolated_magnitudes_by_luminosity(
         color_table: Dict[str, np.ndarray],
         luminosity: float,
         mass_index: int) -> Tuple[float, ...]:
+    luminosity_grid = color_table['luminosity']
+
     for row_index in range(rows_count_1 - 1):
-        if (color_table['luminosity'][mass_index, row_index + 1] <= luminosity
-                <= color_table['luminosity'][mass_index, row_index]):
+        if (luminosity_grid[mass_index, row_index + 1] <= luminosity
+                <= luminosity_grid[mass_index, row_index]):
             row_index_1 = row_index
             break
 
     for row_index in range(rows_count_2 - 1):
-        if (color_table['luminosity'][mass_index + 1, row_index + 1]
-                <= luminosity
-                <= color_table['luminosity'][mass_index + 1, row_index]):
+        if (luminosity_grid[mass_index + 1, row_index + 1] <= luminosity
+                <= luminosity_grid[mass_index + 1, row_index]):
             row_index_2 = row_index
             break
 
     get_magnitude = partial(get_interpolated_magnitude,
                             star_mass=star_mass,
                             star_luminosity=luminosity,
-                            table_luminosity=color_table['luminosity'],
+                            table_luminosity=luminosity_grid,
                             table_mass=color_table['mass'],
                             row_index_1=row_index_1,
                             row_index_2=row_index_2,
