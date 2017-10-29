@@ -9,6 +9,8 @@ RUN apt-get update && \
 WORKDIR /alcor
 
 ARG FORTRAN_COMPILER_OPTIONS
+ENV FORTRAN_COMPILER_OPTIONS ${FORTRAN_COMPILER_OPTIONS}
+
 COPY ./test_project test_project
 RUN cd test_project && \
     # unzipping seed files
@@ -27,4 +29,6 @@ RUN python3 -m pip install .
 
 COPY ./manage.py manage.py
 
-ENTRYPOINT ["python3", "manage.py"]
+COPY ./docker-entrypoint.sh docker-entrypoint.sh
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
