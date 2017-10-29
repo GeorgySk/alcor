@@ -100,12 +100,11 @@ def get_spectral_type(db_to_da_fraction: float) -> enum.Enum:
     return SpectralType.DA
 
 
-def one_interpolation(star: Star,
+def one_interpolation(star: pd.Series,
                       color_table: Dict[str, np.ndarray],
                       one_model: bool = True,
-                      by_logarithm: bool = False
-                      ) -> Tuple[float, ...]:
-    star.cooling_time = log10(star.cooling_time) + 9.
+                      by_logarithm: bool = False) -> Tuple[float, ...]:
+    star['cooling_time'] = log10(star['cooling_time']) + 9.
 
     luminosity = interpolate(star=star,
                              cooling_or_color_sequence=color_table,
