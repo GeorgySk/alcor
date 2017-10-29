@@ -415,7 +415,7 @@ def interpolate_by_mass(star: pd.Series,
     return x1 + (x3 - x1) * den
 
 
-def get_xm(star: Star,
+def get_xm(star: pd.Series,
            cooling_time: np.ndarray,
            pre_wd_lifetime: np.ndarray,
            interest_sequence: np.ndarray,
@@ -423,7 +423,7 @@ def get_xm(star: Star,
            mass_index: int,
            by_logarithm: bool,
            one_model: bool = False) -> float:
-    if star.cooling_time < cooling_time[mass_index, 0]:
+    if star['cooling_time'] < cooling_time[mass_index, 0]:
         return get_extrapolated_xm(
             star=star,
             cooling_time=cooling_time,
@@ -436,7 +436,7 @@ def get_xm(star: Star,
 
     rows_count = rows_counts[mass_index]
 
-    if star.cooling_time > cooling_time[mass_index, rows_count]:
+    if star['cooling_time'] > cooling_time[mass_index, rows_count]:
         return get_extrapolated_xm(
             star=star,
             cooling_time=cooling_time,
@@ -448,13 +448,13 @@ def get_xm(star: Star,
             one_model=one_model)
 
     for row_index in range(rows_count - 1):
-        if (cooling_time[mass_index, row_index] <= star.cooling_time
+        if (cooling_time[mass_index, row_index] <= star['cooling_time']
                 <= cooling_time[mass_index, row_index + 1]):
             y1 = cooling_time[mass_index, row_index]
             y2 = cooling_time[mass_index, row_index + 1]
             x1 = interest_sequence[mass_index, row_index]
             x2 = interest_sequence[mass_index, row_index + 1]
-            deltf = (star.cooling_time - y1) / (y2 - y1)
+            deltf = (star['cooling_time'] - y1) / (y2 - y1)
 
             return x1 + deltf * (x2 - x1)
 
