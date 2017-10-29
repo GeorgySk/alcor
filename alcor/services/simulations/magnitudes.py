@@ -208,33 +208,39 @@ def da_db_interpolation(star: pd.Series,
 
 
 def get_luminosity_effective_temperature_limits(
+        *,
         star: pd.Series,
         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
         min_metallicity_by_thousand: int,
         max_metallicity_by_thousand: int) -> Tuple[float, ...]:
+    min_metallicity_sequences = cooling_sequences[min_metallicity_by_thousand]
+    max_metallicity_sequences = cooling_sequences[max_metallicity_by_thousand]
+
     min_luminosity = interpolate(
-        star,
-        cooling_sequences[min_metallicity_by_thousand],
+        star=star,
+        cooling_or_color_sequence=min_metallicity_sequences,
         interest_sequence='luminosity',
         by_logarithm=False)
     min_effective_temperature = interpolate(
-        star,
-        cooling_sequences[min_metallicity_by_thousand],
+        star=star,
+        cooling_or_color_sequence=min_metallicity_sequences,
         interest_sequence='effective_temperature',
         by_logarithm=True)
     max_luminosity = interpolate(
-        star,
-        cooling_sequences[max_metallicity_by_thousand],
+        star=star,
+        cooling_or_color_sequence=max_metallicity_sequences,
         interest_sequence='luminosity',
         by_logarithm=False)
     max_effective_temperature = interpolate(
-        star,
-        cooling_sequences[max_metallicity_by_thousand],
+        star=star,
+        cooling_or_color_sequence=max_metallicity_sequences,
         interest_sequence='effective_temperature',
         by_logarithm=True)
 
-    return (min_luminosity, max_luminosity,
-            min_effective_temperature, max_effective_temperature)
+    return (min_luminosity,
+            max_luminosity,
+            min_effective_temperature,
+            max_effective_temperature)
 
 
 def interpolate(*,
