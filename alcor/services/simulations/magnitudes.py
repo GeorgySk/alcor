@@ -501,22 +501,20 @@ def interpolate_magnitudes(*,
                            star_mass: float,
                            color_table: Dict[str, np.ndarray],
                            luminosity: float) -> Tuple[float, ...]:
-    if star_mass <= color_table['mass'][0]:
-        rows_count_1 = color_table['rows_counts'][0]
-        rows_count_2 = color_table['rows_counts'][1]
+    grid_masses = color_table['mass']
+    rows_counts = color_table['rows_counts']
+
+    if star_mass <= grid_masses[0]:
         min_mass_index = 0
-    elif star_mass > color_table['mass'][-1]:
-        rows_count_1 = color_table['rows_counts'][-2]
-        rows_count_2 = color_table['rows_counts'][-1]
-        min_mass_index = color_table['mass'].size() - 1
+    elif star_mass > grid_masses[-1]:
+        # Index of element before the last one
+        min_mass_index = -2
     else:
-        for mass_index in range(color_table['mass'].size() - 1):
-            if (color_table['mass'][mass_index] < star_mass
-                    <= color_table['mass'][mass_index + 1]):
-                rows_count_1 = color_table['rows_counts'][mass_index]
-                rows_count_2 = color_table['rows_counts'][mass_index + 1]
-                min_mass_index = mass_index
-                break
+        min_mass_index = find_mass_index(star_mass=star_mass,
+                                         grid_masses=grid_masses)
+
+    rows_count_1 = rows_counts[min_mass_index]
+    rows_count_2 = rows_counts[min_mass_index + 1]
 
     return get_magnitudes(star_mass=star_mass,
                           luminosity=luminosity,
@@ -524,6 +522,16 @@ def interpolate_magnitudes(*,
                           rows_count_1=rows_count_1,
                           rows_count_2=rows_count_2,
                           min_mass_index=min_mass_index)
+
+
+def find_mass_index(*,
+                    star_mass: float,
+                    grid_masses: np.ndarray) -> int:
+    for mass_index in range(grid_masses.size() - 1):
+        if (grid_masses[mass_index]
+                < star_mass
+                <= grid_masses[mass_index + 1]):
+            return mass_index
 
 
 def get_magnitudes(*,
