@@ -272,7 +272,8 @@ def interpolate(star: pd.Series,
         one_model=one_model)
 
 
-def extrapolate_by_mass(star: pd.Series,
+def extrapolate_by_mass(*,
+                        star: pd.Series,
                         min_mass_index: int,
                         mass: np.ndarray,
                         cooling_time: np.ndarray,
@@ -281,29 +282,23 @@ def extrapolate_by_mass(star: pd.Series,
                         rows_counts: np.ndarray,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
+    xm = partial(get_xm,
+                 star_cooling_time=star['cooling_time'],
+                 cooling_time=cooling_time,
+                 pre_wd_lifetime=pre_wd_lifetime,
+                 interest_sequence=interest_sequence,
+                 rows_counts=rows_counts,
+                 by_logarithm=by_logarithm,
+                 one_model=one_model)
+    xm1 = xm(mass_index=min_mass_index)
+    xm2 = xm(mass_index=min_mass_index + 1)
+
     min_mass = mass[min_mass_index]
-    xm1 = get_xm(star_cooling_time=star['cooling_time'],
-                 cooling_time=cooling_time,
-                 pre_wd_lifetime=pre_wd_lifetime,
-                 interest_sequence=interest_sequence,
-                 rows_counts=rows_counts,
-                 mass_index=min_mass_index,
-                 by_logarithm=by_logarithm,
-                 one_model=one_model)
-
     max_mass = mass[min_mass_index + 1]
-    xm2 = get_xm(star_cooling_time=star['cooling_time'],
-                 cooling_time=cooling_time,
-                 pre_wd_lifetime=pre_wd_lifetime,
-                 interest_sequence=interest_sequence,
-                 rows_counts=rows_counts,
-                 mass_index=min_mass_index + 1,
-                 by_logarithm=by_logarithm,
-                 one_model=one_model)
 
-    s = (xm2 - xm1) / (max_mass - min_mass)
-    t = xm2 - s * max_mass
-    return s * star['mass'] + t
+    spline = linear_estimation(x=(min_mass, max_mass),
+                               y=(xm1, xm2))
+    return spline(star['mass'])
 
 
 def get_mass_index(*,
