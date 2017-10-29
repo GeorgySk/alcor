@@ -665,7 +665,7 @@ def get_extrapolated_magnitudes_by_luminosity(
         row_index_2: int,
         mass_index: int) -> Tuple[float, ...]:
     u_ubvri_absolute = get_abs_magnitude(
-        star=star,
+        star_mass=star['mass'],
         luminosity=luminosity,
         table_absolute_magnitude=color_table['u_ubvri_absolute'],
         table_luminosity=color_table['luminosity'],
@@ -674,7 +674,7 @@ def get_extrapolated_magnitudes_by_luminosity(
         row_index_2=row_index_2,
         mass_index=mass_index)
     b_ubvri_absolute = get_abs_magnitude(
-        star=star,
+        star_mass=star['mass'],
         luminosity=luminosity,
         table_absolute_magnitude=color_table['b_ubvri_absolute'],
         table_luminosity=color_table['luminosity'],
@@ -683,7 +683,7 @@ def get_extrapolated_magnitudes_by_luminosity(
         row_index_2=row_index_2,
         mass_index=mass_index)
     v_ubvri_absolute = get_abs_magnitude(
-        star=star,
+        star_mass=star['mass'],
         luminosity=luminosity,
         table_absolute_magnitude=color_table['v_ubvri_absolute'],
         table_luminosity=color_table['luminosity'],
@@ -692,7 +692,7 @@ def get_extrapolated_magnitudes_by_luminosity(
         row_index_2=row_index_2,
         mass_index=mass_index)
     r_ubvri_absolute = get_abs_magnitude(
-        star=star,
+        star_mass=star['mass'],
         luminosity=luminosity,
         table_absolute_magnitude=color_table['r_ubvri_absolute'],
         table_luminosity=color_table['luminosity'],
@@ -701,7 +701,7 @@ def get_extrapolated_magnitudes_by_luminosity(
         row_index_2=row_index_2,
         mass_index=mass_index)
     i_ubvri_absolute = get_abs_magnitude(
-        star=star,
+        star_mass=star['mass'],
         luminosity=luminosity,
         table_absolute_magnitude=color_table['i_ubvri_absolute'],
         table_luminosity=color_table['luminosity'],
@@ -742,7 +742,8 @@ def get_interpolated_magnitude(star: pd.Series,
     return extrapolation_spline(star['mass'])
 
 
-def get_abs_magnitude(star: pd.Series,
+def get_abs_magnitude(*,
+                      star_mass: float,
                       luminosity: float,
                       table_absolute_magnitude: np.ndarray,
                       table_luminosity: np.ndarray,
@@ -767,6 +768,6 @@ def get_abs_magnitude(star: pd.Series,
     abs_magnitude_extrapolation_spline = linear_extrapolation(
             x=(table_mass[mass_index], table_mass[mass_index + 1]),
             y=(c_1, c_2))
-    abs_magnitude = abs_magnitude_extrapolation_spline(star['mass'])
+    abs_magnitude = abs_magnitude_extrapolation_spline(star_mass)
 
     return max(0, abs_magnitude)
