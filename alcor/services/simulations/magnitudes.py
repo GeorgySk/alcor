@@ -534,7 +534,7 @@ def get_magnitudes(star: pd.Series,
     if (luminosity > color_table['luminosity'][min_mass_index, 0]
             or luminosity > color_table['luminosity'][min_mass_index + 1, 0]):
         return get_extrapolated_magnitudes_by_luminosity(
-            star=star,
+            star_mass=star['mass'],
             luminosity=luminosity,
             color_table=color_table,
             row_index_1=0,
@@ -545,7 +545,7 @@ def get_magnitudes(star: pd.Series,
         or luminosity < color_table['luminosity'][min_mass_index + 1,
                                                   rows_count_2]):
         return get_extrapolated_magnitudes_by_luminosity(
-            star=star,
+            star_mass=star['mass'],
             luminosity=luminosity,
             color_table=color_table,
             row_index_1=rows_count_1,
@@ -641,14 +641,14 @@ def get_interpolated_magnitudes_by_luminosity(
 
 
 def get_extrapolated_magnitudes_by_luminosity(
-        star: pd.Series,
+        star_mass: float,
         luminosity: float,
         color_table: Dict[str, np.ndarray],
         row_index_1: int,
         row_index_2: int,
         mass_index: int) -> Tuple[float, ...]:
     get_magnitude = partial(get_abs_magnitude,
-                            star_mass=star['mass'],
+                            star_mass=star_mass,
                             star_luminosity=luminosity,
                             table_luminosity=color_table['luminosity'],
                             table_mass=color_table['mass'],
