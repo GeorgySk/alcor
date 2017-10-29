@@ -581,57 +581,20 @@ def get_interpolated_magnitudes_by_luminosity(
             row_index_2 = row_index
             break
 
-    u_ubvri_absolute = get_interpolated_magnitude(
-        star_mass=star_mass,
-        star_luminosity=luminosity,
-        table_luminosity=color_table['luminosity'],
-        table_magnitude=color_table['u_ubvri_absolute'],
-        table_mass=color_table['mass'],
-        row_index_1=row_index_1,
-        row_index_2=row_index_2,
-        mass_index=mass_index)
-    b_ubvri_absolute = get_interpolated_magnitude(
-        star_mass=star_mass,
-        star_luminosity=luminosity,
-        table_luminosity=color_table['luminosity'],
-        table_magnitude=color_table['b_ubvri_absolute'],
-        table_mass=color_table['mass'],
-        row_index_1=row_index_1,
-        row_index_2=row_index_2,
-        mass_index=mass_index)
-    v_ubvri_absolute = get_interpolated_magnitude(
-        star_mass=star_mass,
-        star_luminosity=luminosity,
-        table_luminosity=color_table['luminosity'],
-        table_magnitude=color_table['v_ubvri_absolute'],
-        table_mass=color_table['mass'],
-        row_index_1=row_index_1,
-        row_index_2=row_index_2,
-        mass_index=mass_index)
-    r_ubvri_absolute = get_interpolated_magnitude(
-        star_mass=star_mass,
-        star_luminosity=luminosity,
-        table_luminosity=color_table['luminosity'],
-        table_magnitude=color_table['r_ubvri_absolute'],
-        table_mass=color_table['mass'],
-        row_index_1=row_index_1,
-        row_index_2=row_index_2,
-        mass_index=mass_index)
-    i_ubvri_absolute = get_interpolated_magnitude(
-        star_mass=star_mass,
-        star_luminosity=luminosity,
-        table_luminosity=color_table['luminosity'],
-        table_magnitude=color_table['i_ubvri_absolute'],
-        table_mass=color_table['mass'],
-        row_index_1=row_index_1,
-        row_index_2=row_index_2,
-        mass_index=mass_index)
+    get_magnitude = partial(get_interpolated_magnitude,
+                            star_mass=star_mass,
+                            star_luminosity=luminosity,
+                            table_luminosity=color_table['luminosity'],
+                            table_mass=color_table['mass'],
+                            row_index_1=row_index_1,
+                            row_index_2=row_index_2,
+                            mass_index=mass_index)
 
-        return (u_ubvri_absolute,
-                b_ubvri_absolute,
-                v_ubvri_absolute,
-                r_ubvri_absolute,
-                i_ubvri_absolute)
+    return (get_magnitude(table_magnitude=color_table['u_ubvri_absolute']),
+            get_magnitude(table_magnitude=color_table['b_ubvri_absolute']),
+            get_magnitude(table_magnitude=color_table['v_ubvri_absolute']),
+            get_magnitude(table_magnitude=color_table['r_ubvri_absolute']),
+            get_magnitude(table_magnitude=color_table['i_ubvri_absolute']))
 
 
 def get_extrapolated_magnitudes_by_luminosity(
