@@ -743,7 +743,7 @@ def get_interpolated_magnitude(star: Star,
                        table_luminosity_or_mass_2=table_mass[1])
 
 
-def get_abs_magnitude(star: Star,
+def get_abs_magnitude(star: pd.Series,
                       luminosity: float,
                       table_absolute_magnitude: np.ndarray,
                       table_luminosity: np.ndarray,
@@ -769,7 +769,7 @@ def get_abs_magnitude(star: Star,
         table_luminosity_or_mass_2=table_luminosity[mass_index + 1,
                                                     row_index_2 + 1])
     abs_magnitude = extrapolate(
-        luminosity_or_mass=star.mass,
+        luminosity_or_mass=star['mass'],
         interest_value_1=c_1,
         interest_value_2=c_2,
         table_luminosity_or_mass_1=table_mass[mass_index],
