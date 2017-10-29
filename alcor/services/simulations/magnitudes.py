@@ -322,7 +322,7 @@ def interpolate_by_mass(star: pd.Series,
 
     if star['cooling_time'] < cooling_time[min_mass_index, 0]:
         x1 = get_extrapolated_xm(
-            star_cooling_time=star,
+            star_cooling_time=star['cooling_time'],
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
@@ -336,7 +336,7 @@ def interpolate_by_mass(star: pd.Series,
                                                 rows_counts[min_mass_index]]:
             rows_count = rows_counts[min_mass_index]
             x1 = get_extrapolated_xm(
-                star_cooling_time=star,
+                star_cooling_time=star['cooling_time'],
                 cooling_time=cooling_time,
                 pre_wd_lifetime=pre_wd_lifetime,
                 interest_sequence=interest_sequence,
@@ -358,7 +358,7 @@ def interpolate_by_mass(star: pd.Series,
 
     if star['cooling_time'] < cooling_time[max_mass_index, 0]:
         x3 = get_extrapolated_xm(
-            star_cooling_time=star,
+            star_cooling_time=star['cooling_time'],
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
@@ -372,7 +372,7 @@ def interpolate_by_mass(star: pd.Series,
                                                 rows_counts[max_mass_index]]:
             rows_count = rows_counts[max_mass_index]
             x3 = get_extrapolated_xm(
-                star_cooling_time=star,
+                star_cooling_time=star['cooling_time'],
                 cooling_time=cooling_time,
                 pre_wd_lifetime=pre_wd_lifetime,
                 interest_sequence=interest_sequence,
@@ -424,7 +424,7 @@ def get_xm(star: pd.Series,
            one_model: bool = False) -> float:
     if star['cooling_time'] < cooling_time[mass_index, 0]:
         return get_extrapolated_xm(
-            star_cooling_time=star,
+            star_cooling_time=star['cooling_time'],
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
@@ -437,7 +437,7 @@ def get_xm(star: pd.Series,
 
     if star['cooling_time'] > cooling_time[mass_index, rows_count]:
         return get_extrapolated_xm(
-            star_cooling_time=star,
+            star_cooling_time=star['cooling_time'],
             cooling_time=cooling_time,
             pre_wd_lifetime=pre_wd_lifetime,
             interest_sequence=interest_sequence,
