@@ -1,4 +1,5 @@
 import enum
+from functools import partial
 from math import log10
 from typing import (Dict,
                     Tuple,
@@ -23,14 +24,15 @@ def assign_magnitudes(*,
                       db_color_table: Dict[str, np.ndarray],
                       one_color_table: Dict[str, np.ndarray]
                       ) -> List[Star]:
-    co_wds = [star
-              for star in stars
-              if star.mass < max_carbon_oxygen_core_wd_mass]
-    one_wds = [star
-               for star in stars
-               if star.mass >= max_carbon_oxygen_core_wd_mass]
+    carbon_oxygen_white_dwarfs = [
+        star
+        for star in stars
+        if star.mass < max_carbon_oxygen_core_wd_mass]
+    oxygen_neon_white_dwarfs = [star
+                                for star in stars
+                                if star.mass >= max_carbon_oxygen_core_wd_mass]
 
-    for star in co_wds:
+    for star in carbon_oxygen_white_dwarfs:
         if get_spectral_type(db_to_da_fraction) == SpectralType.DA:
             star.spectral_type = SpectralType.DA
             (luminosity,
@@ -67,7 +69,7 @@ def assign_magnitudes(*,
         star.r_ubvri_absolute = r_ubvri_absolute
         star.i_ubvri_absolute = i_ubvri_absolute
 
-    for star in one_wds:
+    for star in oxygen_neon_white_dwarfs:
         star.spectral_type = SpectralType.ONe
         (luminosity,
          effective_temperature,
@@ -86,7 +88,7 @@ def assign_magnitudes(*,
         star.r_ubvri_absolute = r_ubvri_absolute
         star.i_ubvri_absolute = i_ubvri_absolute
 
-    return co_wds + one_wds
+    return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
 
 
 def get_spectral_type(db_to_da_fraction: float) -> enum.Enum:
@@ -96,11 +98,10 @@ def get_spectral_type(db_to_da_fraction: float) -> enum.Enum:
 
 
 def one_interpolation(star: Star,
-                      color_table: Dict[str, np.ndarray]
+                      color_table: Dict[str, np.ndarray],
+                      one_model: bool = True,
+                      by_logarithm: bool = False
                       ) -> Tuple[float, ...]:
-    one_model = True
-    by_logarithm = False
-
     star.cooling_time = log10(star.cooling_time) + 9.
 
     luminosity = interpolate(star=star,
@@ -240,11 +241,11 @@ def interpolate(star: Star,
                 interest_sequence: str,
                 by_logarithm: bool,
                 one_model: bool = False) -> float:
-    if star.mass < cooling_or_color_sequence['mass'][0]:
-        return extrapolate_by_mass(
+    grid_masses = cooling_or_color_sequence['mass']
+    extrapolate_by_mass_partial = partial(
+            extrapolate_by_mass,
             star=star,
-            min_mass_index=0,
-            mass=cooling_or_color_sequence['mass'],
+            mass=grid_masses,
             cooling_time=cooling_or_color_sequence['cooling_time'],
             pre_wd_lifetime=cooling_or_color_sequence['pre_wd_lifetime'],
             interest_sequence=cooling_or_color_sequence[interest_sequence],
@@ -252,21 +253,16 @@ def interpolate(star: Star,
             by_logarithm=by_logarithm,
             one_model=one_model)
 
-    if star.mass >= cooling_or_color_sequence['mass'][-1]:
-        return extrapolate_by_mass(
-            star=star,
-            min_mass_index=cooling_or_color_sequence['mass'].size() - 1,
-            mass=cooling_or_color_sequence['mass'],
-            cooling_time=cooling_or_color_sequence['cooling_time'],
-            pre_wd_lifetime=cooling_or_color_sequence['pre_wd_lifetime'],
-            interest_sequence=cooling_or_color_sequence[interest_sequence],
-            rows_counts=cooling_or_color_sequence['rows_counts'],
-            by_logarithm=by_logarithm,
-            one_model=one_model)
+    if star.mass < grid_masses[0]:
+        return extrapolate_by_mass_partial(min_mass_index=0)
+
+    if star.mass >= grid_masses[-1]:
+        return extrapolate_by_mass_partial(
+                min_mass_index=grid_masses.size() - 1)
 
     return interpolate_by_mass(
         star=star,
-        mass=cooling_or_color_sequence['mass'],
+        mass=grid_masses,
         cooling_time=cooling_or_color_sequence['cooling_time'],
         pre_wd_lifetime=cooling_or_color_sequence['pre_wd_lifetime'],
         interest_sequence=cooling_or_color_sequence[interest_sequence],
