@@ -8,7 +8,6 @@ from typing import (Dict,
 import numpy as np
 import pandas as pd
 
-from alcor.models import Star
 from alcor.models.star import SpectralType
 
 GRAVITATIONAL_CONST_CM_S_KG = 6.67e-5
@@ -26,16 +25,12 @@ def assign_magnitudes(stars: pd.DataFrame,
                       one_color_table: Dict[str, np.ndarray]
                       # TODO: we should return DataFrame
                       ) -> List[pd.Series]:
-    carbon_oxygen_white_dwarfs = [
-        star
-        for _, star in stars.iterrows()
-        if star['mass'] < max_carbon_oxygen_core_wd_mass]
-    oxygen_neon_white_dwarfs = [
-        star
-        for _, star in stars.iterrows()
-        if star['mass'] >= max_carbon_oxygen_core_wd_mass]
+    carbon_oxygen_white_dwarfs_mask = (stars['mass']
+                                       < max_carbon_oxygen_core_wd_mass)
+    carbon_oxygen_white_dwarfs = stars[carbon_oxygen_white_dwarfs_mask]
+    oxygen_neon_white_dwarfs = stars[~carbon_oxygen_white_dwarfs_mask]
 
-    for star in carbon_oxygen_white_dwarfs:
+    for _, star in carbon_oxygen_white_dwarfs.iterrows():
         if get_spectral_type(db_to_da_fraction) == SpectralType.DA:
             star['spectral_type'] = SpectralType.DA
             (luminosity,
@@ -72,7 +67,7 @@ def assign_magnitudes(stars: pd.DataFrame,
         star['r_ubvri_absolute'] = r_ubvri_absolute
         star['i_ubvri_absolute'] = i_ubvri_absolute
 
-    for star in oxygen_neon_white_dwarfs:
+    for _, star in oxygen_neon_white_dwarfs.iterrows():
         star['spectral_type'] = SpectralType.ONe
         (luminosity,
          effective_temperature,
