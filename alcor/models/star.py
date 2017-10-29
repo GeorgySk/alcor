@@ -145,7 +145,7 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
-                 spectral_type: enum.Enum = None,
+                 spectral_type: SpectralType = None,
                  galactic_disk_type: GalacticDiskType = None):
         self.id = None
         self.group_id = group_id
