@@ -65,40 +65,42 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
 
         for mass in masses:
             mass_group = join_group(metallicity_group, mass)
-            cooling_tracks_by_metallicity[int(mass)] = pd.DataFrame(
-                    OrderedDict(cooling_time=file[join_group(mass_group,
-                                                             'cooling_time')],
-                                effective_temperature=file[join_group(
-                                        mass_group, 'effective_temperature')],
-                                luminosity=file[join_group(mass_group,
-                                                           'luminosity')]))
+            tracks = OrderedDict((key, file[join_group(mass_group,
+                                                       key)])
+                                 for key in ['cooling_time',
+                                             'effective_temperature',
+                                             'luminosity'])
+            cooling_tracks_by_metallicity[int(mass)] = pd.DataFrame(tracks)
 
 
 def fill_colors(file: h5py.File) -> Dict[int, pd.DataFrame]:
     for mass_group in file:
-        yield int(mass_group), pd.DataFrame(OrderedDict(
-                luminosity=file[join_group(mass_group, 'luminosity')],
-                color_u=file[join_group(mass_group, 'color_u')],
-                color_b=file[join_group(mass_group, 'color_b')],
-                color_v=file[join_group(mass_group, 'color_v')],
-                color_r=file[join_group(mass_group, 'color_r')],
-                color_i=file[join_group(mass_group, 'color_i')],
-                color_j=file[join_group(mass_group, 'color_j')]))
+        tracks = OrderedDict((key, file[join_group(mass_group,
+                                                   key)])
+                             for key in ['luminosity',
+                                         'color_u',
+                                         'color_b',
+                                         'color_v',
+                                         'color_r',
+                                         'color_i',
+                                         'color_j'])
+        yield int(mass_group), pd.DataFrame(tracks)
 
 
 def fill_one_table(file: h5py.File) -> Dict[int, pd.DataFrame]:
     for mass_group in file:
-        yield int(mass_group), pd.DataFrame(OrderedDict(
-                luminosity=file[join_group(mass_group, 'luminosity')],
-                cooling_time=file[join_group(mass_group, 'cooling_time')],
-                effective_temperature=file[join_group(
-                        mass_group, 'effective_temperature')],
-                color_u=file[join_group(mass_group, 'color_u')],
-                color_b=file[join_group(mass_group, 'color_b')],
-                color_v=file[join_group(mass_group, 'color_v')],
-                color_r=file[join_group(mass_group, 'color_r')],
-                color_i=file[join_group(mass_group, 'color_i')],
-                color_j=file[join_group(mass_group, 'color_j')]))
+        tracks = OrderedDict((key, file[join_group(mass_group,
+                                                   key)])
+                             for key in ['luminosity',
+                                         'cooling_time',
+                                         'effective_temperature',
+                                         'color_u',
+                                         'color_b',
+                                         'color_v',
+                                         'color_r',
+                                         'color_i',
+                                         'color_j'])
+        yield int(mass_group), pd.DataFrame(tracks)
 
 
 @contextmanager
