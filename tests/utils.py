@@ -42,10 +42,14 @@ def sub_dict(dictionary: Dict[Hashable, Any],
             for key in keys}
 
 
+# More info on fort files at:
+# http://docs.cray.com/books/S-3695-35/html-S-3695-35/pdollsmg.html
 def fort_files_by_metallicities_lengths(fort_links: Dict[int, Iterable[int]],
                                         *,
                                         base_dir: str) -> List[int]:
-    for fort_links_range in fort_links.values():
+    fort_links_ranges = fort_links.values()
+
+    for fort_links_range in fort_links_ranges:
         yield from fort_files_lengths(fort_links=fort_links_range,
                                       fort_files_dir=base_dir)
 
