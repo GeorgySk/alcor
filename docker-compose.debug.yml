@@ -4,7 +4,7 @@ services:
   alcor:
     build: .
     image: lycantropos/alcor:0.0.0
-    entrypoint: "/alcor/docker-entrypoint.tests.sh"
+    entrypoint: /alcor/docker-entrypoint.tests.sh
     volumes:
       - .:/alcor/
     extra_hosts:
