@@ -75,5 +75,5 @@ def tracks_by_metallicities_lengths(
 
 
 def tracks_lengths(sequences: Dict[int, pd.DataFrame]) -> List[int]:
-    for _, sequence in sequences.items():
+    for sequence in sequences.values():
         yield sequence.shape[0]
