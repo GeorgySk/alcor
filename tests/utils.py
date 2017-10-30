@@ -71,7 +71,7 @@ def file_lines_count(file_path: str) -> int:
 def tracks_by_metallicities_lengths(
         cooling_tracks: Dict[int, Dict[int, pd.DataFrame]]) -> List[int]:
     for sequences in cooling_tracks.values():
-        yield from tracks_lengths(sequences=sequences)
+        yield from tracks_lengths(sequences)
 
 
 def tracks_lengths(sequences: Dict[int, pd.DataFrame]) -> List[int]:
