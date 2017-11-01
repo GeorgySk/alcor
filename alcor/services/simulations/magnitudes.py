@@ -44,26 +44,12 @@ def assign_magnitudes(stars: pd.DataFrame,
         spectral_type = generate_spectral_type(db_to_da_fraction)
         star['spectral_type'] = spectral_type
 
-        (luminosity,
-         effective_temperature,
-         u_ubvri_absolute,
-         b_ubvri_absolute,
-         v_ubvri_absolute,
-         r_ubvri_absolute,
-         i_ubvri_absolute) = da_db_interpolation(
+        da_db_interpolation(
                 star,
                 cooling_sequences=cooling_sequences[spectral_type],
                 color_table=colo_tables[spectral_type],
                 # TODO. can they be taken from cool.seq. keys?
                 metallicities=metallicities[spectral_type])
-
-        star['luminosity'] = -luminosity
-        star['effective_temperature'] = effective_temperature
-        star['u_ubvri_absolute'] = u_ubvri_absolute
-        star['b_ubvri_absolute'] = b_ubvri_absolute
-        star['v_ubvri_absolute'] = v_ubvri_absolute
-        star['r_ubvri_absolute'] = r_ubvri_absolute
-        star['i_ubvri_absolute'] = i_ubvri_absolute
 
     oxygen_neon_white_dwarfs['cooling_time'] = 9. + log10(
             oxygen_neon_white_dwarfs['cooling_time'])
@@ -145,8 +131,14 @@ def da_db_interpolation(star: pd.Series,
                         *,
                         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                         color_table: Dict[str, np.ndarray],
-                        metallicities: List[float]) -> Tuple[float, ...]:
+                        metallicities: List[float]) -> None:
+    luminosity_grid = color_table['luminosity']
+    mass_grid = color_table['mass_grid']
+    rows_counts = color_table['rows_counts']
     star_metallicity = star['metallicity']
+    star_luminosity = star['luminosity']
+    star_mass = star['mass']
+    star_cooling_time = star['cooling_time']
 
     min_metallicity_index = get_min_metallicity_index(
             star_metallicity=star_metallicity,
@@ -159,7 +151,8 @@ def da_db_interpolation(star: pd.Series,
      min_effective_temperature,
      max_effective_temperature) = (
         get_luminosity_effective_temperature_limits(
-            star=star,
+            star_mass=star_mass,
+            star_cooling_time=star_cooling_time,
             cooling_sequences=cooling_sequences,
             min_metallicity_by_thousand=int(min_metallicity * 1e3),
             max_metallicity_by_thousand=int(max_metallicity * 1e3)))
@@ -173,25 +166,37 @@ def da_db_interpolation(star: pd.Series,
                                   max_effective_temperature))
     effective_temperature = spline(star_metallicity)
 
-    (u_ubvri_absolute,
-     b_ubvri_absolute,
-     v_ubvri_absolute,
-     r_ubvri_absolute,
-     i_ubvri_absolute) = interpolate_magnitudes(star_mass=star['mass'],
-                                                color_table=color_table,
-                                                luminosity=luminosity)
-    return (luminosity,
-            effective_temperature,
-            u_ubvri_absolute,
-            b_ubvri_absolute,
-            v_ubvri_absolute,
-            r_ubvri_absolute,
-            i_ubvri_absolute)
+    interpolate_magnitudes_partial = partial(interpolate_magnitudes,
+                                             luminosity_grid=luminosity_grid,
+                                             mass_grid=mass_grid,
+                                             rows_counts=rows_counts,
+                                             star_luminosity=star_luminosity,
+                                             star_mass=star_mass)
+
+    u_ubvri_absolute = interpolate_magnitudes_partial(
+            magnitude_grid=color_table['u_ubvri_absolute'])
+    b_ubvri_absolute = interpolate_magnitudes_partial(
+            magnitude_grid=color_table['b_ubvri_absolute'])
+    v_ubvri_absolute = interpolate_magnitudes_partial(
+            magnitude_grid=color_table['v_ubvri_absolute'])
+    r_ubvri_absolute = interpolate_magnitudes_partial(
+            magnitude_grid=color_table['r_ubvri_absolute'])
+    i_ubvri_absolute = interpolate_magnitudes_partial(
+            magnitude_grid=color_table['i_ubvri_absolute'])
+
+    star['luminosity'] = -luminosity
+    star['effective_temperature'] = effective_temperature
+    star['u_ubvri_absolute'] = u_ubvri_absolute
+    star['b_ubvri_absolute'] = b_ubvri_absolute
+    star['v_ubvri_absolute'] = v_ubvri_absolute
+    star['r_ubvri_absolute'] = r_ubvri_absolute
+    star['i_ubvri_absolute'] = i_ubvri_absolute
 
 
 def get_luminosity_effective_temperature_limits(
         *,
-        star: pd.Series,
+        star_mass: float,
+        star_cooling_time: float,
         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
         min_metallicity_by_thousand: int,
         max_metallicity_by_thousand: int) -> Tuple[float, ...]:
@@ -199,24 +204,42 @@ def get_luminosity_effective_temperature_limits(
     max_metallicity_sequences = cooling_sequences[max_metallicity_by_thousand]
 
     min_luminosity = interpolate(
-        star=star,
-        cooling_or_color_sequence=min_metallicity_sequences,
-        interest_sequence='luminosity',
+        star_mass=star_mass,
+        star_cooling_time=star_cooling_time,
+        mass_grid=min_metallicity_sequences['mass'],
+        cooling_time_grid=min_metallicity_sequences['cooling_time'],
+        pre_wd_lifetime_grid=min_metallicity_sequences['pre_wd_lifetime'],
+        interest_sequence_grid=min_metallicity_sequences['luminosity'],
+        rows_counts=min_metallicity_sequences['rows_counts'],
         by_logarithm=False)
     min_effective_temperature = interpolate(
-        star=star,
-        cooling_or_color_sequence=min_metallicity_sequences,
-        interest_sequence='effective_temperature',
+        star_mass=star_mass,
+        star_cooling_time=star_cooling_time,
+        mass_grid=min_metallicity_sequences['mass'],
+        cooling_time_grid=min_metallicity_sequences['cooling_time'],
+        pre_wd_lifetime_grid=min_metallicity_sequences['pre_wd_lifetime'],
+        interest_sequence_grid=min_metallicity_sequences[
+            'effective_temperature'],
+        rows_counts=min_metallicity_sequences['rows_counts'],
         by_logarithm=True)
     max_luminosity = interpolate(
-        star=star,
-        cooling_or_color_sequence=max_metallicity_sequences,
-        interest_sequence='luminosity',
+        star_mass=star_mass,
+        star_cooling_time=star_cooling_time,
+        mass_grid=max_metallicity_sequences['mass'],
+        cooling_time_grid=max_metallicity_sequences['cooling_time'],
+        pre_wd_lifetime_grid=max_metallicity_sequences['pre_wd_lifetime'],
+        interest_sequence_grid=max_metallicity_sequences['luminosity'],
+        rows_counts=max_metallicity_sequences['rows_counts'],
         by_logarithm=False)
     max_effective_temperature = interpolate(
-        star=star,
-        cooling_or_color_sequence=max_metallicity_sequences,
-        interest_sequence='effective_temperature',
+        star_mass=star_mass,
+        star_cooling_time=star_cooling_time,
+        mass_grid=max_metallicity_sequences['mass'],
+        cooling_time_grid=max_metallicity_sequences['cooling_time'],
+        pre_wd_lifetime_grid=max_metallicity_sequences['pre_wd_lifetime'],
+        interest_sequence_grid=max_metallicity_sequences[
+            'effective_temperature'],
+        rows_counts=max_metallicity_sequences['rows_counts'],
         by_logarithm=True)
 
     return (min_luminosity,
@@ -226,153 +249,150 @@ def get_luminosity_effective_temperature_limits(
 
 
 def interpolate(*,
-                star: pd.Series,
-                cooling_or_color_sequence: Dict[str, np.ndarray],
-                interest_sequence: str,
+                star_mass: float,
+                star_cooling_time: float,
+                mass_grid: np.ndarray,
+                cooling_time_grid: np.ndarray,
+                pre_wd_lifetime_grid: np.ndarray,
+                interest_sequence_grid: np.ndarray,
+                rows_counts: np.ndarray,
                 by_logarithm: bool,
                 one_model: bool = False) -> float:
-    grid_masses = cooling_or_color_sequence['mass']
-    grid_cooling_times = cooling_or_color_sequence['cooling_time']
-    grid_pre_wd_lifetimes = cooling_or_color_sequence['pre_wd_lifetime']
-    rows_counts = cooling_or_color_sequence['rows_counts']
-    grid_interest_sequence = cooling_or_color_sequence[interest_sequence]
-
     extrapolate_by_mass_partial = partial(
             extrapolate_by_mass,
-            star=star,
-            mass=grid_masses,
-            cooling_time=grid_cooling_times,
-            pre_wd_lifetime=grid_pre_wd_lifetimes,
-            interest_sequence=grid_interest_sequence,
+            star_cooling_time=star_cooling_time,
+            star_mass=star_mass,
+            mass_grid=mass_grid,
+            cooling_time_grid=cooling_time_grid,
+            pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+            interest_sequence_grid=interest_sequence_grid,
             rows_counts=rows_counts,
             by_logarithm=by_logarithm,
             one_model=one_model)
 
-    star_mass = star['mass']
-
-    if star_mass < grid_masses[0]:
+    if star_mass < mass_grid[0]:
         return extrapolate_by_mass_partial(min_mass_index=0)
 
-    if star_mass >= grid_masses[-1]:
+    if star_mass >= mass_grid[-1]:
         return extrapolate_by_mass_partial(
-                min_mass_index=grid_masses.size() - 1)
+                min_mass_index=mass_grid.size() - 1)
 
     return interpolate_by_mass(
-        star=star,
-        mass=grid_masses,
-        cooling_time=grid_cooling_times,
-        pre_wd_lifetime=grid_pre_wd_lifetimes,
-        interest_sequence=grid_interest_sequence,
+        star_mass=star_mass,
+        star_cooling_time=star_cooling_time,
+        mass_grid=mass_grid,
+        cooling_time_grid=cooling_time_grid,
+        pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+        interest_sequence_grid=interest_sequence_grid,
         rows_counts=rows_counts,
         by_logarithm=by_logarithm,
         one_model=one_model)
 
 
 def extrapolate_by_mass(*,
-                        star: pd.Series,
+                        star_cooling_time: float,
+                        star_mass: float,
                         min_mass_index: int,
-                        mass: np.ndarray,
-                        cooling_time: np.ndarray,
-                        pre_wd_lifetime: np.ndarray,
-                        interest_sequence: np.ndarray,
+                        mass_grid: np.ndarray,
+                        cooling_time_grid: np.ndarray,
+                        pre_wd_lifetime_grid: np.ndarray,
+                        interest_sequence_grid: np.ndarray,
                         rows_counts: np.ndarray,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
     xm = partial(get_xm,
-                 star_cooling_time=star['cooling_time'],
-                 cooling_time=cooling_time,
-                 pre_wd_lifetime=pre_wd_lifetime,
-                 interest_sequence=interest_sequence,
+                 star_cooling_time=star_cooling_time,
+                 cooling_time_grid=cooling_time_grid,
+                 pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+                 interest_sequence_grid=interest_sequence_grid,
                  rows_counts=rows_counts,
                  by_logarithm=by_logarithm,
                  one_model=one_model)
     xm1 = xm(mass_index=min_mass_index)
     xm2 = xm(mass_index=min_mass_index + 1)
 
-    min_mass = mass[min_mass_index]
-    max_mass = mass[min_mass_index + 1]
+    min_mass = mass_grid[min_mass_index]
+    max_mass = mass_grid[min_mass_index + 1]
 
     spline = linear_estimation(x=(min_mass, max_mass),
                                y=(xm1, xm2))
-    return spline(star['mass'])
+    return spline(star_mass)
 
 
 def get_mass_index(*,
                    star_mass: float,
-                   grid_masses: np.ndarray) -> int:
-    for row_index in range(grid_masses.size() - 1):
-        if grid_masses[row_index] <= star_mass < grid_masses[row_index + 1]:
+                   mass_grid: np.ndarray) -> int:
+    for row_index in range(mass_grid.size() - 1):
+        if mass_grid[row_index] <= star_mass < mass_grid[row_index + 1]:
             return row_index
 
 
 def interpolate_by_mass(*,
-                        star: pd.Series,
-                        mass: np.ndarray,
-                        cooling_time: np.ndarray,
-                        pre_wd_lifetime: np.ndarray,
-                        interest_sequence: np.ndarray,
+                        star_mass: float,
+                        star_cooling_time: float,
+                        mass_grid: np.ndarray,
+                        cooling_time_grid: np.ndarray,
+                        pre_wd_lifetime_grid: np.ndarray,
+                        interest_sequence_grid: np.ndarray,
                         rows_counts: np.ndarray,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
-    star_mass = star['mass']
-    star_cooling_time = star['cooling_time']
-
     min_mass_index = get_mass_index(star_mass=star_mass,
-                                    grid_masses=mass)
+                                    mass_grid=mass_grid)
     max_mass_index = min_mass_index + 1
 
     extrapolated_xm = partial(get_extrapolated_xm,
                               star_cooling_time=star_cooling_time,
-                              cooling_time=cooling_time,
-                              pre_wd_lifetime=pre_wd_lifetime,
-                              interest_sequence=interest_sequence,
+                              cooling_time_grid=cooling_time_grid,
+                              pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+                              interest_sequence_grid=interest_sequence_grid,
                               by_logarithm=by_logarithm,
                               one_model=one_model)
 
-    if star_cooling_time < cooling_time[min_mass_index, 0]:
+    if star_cooling_time < cooling_time_grid[min_mass_index, 0]:
         x1 = extrapolated_xm(min_row_index=1,
                              mass_index=min_mass_index)
         case_1 = 1
-    elif star_cooling_time >= cooling_time[min_mass_index,
-                                           rows_counts[min_mass_index]]:
+    elif star_cooling_time >= cooling_time_grid[min_mass_index,
+                                                rows_counts[min_mass_index]]:
         rows_count = rows_counts[min_mass_index]
         x1 = extrapolated_xm(min_row_index=rows_count,
                              mass_index=min_mass_index)
         case_1 = 1
     else:
         for row_index in range(rows_counts[min_mass_index] - 1):
-            if (cooling_time[min_mass_index, row_index]
+            if (cooling_time_grid[min_mass_index, row_index]
                     <= star_cooling_time
-                    <= cooling_time[min_mass_index, row_index + 1]):
-                y1 = cooling_time[min_mass_index, row_index]
-                y2 = cooling_time[min_mass_index, row_index + 1]
-                x1 = interest_sequence[min_mass_index, row_index]
-                x2 = interest_sequence[min_mass_index, row_index + 1]
+                    <= cooling_time_grid[min_mass_index, row_index + 1]):
+                y1 = cooling_time_grid[min_mass_index, row_index]
+                y2 = cooling_time_grid[min_mass_index, row_index + 1]
+                x1 = interest_sequence_grid[min_mass_index, row_index]
+                x2 = interest_sequence_grid[min_mass_index, row_index + 1]
                 case_1 = 0
 
-    if star_cooling_time < cooling_time[max_mass_index, 0]:
+    if star_cooling_time < cooling_time_grid[max_mass_index, 0]:
         x3 = extrapolated_xm(min_row_index=1,
                              mass_index=max_mass_index)
         case_2 = 1
-    elif star_cooling_time >= cooling_time[max_mass_index,
-                                           rows_counts[max_mass_index]]:
+    elif star_cooling_time >= cooling_time_grid[max_mass_index,
+                                                rows_counts[max_mass_index]]:
         rows_count = rows_counts[max_mass_index]
         x3 = extrapolated_xm(min_row_index=rows_count,
                              mass_index=max_mass_index)
         case_2 = 1
     else:
         for row_index in range(rows_counts[max_mass_index] - 1):
-            if (cooling_time[max_mass_index, row_index]
+            if (cooling_time_grid[max_mass_index, row_index]
                     <= star_cooling_time
-                    <= cooling_time[max_mass_index, row_index + 1]):
-                y3 = cooling_time[max_mass_index, row_index]
-                y4 = cooling_time[max_mass_index, row_index + 1]
-                x3 = interest_sequence[max_mass_index, row_index]
-                x4 = interest_sequence[max_mass_index, row_index + 1]
+                    <= cooling_time_grid[max_mass_index, row_index + 1]):
+                y3 = cooling_time_grid[max_mass_index, row_index]
+                y4 = cooling_time_grid[max_mass_index, row_index + 1]
+                x3 = interest_sequence_grid[max_mass_index, row_index]
+                x4 = interest_sequence_grid[max_mass_index, row_index + 1]
                 case_2 = 0
 
-    min_mass = mass[min_mass_index]
-    max_mass = mass[max_mass_index]
+    min_mass = mass_grid[min_mass_index]
+    max_mass = mass_grid[max_mass_index]
     get_linear_estimation = partial(linear_estimation,
                                     x=(min_mass, max_mass))
 
@@ -415,147 +435,156 @@ def interpolate_by_mass(*,
 
 def get_xm(*,
            star_cooling_time: float,
-           cooling_time: np.ndarray,
-           pre_wd_lifetime: np.ndarray,
-           interest_sequence: np.ndarray,
+           cooling_time_grid: np.ndarray,
+           pre_wd_lifetime_grid: np.ndarray,
+           interest_sequence_grid: np.ndarray,
            rows_counts: np.ndarray,
            mass_index: int,
            by_logarithm: bool,
            one_model: bool = False) -> float:
     extrapolated_xm = partial(get_extrapolated_xm,
                               star_cooling_time=star_cooling_time,
-                              cooling_time=cooling_time,
-                              pre_wd_lifetime=pre_wd_lifetime,
-                              interest_sequence=interest_sequence,
+                              cooling_time_grid=cooling_time_grid,
+                              pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+                              interest_sequence_grid=interest_sequence_grid,
                               mass_index=mass_index,
                               by_logarithm=by_logarithm,
                               one_model=one_model)
 
-    if star_cooling_time < cooling_time[mass_index, 0]:
+    if star_cooling_time < cooling_time_grid[mass_index, 0]:
         return extrapolated_xm(min_row_index=0)
 
     rows_count = rows_counts[mass_index]
 
-    if star_cooling_time > cooling_time[mass_index, rows_count]:
+    if star_cooling_time > cooling_time_grid[mass_index, rows_count]:
         return extrapolated_xm(min_row_index=rows_count - 1)
 
     for row_index in range(rows_count - 1):
-        if (cooling_time[mass_index, row_index] <= star_cooling_time
-                <= cooling_time[mass_index, row_index + 1]):
+        if (cooling_time_grid[mass_index, row_index] <= star_cooling_time
+                <= cooling_time_grid[mass_index, row_index + 1]):
             spline = linear_estimation(
-                    x=(cooling_time[mass_index, row_index],
-                       cooling_time[mass_index, row_index + 1]),
-                    y=(interest_sequence[mass_index, row_index],
-                       interest_sequence[mass_index, row_index + 1]))
+                    x=(cooling_time_grid[mass_index, row_index],
+                       cooling_time_grid[mass_index, row_index + 1]),
+                    y=(interest_sequence_grid[mass_index, row_index],
+                       interest_sequence_grid[mass_index, row_index + 1]))
             return spline(star_cooling_time)
 
 
 def get_extrapolated_xm(*,
                         star_cooling_time: float,
-                        cooling_time: np.ndarray,
-                        pre_wd_lifetime: np.ndarray,
-                        interest_sequence: np.ndarray,
+                        cooling_time_grid: np.ndarray,
+                        pre_wd_lifetime_grid: np.ndarray,
+                        interest_sequence_grid: np.ndarray,
                         mass_index: int,
                         min_row_index: int,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
     if one_model:
         spline = linear_estimation(
-                x=(cooling_time[mass_index, min_row_index],
-                   cooling_time[mass_index, min_row_index + 1]),
-                y=(interest_sequence[mass_index, min_row_index],
-                   interest_sequence[mass_index, min_row_index + 1]))
+                x=(cooling_time_grid[mass_index, min_row_index],
+                   cooling_time_grid[mass_index, min_row_index + 1]),
+                y=(interest_sequence_grid[mass_index, min_row_index],
+                   interest_sequence_grid[mass_index, min_row_index + 1]))
         return spline(star_cooling_time)
 
-    x0 = log10(cooling_time[mass_index, min_row_index]
-               + pre_wd_lifetime[mass_index])
-    x1 = log10(cooling_time[mass_index, min_row_index + 1]
-               + pre_wd_lifetime[mass_index])
+    x0 = log10(cooling_time_grid[mass_index, min_row_index]
+               + pre_wd_lifetime_grid[mass_index])
+    x1 = log10(cooling_time_grid[mass_index, min_row_index + 1]
+               + pre_wd_lifetime_grid[mass_index])
 
     if by_logarithm:
-        y0 = log10(interest_sequence[mass_index, min_row_index])
-        y1 = log10(interest_sequence[mass_index, min_row_index + 1])
+        y0 = log10(interest_sequence_grid[mass_index, min_row_index])
+        y1 = log10(interest_sequence_grid[mass_index, min_row_index + 1])
         spline = linear_estimation(x=(x0, x1),
                                    y=(y0, y1))
         return 10.0 ** spline(star_cooling_time)
 
     spline = linear_estimation(
             x=(x0, x1),
-            y=(interest_sequence[mass_index, min_row_index],
-               interest_sequence[mass_index, min_row_index + 1]))
+            y=(interest_sequence_grid[mass_index, min_row_index],
+               interest_sequence_grid[mass_index, min_row_index + 1]))
     return spline(star_cooling_time)
 
 
 def interpolate_magnitudes(*,
                            star_mass: float,
-                           color_table: Dict[str, np.ndarray],
-                           luminosity: float) -> Tuple[float, ...]:
-    grid_masses = color_table['mass']
-    rows_counts = color_table['rows_counts']
-
-    if star_mass <= grid_masses[0]:
+                           star_luminosity: float,
+                           mass_grid: np.ndarray,
+                           rows_counts: np.ndarray,
+                           luminosity_grid: np.ndarray,
+                           magnitude_grid: np.ndarray) -> Tuple[float]:
+    if star_mass <= mass_grid[0]:
         min_mass_index = 0
-    elif star_mass > grid_masses[-1]:
+    elif star_mass > mass_grid[-1]:
         # Index of element before the last one
         min_mass_index = -2
     else:
         min_mass_index = find_mass_index(star_mass=star_mass,
-                                         grid_masses=grid_masses)
+                                         mass_grid=mass_grid)
 
     rows_count_1 = rows_counts[min_mass_index]
     rows_count_2 = rows_counts[min_mass_index + 1]
 
-    return get_magnitudes(star_mass=star_mass,
-                          luminosity=luminosity,
-                          color_table=color_table,
-                          rows_count_1=rows_count_1,
-                          rows_count_2=rows_count_2,
-                          min_mass_index=min_mass_index)
+    return get_color_magnitude(star_mass=star_mass,
+                               star_luminosity=star_luminosity,
+                               rows_count_1=rows_count_1,
+                               rows_count_2=rows_count_2,
+                               min_mass_index=min_mass_index,
+                               luminosity_grid=luminosity_grid,
+                               magnitude_grid=magnitude_grid,
+                               mass_grid=mass_grid)
 
 
 def find_mass_index(*,
                     star_mass: float,
-                    grid_masses: np.ndarray) -> int:
-    for mass_index in range(grid_masses.size() - 1):
-        if (grid_masses[mass_index]
+                    mass_grid: np.ndarray) -> int:
+    for mass_index in range(mass_grid.size() - 1):
+        if (mass_grid[mass_index]
                 < star_mass
-                <= grid_masses[mass_index + 1]):
+                <= mass_grid[mass_index + 1]):
             return mass_index
 
 
-def get_magnitudes(*,
-                   star_mass: float,
-                   luminosity: float,
-                   color_table: Dict[str, np.ndarray],
-                   rows_count_1: int,
-                   rows_count_2: int,
-                   min_mass_index: int) -> Tuple[float, ...]:
-    luminosity_grid = color_table['luminosity']
-
+def get_color_magnitude(*,
+                        star_mass: float,
+                        star_luminosity: float,
+                        rows_count_1: int,
+                        rows_count_2: int,
+                        min_mass_index: int,
+                        luminosity_grid: np.ndarray,
+                        magnitude_grid: np.ndarray,
+                        mass_grid: np.ndarray) -> Tuple[float]:
     extrapolated_magnitudes = partial(
             get_extrapolated_magnitudes_by_luminosity,
             star_mass=star_mass,
-            star_luminosity=luminosity,
-            color_table=color_table,
-            mass_index=min_mass_index)
+            star_luminosity=star_luminosity,
+            magnitude_grid=magnitude_grid,
+            mass_index=min_mass_index,
+            luminosity_grid=luminosity_grid,
+            mass_grid=mass_grid)
 
-    if (luminosity > luminosity_grid[min_mass_index, 0]
-            or luminosity > luminosity_grid[min_mass_index + 1, 0]):
+    if (star_luminosity > luminosity_grid[min_mass_index, 0]
+            or star_luminosity > luminosity_grid[min_mass_index + 1, 0]):
         return extrapolated_magnitudes(row_index_1=0,
-                                       row_index_2=0)
+                                       row_index_2=0,
+                                       magnitude_grid=magnitude_grid)
 
-    if (luminosity < luminosity_grid[min_mass_index, rows_count_1]
-            or luminosity < luminosity_grid[min_mass_index + 1, rows_count_2]):
+    if (star_luminosity < luminosity_grid[min_mass_index, rows_count_1]
+            or star_luminosity < luminosity_grid[min_mass_index + 1,
+                                                 rows_count_2]):
         return extrapolated_magnitudes(row_index_1=rows_count_1,
-                                       row_index_2=rows_count_2)
+                                       row_index_2=rows_count_2,
+                                       magnitude_grid=magnitude_grid)
 
     return get_interpolated_magnitudes_by_luminosity(
         star_mass=star_mass,
         rows_count_1=rows_count_1,
         rows_count_2=rows_count_2,
-        color_table=color_table,
-        luminosity=luminosity,
-        mass_index=min_mass_index)
+        magnitude_grid=magnitude_grid,
+        star_luminosity=star_luminosity,
+        mass_index=min_mass_index,
+        luminosity_grid=luminosity_grid,
+        mass_grid=mass_grid)
 
 
 def get_interpolated_magnitudes_by_luminosity(
@@ -563,13 +592,13 @@ def get_interpolated_magnitudes_by_luminosity(
         star_mass: float,
         rows_count_1: int,
         rows_count_2: int,
-        color_table: Dict[str, np.ndarray],
-        luminosity: float,
-        mass_index: int) -> Tuple[float, ...]:
-    luminosity_grid = color_table['luminosity']
-
+        magnitude_grid: np.ndarray,
+        star_luminosity: float,
+        mass_index: int,
+        luminosity_grid: np.ndarray,
+        mass_grid: np.ndarray) -> Tuple[float]:
     find_row_index = partial(find_index,
-                             luminosity=luminosity,
+                             luminosity=star_luminosity,
                              luminosity_grid=luminosity_grid)
     row_index_1 = find_row_index(rows_count=rows_count_1,
                                  mass_index=mass_index)
@@ -578,28 +607,24 @@ def get_interpolated_magnitudes_by_luminosity(
 
     get_magnitude = partial(get_interpolated_magnitude,
                             star_mass=star_mass,
-                            star_luminosity=luminosity,
-                            table_luminosity=luminosity_grid,
-                            table_mass=color_table['mass'],
+                            star_luminosity=star_luminosity,
+                            luminosity_grid=luminosity_grid,
+                            mass_grid=mass_grid,
                             row_index_1=row_index_1,
                             row_index_2=row_index_2,
                             mass_index=mass_index)
 
-    return (get_magnitude(table_magnitude=color_table['u_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['b_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['v_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['r_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['i_ubvri_absolute']))
+    return get_magnitude(magnitude_grid=magnitude_grid)
 
 
 def find_index(*,
                rows_count: int,
-               luminosity: float,
+               star_luminosity: float,
                luminosity_grid: np.ndarray,
                mass_index: int) -> int:
     for row_index in range(rows_count - 1):
         if (luminosity_grid[mass_index, row_index + 1]
-                <= luminosity
+                <= star_luminosity
                 <= luminosity_grid[mass_index, row_index]):
             return row_index
 
@@ -608,47 +633,45 @@ def get_extrapolated_magnitudes_by_luminosity(
         *,
         star_mass: float,
         star_luminosity: float,
-        color_table: Dict[str, np.ndarray],
+        magnitude_grid: np.ndarray,
         row_index_1: int,
         row_index_2: int,
-        mass_index: int) -> Tuple[float, ...]:
+        mass_index: int,
+        luminosity_grid: np.ndarray,
+        mass_grid: np.ndarray) -> Tuple[float]:
     get_magnitude = partial(get_extrapolated_magnitude,
                             star_mass=star_mass,
                             star_luminosity=star_luminosity,
-                            luminosity_grid=color_table['luminosity'],
-                            mass_grid=color_table['mass'],
+                            luminosity_grid=luminosity_grid,
+                            mass_grid=mass_grid,
                             row_index_1=row_index_1,
                             row_index_2=row_index_2,
                             mass_index=mass_index)
 
-    return (get_magnitude(table_magnitude=color_table['u_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['b_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['v_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['r_ubvri_absolute']),
-            get_magnitude(table_magnitude=color_table['i_ubvri_absolute']))
+    return get_magnitude(magnitude_grid=magnitude_grid)
 
 
 def get_interpolated_magnitude(*,
                                star_mass: float,
                                star_luminosity: float,
-                               table_luminosity: np.ndarray,
-                               table_magnitude: np.ndarray,
+                               luminosity_grid: np.ndarray,
+                               magnitude_grid: np.ndarray,
                                table_mass: np.ndarray,
                                row_index_1: int,
                                row_index_2: int,
                                mass_index: int) -> float:
     spline = linear_estimation(
-            x=(table_luminosity[mass_index, row_index_1],
-               table_luminosity[mass_index, row_index_1 + 1]),
-            y=(table_magnitude[mass_index, row_index_1],
-               table_magnitude[mass_index, row_index_1 + 1]))
+            x=(luminosity_grid[mass_index, row_index_1],
+               luminosity_grid[mass_index, row_index_1 + 1]),
+            y=(magnitude_grid[mass_index, row_index_1],
+               magnitude_grid[mass_index, row_index_1 + 1]))
     min_magnitude = spline(star_luminosity)
 
     spline = linear_estimation(
-            x=(table_luminosity[mass_index + 1, row_index_2],
-               table_luminosity[mass_index + 1, row_index_2 + 1]),
-            y=(table_magnitude[mass_index + 1, row_index_2],
-               table_magnitude[mass_index + 1, row_index_2 + 1]))
+            x=(luminosity_grid[mass_index + 1, row_index_2],
+               luminosity_grid[mass_index + 1, row_index_2 + 1]),
+            y=(magnitude_grid[mass_index + 1, row_index_2],
+               magnitude_grid[mass_index + 1, row_index_2 + 1]))
     max_magnitude = spline(star_luminosity)
 
     magnitude_spline = linear_estimation(x=(table_mass[0], table_mass[1]),
