@@ -29,39 +29,34 @@ def assign_magnitudes(stars: pd.DataFrame,
                       one_color_table: Dict[str, np.ndarray]
                       # TODO: we should return DataFrame
                       ) -> List[pd.Series]:
+    cooling_sequences = {SpectralType.DA: da_cooling_sequences,
+                         SpectralType.DB: db_cooling_sequences}
+    colo_tables = {SpectralType.DA: da_color_table,
+                   SpectralType.DB: db_color_table}
+    metallicities = {SpectralType.DA: [0.001, 0.01, 0.03, 0.06],
+                     SpectralType.DB: [0.001, 0.01, 0.06]}
+
     carbon_oxygen_white_dwarfs_mask = (stars['mass']
                                        < max_carbon_oxygen_core_wd_mass)
     carbon_oxygen_white_dwarfs = stars[carbon_oxygen_white_dwarfs_mask]
     oxygen_neon_white_dwarfs = stars[~carbon_oxygen_white_dwarfs_mask]
 
     for _, star in carbon_oxygen_white_dwarfs.iterrows():
-        if get_spectral_type(db_to_da_fraction) == SpectralType.DA:
-            star['spectral_type'] = SpectralType.DA
-            (luminosity,
-             effective_temperature,
-             u_ubvri_absolute,
-             b_ubvri_absolute,
-             v_ubvri_absolute,
-             r_ubvri_absolute,
-             i_ubvri_absolute) = da_db_interpolation(
-                star=star,
-                cooling_sequences=da_cooling_sequences,
-                color_table=da_color_table,
+        spectral_type = get_spectral_type(db_to_da_fraction)
+        star['spectral_type'] = spectral_type
+
+        (luminosity,
+         effective_temperature,
+         u_ubvri_absolute,
+         b_ubvri_absolute,
+         v_ubvri_absolute,
+         r_ubvri_absolute,
+         i_ubvri_absolute) = da_db_interpolation(
+                star,
+                cooling_sequences=cooling_sequences[spectral_type],
+                color_table=colo_tables[spectral_type],
                 # TODO. can they be taken from cool.seq. keys?
-                metallicities=[0.001, 0.01, 0.03, 0.06])
-        else:
-            star['spectral_type'] = SpectralType.DB
-            (luminosity,
-             effective_temperature,
-             u_ubvri_absolute,
-             b_ubvri_absolute,
-             v_ubvri_absolute,
-             r_ubvri_absolute,
-             i_ubvri_absolute) = da_db_interpolation(
-                star=star,
-                cooling_sequences=db_cooling_sequences,
-                color_table=db_color_table,
-                metallicities=[0.001, 0.01, 0.06])
+                metallicities=metallicities[spectral_type])
 
         star['luminosity'] = -luminosity
         star['effective_temperature'] = effective_temperature
@@ -146,8 +141,8 @@ def get_min_metallicity_index(*,
             return metallicity_index
 
 
-def da_db_interpolation(*,
-                        star: pd.Series,
+def da_db_interpolation(star: pd.Series,
+                        *,
                         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                         color_table: Dict[str, np.ndarray],
                         metallicities: List[float]) -> Tuple[float, ...]:
