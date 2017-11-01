@@ -42,7 +42,7 @@ def assign_magnitudes(stars: pd.DataFrame,
     oxygen_neon_white_dwarfs = stars[~carbon_oxygen_white_dwarfs_mask]
 
     for _, star in carbon_oxygen_white_dwarfs.iterrows():
-        spectral_type = get_spectral_type(db_to_da_fraction)
+        spectral_type = generate_spectral_type(db_to_da_fraction)
         star['spectral_type'] = spectral_type
 
         (luminosity,
@@ -91,7 +91,7 @@ def assign_magnitudes(stars: pd.DataFrame,
     return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
 
 
-def get_spectral_type(db_to_da_fraction: float) -> SpectralType:
+def generate_spectral_type(db_to_da_fraction: float) -> SpectralType:
     if np.random.rand() < db_to_da_fraction:
         return SpectralType.DB
     return SpectralType.DA
