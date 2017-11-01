@@ -5,6 +5,7 @@ FROM python:${PYTHON3_VERSION}
 RUN apt-get update && \
     apt-get install -y gfortran \
                        unzip \
+                       # scipy's dependencies
                        libblas-dev \
                        liblapack-dev \
                        libatlas-base-dev
