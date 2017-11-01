@@ -1,4 +1,3 @@
-import enum
 from functools import partial
 from math import log10
 from typing import (Dict,
