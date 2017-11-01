@@ -91,7 +91,7 @@ def assign_magnitudes(stars: pd.DataFrame,
     return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
 
 
-def get_spectral_type(db_to_da_fraction: float) -> enum.Enum:
+def get_spectral_type(db_to_da_fraction: float) -> SpectralType:
     if np.random.rand() < db_to_da_fraction:
         return SpectralType.DB
     return SpectralType.DA
