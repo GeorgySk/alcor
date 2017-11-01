@@ -66,6 +66,9 @@ def assign_magnitudes(stars: pd.DataFrame,
         star['r_ubvri_absolute'] = r_ubvri_absolute
         star['i_ubvri_absolute'] = i_ubvri_absolute
 
+    oxygen_neon_white_dwarfs['cooling_time'] = 9. + log10(
+            oxygen_neon_white_dwarfs['cooling_time'])
+
     for _, star in oxygen_neon_white_dwarfs.iterrows():
         star['spectral_type'] = SpectralType.ONe
         (luminosity,
@@ -99,8 +102,6 @@ def one_interpolation(*,
                       color_table: Dict[str, np.ndarray],
                       one_model: bool = True,
                       by_logarithm: bool = False) -> Tuple[float, ...]:
-    star['cooling_time'] = log10(star['cooling_time']) + 9.
-
     do_interpolation = partial(interpolate,
                                star=star,
                                cooling_or_color_sequence=color_table,
