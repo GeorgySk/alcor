@@ -55,22 +55,9 @@ def assign_magnitudes(stars: pd.DataFrame,
 
     for _, star in oxygen_neon_white_dwarfs.iterrows():
         star['spectral_type'] = SpectralType.ONe
-        (luminosity,
-         effective_temperature,
-         u_ubvri_absolute,
-         b_ubvri_absolute,
-         v_ubvri_absolute,
-         r_ubvri_absolute,
-         i_ubvri_absolute) = one_interpolation(star=star,
-                                               color_table=one_color_table)
 
-        star['luminosity'] = -luminosity
-        star['effective_temperature'] = effective_temperature
-        star['u_ubvri_absolute'] = u_ubvri_absolute
-        star['b_ubvri_absolute'] = b_ubvri_absolute
-        star['v_ubvri_absolute'] = v_ubvri_absolute
-        star['r_ubvri_absolute'] = r_ubvri_absolute
-        star['i_ubvri_absolute'] = i_ubvri_absolute
+        one_interpolation(star,
+                          color_table=one_color_table)
 
     return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
 
@@ -81,39 +68,33 @@ def generate_spectral_type(db_to_da_fraction: float) -> SpectralType:
     return SpectralType.DA
 
 
-def one_interpolation(*,
-                      star: pd.Series,
+def one_interpolation(star: pd.Series,
+                      *,
                       color_table: Dict[str, np.ndarray],
                       one_model: bool = True,
-                      by_logarithm: bool = False) -> Tuple[float, ...]:
+                      by_logarithm: bool = False) -> None:
     do_interpolation = partial(interpolate,
                                star=star,
                                cooling_or_color_sequence=color_table,
                                by_logarithm=by_logarithm,
                                one_model=one_model)
-    luminosity = do_interpolation(interest_sequence='luminosity')
-    v_ubvri_absolute = do_interpolation(interest_sequence='v_ubvri_absolute')
-    bv_ubvri = do_interpolation(interest_sequence='bv_ubvri')
-    vi_ubvri = do_interpolation(interest_sequence='vi_ubvri')
-    vr_ubvri = do_interpolation(interest_sequence='vr_ubvri')
-    uv_ubvri = do_interpolation(interest_sequence='uv_ubvri')
+    star['luminosity'] = do_interpolation(interest_sequence_grid='luminosity')
+    v_ubvri_absolute = do_interpolation(
+            interest_sequence_grid='v_ubvri_absolute')
+    bv_ubvri = do_interpolation(interest_sequence_grid='bv_ubvri')
+    vi_ubvri = do_interpolation(interest_sequence_grid='vi_ubvri')
+    vr_ubvri = do_interpolation(interest_sequence_grid='vr_ubvri')
+    uv_ubvri = do_interpolation(interest_sequence_grid='uv_ubvri')
     log_effective_temperature = do_interpolation(
-            interest_sequence='log_effective_temperature')
+            interest_sequence_grid='log_effective_temperature')
 
-    effective_temperature = 10. ** log_effective_temperature
+    star['effective_temperature'] = 10. ** log_effective_temperature
 
-    u_ubvri_absolute = uv_ubvri + v_ubvri_absolute
-    b_ubvri_absolute = bv_ubvri + v_ubvri_absolute
-    r_ubvri_absolute = v_ubvri_absolute - vr_ubvri
-    i_ubvri_absolute = v_ubvri_absolute - vi_ubvri
-
-    return (luminosity,
-            effective_temperature,
-            u_ubvri_absolute,
-            b_ubvri_absolute,
-            v_ubvri_absolute,
-            r_ubvri_absolute,
-            i_ubvri_absolute)
+    star['u_ubvri_absolute'] = uv_ubvri + v_ubvri_absolute
+    star['b_ubvri_absolute'] = bv_ubvri + v_ubvri_absolute
+    star['r_ubvri_absolute'] = v_ubvri_absolute - vr_ubvri
+    star['i_ubvri_absolute'] = v_ubvri_absolute - vi_ubvri
+    star['v_ubvri_absolute'] = v_ubvri_absolute
 
 
 def get_min_metallicity_index(*,
@@ -302,24 +283,6 @@ def estimate_color_magnitude(*,
     return estimate_at(star_mass,
                        x=(min_mass, max_mass),
                        y=(min_magnitude, max_magnitude))
-
-
-def get_value_of_interest(*,
-                          star_mass: float,
-                          star_cooling_time: float,
-                          mass_grid: np.ndarray,
-                          cooling_time_grid: np.ndarray,
-                          pre_wd_lifetime_grid: np.ndarray,
-                          rows_counts: np.ndarray,
-                          interest_sequence_grid: np.ndarray) -> float:
-    return interpolate(star_mass=star_mass,
-                       star_cooling_time=star_cooling_time,
-                       mass_grid=mass_grid,
-                       cooling_time_grid=cooling_time_grid,
-                       pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                       rows_counts=rows_counts,
-                       interest_sequence_grid=interest_sequence_grid,
-                       by_logarithm=False)
 
 
 def interpolate(*,
