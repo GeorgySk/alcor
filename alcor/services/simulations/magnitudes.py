@@ -228,23 +228,80 @@ def da_db_interpolation(star: pd.Series,
     rows_count_1 = rows_counts[min_mass_index]
     rows_count_2 = rows_counts[min_mass_index + 1]
 
-    estimated_magnitude = partial(get_color_magnitude,
-                                  star_mass=star_mass,
-                                  star_luminosity=star_luminosity,
-                                  rows_count_1=rows_count_1,
-                                  rows_count_2=rows_count_2,
-                                  min_mass_index=min_mass_index,
-                                  luminosity_grid=luminosity_grid,
-                                  mass_grid=mass_grid)
-
     colors = ['u_ubvri_absolute',
               'b_ubvri_absolute',
               'v_ubvri_absolute',
               'r_ubvri_absolute',
               'i_ubvri_absolute']
 
+    do_estimation = partial(estimate_color_magnitude,
+                            star_mass=star_mass,
+                            star_luminosity=star_luminosity,
+                            luminosity_grid=luminosity_grid,
+                            min_mass_index=min_mass_index)
+
+    if (star_luminosity > luminosity_grid[min_mass_index, 0]
+            or star_luminosity > luminosity_grid[min_mass_index + 1, 0]):
+        min_mass = mass_grid[min_mass_index]
+        max_mass = mass_grid[min_mass_index + 1]
+        row_index_1 = 0
+        row_index_2 = 0
+    elif (star_luminosity < luminosity_grid[min_mass_index, rows_count_1]
+          or star_luminosity < luminosity_grid[min_mass_index + 1,
+                                               rows_count_2]):
+        min_mass = mass_grid[min_mass_index]
+        max_mass = mass_grid[min_mass_index + 1]
+        row_index_1 = rows_count_1
+        row_index_2 = rows_count_2
+    else:
+        min_mass = mass_grid[0]
+        max_mass = mass_grid[1]
+        find_row_index = partial(find_index,
+                                 luminosity=star_luminosity)
+        row_index_1 = find_row_index(
+                rows_count=rows_count_1,
+                luminosity_grid_for_specific_mass=luminosity_grid[
+                                                  min_mass_index, :])
+        row_index_2 = find_row_index(
+                rows_count=rows_count_2,
+                luminosity_grid_for_specific_mass=luminosity_grid[
+                                                  min_mass_index + 1, :])
+
     for color in colors:
-        star[color] = estimated_magnitude(magnitude_grid=color_table[color])
+        magnitude = do_estimation(magnitude_grid=color_table[color],
+                                  min_mass=min_mass,
+                                  max_mass=max_mass,
+                                  row_index_1=row_index_1,
+                                  row_index_2=row_index_2)
+        star[color] = max(0., magnitude)
+
+
+def estimate_color_magnitude(*,
+                             star_mass: float,
+                             star_luminosity: float,
+                             min_mass_index: int,
+                             luminosity_grid: np.ndarray,
+                             magnitude_grid: np.ndarray,
+                             min_mass: float,
+                             max_mass: float,
+                             row_index_1: int,
+                             row_index_2: int) -> float:
+    min_magnitude = estimate_at(
+            star_luminosity,
+            x=(luminosity_grid[min_mass_index, row_index_1],
+               luminosity_grid[min_mass_index, row_index_1 + 1]),
+            y=(magnitude_grid[min_mass_index, row_index_1],
+               magnitude_grid[min_mass_index, row_index_1 + 1]))
+    max_magnitude = estimate_at(
+            star_luminosity,
+            x=(luminosity_grid[min_mass_index + 1, row_index_2],
+               luminosity_grid[min_mass_index + 1, row_index_2 + 1]),
+            y=(magnitude_grid[min_mass_index + 1, row_index_2],
+               magnitude_grid[min_mass_index + 1, row_index_2 + 1]))
+
+    return estimate_at(star_mass,
+                       x=(min_mass, max_mass),
+                       y=(min_magnitude, max_magnitude))
 
 
 def get_value_of_interest(*,
@@ -521,76 +578,6 @@ def find_mass_index(*,
     star_mass = np.array([star_mass])
     left_index = np.searchsorted(mass_grid, star_mass) - 1
     return np.asscalar(left_index)
-
-
-def get_color_magnitude(*,
-                        star_mass: float,
-                        star_luminosity: float,
-                        rows_count_1: int,
-                        rows_count_2: int,
-                        min_mass_index: int,
-                        luminosity_grid: np.ndarray,
-                        magnitude_grid: np.ndarray,
-                        mass_grid: np.ndarray,
-                        extrapolating_case: bool = False) -> float:
-    if (star_luminosity > luminosity_grid[min_mass_index, 0]
-            or star_luminosity > luminosity_grid[min_mass_index + 1, 0]):
-        extrapolating_case = True
-        row_index_1 = 0
-        row_index_2 = 0
-
-    if (star_luminosity < luminosity_grid[min_mass_index, rows_count_1]
-            or star_luminosity < luminosity_grid[min_mass_index + 1,
-                                                 rows_count_2]):
-        extrapolating_case = True
-        row_index_1 = rows_count_1
-        row_index_2 = rows_count_2
-
-    if extrapolating_case:
-        min_magnitude = estimate_at(
-                star_luminosity,
-                x=(luminosity_grid[min_mass_index, row_index_1],
-                   luminosity_grid[min_mass_index, row_index_1 + 1]),
-                y=(magnitude_grid[min_mass_index, row_index_1],
-                   magnitude_grid[min_mass_index, row_index_1 + 1]))
-        max_magnitude = estimate_at(
-                star_luminosity,
-                x=(luminosity_grid[min_mass_index + 1, row_index_2],
-                   luminosity_grid[min_mass_index + 1, row_index_2 + 1]),
-                y=(magnitude_grid[min_mass_index + 1, row_index_2],
-                   magnitude_grid[min_mass_index + 1, row_index_2 + 1]))
-        magnitude = estimate_at(star_mass,
-                                x=(mass_grid[min_mass_index],
-                                   mass_grid[min_mass_index + 1]),
-                                y=(min_magnitude, max_magnitude))
-        return max(0, magnitude)
-
-    find_row_index = partial(find_index,
-                             luminosity=star_luminosity)
-    row_index_1 = find_row_index(
-            rows_count=rows_count_1,
-            luminosity_grid_for_specific_mass=luminosity_grid[
-                                              min_mass_index, :])
-    row_index_2 = find_row_index(
-            rows_count=rows_count_2,
-            luminosity_grid_for_specific_mass=luminosity_grid[
-                                              min_mass_index + 1, :])
-    min_magnitude = estimate_at(
-            star_luminosity,
-            x=(luminosity_grid[min_mass_index, row_index_1],
-               luminosity_grid[min_mass_index, row_index_1 + 1]),
-            y=(magnitude_grid[min_mass_index, row_index_1],
-               magnitude_grid[min_mass_index, row_index_1 + 1]))
-    max_magnitude = estimate_at(
-            star_luminosity,
-            x=(luminosity_grid[min_mass_index + 1, row_index_2],
-               luminosity_grid[min_mass_index + 1, row_index_2 + 1]),
-            y=(magnitude_grid[min_mass_index + 1, row_index_2],
-               magnitude_grid[min_mass_index + 1, row_index_2 + 1]))
-
-    return estimate_at(star_mass,
-                       x=(mass_grid[0], mass_grid[1]),
-                       y=(min_magnitude, max_magnitude))
 
 
 def find_index(*,
