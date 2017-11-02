@@ -469,12 +469,12 @@ def get_xm(*,
     for row_index in range(rows_count - 1):
         if (cooling_time_grid[mass_index, row_index] <= star_cooling_time
                 <= cooling_time_grid[mass_index, row_index + 1]):
-            spline = linear_estimation(
+            return estimate_at(
+                    star_cooling_time,
                     x=(cooling_time_grid[mass_index, row_index],
                        cooling_time_grid[mass_index, row_index + 1]),
                     y=(interest_sequence_grid[mass_index, row_index],
                        interest_sequence_grid[mass_index, row_index + 1]))
-            return spline(star_cooling_time)
 
 
 def get_extrapolated_xm(*,
@@ -487,30 +487,32 @@ def get_extrapolated_xm(*,
                         by_logarithm: bool,
                         one_model: bool = False) -> float:
     if one_model:
-        spline = linear_estimation(
+        return estimate_at(
+                star_cooling_time,
                 x=(cooling_time_grid[mass_index, min_row_index],
                    cooling_time_grid[mass_index, min_row_index + 1]),
                 y=(interest_sequence_grid[mass_index, min_row_index],
                    interest_sequence_grid[mass_index, min_row_index + 1]))
-        return spline(star_cooling_time)
-
-    x0 = log10(cooling_time_grid[mass_index, min_row_index]
-               + pre_wd_lifetime_grid[mass_index])
-    x1 = log10(cooling_time_grid[mass_index, min_row_index + 1]
-               + pre_wd_lifetime_grid[mass_index])
-
     if by_logarithm:
-        y0 = log10(interest_sequence_grid[mass_index, min_row_index])
-        y1 = log10(interest_sequence_grid[mass_index, min_row_index + 1])
-        spline = linear_estimation(x=(x0, x1),
-                                   y=(y0, y1))
-        return 10.0 ** spline(star_cooling_time)
+        return 10. ** estimate_at(
+                star_cooling_time,
+                x=(log10(cooling_time_grid[mass_index, min_row_index]
+                         + pre_wd_lifetime_grid[mass_index]),
+                   log10(cooling_time_grid[mass_index, min_row_index + 1]
+                         + pre_wd_lifetime_grid[mass_index])),
+                y=(log10(interest_sequence_grid[mass_index,
+                                                min_row_index]),
+                   log10(interest_sequence_grid[mass_index,
+                                                min_row_index + 1])))
 
-    spline = linear_estimation(
-            x=(x0, x1),
+    return estimate_at(
+            star_cooling_time,
+            x=(log10(cooling_time_grid[mass_index, min_row_index]
+                     + pre_wd_lifetime_grid[mass_index]),
+               log10(cooling_time_grid[mass_index, min_row_index + 1]
+                     + pre_wd_lifetime_grid[mass_index])),
             y=(interest_sequence_grid[mass_index, min_row_index],
                interest_sequence_grid[mass_index, min_row_index + 1]))
-    return spline(star_cooling_time)
 
 
 def find_mass_index(*,
