@@ -52,10 +52,9 @@ def assign_magnitudes(stars: pd.DataFrame,
 
     oxygen_neon_white_dwarfs['cooling_time'] = 9. + log10(
             oxygen_neon_white_dwarfs['cooling_time'])
+    oxygen_neon_white_dwarfs['spectral_type'] = SpectralType.ONe
 
     for _, star in oxygen_neon_white_dwarfs.iterrows():
-        star['spectral_type'] = SpectralType.ONe
-
         one_interpolation(star,
                           color_table=one_color_table)
 
@@ -80,26 +79,21 @@ def one_interpolation(star: pd.Series,
     pre_wd_lifetime_grid = color_table['pre_wd_lifetime_grid']
     rows_counts = color_table['rows_counts']
 
+    extrapolate = partial(make_extrapolation,
+                          star_mass=star_mass,
+                          star_cooling_time=star_cooling_time,
+                          cooling_time_grid=cooling_time_grid,
+                          pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+                          rows_counts=rows_counts,
+                          mass_grid=mass_grid,
+                          by_logarithm=by_logarithm)
+
     if star_mass < mass_grid[0]:
-        do_estimation = partial(make_extrapolation,
-                                star_mass=star_mass,
-                                star_cooling_time=star_cooling_time,
-                                cooling_time_grid=cooling_time_grid,
-                                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                                min_mass_index=0,
-                                rows_counts=rows_counts,
-                                mass_grid=mass_grid,
-                                by_logarithm=by_logarithm)
+        do_estimation = partial(extrapolate,
+                                min_mass_index=0)
     elif star_mass >= mass_grid[-1]:
-        do_estimation = partial(make_extrapolation,
-                                star_mass=star_mass,
-                                star_cooling_time=star_cooling_time,
-                                cooling_time_grid=cooling_time_grid,
-                                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                                min_mass_index=mass_grid.size() - 1,
-                                rows_counts=rows_counts,
-                                mass_grid=mass_grid,
-                                by_logarithm=by_logarithm)
+        do_estimation = partial(extrapolate,
+                                min_mass_index=mass_grid.size() - 1)
     else:
         do_estimation = partial(interpolate,
                                 star=star,
