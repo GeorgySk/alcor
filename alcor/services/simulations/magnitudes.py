@@ -210,14 +210,14 @@ def da_db_interpolation(star: pd.Series,
             interest_sequence_grid=max_metallicity_effective_temperature_grid,
             by_logarithm=True)
 
-    luminosity = estimate_at(star_metallicity,
-                             x=(min_metallicity, max_metallicity),
-                             y=(min_luminosity, max_luminosity))
+    star['luminosity'] = -estimate_at(star_metallicity,
+                                      x=(min_metallicity, max_metallicity),
+                                      y=(min_luminosity, max_luminosity))
 
-    effective_temperature = estimate_at(star_metallicity,
-                                        x=(min_metallicity, max_metallicity),
-                                        y=(min_effective_temperature,
-                                           max_effective_temperature))
+    star['effective_temperature'] = estimate_at(
+            star_metallicity,
+            x=(min_metallicity, max_metallicity),
+            y=(min_effective_temperature, max_effective_temperature))
 
     luminosity_grid = color_table['luminosity']
     mass_grid = color_table['mass_grid']
@@ -237,24 +237,14 @@ def da_db_interpolation(star: pd.Series,
                                   luminosity_grid=luminosity_grid,
                                   mass_grid=mass_grid)
 
-    u_ubvri_absolute = estimated_magnitude(
-            magnitude_grid=color_table['u_ubvri_absolute'])
-    b_ubvri_absolute = estimated_magnitude(
-            magnitude_grid=color_table['b_ubvri_absolute'])
-    v_ubvri_absolute = estimated_magnitude(
-            magnitude_grid=color_table['v_ubvri_absolute'])
-    r_ubvri_absolute = estimated_magnitude(
-            magnitude_grid=color_table['r_ubvri_absolute'])
-    i_ubvri_absolute = estimated_magnitude(
-            magnitude_grid=color_table['i_ubvri_absolute'])
+    colors = ['u_ubvri_absolute',
+              'b_ubvri_absolute',
+              'v_ubvri_absolute',
+              'r_ubvri_absolute',
+              'i_ubvri_absolute']
 
-    star['luminosity'] = -luminosity
-    star['effective_temperature'] = effective_temperature
-    star['u_ubvri_absolute'] = u_ubvri_absolute
-    star['b_ubvri_absolute'] = b_ubvri_absolute
-    star['v_ubvri_absolute'] = v_ubvri_absolute
-    star['r_ubvri_absolute'] = r_ubvri_absolute
-    star['i_ubvri_absolute'] = i_ubvri_absolute
+    for color in colors:
+        star[color] = estimated_magnitude(magnitude_grid=color_table[color])
 
 
 def get_value_of_interest(*,
