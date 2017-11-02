@@ -147,9 +147,8 @@ def da_db_interpolation(star: pd.Series,
                         *,
                         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                         color_table: Dict[str, np.ndarray],
-                        metallicities: List[float]) -> None:
+                        metallicities: List[float]) -> pd.Series:
     star_metallicity = star['metallicity']
-    star_luminosity = star['luminosity']
     star_mass = star['mass']
     star_cooling_time = star['cooling_time']
 
@@ -328,6 +327,17 @@ def da_db_interpolation(star: pd.Series,
             x=(min_metallicity, max_metallicity),
             y=(min_effective_temperature, max_effective_temperature))
 
+    star = star_with_colors(star,
+                            color_table=color_table)
+
+    return star
+
+
+def star_with_colors(star: pd.Series,
+                     *,
+                     color_table: Dict[str, np.ndarray]) -> pd.Series:
+    star_mass = star['mass']
+    star_luminosity = star['luminosity']
     luminosity_grid = color_table['luminosity']
     mass_grid = color_table['mass_grid']
     rows_counts = color_table['rows_counts']
@@ -388,6 +398,8 @@ def da_db_interpolation(star: pd.Series,
                                 x=(min_mass, max_mass),
                                 y=(min_magnitude, max_magnitude))
         star[color] = max(0., magnitude)
+
+    return star
 
 
 def make_extrapolation(*,
