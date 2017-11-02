@@ -576,12 +576,15 @@ def get_color_magnitude(*,
         return max(0, magnitude)
 
     find_row_index = partial(find_index,
-                             luminosity=star_luminosity,
-                             luminosity_grid=luminosity_grid)
-    row_index_1 = find_row_index(rows_count=rows_count_1,
-                                 mass_index=min_mass_index)
-    row_index_2 = find_row_index(rows_count=rows_count_2,
-                                 mass_index=min_mass_index + 1)
+                             luminosity=star_luminosity)
+    row_index_1 = find_row_index(
+            rows_count=rows_count_1,
+            luminosity_grid_for_specific_mass=luminosity_grid[
+                                              min_mass_index, :])
+    row_index_2 = find_row_index(
+            rows_count=rows_count_2,
+            luminosity_grid_for_specific_mass=luminosity_grid[
+                                              min_mass_index + 1, :])
     min_magnitude = estimate_at(
             star_luminosity,
             x=(luminosity_grid[min_mass_index, row_index_1],
@@ -603,12 +606,11 @@ def get_color_magnitude(*,
 def find_index(*,
                rows_count: int,
                star_luminosity: float,
-               luminosity_grid: np.ndarray,
-               mass_index: int) -> int:
+               luminosity_grid_for_specific_mass: np.ndarray) -> int:
     for row_index in range(rows_count - 1):
-        if (luminosity_grid[mass_index, row_index + 1]
+        if (luminosity_grid_for_specific_mass[row_index + 1]
                 <= star_luminosity
-                <= luminosity_grid[mass_index, row_index]):
+                <= luminosity_grid_for_specific_mass[row_index]):
             return row_index
 
 
