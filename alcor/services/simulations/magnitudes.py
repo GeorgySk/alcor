@@ -265,24 +265,35 @@ def interpolate(*,
                 rows_counts: np.ndarray,
                 by_logarithm: bool,
                 one_model: bool = False) -> float:
-    extrapolate_by_mass_partial = partial(
-            extrapolate_by_mass,
-            star_cooling_time=star_cooling_time,
-            star_mass=star_mass,
-            mass_grid=mass_grid,
-            cooling_time_grid=cooling_time_grid,
-            pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-            interest_sequence_grid=interest_sequence_grid,
-            rows_counts=rows_counts,
-            by_logarithm=by_logarithm,
-            one_model=one_model)
+    interest_value = partial(get_interest_value,
+                             star_cooling_time=star_cooling_time,
+                             cooling_time_grid=cooling_time_grid,
+                             pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+                             interest_sequence_grid=interest_sequence_grid,
+                             by_logarithm=by_logarithm,
+                             one_model=one_model)
+    extrapolating = False
 
     if star_mass < mass_grid[0]:
-        return extrapolate_by_mass_partial(min_mass_index=0)
+        min_mass_index = 0
+        extrapolating = True
 
     if star_mass >= mass_grid[-1]:
-        return extrapolate_by_mass_partial(
-                min_mass_index=mass_grid.size() - 1)
+        min_mass_index = mass_grid.size() - 1
+        extrapolating = True
+
+    if extrapolating:
+        min_interest_value = interest_value(
+                mass_index=min_mass_index,
+                rows_count=rows_counts[min_mass_index])
+        max_interest_value = interest_value(
+                mass_index=min_mass_index + 1,
+                rows_count=rows_counts[min_mass_index + 1])
+        min_mass = mass_grid[min_mass_index]
+        max_mass = mass_grid[min_mass_index + 1]
+        return estimate_at(star_mass,
+                           x=(min_mass, max_mass),
+                           y=(min_interest_value, max_interest_value))
 
     return interpolate_by_mass(
         star_mass=star_mass,
@@ -294,36 +305,6 @@ def interpolate(*,
         rows_counts=rows_counts,
         by_logarithm=by_logarithm,
         one_model=one_model)
-
-
-def extrapolate_by_mass(*,
-                        star_cooling_time: float,
-                        star_mass: float,
-                        min_mass_index: int,
-                        mass_grid: np.ndarray,
-                        cooling_time_grid: np.ndarray,
-                        pre_wd_lifetime_grid: np.ndarray,
-                        interest_sequence_grid: np.ndarray,
-                        rows_counts: np.ndarray,
-                        by_logarithm: bool,
-                        one_model: bool = False) -> float:
-    xm = partial(get_xm,
-                 star_cooling_time=star_cooling_time,
-                 cooling_time_grid=cooling_time_grid,
-                 pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                 interest_sequence_grid=interest_sequence_grid,
-                 rows_counts=rows_counts,
-                 by_logarithm=by_logarithm,
-                 one_model=one_model)
-    xm1 = xm(mass_index=min_mass_index)
-    xm2 = xm(mass_index=min_mass_index + 1)
-
-    min_mass = mass_grid[min_mass_index]
-    max_mass = mass_grid[min_mass_index + 1]
-
-    spline = linear_estimation(x=(min_mass, max_mass),
-                               y=(xm1, xm2))
-    return spline(star_mass)
 
 
 def get_mass_index(*,
@@ -440,15 +421,15 @@ def interpolate_by_mass(*,
     return spline(star_mass)
 
 
-def get_xm(*,
-           star_cooling_time: float,
-           cooling_time_grid: np.ndarray,
-           pre_wd_lifetime_grid: np.ndarray,
-           interest_sequence_grid: np.ndarray,
-           rows_counts: np.ndarray,
-           mass_index: int,
-           by_logarithm: bool,
-           one_model: bool = False) -> float:
+def get_interest_value(*,
+                       star_cooling_time: float,
+                       cooling_time_grid: np.ndarray,
+                       pre_wd_lifetime_grid: np.ndarray,
+                       interest_sequence_grid: np.ndarray,
+                       rows_count: int,
+                       mass_index: int,
+                       by_logarithm: bool,
+                       one_model: bool = False) -> float:
     extrapolated_xm = partial(get_extrapolated_xm,
                               star_cooling_time=star_cooling_time,
                               cooling_time_grid=cooling_time_grid,
@@ -460,8 +441,6 @@ def get_xm(*,
 
     if star_cooling_time < cooling_time_grid[mass_index, 0]:
         return extrapolated_xm(min_row_index=0)
-
-    rows_count = rows_counts[mass_index]
 
     if star_cooling_time > cooling_time_grid[mass_index, rows_count]:
         return extrapolated_xm(min_row_index=rows_count - 1)
