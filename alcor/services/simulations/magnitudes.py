@@ -48,7 +48,6 @@ def assign_magnitudes(stars: pd.DataFrame,
                 star,
                 cooling_sequences=cooling_sequences[spectral_type],
                 color_table=colo_tables[spectral_type],
-                # TODO. can they be taken from cool.seq. keys?
                 metallicities=metallicities[spectral_type])
 
     oxygen_neon_white_dwarfs['cooling_time'] = 9. + log10(
@@ -120,11 +119,13 @@ def one_interpolation(*,
 def get_min_metallicity_index(*,
                               star_metallicity: float,
                               grid_metallicities: List[float]) -> int:
-    for metallicity_index in range(len(grid_metallicities) - 1):
-        if (grid_metallicities[metallicity_index]
-                <= star_metallicity
-                < grid_metallicities[metallicity_index + 1]):
-            return metallicity_index
+    if (star_metallicity < grid_metallicities[0]
+            or star_metallicity > grid_metallicities[-1]):
+        raise ValueError(f'There is no support for metallicities '
+                         f'lying out of the range of {grid_metallicities}')
+    star_metallicity = np.array([star_metallicity])
+    left_index = np.searchsorted(grid_metallicities, star_metallicity) - 1.
+    return np.asscalar(left_index)
 
 
 def da_db_interpolation(star: pd.Series,
@@ -132,9 +133,6 @@ def da_db_interpolation(star: pd.Series,
                         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
                         color_table: Dict[str, np.ndarray],
                         metallicities: List[float]) -> None:
-    luminosity_grid = color_table['luminosity']
-    mass_grid = color_table['mass_grid']
-    rows_counts = color_table['rows_counts']
     star_metallicity = star['metallicity']
     star_luminosity = star['luminosity']
     star_mass = star['mass']
@@ -146,25 +144,84 @@ def da_db_interpolation(star: pd.Series,
     min_metallicity = metallicities[min_metallicity_index]
     max_metallicity = metallicities[min_metallicity_index + 1]
 
-    (min_luminosity,
-     max_luminosity,
-     min_effective_temperature,
-     max_effective_temperature) = (
-        get_luminosity_effective_temperature_limits(
+    min_metallicity_cooling_sequences = cooling_sequences[int(
+            min_metallicity * 1e3)]
+    max_metallicity_cooling_sequences = cooling_sequences[int(
+            max_metallicity * 1e3)]
+
+    min_metallicity_cooling_time_grid = (
+        min_metallicity_cooling_sequences['cooling_time'])
+    min_metallicity_mass_grid = min_metallicity_cooling_sequences['mass']
+    min_metallicity_pre_wd_lifetime_grid = (
+        min_metallicity_cooling_sequences['pre_wd_lifetime'])
+    min_metallicity_rows_counts = (
+        min_metallicity_cooling_sequences['rows_counts'])
+    min_metallicity_luminosity_grid = (
+        min_metallicity_cooling_sequences['luminosity'])
+    min_metallicity_effective_temperature_grid = (
+        min_metallicity_cooling_sequences['effective_temperature'])
+
+    max_metallicity_cooling_time_grid = (
+        max_metallicity_cooling_sequences['cooling_time'])
+    max_metallicity_mass_grid = max_metallicity_cooling_sequences['mass']
+    max_metallicity_pre_wd_lifetime_grid = (
+        max_metallicity_cooling_sequences['pre_wd_lifetime'])
+    max_metallicity_rows_counts = (
+        max_metallicity_cooling_sequences['rows_counts'])
+    max_metallicity_luminosity_grid = (
+        max_metallicity_cooling_sequences['luminosity'])
+    max_metallicity_effective_temperature_grid = (
+        max_metallicity_cooling_sequences['effective_temperature'])
+
+    min_luminosity = interpolate(
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
-            cooling_sequences=cooling_sequences,
-            min_metallicity_by_thousand=int(min_metallicity * 1e3),
-            max_metallicity_by_thousand=int(max_metallicity * 1e3)))
+            mass_grid=min_metallicity_mass_grid,
+            cooling_time_grid=min_metallicity_cooling_time_grid,
+            pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
+            rows_counts=min_metallicity_rows_counts,
+            interest_sequence_grid=min_metallicity_luminosity_grid,
+            by_logarithm=False)
+    max_luminosity = interpolate(
+            star_mass=star_mass,
+            star_cooling_time=star_cooling_time,
+            mass_grid=max_metallicity_mass_grid,
+            cooling_time_grid=max_metallicity_cooling_time_grid,
+            pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
+            rows_counts=max_metallicity_rows_counts,
+            interest_sequence_grid=max_metallicity_luminosity_grid,
+            by_logarithm=False)
+    min_effective_temperature = interpolate(
+            star_mass=star_mass,
+            star_cooling_time=star_cooling_time,
+            mass_grid=min_metallicity_mass_grid,
+            cooling_time_grid=min_metallicity_cooling_time_grid,
+            pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
+            rows_counts=min_metallicity_rows_counts,
+            interest_sequence_grid=min_metallicity_effective_temperature_grid,
+            by_logarithm=True)
+    max_effective_temperature = interpolate(
+            star_mass=star_mass,
+            star_cooling_time=star_cooling_time,
+            mass_grid=max_metallicity_mass_grid,
+            cooling_time_grid=max_metallicity_cooling_time_grid,
+            pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
+            rows_counts=max_metallicity_rows_counts,
+            interest_sequence_grid=max_metallicity_effective_temperature_grid,
+            by_logarithm=True)
 
-    spline = linear_estimation(x=(min_metallicity, max_metallicity),
-                               y=(min_luminosity, max_luminosity))
-    luminosity = spline(star_metallicity)
+    luminosity = estimate_at(star_metallicity,
+                             x=(min_metallicity, max_metallicity),
+                             y=(min_luminosity, max_luminosity))
 
-    spline = linear_estimation(x=(min_metallicity, max_metallicity),
-                               y=(min_effective_temperature,
-                                  max_effective_temperature))
-    effective_temperature = spline(star_metallicity)
+    effective_temperature = estimate_at(star_metallicity,
+                                        x=(min_metallicity, max_metallicity),
+                                        y=(min_effective_temperature,
+                                           max_effective_temperature))
+
+    luminosity_grid = color_table['luminosity']
+    mass_grid = color_table['mass_grid']
+    rows_counts = color_table['rows_counts']
 
     min_mass_index = find_mass_index(star_mass=star_mass,
                                      mass_grid=mass_grid)
@@ -200,52 +257,22 @@ def da_db_interpolation(star: pd.Series,
     star['i_ubvri_absolute'] = i_ubvri_absolute
 
 
-def get_luminosity_effective_temperature_limits(
-        *,
-        star_mass: float,
-        star_cooling_time: float,
-        cooling_sequences: Dict[int, Dict[str, np.ndarray]],
-        min_metallicity_by_thousand: int,
-        max_metallicity_by_thousand: int) -> Tuple[float, ...]:
-    min_metallicity_sequences = cooling_sequences[min_metallicity_by_thousand]
-    max_metallicity_sequences = cooling_sequences[max_metallicity_by_thousand]
-
-    do_min_interpolation = partial(
-            interpolate,
-            star_mass=star_mass,
-            star_cooling_time=star_cooling_time,
-            mass_grid=min_metallicity_sequences['mass'],
-            cooling_time_grid=min_metallicity_sequences['cooling_time'],
-            pre_wd_lifetime_grid=min_metallicity_sequences['pre_wd_lifetime'],
-            rows_counts=min_metallicity_sequences['rows_counts'])
-    do_max_interpolation = partial(
-            interpolate,
-            star_mass=star_mass,
-            star_cooling_time=star_cooling_time,
-            mass_grid=max_metallicity_sequences['mass'],
-            cooling_time_grid=max_metallicity_sequences['cooling_time'],
-            pre_wd_lifetime_grid=max_metallicity_sequences['pre_wd_lifetime'],
-            rows_counts=max_metallicity_sequences['rows_counts'])
-
-    min_luminosity = do_min_interpolation(
-        interest_sequence_grid=min_metallicity_sequences['luminosity'],
-        by_logarithm=False)
-    min_effective_temperature = do_min_interpolation(
-        interest_sequence_grid=min_metallicity_sequences[
-            'effective_temperature'],
-        by_logarithm=True)
-    max_luminosity = do_max_interpolation(
-        interest_sequence_grid=max_metallicity_sequences['luminosity'],
-        by_logarithm=False)
-    max_effective_temperature = do_max_interpolation(
-        interest_sequence_grid=max_metallicity_sequences[
-            'effective_temperature'],
-        by_logarithm=True)
-
-    return (min_luminosity,
-            max_luminosity,
-            min_effective_temperature,
-            max_effective_temperature)
+def get_value_of_interest(*,
+                          star_mass: float,
+                          star_cooling_time: float,
+                          mass_grid: np.ndarray,
+                          cooling_time_grid: np.ndarray,
+                          pre_wd_lifetime_grid: np.ndarray,
+                          rows_counts: np.ndarray,
+                          interest_sequence_grid: np.ndarray) -> float:
+    return interpolate(star_mass=star_mass,
+                       star_cooling_time=star_cooling_time,
+                       mass_grid=mass_grid,
+                       cooling_time_grid=cooling_time_grid,
+                       pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+                       rows_counts=rows_counts,
+                       interest_sequence_grid=interest_sequence_grid,
+                       by_logarithm=False)
 
 
 def interpolate(*,
@@ -501,11 +528,9 @@ def find_mass_index(*,
     elif star_mass > mass_grid[-1]:
         # Index of element before the last one
         return -2
-    for mass_index in range(mass_grid.size() - 1):
-        if (mass_grid[mass_index]
-                < star_mass
-                <= mass_grid[mass_index + 1]):
-            return mass_index
+    star_mass = np.array([star_mass])
+    left_index = np.searchsorted(mass_grid, star_mass) - 1
+    return np.asscalar(left_index)
 
 
 def get_color_magnitude(*,
