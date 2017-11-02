@@ -85,15 +85,19 @@ def one_interpolation(star: pd.Series,
                           cooling_time_grid=cooling_time_grid,
                           pre_wd_lifetime_grid=pre_wd_lifetime_grid,
                           rows_counts=rows_counts,
-                          mass_grid=mass_grid,
                           by_logarithm=by_logarithm)
 
     if star_mass < mass_grid[0]:
         do_estimation = partial(extrapolate,
-                                min_mass_index=0)
+                                min_mass_index=0,
+                                min_mass=mass_grid[0],
+                                max_mass=mass_grid[1])
     elif star_mass >= mass_grid[-1]:
+        min_mass_index = mass_grid.size() - 1
         do_estimation = partial(extrapolate,
-                                min_mass_index=mass_grid.size() - 1)
+                                min_mass_index=min_mass_index,
+                                min_mass=mass_grid[min_mass_index],
+                                max_mass=mass_grid[min_mass_index + 1])
     else:
         do_estimation = partial(interpolate,
                                 star=star,
@@ -183,36 +187,43 @@ def da_db_interpolation(star: pd.Series,
             star_cooling_time=star_cooling_time,
             cooling_time_grid=min_metallicity_cooling_time_grid,
             pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
-            rows_counts=min_metallicity_rows_counts,
-            mass_grid=min_metallicity_mass_grid)
+            rows_counts=min_metallicity_rows_counts)
     do_max_extrapolation = partial(
             make_extrapolation,
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
             cooling_time_grid=max_metallicity_cooling_time_grid,
             pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
-            rows_counts=max_metallicity_rows_counts,
-            mass_grid=max_metallicity_mass_grid)
+            rows_counts=max_metallicity_rows_counts)
 
     if star_mass < min_metallicity_mass_grid[0]:
         min_luminosity = do_min_extrapolation(
                 min_mass_index=0,
                 interest_sequence_grid=min_metallicity_luminosity_grid,
+                min_mass=min_metallicity_mass_grid[0],
+                max_mass=min_metallicity_mass_grid[1],
                 by_logarithm=False)
         min_effective_temperature = do_min_extrapolation(
                 min_mass_index=0,
                 interest_sequence_grid=(
                     min_metallicity_effective_temperature_grid),
+                min_mass=min_metallicity_mass_grid[0],
+                max_mass=min_metallicity_mass_grid[1],
                 by_logarithm=True)
     elif star_mass >= min_metallicity_mass_grid[-1]:
+        min_mass_index = min_metallicity_mass_grid.size() - 1
         min_luminosity = do_min_extrapolation(
-                min_mass_index=min_metallicity_mass_grid.size() - 1,
+                min_mass_index=min_mass_index,
                 interest_sequence_grid=min_metallicity_luminosity_grid,
+                min_mass=min_metallicity_mass_grid[min_mass_index],
+                max_mass=min_metallicity_mass_grid[min_mass_index + 1],
                 by_logarithm=False)
         min_effective_temperature = do_min_extrapolation(
-                min_mass_index=min_metallicity_mass_grid.size() - 1,
+                min_mass_index=min_mass_index,
                 interest_sequence_grid=(
                     min_metallicity_effective_temperature_grid),
+                min_mass=min_metallicity_mass_grid[min_mass_index],
+                max_mass=min_metallicity_mass_grid[min_mass_index + 1],
                 by_logarithm=True)
     else:
         min_luminosity = interpolate(
@@ -239,21 +250,30 @@ def da_db_interpolation(star: pd.Series,
         max_luminosity = do_max_extrapolation(
                 min_mass_index=0,
                 interest_sequence_grid=max_metallicity_luminosity_grid,
+                min_mass=max_metallicity_mass_grid[0],
+                max_mass=max_metallicity_mass_grid[1],
                 by_logarithm=False)
         max_effective_temperature = do_max_extrapolation(
                 min_mass_index=0,
                 interest_sequence_grid=(
                     max_metallicity_effective_temperature_grid),
+                min_mass=max_metallicity_mass_grid[0],
+                max_mass=max_metallicity_mass_grid[1],
                 by_logarithm=True)
     elif star_mass >= max_metallicity_mass_grid[-1]:
+        min_mass_index = max_metallicity_mass_grid.size() - 1
         max_luminosity = do_max_extrapolation(
-                min_mass_index=max_metallicity_mass_grid.size() - 1,
+                min_mass_index=min_mass_index,
                 interest_sequence_grid=max_metallicity_luminosity_grid,
+                min_mass=max_metallicity_mass_grid[min_mass_index],
+                max_mass=max_metallicity_mass_grid[min_mass_index + 1],
                 by_logarithm=False)
         max_effective_temperature = do_max_extrapolation(
-                min_mass_index=max_metallicity_mass_grid.size() - 1,
+                min_mass_index=min_mass_index,
                 interest_sequence_grid=(
                     max_metallicity_effective_temperature_grid),
+                min_mass=max_metallicity_mass_grid[min_mass_index],
+                max_mass=max_metallicity_mass_grid[min_mass_index + 1],
                 by_logarithm=True)
     else:
         max_luminosity = interpolate(
@@ -355,7 +375,8 @@ def make_extrapolation(*,
                        interest_sequence_grid: np.ndarray,
                        min_mass_index: int,
                        rows_counts: np.ndarray,
-                       mass_grid: np.ndarray,
+                       min_mass: float,
+                       max_mass: float,
                        by_logarithm: bool,
                        one_model: bool = False) -> float:
     interest_value = partial(get_interest_value,
@@ -372,8 +393,6 @@ def make_extrapolation(*,
     max_interest_value = interest_value(
             mass_index=min_mass_index + 1,
             rows_count=rows_counts[min_mass_index + 1])
-    min_mass = mass_grid[min_mass_index]
-    max_mass = mass_grid[min_mass_index + 1]
     return estimate_at(star_mass,
                        x=(min_mass, max_mass),
                        y=(min_interest_value, max_interest_value))
