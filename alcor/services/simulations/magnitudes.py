@@ -166,22 +166,29 @@ def da_db_interpolation(star: pd.Series,
                                   max_effective_temperature))
     effective_temperature = spline(star_metallicity)
 
-    interpolate_magnitudes_partial = partial(interpolate_magnitudes,
-                                             luminosity_grid=luminosity_grid,
-                                             mass_grid=mass_grid,
-                                             rows_counts=rows_counts,
-                                             star_luminosity=star_luminosity,
-                                             star_mass=star_mass)
+    min_mass_index = find_mass_index(star_mass=star_mass,
+                                     mass_grid=mass_grid)
+    rows_count_1 = rows_counts[min_mass_index]
+    rows_count_2 = rows_counts[min_mass_index + 1]
 
-    u_ubvri_absolute = interpolate_magnitudes_partial(
+    estimated_magnitude = partial(get_color_magnitude,
+                                  star_mass=star_mass,
+                                  star_luminosity=star_luminosity,
+                                  rows_count_1=rows_count_1,
+                                  rows_count_2=rows_count_2,
+                                  min_mass_index=min_mass_index,
+                                  luminosity_grid=luminosity_grid,
+                                  mass_grid=mass_grid)
+
+    u_ubvri_absolute = estimated_magnitude(
             magnitude_grid=color_table['u_ubvri_absolute'])
-    b_ubvri_absolute = interpolate_magnitudes_partial(
+    b_ubvri_absolute = estimated_magnitude(
             magnitude_grid=color_table['b_ubvri_absolute'])
-    v_ubvri_absolute = interpolate_magnitudes_partial(
+    v_ubvri_absolute = estimated_magnitude(
             magnitude_grid=color_table['v_ubvri_absolute'])
-    r_ubvri_absolute = interpolate_magnitudes_partial(
+    r_ubvri_absolute = estimated_magnitude(
             magnitude_grid=color_table['r_ubvri_absolute'])
-    i_ubvri_absolute = interpolate_magnitudes_partial(
+    i_ubvri_absolute = estimated_magnitude(
             magnitude_grid=color_table['i_ubvri_absolute'])
 
     star['luminosity'] = -luminosity
@@ -506,38 +513,14 @@ def get_extrapolated_xm(*,
     return spline(star_cooling_time)
 
 
-def interpolate_magnitudes(*,
-                           star_mass: float,
-                           star_luminosity: float,
-                           mass_grid: np.ndarray,
-                           rows_counts: np.ndarray,
-                           luminosity_grid: np.ndarray,
-                           magnitude_grid: np.ndarray) -> float:
-    if star_mass <= mass_grid[0]:
-        min_mass_index = 0
-    elif star_mass > mass_grid[-1]:
-        # Index of element before the last one
-        min_mass_index = -2
-    else:
-        min_mass_index = find_mass_index(star_mass=star_mass,
-                                         mass_grid=mass_grid)
-
-    rows_count_1 = rows_counts[min_mass_index]
-    rows_count_2 = rows_counts[min_mass_index + 1]
-
-    return get_color_magnitude(star_mass=star_mass,
-                               star_luminosity=star_luminosity,
-                               rows_count_1=rows_count_1,
-                               rows_count_2=rows_count_2,
-                               min_mass_index=min_mass_index,
-                               luminosity_grid=luminosity_grid,
-                               magnitude_grid=magnitude_grid,
-                               mass_grid=mass_grid)
-
-
 def find_mass_index(*,
                     star_mass: float,
                     mass_grid: np.ndarray) -> int:
+    if star_mass <= mass_grid[0]:
+        return 0
+    elif star_mass > mass_grid[-1]:
+        # Index of element before the last one
+        return -2
     for mass_index in range(mass_grid.size() - 1):
         if (mass_grid[mass_index]
                 < star_mass
