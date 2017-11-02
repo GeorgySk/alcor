@@ -2,24 +2,16 @@ import math
 import numpy as np
 import pandas as pd
 
-from alcor.services.simulations.luminosities import (
-    set_metallicities,
-    extrapolated_times,
-    estimated_times,
-    estimate_lifetime,
-    get_main_sequence_lifetimes,
-    set_cooling_times,
-    set_masses,
-    white_dwarf_masses,
-    get_white_dwarfs)
+from alcor.services.simulations import luminosities
 
 
 def test_set_metallicities(stars_w_galactic_disk_types: pd.DataFrame,
                            solar_metallicity: float,
                            subsolar_metallicity: float) -> None:
-    set_metallicities(stars_w_galactic_disk_types,
-                      subsolar_metallicity=subsolar_metallicity,
-                      solar_metallicity=solar_metallicity)
+    luminosities.set_metallicities(
+            stars_w_galactic_disk_types,
+            subsolar_metallicity=subsolar_metallicity,
+            solar_metallicity=solar_metallicity)
 
     thin_disk_stars_mask = (stars_w_galactic_disk_types['galactic_disk_type']
                             == 'thin')
@@ -46,9 +38,10 @@ def test_set_metallicities(stars_w_galactic_disk_types: pd.DataFrame,
 def test_extrapolated_times(masses: np.ndarray,
                             rightmost_mass: float,
                             rightmost_time: float) -> None:
-    times = extrapolated_times(masses=masses,
-                               rightmost_mass=rightmost_mass,
-                               rightmost_time=rightmost_time)
+    times = luminosities.extrapolated_times(
+            masses=masses,
+            rightmost_mass=rightmost_mass,
+            rightmost_time=rightmost_time)
 
     assert isinstance(times, np.ndarray)
     assert masses.shape == times.shape
@@ -65,12 +58,13 @@ def test_estimated_times(masses: np.ndarray) -> None:
     model_subsolar_times = np.array([10.34, 5.756, 2.623, 1.412,
                                      0.905, 0.639, 0.245])
 
-    solar_times = estimated_times(masses=masses,
-                                  model_masses=model_solar_masses,
-                                  model_times=model_solar_times)
-    subsolar_times = estimated_times(masses=masses,
-                                     model_masses=model_subsolar_masses,
-                                     model_times=model_subsolar_times)
+    solar_times = luminosities.estimated_times(masses=masses,
+                                               model_masses=model_solar_masses,
+                                               model_times=model_solar_times)
+    subsolar_times = luminosities.estimated_times(
+            masses=masses,
+            model_masses=model_subsolar_masses,
+            model_times=model_subsolar_times)
 
     assert isinstance(solar_times, np.ndarray)
     assert isinstance(subsolar_times, np.ndarray)
@@ -79,18 +73,19 @@ def test_estimated_times(masses: np.ndarray) -> None:
 
 
 def test_estimate_lifetime() -> None:
-    estimated_lifetime = estimate_lifetime(metallicity=3.,
-                                           subsolar_main_sequence_lifetime=1.,
-                                           solar_main_sequence_lifetime=2.,
-                                           subsolar_metallicity=1.,
-                                           solar_metallicity=2.)
+    estimated_lifetime = luminosities.estimate_lifetime(
+            metallicity=3.,
+            subsolar_main_sequence_lifetime=1.,
+            solar_main_sequence_lifetime=2.,
+            subsolar_metallicity=1.,
+            solar_metallicity=2.)
 
     assert math.isclose(estimated_lifetime, 3.)
 
 
 def test_get_main_sequence_lifetimes(masses: np.ndarray,
                                      metallicities: np.ndarray) -> None:
-    main_sequence_lifetimes = get_main_sequence_lifetimes(
+    main_sequence_lifetimes = luminosities.get_main_sequence_lifetimes(
             masses=masses,
             metallicities=metallicities,
             solar_metallicity=0.01,
@@ -101,10 +96,10 @@ def test_get_main_sequence_lifetimes(masses: np.ndarray,
 
 def test_set_cooling_times(stars_without_cooling_times: pd.DataFrame) -> None:
     columns_before = stars_without_cooling_times.columns
-    set_cooling_times(stars_without_cooling_times,
-                      max_galactic_structure_age=12.,
-                      subsolar_metallicity=0.001,
-                      solar_metallicity=0.01)
+    luminosities.set_cooling_times(stars_without_cooling_times,
+                                   max_galactic_structure_age=12.,
+                                   subsolar_metallicity=0.001,
+                                   solar_metallicity=0.01)
     columns_after = stars_without_cooling_times.columns
 
     assert isinstance(stars_without_cooling_times, pd.DataFrame)
@@ -114,7 +109,7 @@ def test_set_cooling_times(stars_without_cooling_times: pd.DataFrame) -> None:
 
 
 def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
-    masses = white_dwarf_masses(progenitor_masses)
+    masses = luminosities.white_dwarf_masses(progenitor_masses)
 
     assert isinstance(masses, np.ndarray)
     assert progenitor_masses.shape[0] == masses.shape[0]
@@ -122,8 +117,8 @@ def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
 
 def test_set_masses(stars_without_masses: pd.DataFrame) -> None:
     columns_before = stars_without_masses.columns
-    set_masses(stars_without_masses,
-               ifmr_parameter=1.)
+    luminosities.set_masses(stars_without_masses,
+                            ifmr_parameter=1.)
     columns_after = stars_without_masses.columns
 
     assert isinstance(stars_without_masses, pd.DataFrame)
@@ -133,8 +128,8 @@ def test_set_masses(stars_without_masses: pd.DataFrame) -> None:
 
 
 def test_get_white_dwarfs(main_sequence_stars: pd.DataFrame) -> None:
-    white_dwarfs = get_white_dwarfs(main_sequence_stars,
-                                    max_galactic_structure_age=12.)
+    white_dwarfs = luminosities.white_dwarfs(main_sequence_stars,
+                                             max_galactic_structure_age=12.)
 
     assert isinstance(white_dwarfs, pd.DataFrame)
     assert 'metallicity' in white_dwarfs.columns

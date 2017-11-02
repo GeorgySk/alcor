@@ -3,15 +3,15 @@ import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 
-def get_white_dwarfs(stars: pd.DataFrame,
-                     *,
-                     max_galactic_structure_age: float,
-                     ifmr_parameter: float = 1.,
-                     chandrasekhar_limit: float = 1.4,
-                     max_mass: float = 10.5,
-                     solar_metallicity: float = 0.01,
-                     subsolar_metallicity: float = 0.001,
-                     min_cooling_time: float = 0.) -> pd.DataFrame:
+def white_dwarfs(stars: pd.DataFrame,
+                 *,
+                 max_galactic_structure_age: float,
+                 ifmr_parameter: float = 1.,
+                 chandrasekhar_limit: float = 1.4,
+                 max_mass: float = 10.5,
+                 solar_metallicity: float = 0.01,
+                 subsolar_metallicity: float = 0.001,
+                 min_cooling_time: float = 0.) -> pd.DataFrame:
     """
     Filters white dwarfs stars from initial sample of main sequence stars
     and assigns metallicities, cooling times and masses.
