@@ -177,28 +177,43 @@ def da_db_interpolation(star: pd.Series,
     max_metallicity_effective_temperature_grid = (
         max_metallicity_cooling_sequences['effective_temperature'])
 
+    do_min_extrapolation = partial(
+            make_extrapolation,
+            star_mass=star_mass,
+            star_cooling_time=star_cooling_time,
+            cooling_time_grid=min_metallicity_cooling_time_grid,
+            pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
+            rows_counts=min_metallicity_rows_counts,
+            mass_grid=min_metallicity_mass_grid)
+    do_max_extrapolation = partial(
+            make_extrapolation,
+            star_mass=star_mass,
+            star_cooling_time=star_cooling_time,
+            cooling_time_grid=max_metallicity_cooling_time_grid,
+            pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
+            rows_counts=max_metallicity_rows_counts,
+            mass_grid=max_metallicity_mass_grid)
+
     if star_mass < min_metallicity_mass_grid[0]:
-        min_luminosity = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=min_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
+        min_luminosity = do_min_extrapolation(
                 min_mass_index=0,
-                rows_counts=min_metallicity_rows_counts,
-                mass_grid=min_metallicity_mass_grid,
                 interest_sequence_grid=min_metallicity_luminosity_grid,
                 by_logarithm=False)
+        min_effective_temperature = do_min_extrapolation(
+                min_mass_index=0,
+                interest_sequence_grid=(
+                    min_metallicity_effective_temperature_grid),
+                by_logarithm=True)
     elif star_mass >= min_metallicity_mass_grid[-1]:
-        min_luminosity = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=min_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
+        min_luminosity = do_min_extrapolation(
                 min_mass_index=min_metallicity_mass_grid.size() - 1,
-                rows_counts=min_metallicity_rows_counts,
-                mass_grid=min_metallicity_mass_grid,
                 interest_sequence_grid=min_metallicity_luminosity_grid,
                 by_logarithm=False)
+        min_effective_temperature = do_min_extrapolation(
+                min_mass_index=min_metallicity_mass_grid.size() - 1,
+                interest_sequence_grid=(
+                    min_metallicity_effective_temperature_grid),
+                by_logarithm=True)
     else:
         min_luminosity = interpolate(
                 star_mass=star_mass,
@@ -209,65 +224,6 @@ def da_db_interpolation(star: pd.Series,
                 rows_counts=min_metallicity_rows_counts,
                 interest_sequence_grid=min_metallicity_luminosity_grid,
                 by_logarithm=False)
-
-    if star_mass < max_metallicity_mass_grid[0]:
-        max_luminosity = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=max_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
-                min_mass_index=0,
-                rows_counts=max_metallicity_rows_counts,
-                mass_grid=max_metallicity_mass_grid,
-                interest_sequence_grid=max_metallicity_luminosity_grid,
-                by_logarithm=False)
-    elif star_mass >= max_metallicity_mass_grid[-1]:
-        max_luminosity = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=max_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
-                min_mass_index=max_metallicity_mass_grid.size() - 1,
-                rows_counts=max_metallicity_rows_counts,
-                mass_grid=max_metallicity_mass_grid,
-                interest_sequence_grid=max_metallicity_luminosity_grid,
-                by_logarithm=False)
-    else:
-        max_luminosity = interpolate(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                mass_grid=max_metallicity_mass_grid,
-                cooling_time_grid=max_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
-                rows_counts=max_metallicity_rows_counts,
-                interest_sequence_grid=max_metallicity_luminosity_grid,
-                by_logarithm=False)
-
-    if star_mass < min_metallicity_mass_grid[0]:
-        min_effective_temperature = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=min_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
-                min_mass_index=0,
-                rows_counts=min_metallicity_rows_counts,
-                mass_grid=min_metallicity_mass_grid,
-                interest_sequence_grid=(
-                    min_metallicity_effective_temperature_grid),
-                by_logarithm=True)
-    elif star_mass >= min_metallicity_mass_grid[-1]:
-        min_effective_temperature = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=min_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
-                min_mass_index=min_metallicity_mass_grid.size() - 1,
-                rows_counts=min_metallicity_rows_counts,
-                mass_grid=min_metallicity_mass_grid,
-                interest_sequence_grid=(
-                    min_metallicity_effective_temperature_grid),
-                by_logarithm=True)
-    else:
         min_effective_temperature = interpolate(
                 star_mass=star_mass,
                 star_cooling_time=star_cooling_time,
@@ -280,30 +236,35 @@ def da_db_interpolation(star: pd.Series,
                 by_logarithm=True)
 
     if star_mass < max_metallicity_mass_grid[0]:
-        max_effective_temperature = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=max_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
+        max_luminosity = do_max_extrapolation(
                 min_mass_index=0,
-                rows_counts=max_metallicity_rows_counts,
-                mass_grid=max_metallicity_mass_grid,
+                interest_sequence_grid=max_metallicity_luminosity_grid,
+                by_logarithm=False)
+        max_effective_temperature = do_max_extrapolation(
+                min_mass_index=0,
                 interest_sequence_grid=(
                     max_metallicity_effective_temperature_grid),
                 by_logarithm=True)
     elif star_mass >= max_metallicity_mass_grid[-1]:
-        max_effective_temperature = make_extrapolation(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=max_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
+        max_luminosity = do_max_extrapolation(
                 min_mass_index=max_metallicity_mass_grid.size() - 1,
-                rows_counts=max_metallicity_rows_counts,
-                mass_grid=max_metallicity_mass_grid,
+                interest_sequence_grid=max_metallicity_luminosity_grid,
+                by_logarithm=False)
+        max_effective_temperature = do_max_extrapolation(
+                min_mass_index=max_metallicity_mass_grid.size() - 1,
                 interest_sequence_grid=(
                     max_metallicity_effective_temperature_grid),
                 by_logarithm=True)
     else:
+        max_luminosity = interpolate(
+                star_mass=star_mass,
+                star_cooling_time=star_cooling_time,
+                mass_grid=max_metallicity_mass_grid,
+                cooling_time_grid=max_metallicity_cooling_time_grid,
+                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
+                rows_counts=max_metallicity_rows_counts,
+                interest_sequence_grid=max_metallicity_luminosity_grid,
+                by_logarithm=False)
         max_effective_temperature = interpolate(
                 star_mass=star_mass,
                 star_cooling_time=star_cooling_time,
@@ -339,12 +300,6 @@ def da_db_interpolation(star: pd.Series,
               'r_ubvri_absolute',
               'i_ubvri_absolute']
 
-    do_estimation = partial(estimate_color_magnitude,
-                            star_mass=star_mass,
-                            star_luminosity=star_luminosity,
-                            luminosity_grid=luminosity_grid,
-                            min_mass_index=min_mass_index)
-
     if (star_luminosity > luminosity_grid[min_mass_index, 0]
             or star_luminosity > luminosity_grid[min_mass_index + 1, 0]):
         min_mass = mass_grid[min_mass_index]
@@ -373,40 +328,23 @@ def da_db_interpolation(star: pd.Series,
                                                   min_mass_index + 1, :])
 
     for color in colors:
-        magnitude = do_estimation(magnitude_grid=color_table[color],
-                                  min_mass=min_mass,
-                                  max_mass=max_mass,
-                                  row_index_1=row_index_1,
-                                  row_index_2=row_index_2)
+        magnitude_grid = color_table[color]
+        min_magnitude = estimate_at(
+                star_luminosity,
+                x=(luminosity_grid[min_mass_index, row_index_1],
+                   luminosity_grid[min_mass_index, row_index_1 + 1]),
+                y=(magnitude_grid[min_mass_index, row_index_1],
+                   magnitude_grid[min_mass_index, row_index_1 + 1]))
+        max_magnitude = estimate_at(
+                star_luminosity,
+                x=(luminosity_grid[min_mass_index + 1, row_index_2],
+                   luminosity_grid[min_mass_index + 1, row_index_2 + 1]),
+                y=(magnitude_grid[min_mass_index + 1, row_index_2],
+                   magnitude_grid[min_mass_index + 1, row_index_2 + 1]))
+        magnitude = estimate_at(star_mass,
+                                x=(min_mass, max_mass),
+                                y=(min_magnitude, max_magnitude))
         star[color] = max(0., magnitude)
-
-
-def estimate_color_magnitude(*,
-                             star_mass: float,
-                             star_luminosity: float,
-                             min_mass_index: int,
-                             luminosity_grid: np.ndarray,
-                             magnitude_grid: np.ndarray,
-                             min_mass: float,
-                             max_mass: float,
-                             row_index_1: int,
-                             row_index_2: int) -> float:
-    min_magnitude = estimate_at(
-            star_luminosity,
-            x=(luminosity_grid[min_mass_index, row_index_1],
-               luminosity_grid[min_mass_index, row_index_1 + 1]),
-            y=(magnitude_grid[min_mass_index, row_index_1],
-               magnitude_grid[min_mass_index, row_index_1 + 1]))
-    max_magnitude = estimate_at(
-            star_luminosity,
-            x=(luminosity_grid[min_mass_index + 1, row_index_2],
-               luminosity_grid[min_mass_index + 1, row_index_2 + 1]),
-            y=(magnitude_grid[min_mass_index + 1, row_index_2],
-               magnitude_grid[min_mass_index + 1, row_index_2 + 1]))
-
-    return estimate_at(star_mass,
-                       x=(min_mass, max_mass),
-                       y=(min_magnitude, max_magnitude))
 
 
 def make_extrapolation(*,
