@@ -99,9 +99,16 @@ def one_interpolation(star: pd.Series,
                                 min_mass=mass_grid[min_mass_index],
                                 max_mass=mass_grid[min_mass_index + 1])
     else:
-        do_estimation = partial(interpolate,
+        min_mass_index = get_mass_index(star_mass=star_mass,
+                                        mass_grid=mass_grid)
+        min_mass = mass_grid[min_mass_index]
+        max_mass = mass_grid[min_mass_index + 1]
+        do_estimation = partial(interpolate_by_mass,
                                 star=star,
                                 cooling_or_color_sequence=color_table,
+                                min_mass=min_mass,
+                                max_mass=max_mass,
+                                min_mass_index=min_mass_index,
                                 by_logarithm=by_logarithm,
                                 one_model=one_model)
 
@@ -226,19 +233,27 @@ def da_db_interpolation(star: pd.Series,
                 max_mass=min_metallicity_mass_grid[min_mass_index + 1],
                 by_logarithm=True)
     else:
-        min_luminosity = interpolate(
+        min_mass_index = get_mass_index(star_mass=star_mass,
+                                        mass_grid=min_metallicity_mass_grid)
+        min_mass = min_metallicity_mass_grid[min_mass_index]
+        max_mass = min_metallicity_mass_grid[min_mass_index + 1]
+        min_luminosity = interpolate_by_mass(
                 star_mass=star_mass,
                 star_cooling_time=star_cooling_time,
-                mass_grid=min_metallicity_mass_grid,
+                min_mass=min_mass,
+                max_mass=max_mass,
+                min_mass_index=min_mass_index,
                 cooling_time_grid=min_metallicity_cooling_time_grid,
                 pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
                 rows_counts=min_metallicity_rows_counts,
                 interest_sequence_grid=min_metallicity_luminosity_grid,
                 by_logarithm=False)
-        min_effective_temperature = interpolate(
+        min_effective_temperature = interpolate_by_mass(
                 star_mass=star_mass,
                 star_cooling_time=star_cooling_time,
-                mass_grid=min_metallicity_mass_grid,
+                min_mass=min_mass,
+                max_mass=max_mass,
+                min_mass_index=min_mass_index,
                 cooling_time_grid=min_metallicity_cooling_time_grid,
                 pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
                 rows_counts=min_metallicity_rows_counts,
@@ -276,19 +291,27 @@ def da_db_interpolation(star: pd.Series,
                 max_mass=max_metallicity_mass_grid[min_mass_index + 1],
                 by_logarithm=True)
     else:
-        max_luminosity = interpolate(
+        min_mass_index = get_mass_index(star_mass=star_mass,
+                                        mass_grid=max_metallicity_mass_grid)
+        min_mass = max_metallicity_mass_grid[min_mass_index]
+        max_mass = max_metallicity_mass_grid[min_mass_index + 1]
+        max_luminosity = interpolate_by_mass(
                 star_mass=star_mass,
                 star_cooling_time=star_cooling_time,
-                mass_grid=max_metallicity_mass_grid,
+                min_mass=min_mass,
+                max_mass=max_mass,
+                min_mass_index=min_mass_index,
                 cooling_time_grid=max_metallicity_cooling_time_grid,
                 pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
                 rows_counts=max_metallicity_rows_counts,
                 interest_sequence_grid=max_metallicity_luminosity_grid,
                 by_logarithm=False)
-        max_effective_temperature = interpolate(
+        max_effective_temperature = interpolate_by_mass(
                 star_mass=star_mass,
                 star_cooling_time=star_cooling_time,
-                mass_grid=max_metallicity_mass_grid,
+                min_mass=min_mass,
+                max_mass=max_mass,
+                min_mass_index=min_mass_index,
                 cooling_time_grid=max_metallicity_cooling_time_grid,
                 pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
                 rows_counts=max_metallicity_rows_counts,
@@ -396,35 +419,6 @@ def make_extrapolation(*,
     return estimate_at(star_mass,
                        x=(min_mass, max_mass),
                        y=(min_interest_value, max_interest_value))
-
-
-def interpolate(*,
-                star_mass: float,
-                star_cooling_time: float,
-                mass_grid: np.ndarray,
-                cooling_time_grid: np.ndarray,
-                pre_wd_lifetime_grid: np.ndarray,
-                interest_sequence_grid: np.ndarray,
-                rows_counts: np.ndarray,
-                by_logarithm: bool,
-                one_model: bool = False) -> float:
-    min_mass_index = get_mass_index(star_mass=star_mass,
-                                    mass_grid=mass_grid)
-    min_mass = mass_grid[min_mass_index]
-    max_mass = mass_grid[min_mass_index + 1]
-
-    return interpolate_by_mass(
-        star_mass=star_mass,
-        star_cooling_time=star_cooling_time,
-        min_mass=min_mass,
-        max_mass=max_mass,
-        min_mass_index=min_mass_index,
-        cooling_time_grid=cooling_time_grid,
-        pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-        interest_sequence_grid=interest_sequence_grid,
-        rows_counts=rows_counts,
-        by_logarithm=by_logarithm,
-        one_model=one_model)
 
 
 def get_mass_index(*,
