@@ -218,8 +218,9 @@ def star_with_colors(star: pd.Series,
 
     min_mass_index = calculate_index(star_mass,
                                      grid=mass_grid)
+    max_mass_index = min_mass_index + 1
     rows_count = rows_counts[min_mass_index]
-    next_rows_count = rows_counts[min_mass_index + 1]
+    next_rows_count = rows_counts[max_mass_index]
 
     colors = ['u_ubvri_absolute',
               'b_ubvri_absolute',
@@ -227,39 +228,45 @@ def star_with_colors(star: pd.Series,
               'r_ubvri_absolute',
               'i_ubvri_absolute']
 
+    min_luminosity_grid = luminosity_grid[min_mass_index, :]
+    max_luminosity_grid = luminosity_grid[max_mass_index, :]
+
     row_index = calculate_index(star_luminosity,
-                                grid=luminosity_grid[min_mass_index, :])
+                                grid=min_luminosity_grid)
     next_row_index = calculate_index(
             star_luminosity,
-            grid=luminosity_grid[min_mass_index + 1, :])
+            grid=max_luminosity_grid)
 
-    if (star_luminosity > luminosity_grid[min_mass_index, 0]
-            or star_luminosity > luminosity_grid[min_mass_index + 1, 0]):
+    if (star_luminosity > min_luminosity_grid[0]
+            or star_luminosity > max_luminosity_grid[0]):
         min_mass = mass_grid[min_mass_index]
-        max_mass = mass_grid[min_mass_index + 1]
-    elif (star_luminosity < luminosity_grid[min_mass_index, rows_count]
-          or star_luminosity < luminosity_grid[min_mass_index + 1,
-                                               next_rows_count]):
+        max_mass = mass_grid[max_mass_index]
+    elif (star_luminosity < min_luminosity_grid[rows_count]
+          or star_luminosity < max_luminosity_grid[next_rows_count]):
         min_mass = mass_grid[min_mass_index]
-        max_mass = mass_grid[min_mass_index + 1]
+        max_mass = mass_grid[max_mass_index]
     else:
+        # TODO: check these indexes, they look suspicious
         min_mass = mass_grid[0]
         max_mass = mass_grid[1]
 
     for color in colors:
         magnitude_grid = color_table[color]
+        min_magnitude_grid = magnitude_grid[min_mass_index, :]
+        max_magnitude_grid = magnitude_grid[max_mass_index, :]
+
         min_magnitude = estimate_at(
                 star_luminosity,
-                x=(luminosity_grid[min_mass_index, row_index],
-                   luminosity_grid[min_mass_index, row_index + 1]),
-                y=(magnitude_grid[min_mass_index, row_index],
-                   magnitude_grid[min_mass_index, row_index + 1]))
+                x=(min_luminosity_grid[row_index],
+                   min_luminosity_grid[row_index + 1]),
+                y=(min_magnitude_grid[row_index],
+                   magnitude_grid[row_index + 1]))
         max_magnitude = estimate_at(
                 star_luminosity,
-                x=(luminosity_grid[min_mass_index + 1, next_row_index],
-                   luminosity_grid[min_mass_index + 1, next_row_index + 1]),
-                y=(magnitude_grid[min_mass_index + 1, next_row_index],
-                   magnitude_grid[min_mass_index + 1, next_row_index + 1]))
+                x=(max_luminosity_grid[next_row_index],
+                   max_luminosity_grid[next_row_index + 1]),
+                y=(max_magnitude_grid[next_row_index],
+                   max_magnitude_grid[next_row_index + 1]))
         magnitude = estimate_at(star_mass,
                                 x=(min_mass, max_mass),
                                 y=(min_magnitude, max_magnitude))
