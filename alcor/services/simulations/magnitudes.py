@@ -87,27 +87,25 @@ def one_interpolation(star: pd.Series,
                           rows_counts=rows_counts,
                           by_logarithm=by_logarithm)
 
+    min_mass_index = find_mass_index(star_mass=star_mass,
+                                     mass_grid=mass_grid)
+
     if star_mass < mass_grid[0]:
         do_estimation = partial(extrapolate,
-                                min_mass_index=0,
-                                min_mass=mass_grid[0],
-                                max_mass=mass_grid[1])
+                                min_mass_index=min_mass_index,
+                                min_mass=mass_grid[min_mass_index],
+                                max_mass=mass_grid[min_mass_index + 1])
     elif star_mass >= mass_grid[-1]:
-        min_mass_index = mass_grid.size() - 1
         do_estimation = partial(extrapolate,
                                 min_mass_index=min_mass_index,
                                 min_mass=mass_grid[min_mass_index],
                                 max_mass=mass_grid[min_mass_index + 1])
     else:
-        min_mass_index = get_mass_index(star_mass=star_mass,
-                                        mass_grid=mass_grid)
-        min_mass = mass_grid[min_mass_index]
-        max_mass = mass_grid[min_mass_index + 1]
         do_estimation = partial(interpolate_by_mass,
                                 star=star,
                                 cooling_or_color_sequence=color_table,
-                                min_mass=min_mass,
-                                max_mass=max_mass,
+                                min_mass=mass_grid[min_mass_index],
+                                max_mass=mass_grid[min_mass_index + 1],
                                 min_mass_index=min_mass_index,
                                 by_logarithm=by_logarithm,
                                 one_model=one_model)
@@ -152,16 +150,14 @@ def estimate_edge_case(*,
                        rows_counts: np.ndarray,
                        interest_sequence_grid: np.ndarray,
                        by_logarithm: bool) -> float:
-    if star_mass < mass_grid[0]:
-        min_mass_index = 0
-        do_estimation = extrapolate_interest_value
-    elif star_mass >= mass_grid[-1]:
-        min_mass_index = mass_grid.size() - 1
+    min_mass_index = find_mass_index(star_mass=star_mass,
+                                     mass_grid=mass_grid)
+
+    if star_mass < mass_grid[0] or star_mass >= mass_grid[-1]:
         do_estimation = extrapolate_interest_value
     else:
-        min_mass_index = get_mass_index(star_mass=star_mass,
-                                        mass_grid=mass_grid)
         do_estimation = interpolate_by_mass
+
     return do_estimation(
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
@@ -340,14 +336,6 @@ def extrapolate_interest_value(*,
     return estimate_at(star_mass,
                        x=(min_mass, max_mass),
                        y=(min_interest_value, max_interest_value))
-
-
-def get_mass_index(*,
-                   star_mass: float,
-                   mass_grid: np.ndarray) -> int:
-    for row_index in range(mass_grid.size() - 1):
-        if mass_grid[row_index] <= star_mass < mass_grid[row_index + 1]:
-            return row_index
 
 
 def interpolate_by_mass(*,
