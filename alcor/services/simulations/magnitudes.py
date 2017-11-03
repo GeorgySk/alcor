@@ -79,8 +79,8 @@ def one_interpolation(star: pd.Series,
     pre_wd_lifetime_grid = color_table['pre_wd_lifetime_grid']
     rows_counts = color_table['rows_counts']
 
-    min_mass_index = find_mass_index(star_mass=star_mass,
-                                     mass_grid=mass_grid)
+    min_mass_index = calculate_index(star_mass,
+                                     grid=mass_grid)
 
     if star_mass < mass_grid[0] or star_mass >= mass_grid[-1]:
         estimate_interest_value = extrapolate_interest_value
@@ -116,18 +116,6 @@ def one_interpolation(star: pd.Series,
     star['r_ubvri_absolute'] = v_ubvri_absolute - vr_ubvri
     star['i_ubvri_absolute'] = v_ubvri_absolute - vi_ubvri
     star['v_ubvri_absolute'] = v_ubvri_absolute
-
-
-def get_min_metallicity_index(*,
-                              star_metallicity: float,
-                              grid_metallicities: List[float]) -> int:
-    if (star_metallicity < grid_metallicities[0]
-            or star_metallicity > grid_metallicities[-1]):
-        raise ValueError(f'There is no support for metallicities '
-                         f'lying out of the range of {grid_metallicities}')
-    star_metallicity = np.array([star_metallicity])
-    left_index = np.searchsorted(grid_metallicities, star_metallicity) - 1.
-    return np.asscalar(left_index)
 
 
 def estimate_edge_case(*,
@@ -178,12 +166,12 @@ def da_db_interpolation(star: pd.Series,
     max_metallicity_grids = cooling_sequences[int(
             max_metallicity * 1e3)]
 
-    min_metallicity_mass_index = find_mass_index(
-            star_mass=star_mass,
-            mass_grid=min_metallicity_grids['mass'])
-    max_metallicity_mass_index = find_mass_index(
-            star_mass=star_mass,
-            mass_grid=max_metallicity_grids['mass'])
+    min_metallicity_mass_index = calculate_index(
+            star_mass,
+            grid=min_metallicity_grids['mass'])
+    max_metallicity_mass_index = calculate_index(
+            star_mass,
+            grid=max_metallicity_grids['mass'])
 
     estimate_min_case = partial(
             estimate_edge_case,
@@ -243,8 +231,8 @@ def star_with_colors(star: pd.Series,
     mass_grid = color_table['mass_grid']
     rows_counts = color_table['rows_counts']
 
-    min_mass_index = find_mass_index(star_mass=star_mass,
-                                     mass_grid=mass_grid)
+    min_mass_index = calculate_index(star_mass,
+                                     grid=mass_grid)
     rows_count = rows_counts[min_mass_index]
     next_rows_count = rows_counts[min_mass_index + 1]
 
@@ -310,7 +298,6 @@ def extrapolate_interest_value(*,
                                pre_wd_lifetime_grid: np.ndarray,
                                interest_sequence_grid: np.ndarray,
                                min_mass_index: int,
-                               rows_counts: np.ndarray,
                                min_mass: float,
                                max_mass: float,
                                by_logarithm: bool,
@@ -324,11 +311,9 @@ def extrapolate_interest_value(*,
                              one_model=one_model)
 
     min_interest_value = interest_value(
-            mass_index=min_mass_index,
-            rows_count=rows_counts[min_mass_index])
+            mass_index=min_mass_index)
     max_interest_value = interest_value(
-            mass_index=min_mass_index + 1,
-            rows_count=rows_counts[min_mass_index + 1])
+            mass_index=min_mass_index + 1)
     return estimate_at(star_mass,
                        x=(min_mass, max_mass),
                        y=(min_interest_value, max_interest_value))
@@ -457,7 +442,6 @@ def get_interest_value(*,
                        cooling_time_grid: np.ndarray,
                        pre_wd_lifetime_grid: np.ndarray,
                        interest_sequence_grid: np.ndarray,
-                       rows_count: int,
                        mass_index: int,
                        by_logarithm: bool,
                        one_model: bool = False) -> float:
@@ -487,21 +471,19 @@ def get_interest_value(*,
                 by_logarithm=by_logarithm,
                 one_model=one_model)
 
-    if star_cooling_time < cooling_time_grid[mass_index, 0]:
-        return extrapolated_interest_value(min_row_index=0)
+    min_row_index = calculate_index(star_cooling_time,
+                                    grid=cooling_time_grid[mass_index, :])
 
-    if star_cooling_time > cooling_time_grid[mass_index, rows_count]:
-        return extrapolated_interest_value(min_row_index=rows_count - 1)
-
-    for row_index in range(rows_count - 1):
-        if (cooling_time_grid[mass_index, row_index] <= star_cooling_time
-                <= cooling_time_grid[mass_index, row_index + 1]):
-            return estimate_at(
-                    star_cooling_time,
-                    x=(cooling_time_grid[mass_index, row_index],
-                       cooling_time_grid[mass_index, row_index + 1]),
-                    y=(interest_sequence_grid[mass_index, row_index],
-                       interest_sequence_grid[mass_index, row_index + 1]))
+    if (star_cooling_time < cooling_time_grid[mass_index, 0]
+            or star_cooling_time > cooling_time_grid[mass_index, -1]):
+        return extrapolated_interest_value(min_row_index=min_row_index)
+    else:
+        return estimate_at(
+                star_cooling_time,
+                x=(cooling_time_grid[mass_index, min_row_index],
+                   cooling_time_grid[mass_index, min_row_index + 1]),
+                y=(interest_sequence_grid[mass_index, min_row_index],
+                   interest_sequence_grid[mass_index, min_row_index + 1]))
 
 
 def one_white_dwarfs_estimated_interest_value(
@@ -554,19 +536,6 @@ def get_extrapolated_interest_value(*,
                interest_sequence_grid[mass_index, min_row_index + 1]))
 
 
-def find_mass_index(*,
-                    star_mass: float,
-                    mass_grid: np.ndarray) -> int:
-    if star_mass <= mass_grid[0]:
-        return 0
-    elif star_mass > mass_grid[-1]:
-        # Index of element before the last one
-        return -2
-    star_mass = np.array([star_mass])
-    left_index = np.searchsorted(mass_grid, star_mass) - 1
-    return np.asscalar(left_index)
-
-
 def find_index(*,
                rows_count: int,
                star_luminosity: float,
@@ -578,10 +547,35 @@ def find_index(*,
             return row_index
 
 
-def estimate_at(x0: float,
+def get_min_metallicity_index(*,
+                              star_metallicity: float,
+                              grid_metallicities: List[float]) -> int:
+    if (star_metallicity < grid_metallicities[0]
+            or star_metallicity > grid_metallicities[-1]):
+        raise ValueError(f'There is no support for metallicities '
+                         f'lying out of the range of {grid_metallicities}')
+    star_metallicity = np.array([star_metallicity])
+    left_index = np.searchsorted(grid_metallicities, star_metallicity) - 1.
+    return np.asscalar(left_index)
+
+
+def calculate_index(value: float,
+                    *,
+                    grid: np.ndarray) -> int:
+    if value <= grid[0]:
+        return 0
+    elif value > grid[-1]:
+        # Index of element before the last one
+        return -2
+    star_cooling_time = np.array([value])
+    left_index = np.searchsorted(grid, star_cooling_time) - 1
+    return np.asscalar(left_index)
+
+
+def estimate_at(x_0: float,
                 *,
                 x: Tuple[float, float],
                 y: Tuple[float, float]) -> float:
     spline = linear_estimation(x=x,
                                y=y)
-    return spline(x0)
+    return spline(x_0)
