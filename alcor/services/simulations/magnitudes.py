@@ -343,11 +343,11 @@ def interpolate_by_mass(*,
         extrapolated_interest_value = partial(
                 get_extrapolated_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                interest_sequence_grid=interest_sequence_grid,
-                by_logarithm=by_logarithm,
-                one_model=one_model)
+                cooling_time_grid=log10(
+                        cooling_time_grid[min_mass_index, :]
+                        + pre_wd_lifetime_grid[min_mass_index]),
+                interest_sequence_grid=interest_sequence_grid[
+                                       min_mass_index, :])
 
     if star_cooling_time < cooling_time_grid[min_mass_index, 0]:
         x_1 = extrapolated_interest_value(min_row_index=1,
@@ -458,12 +458,9 @@ def get_interest_value(*,
         extrapolated_interest_value = partial(
                 get_extrapolated_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                interest_sequence_grid=interest_sequence_grid,
-                mass_index=mass_index,
-                by_logarithm=by_logarithm,
-                one_model=one_model)
+                cooling_time_grid=log10(cooling_time_grid[mass_index, :]
+                                        + pre_wd_lifetime_grid[mass_index]),
+                interest_sequence_grid=interest_sequence_grid[mass_index, :])
 
     min_row_index = calculate_index(star_cooling_time,
                                     grid=cooling_time_grid[mass_index, :])
@@ -519,18 +516,13 @@ def extrapolated_interest_value_by_log(
 def get_extrapolated_interest_value(*,
                                     star_cooling_time: float,
                                     cooling_time_grid: np.ndarray,
-                                    pre_wd_lifetime_grid: np.ndarray,
                                     interest_sequence_grid: np.ndarray,
-                                    mass_index: int,
                                     min_row_index: int) -> float:
-    return estimate_at(
-            star_cooling_time,
-            x=(log10(cooling_time_grid[mass_index, min_row_index]
-                     + pre_wd_lifetime_grid[mass_index]),
-               log10(cooling_time_grid[mass_index, min_row_index + 1]
-                     + pre_wd_lifetime_grid[mass_index])),
-            y=(interest_sequence_grid[mass_index, min_row_index],
-               interest_sequence_grid[mass_index, min_row_index + 1]))
+    return estimate_at(star_cooling_time,
+                       x=(cooling_time_grid[min_row_index],
+                          cooling_time_grid[min_row_index + 1]),
+                       y=(interest_sequence_grid[min_row_index],
+                          interest_sequence_grid[min_row_index + 1]))
 
 
 def get_min_metallicity_index(*,
