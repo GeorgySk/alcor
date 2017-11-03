@@ -388,84 +388,84 @@ def interpolate_by_mass(*,
                 one_model=one_model)
 
     if star_cooling_time < cooling_time_grid[min_mass_index, 0]:
-        x1 = extrapolated_interest_value(min_row_index=1,
-                                         mass_index=min_mass_index)
+        x_1 = extrapolated_interest_value(min_row_index=1,
+                                          mass_index=min_mass_index)
         case_1 = 1
     elif star_cooling_time >= cooling_time_grid[min_mass_index,
                                                 rows_counts[min_mass_index]]:
         rows_count = rows_counts[min_mass_index]
-        x1 = extrapolated_interest_value(min_row_index=rows_count,
-                                         mass_index=min_mass_index)
+        x_1 = extrapolated_interest_value(min_row_index=rows_count,
+                                          mass_index=min_mass_index)
         case_1 = 1
     else:
         for row_index in range(rows_counts[min_mass_index] - 1):
             if (cooling_time_grid[min_mass_index, row_index]
                     <= star_cooling_time
                     <= cooling_time_grid[min_mass_index, row_index + 1]):
-                y1 = cooling_time_grid[min_mass_index, row_index]
-                y2 = cooling_time_grid[min_mass_index, row_index + 1]
-                x1 = interest_sequence_grid[min_mass_index, row_index]
-                x2 = interest_sequence_grid[min_mass_index, row_index + 1]
+                y_1 = cooling_time_grid[min_mass_index, row_index]
+                y_2 = cooling_time_grid[min_mass_index, row_index + 1]
+                x_1 = interest_sequence_grid[min_mass_index, row_index]
+                x_2 = interest_sequence_grid[min_mass_index, row_index + 1]
                 case_1 = 0
 
     if star_cooling_time < cooling_time_grid[max_mass_index, 0]:
-        x3 = extrapolated_interest_value(min_row_index=1,
-                                         mass_index=max_mass_index)
+        x_3 = extrapolated_interest_value(min_row_index=1,
+                                          mass_index=max_mass_index)
         case_2 = 1
     elif star_cooling_time >= cooling_time_grid[max_mass_index,
                                                 rows_counts[max_mass_index]]:
         rows_count = rows_counts[max_mass_index]
-        x3 = extrapolated_interest_value(min_row_index=rows_count,
-                                         mass_index=max_mass_index)
+        x_3 = extrapolated_interest_value(min_row_index=rows_count,
+                                          mass_index=max_mass_index)
         case_2 = 1
     else:
         for row_index in range(rows_counts[max_mass_index] - 1):
             if (cooling_time_grid[max_mass_index, row_index]
                     <= star_cooling_time
                     <= cooling_time_grid[max_mass_index, row_index + 1]):
-                y3 = cooling_time_grid[max_mass_index, row_index]
-                y4 = cooling_time_grid[max_mass_index, row_index + 1]
-                x3 = interest_sequence_grid[max_mass_index, row_index]
-                x4 = interest_sequence_grid[max_mass_index, row_index + 1]
+                y_3 = cooling_time_grid[max_mass_index, row_index]
+                y_4 = cooling_time_grid[max_mass_index, row_index + 1]
+                x_3 = interest_sequence_grid[max_mass_index, row_index]
+                x_4 = interest_sequence_grid[max_mass_index, row_index + 1]
                 case_2 = 0
 
     if case_1 == 0 and case_2 == 0:
-        ym1 = estimate_at(star_mass,
-                          x=(min_mass, max_mass),
-                          y=(y1, y3))
-        ym2 = estimate_at(star_mass,
-                          x=(min_mass, max_mass),
-                          y=(y2, y4))
-        xm1 = estimate_at(star_mass,
-                          x=(min_mass, max_mass),
-                          y=(x1, x3))
-        xm2 = estimate_at(star_mass,
-                          x=(min_mass, max_mass),
-                          y=(x2, x4))
+        ym_1 = estimate_at(star_mass,
+                           x=(min_mass, max_mass),
+                           y=(y_1, y_3))
+        ym_2 = estimate_at(star_mass,
+                           x=(min_mass, max_mass),
+                           y=(y_2, y_4))
+        xm_1 = estimate_at(star_mass,
+                           x=(min_mass, max_mass),
+                           y=(x_1, x_3))
+        xm_2 = estimate_at(star_mass,
+                           x=(min_mass, max_mass),
+                           y=(x_2, x_4))
 
         return estimate_at(star_cooling_time,
-                           x=(ym1, ym2),
-                           y=(xm1, xm2))
+                           x=(ym_1, ym_2),
+                           y=(xm_1, xm_2))
 
     if case_1 == 0 and case_2 == 1:
-        xm1 = estimate_at(star_cooling_time,
-                          x=(y1, y2),
-                          y=(x1, x2))
+        xm_1 = estimate_at(star_cooling_time,
+                           x=(y_1, y_2),
+                           y=(x_1, x_2))
         return estimate_at(star_mass,
                            x=(min_mass, max_mass),
-                           y=(xm1, x3))
+                           y=(xm_1, x_3))
 
     if case_1 == 1 and case_2 == 0:
-        xm2 = estimate_at(star_cooling_time,
-                          x=(y3, y4),
-                          y=(x3, x4))
+        xm_2 = estimate_at(star_cooling_time,
+                           x=(y_3, y_4),
+                           y=(x_3, x_4))
         return estimate_at(star_mass,
                            x=(min_mass, max_mass),
-                           y=(x1, xm2))
+                           y=(x_1, xm_2))
 
     return estimate_at(star_mass,
                        x=(min_mass, max_mass),
-                       y=(x1, x3))
+                       y=(x_1, x_3))
 
 
 def get_interest_value(*,
