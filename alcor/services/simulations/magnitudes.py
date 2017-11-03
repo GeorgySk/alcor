@@ -378,13 +378,13 @@ def interpolate_by_mass(*,
     if star_cooling_time < cooling_time_grid[min_mass_index, 0]:
         x_1 = extrapolated_interest_value(min_row_index=1,
                                           mass_index=min_mass_index)
-        case_1 = 1
+        case_1 = True
     elif star_cooling_time >= cooling_time_grid[min_mass_index,
                                                 rows_counts[min_mass_index]]:
         rows_count = rows_counts[min_mass_index]
         x_1 = extrapolated_interest_value(min_row_index=rows_count,
                                           mass_index=min_mass_index)
-        case_1 = 1
+        case_1 = True
     else:
         for row_index in range(rows_counts[min_mass_index] - 1):
             if (cooling_time_grid[min_mass_index, row_index]
@@ -394,18 +394,18 @@ def interpolate_by_mass(*,
                 y_2 = cooling_time_grid[min_mass_index, row_index + 1]
                 x_1 = interest_sequence_grid[min_mass_index, row_index]
                 x_2 = interest_sequence_grid[min_mass_index, row_index + 1]
-                case_1 = 0
+                case_1 = False
 
     if star_cooling_time < cooling_time_grid[max_mass_index, 0]:
         x_3 = extrapolated_interest_value(min_row_index=1,
                                           mass_index=max_mass_index)
-        case_2 = 1
+        case_2 = True
     elif star_cooling_time >= cooling_time_grid[max_mass_index,
                                                 rows_counts[max_mass_index]]:
         rows_count = rows_counts[max_mass_index]
         x_3 = extrapolated_interest_value(min_row_index=rows_count,
                                           mass_index=max_mass_index)
-        case_2 = 1
+        case_2 = True
     else:
         for row_index in range(rows_counts[max_mass_index] - 1):
             if (cooling_time_grid[max_mass_index, row_index]
@@ -415,9 +415,9 @@ def interpolate_by_mass(*,
                 y_4 = cooling_time_grid[max_mass_index, row_index + 1]
                 x_3 = interest_sequence_grid[max_mass_index, row_index]
                 x_4 = interest_sequence_grid[max_mass_index, row_index + 1]
-                case_2 = 0
+                case_2 = False
 
-    if case_1 == 0 and case_2 == 0:
+    if not case_1 and not case_2:
         ym_1 = estimate_at(star_mass,
                            x=(min_mass, max_mass),
                            y=(y_1, y_3))
@@ -435,7 +435,7 @@ def interpolate_by_mass(*,
                            x=(ym_1, ym_2),
                            y=(xm_1, xm_2))
 
-    if case_1 == 0 and case_2 == 1:
+    if not case_1 and case_2:
         xm_1 = estimate_at(star_cooling_time,
                            x=(y_1, y_2),
                            y=(x_1, x_2))
@@ -443,7 +443,7 @@ def interpolate_by_mass(*,
                            x=(min_mass, max_mass),
                            y=(xm_1, x_3))
 
-    if case_1 == 1 and case_2 == 0:
+    if case_1 and not case_2:
         xm_2 = estimate_at(star_cooling_time,
                            x=(y_3, y_4),
                            y=(x_3, x_4))
