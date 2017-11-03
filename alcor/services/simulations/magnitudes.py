@@ -330,73 +330,93 @@ def interpolate_by_mass(*,
                         one_model: bool = False) -> float:
     max_mass_index = min_mass_index + 1
 
+    min_cooling_time_grid = cooling_time_grid[min_mass_index, :]
+    max_cooling_time_grid = cooling_time_grid[max_mass_index, :]
+    min_pre_wd_lifetime = pre_wd_lifetime_grid[min_mass_index]
+    max_pre_wd_lifetime = pre_wd_lifetime_grid[max_mass_index]
+    min_interest_sequence = interest_sequence_grid[min_mass_index, :]
+    max_interest_sequence = interest_sequence_grid[max_mass_index, :]
+
     if one_model:
-        extrapolated_interest_value = partial(
+        min_extrapolated_interest_value = partial(
                 estimated_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=(cooling_time_grid[min_mass_index, :]
-                                   + pre_wd_lifetime_grid[min_mass_index]),
-                interest_sequence_grid=interest_sequence_grid[
-                                       min_mass_index, :])
+                cooling_time_grid=(min_cooling_time_grid
+                                   + min_pre_wd_lifetime),
+                interest_sequence_grid=min_interest_sequence)
+        max_extrapolated_interest_value = partial(
+                estimated_interest_value,
+                star_cooling_time=star_cooling_time,
+                cooling_time_grid=(max_cooling_time_grid
+                                   + max_pre_wd_lifetime),
+                interest_sequence_grid=max_interest_sequence)
     elif by_logarithm:
-        extrapolated_interest_value = partial(
+        min_extrapolated_interest_value = partial(
                 estimated_log_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(
-                        cooling_time_grid[min_mass_index, :]
-                        + pre_wd_lifetime_grid[min_mass_index]),
-                interest_sequence_grid=log10(
-                        interest_sequence_grid[min_mass_index, :]))
+                cooling_time_grid=log10(min_cooling_time_grid
+                                        + min_pre_wd_lifetime),
+                interest_sequence_grid=log10(min_interest_sequence))
+        max_extrapolated_interest_value = partial(
+                estimated_log_interest_value,
+                star_cooling_time=star_cooling_time,
+                cooling_time_grid=log10(max_cooling_time_grid
+                                        + max_pre_wd_lifetime),
+                interest_sequence_grid=log10(max_interest_sequence))
     else:
-        extrapolated_interest_value = partial(
+        min_extrapolated_interest_value = partial(
                 estimated_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(
-                        cooling_time_grid[min_mass_index, :]
-                        + pre_wd_lifetime_grid[min_mass_index]),
-                interest_sequence_grid=interest_sequence_grid[
-                                       min_mass_index, :])
+                cooling_time_grid=log10(min_cooling_time_grid
+                                        + min_pre_wd_lifetime),
+                interest_sequence_grid=min_interest_sequence)
+        max_extrapolated_interest_value = partial(
+                estimated_interest_value,
+                star_cooling_time=star_cooling_time,
+                cooling_time_grid=log10(max_cooling_time_grid
+                                        + max_pre_wd_lifetime),
+                interest_sequence_grid=max_interest_sequence)
 
-    if star_cooling_time < cooling_time_grid[min_mass_index, 0]:
-        x_1 = extrapolated_interest_value(min_row_index=1,
-                                          mass_index=min_mass_index)
+    if star_cooling_time < min_cooling_time_grid[0]:
+        x_1 = min_extrapolated_interest_value(min_row_index=1,
+                                              mass_index=min_mass_index)
         case_1 = True
-    elif star_cooling_time >= cooling_time_grid[min_mass_index,
-                                                rows_counts[min_mass_index]]:
+    elif (star_cooling_time
+              >= min_cooling_time_grid[rows_counts[min_mass_index]]):
         rows_count = rows_counts[min_mass_index]
-        x_1 = extrapolated_interest_value(min_row_index=rows_count,
-                                          mass_index=min_mass_index)
+        x_1 = min_extrapolated_interest_value(min_row_index=rows_count,
+                                              mass_index=min_mass_index)
         case_1 = True
     else:
         for row_index in range(rows_counts[min_mass_index] - 1):
-            if (cooling_time_grid[min_mass_index, row_index]
+            if (min_cooling_time_grid[row_index]
                     <= star_cooling_time
-                    <= cooling_time_grid[min_mass_index, row_index + 1]):
-                y_1 = cooling_time_grid[min_mass_index, row_index]
-                y_2 = cooling_time_grid[min_mass_index, row_index + 1]
-                x_1 = interest_sequence_grid[min_mass_index, row_index]
-                x_2 = interest_sequence_grid[min_mass_index, row_index + 1]
+                    <= min_cooling_time_grid[row_index + 1]):
+                y_1 = min_cooling_time_grid[row_index]
+                y_2 = min_cooling_time_grid[row_index + 1]
+                x_1 = min_interest_sequence[row_index]
+                x_2 = min_interest_sequence[row_index + 1]
                 case_1 = False
 
-    if star_cooling_time < cooling_time_grid[max_mass_index, 0]:
-        x_3 = extrapolated_interest_value(min_row_index=1,
-                                          mass_index=max_mass_index)
+    if star_cooling_time < max_cooling_time_grid[0]:
+        x_3 = max_extrapolated_interest_value(min_row_index=1,
+                                              mass_index=max_mass_index)
         case_2 = True
-    elif star_cooling_time >= cooling_time_grid[max_mass_index,
-                                                rows_counts[max_mass_index]]:
+    elif (star_cooling_time
+              >= max_cooling_time_grid[rows_counts[max_mass_index]]):
         rows_count = rows_counts[max_mass_index]
-        x_3 = extrapolated_interest_value(min_row_index=rows_count,
-                                          mass_index=max_mass_index)
+        x_3 = max_extrapolated_interest_value(min_row_index=rows_count,
+                                              mass_index=max_mass_index)
         case_2 = True
     else:
         for row_index in range(rows_counts[max_mass_index] - 1):
-            if (cooling_time_grid[max_mass_index, row_index]
+            if (max_cooling_time_grid[row_index]
                     <= star_cooling_time
-                    <= cooling_time_grid[max_mass_index, row_index + 1]):
-                y_3 = cooling_time_grid[max_mass_index, row_index]
-                y_4 = cooling_time_grid[max_mass_index, row_index + 1]
-                x_3 = interest_sequence_grid[max_mass_index, row_index]
-                x_4 = interest_sequence_grid[max_mass_index, row_index + 1]
+                    <= max_cooling_time_grid[row_index + 1]):
+                y_3 = max_cooling_time_grid[row_index]
+                y_4 = max_cooling_time_grid[row_index + 1]
+                x_3 = max_interest_sequence[row_index]
+                x_4 = max_interest_sequence[row_index + 1]
                 case_2 = False
 
     if not case_1 and not case_2:
@@ -458,16 +478,16 @@ def get_interest_value(*,
         else:
             cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
 
-        if by_logarithm:
-            extrapolated_interest_value = estimated_log_interest_value
-        else:
-            extrapolated_interest_value = estimated_interest_value
-
-        return extrapolated_interest_value(
+        estimated_value = estimated_interest_value(
                 min_row_index=min_row_index,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=cooling_time_grid,
                 interest_sequence_grid=interest_sequence_grid)
+
+        if by_logarithm:
+            return 10. ** estimated_value
+        else:
+            return estimated_value
     else:
         return estimate_at(
                 star_cooling_time,
