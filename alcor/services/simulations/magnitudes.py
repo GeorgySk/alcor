@@ -79,36 +79,25 @@ def one_interpolation(star: pd.Series,
     pre_wd_lifetime_grid = color_table['pre_wd_lifetime_grid']
     rows_counts = color_table['rows_counts']
 
-    extrapolate = partial(extrapolate_interest_value,
-                          star_mass=star_mass,
-                          star_cooling_time=star_cooling_time,
-                          cooling_time_grid=cooling_time_grid,
-                          pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                          rows_counts=rows_counts,
-                          by_logarithm=by_logarithm)
-
     min_mass_index = find_mass_index(star_mass=star_mass,
                                      mass_grid=mass_grid)
 
-    if star_mass < mass_grid[0]:
-        do_estimation = partial(extrapolate,
-                                min_mass_index=min_mass_index,
-                                min_mass=mass_grid[min_mass_index],
-                                max_mass=mass_grid[min_mass_index + 1])
-    elif star_mass >= mass_grid[-1]:
-        do_estimation = partial(extrapolate,
-                                min_mass_index=min_mass_index,
-                                min_mass=mass_grid[min_mass_index],
-                                max_mass=mass_grid[min_mass_index + 1])
+    if star_mass < mass_grid[0] or star_mass >= mass_grid[-1]:
+        estimate_interest_value = extrapolate_interest_value
     else:
-        do_estimation = partial(interpolate_by_mass,
-                                star=star,
-                                cooling_or_color_sequence=color_table,
-                                min_mass=mass_grid[min_mass_index],
-                                max_mass=mass_grid[min_mass_index + 1],
-                                min_mass_index=min_mass_index,
-                                by_logarithm=by_logarithm,
-                                one_model=one_model)
+        estimate_interest_value = interpolate_by_mass
+
+    do_estimation = partial(estimate_interest_value,
+                            star_mass=star_mass,
+                            star_cooling_time=star_cooling_time,
+                            min_mass=mass_grid[min_mass_index],
+                            max_mass=mass_grid[min_mass_index + 1],
+                            min_mass_index=min_mass_index,
+                            cooling_time_grid=cooling_time_grid,
+                            pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+                            rows_counts=rows_counts,
+                            by_logarithm=by_logarithm,
+                            one_model=one_model)
 
     star['luminosity'] = do_estimation(interest_sequence_grid='luminosity')
     v_ubvri_absolute = do_estimation(
