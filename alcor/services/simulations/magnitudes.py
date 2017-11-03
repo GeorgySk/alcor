@@ -79,7 +79,7 @@ def one_interpolation(star: pd.Series,
     pre_wd_lifetime_grid = color_table['pre_wd_lifetime_grid']
     rows_counts = color_table['rows_counts']
 
-    extrapolate = partial(make_extrapolation,
+    extrapolate = partial(extrapolate_interest_value,
                           star_mass=star_mass,
                           star_cooling_time=star_cooling_time,
                           cooling_time_grid=cooling_time_grid,
@@ -154,10 +154,10 @@ def estimate_edge_case(*,
                        by_logarithm: bool) -> float:
     if star_mass < mass_grid[0]:
         min_mass_index = 0
-        do_estimation = make_extrapolation
+        do_estimation = extrapolate_interest_value
     elif star_mass >= mass_grid[-1]:
         min_mass_index = mass_grid.size() - 1
-        do_estimation = make_extrapolation
+        do_estimation = extrapolate_interest_value
     else:
         min_mass_index = get_mass_index(star_mass=star_mass,
                                         mass_grid=mass_grid)
@@ -311,18 +311,18 @@ def star_with_colors(star: pd.Series,
     return star
 
 
-def make_extrapolation(*,
-                       star_mass: float,
-                       star_cooling_time: float,
-                       cooling_time_grid: np.ndarray,
-                       pre_wd_lifetime_grid: np.ndarray,
-                       interest_sequence_grid: np.ndarray,
-                       min_mass_index: int,
-                       rows_counts: np.ndarray,
-                       min_mass: float,
-                       max_mass: float,
-                       by_logarithm: bool,
-                       one_model: bool = False) -> float:
+def extrapolate_interest_value(*,
+                               star_mass: float,
+                               star_cooling_time: float,
+                               cooling_time_grid: np.ndarray,
+                               pre_wd_lifetime_grid: np.ndarray,
+                               interest_sequence_grid: np.ndarray,
+                               min_mass_index: int,
+                               rows_counts: np.ndarray,
+                               min_mass: float,
+                               max_mass: float,
+                               by_logarithm: bool,
+                               one_model: bool = False) -> float:
     interest_value = partial(get_interest_value,
                              star_cooling_time=star_cooling_time,
                              cooling_time_grid=cooling_time_grid,
