@@ -330,6 +330,7 @@ def interpolate_by_mass(*,
                 one_white_dwarfs_estimated_interest_value,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=cooling_time_grid,
+                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
                 interest_sequence_grid=interest_sequence_grid)
     elif by_logarithm:
         extrapolated_interest_value = partial(
@@ -442,6 +443,7 @@ def get_interest_value(*,
                 one_white_dwarfs_estimated_interest_value,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=cooling_time_grid,
+                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
                 interest_sequence_grid=interest_sequence_grid,
                 mass_index=mass_index)
     elif by_logarithm:
@@ -482,13 +484,16 @@ def one_white_dwarfs_estimated_interest_value(
         *,
         star_cooling_time: float,
         cooling_time_grid: np.ndarray,
+        pre_wd_lifetime_grid: np.ndarray,
         interest_sequence_grid: np.ndarray,
         mass_index: int,
         min_row_index: int) -> float:
     return estimate_at(
             star_cooling_time,
-            x=(cooling_time_grid[mass_index, min_row_index],
-               cooling_time_grid[mass_index, min_row_index + 1]),
+            x=(cooling_time_grid[mass_index, min_row_index]
+               + pre_wd_lifetime_grid[mass_index],
+               cooling_time_grid[mass_index, min_row_index + 1]
+               + pre_wd_lifetime_grid[mass_index]),
             y=(interest_sequence_grid[mass_index, min_row_index],
                interest_sequence_grid[mass_index, min_row_index + 1]))
 
