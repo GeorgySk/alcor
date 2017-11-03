@@ -335,7 +335,7 @@ def interpolate_by_mass(*,
                                        min_mass_index, :])
     elif by_logarithm:
         extrapolated_interest_value = partial(
-                extrapolated_interest_value_by_log,
+                estimated_log_interest_value,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=log10(
                         cooling_time_grid[min_mass_index, :]
@@ -450,7 +450,7 @@ def get_interest_value(*,
                 interest_sequence_grid=interest_sequence_grid[mass_index, :])
     elif by_logarithm:
         extrapolated_interest_value = partial(
-                extrapolated_interest_value_by_log,
+                estimated_log_interest_value,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=log10(cooling_time_grid[mass_index, :]
                                         + pre_wd_lifetime_grid[mass_index]),
@@ -491,7 +491,7 @@ def estimated_interest_value(*,
                           interest_sequence_grid[min_row_index + 1]))
 
 
-def extrapolated_interest_value_by_log(
+def estimated_log_interest_value(
         *,
         star_cooling_time: float,
         cooling_time_grid: np.ndarray,
