@@ -134,14 +134,12 @@ def estimate_edge_case(*,
                        star_mass: float,
                        star_cooling_time: float,
                        cooling_time_grid: np.ndarray,
+                       mass_index: int,
                        mass_grid: np.ndarray,
                        pre_wd_lifetime_grid: np.ndarray,
                        rows_counts: np.ndarray,
                        interest_sequence_grid: np.ndarray,
                        by_logarithm: bool) -> float:
-    min_mass_index = find_mass_index(star_mass=star_mass,
-                                     mass_grid=mass_grid)
-
     if star_mass < mass_grid[0] or star_mass >= mass_grid[-1]:
         do_estimation = extrapolate_interest_value
     else:
@@ -153,10 +151,10 @@ def estimate_edge_case(*,
             cooling_time_grid=cooling_time_grid,
             pre_wd_lifetime_grid=pre_wd_lifetime_grid,
             rows_counts=rows_counts,
-            min_mass_index=min_mass_index,
+            min_mass_index=mass_index,
             interest_sequence_grid=interest_sequence_grid,
-            min_mass=mass_grid[min_mass_index],
-            max_mass=mass_grid[min_mass_index + 1],
+            min_mass=mass_grid[mass_index],
+            max_mass=mass_grid[mass_index + 1],
             by_logarithm=by_logarithm)
 
 
@@ -180,10 +178,18 @@ def da_db_interpolation(star: pd.Series,
     max_metallicity_grids = cooling_sequences[int(
             max_metallicity * 1e3)]
 
+    min_metallicity_mass_index = find_mass_index(
+            star_mass=star_mass,
+            mass_grid=min_metallicity_grids['mass'])
+    max_metallicity_mass_index = find_mass_index(
+            star_mass=star_mass,
+            mass_grid=max_metallicity_grids['mass'])
+
     estimate_min_case = partial(
             estimate_edge_case,
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
+            mass_index=min_metallicity_mass_index,
             cooling_time_grid=min_metallicity_grids['cooling_time'],
             mass_grid=min_metallicity_grids['mass'],
             pre_wd_lifetime_grid=min_metallicity_grids['pre_wd_lifetime'],
@@ -192,6 +198,7 @@ def da_db_interpolation(star: pd.Series,
             estimate_edge_case,
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
+            mass_index=max_metallicity_mass_index,
             cooling_time_grid=max_metallicity_grids['cooling_time'],
             mass_grid=max_metallicity_grids['mass'],
             pre_wd_lifetime_grid=max_metallicity_grids['pre_wd_lifetime'],
