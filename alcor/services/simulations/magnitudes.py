@@ -242,32 +242,24 @@ def star_with_colors(star: pd.Series,
               'r_ubvri_absolute',
               'i_ubvri_absolute']
 
+    row_index = calculate_index(star_luminosity,
+                                grid=luminosity_grid[min_mass_index, :])
+    next_row_index = calculate_index(
+            star_luminosity,
+            grid=luminosity_grid[min_mass_index + 1, :])
+
     if (star_luminosity > luminosity_grid[min_mass_index, 0]
             or star_luminosity > luminosity_grid[min_mass_index + 1, 0]):
         min_mass = mass_grid[min_mass_index]
         max_mass = mass_grid[min_mass_index + 1]
-        row_index = 0
-        next_row_index = 0
     elif (star_luminosity < luminosity_grid[min_mass_index, rows_count]
           or star_luminosity < luminosity_grid[min_mass_index + 1,
                                                next_rows_count]):
         min_mass = mass_grid[min_mass_index]
         max_mass = mass_grid[min_mass_index + 1]
-        row_index = rows_count
-        next_row_index = next_rows_count
     else:
         min_mass = mass_grid[0]
         max_mass = mass_grid[1]
-        find_row_index = partial(find_index,
-                                 luminosity=star_luminosity)
-        row_index = find_row_index(
-                rows_count=rows_count,
-                luminosity_grid_for_specific_mass=luminosity_grid[
-                                                  min_mass_index, :])
-        next_row_index = find_row_index(
-                rows_count=next_rows_count,
-                luminosity_grid_for_specific_mass=luminosity_grid[
-                                                  min_mass_index + 1, :])
 
     for color in colors:
         magnitude_grid = color_table[color]
@@ -534,17 +526,6 @@ def get_extrapolated_interest_value(*,
                      + pre_wd_lifetime_grid[mass_index])),
             y=(interest_sequence_grid[mass_index, min_row_index],
                interest_sequence_grid[mass_index, min_row_index + 1]))
-
-
-def find_index(*,
-               rows_count: int,
-               star_luminosity: float,
-               luminosity_grid_for_specific_mass: np.ndarray) -> int:
-    for row_index in range(rows_count - 1):
-        if (luminosity_grid_for_specific_mass[row_index + 1]
-                <= star_luminosity
-                <= luminosity_grid_for_specific_mass[row_index]):
-            return row_index
 
 
 def get_min_metallicity_index(*,
