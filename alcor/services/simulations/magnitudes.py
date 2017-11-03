@@ -327,21 +327,24 @@ def interpolate_by_mass(*,
 
     if one_model:
         extrapolated_interest_value = partial(
-                one_white_dwarfs_estimated_interest_value,
+                estimated_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                interest_sequence_grid=interest_sequence_grid)
+                cooling_time_grid=(cooling_time_grid[min_mass_index, :]
+                                   + pre_wd_lifetime_grid[min_mass_index]),
+                interest_sequence_grid=interest_sequence_grid[
+                                       min_mass_index, :])
     elif by_logarithm:
         extrapolated_interest_value = partial(
                 extrapolated_interest_value_by_log,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                interest_sequence_grid=interest_sequence_grid)
+                cooling_time_grid=log10(
+                        cooling_time_grid[min_mass_index, :]
+                        + pre_wd_lifetime_grid[min_mass_index]),
+                interest_sequence_grid=log10(
+                        interest_sequence_grid[min_mass_index, :]))
     else:
         extrapolated_interest_value = partial(
-                get_extrapolated_interest_value,
+                estimated_interest_value,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=log10(
                         cooling_time_grid[min_mass_index, :]
@@ -440,23 +443,22 @@ def get_interest_value(*,
                        one_model: bool = False) -> float:
     if one_model:
         extrapolated_interest_value = partial(
-                one_white_dwarfs_estimated_interest_value,
+                estimated_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                interest_sequence_grid=interest_sequence_grid,
-                mass_index=mass_index)
+                cooling_time_grid=(cooling_time_grid[mass_index, :]
+                                   + pre_wd_lifetime_grid[mass_index]),
+                interest_sequence_grid=interest_sequence_grid[mass_index, :])
     elif by_logarithm:
         extrapolated_interest_value = partial(
                 extrapolated_interest_value_by_log,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                interest_sequence_grid=interest_sequence_grid,
-                mass_index=mass_index)
+                cooling_time_grid=log10(cooling_time_grid[mass_index, :]
+                                        + pre_wd_lifetime_grid[mass_index]),
+                interest_sequence_grid=log10(
+                        interest_sequence_grid[mass_index, :]))
     else:
         extrapolated_interest_value = partial(
-                get_extrapolated_interest_value,
+                estimated_interest_value,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=log10(cooling_time_grid[mass_index, :]
                                         + pre_wd_lifetime_grid[mass_index]),
@@ -477,22 +479,16 @@ def get_interest_value(*,
                    interest_sequence_grid[mass_index, min_row_index + 1]))
 
 
-def one_white_dwarfs_estimated_interest_value(
-        *,
-        star_cooling_time: float,
-        cooling_time_grid: np.ndarray,
-        pre_wd_lifetime_grid: np.ndarray,
-        interest_sequence_grid: np.ndarray,
-        mass_index: int,
-        min_row_index: int) -> float:
-    return estimate_at(
-            star_cooling_time,
-            x=(cooling_time_grid[mass_index, min_row_index]
-               + pre_wd_lifetime_grid[mass_index],
-               cooling_time_grid[mass_index, min_row_index + 1]
-               + pre_wd_lifetime_grid[mass_index]),
-            y=(interest_sequence_grid[mass_index, min_row_index],
-               interest_sequence_grid[mass_index, min_row_index + 1]))
+def estimated_interest_value(*,
+                             star_cooling_time: float,
+                             cooling_time_grid: np.ndarray,
+                             interest_sequence_grid: np.ndarray,
+                             min_row_index: int) -> float:
+    return estimate_at(star_cooling_time,
+                       x=(cooling_time_grid[min_row_index],
+                          cooling_time_grid[min_row_index + 1]),
+                       y=(interest_sequence_grid[min_row_index],
+                          interest_sequence_grid[min_row_index + 1]))
 
 
 def extrapolated_interest_value_by_log(
@@ -500,29 +496,12 @@ def extrapolated_interest_value_by_log(
         star_cooling_time: float,
         cooling_time_grid: np.ndarray,
         interest_sequence_grid: np.ndarray,
-        pre_wd_lifetime_grid: np.ndarray,
-        mass_index: int,
         min_row_index: int) -> float:
-    return 10. ** estimate_at(
-            star_cooling_time,
-            x=(log10(cooling_time_grid[mass_index, min_row_index]
-                     + pre_wd_lifetime_grid[mass_index]),
-               log10(cooling_time_grid[mass_index, min_row_index + 1]
-                     + pre_wd_lifetime_grid[mass_index])),
-            y=(log10(interest_sequence_grid[mass_index, min_row_index]),
-               log10(interest_sequence_grid[mass_index, min_row_index + 1])))
-
-
-def get_extrapolated_interest_value(*,
-                                    star_cooling_time: float,
-                                    cooling_time_grid: np.ndarray,
-                                    interest_sequence_grid: np.ndarray,
-                                    min_row_index: int) -> float:
-    return estimate_at(star_cooling_time,
-                       x=(cooling_time_grid[min_row_index],
-                          cooling_time_grid[min_row_index + 1]),
-                       y=(interest_sequence_grid[min_row_index],
-                          interest_sequence_grid[min_row_index + 1]))
+    return 10. ** estimated_interest_value(
+            star_cooling_time=star_cooling_time,
+            cooling_time_grid=cooling_time_grid,
+            interest_sequence_grid=interest_sequence_grid,
+            min_row_index=min_row_index)
 
 
 def get_min_metallicity_index(*,
