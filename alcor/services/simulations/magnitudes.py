@@ -446,22 +446,24 @@ def get_interest_value(*,
                        by_logarithm: bool,
                        one_model: bool = False) -> float:
     if one_model:
-        extrapolated_interest_value = partial(
-                estimated_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=(cooling_time_grid + pre_wd_lifetime),
-                interest_sequence_grid=interest_sequence_grid)
+        cooling_time_grid = cooling_time_grid + pre_wd_lifetime
     elif by_logarithm:
+        cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
+        interest_sequence_grid = np.log10(interest_sequence_grid)
+    else:
+        cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
+
+    if by_logarithm:
         extrapolated_interest_value = partial(
                 estimated_log_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(cooling_time_grid + pre_wd_lifetime),
-                interest_sequence_grid=log10(interest_sequence_grid))
+                cooling_time_grid=cooling_time_grid,
+                interest_sequence_grid=interest_sequence_grid)
     else:
         extrapolated_interest_value = partial(
                 estimated_interest_value,
                 star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(cooling_time_grid + pre_wd_lifetime),
+                cooling_time_grid=cooling_time_grid,
                 interest_sequence_grid=interest_sequence_grid)
 
     min_row_index = calculate_index(star_cooling_time,
