@@ -445,33 +445,29 @@ def get_interest_value(*,
                        interest_sequence_grid: np.ndarray,
                        by_logarithm: bool,
                        one_model: bool = False) -> float:
-    if one_model:
-        cooling_time_grid = cooling_time_grid + pre_wd_lifetime
-    elif by_logarithm:
-        cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
-        interest_sequence_grid = np.log10(interest_sequence_grid)
-    else:
-        cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
-
-    if by_logarithm:
-        extrapolated_interest_value = partial(
-                estimated_log_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                interest_sequence_grid=interest_sequence_grid)
-    else:
-        extrapolated_interest_value = partial(
-                estimated_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                interest_sequence_grid=interest_sequence_grid)
-
     min_row_index = calculate_index(star_cooling_time,
                                     grid=cooling_time_grid)
 
     if (star_cooling_time < cooling_time_grid[0]
             or star_cooling_time > cooling_time_grid[-1]):
-        return extrapolated_interest_value(min_row_index=min_row_index)
+        if one_model:
+            cooling_time_grid = cooling_time_grid + pre_wd_lifetime
+        elif by_logarithm:
+            cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
+            interest_sequence_grid = np.log10(interest_sequence_grid)
+        else:
+            cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
+
+        if by_logarithm:
+            extrapolated_interest_value = estimated_log_interest_value
+        else:
+            extrapolated_interest_value = estimated_interest_value
+
+        return extrapolated_interest_value(
+                min_row_index=min_row_index,
+                star_cooling_time=star_cooling_time,
+                cooling_time_grid=cooling_time_grid,
+                interest_sequence_grid=interest_sequence_grid)
     else:
         return estimate_at(
                 star_cooling_time,
