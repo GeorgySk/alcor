@@ -143,6 +143,38 @@ def get_min_metallicity_index(*,
     return np.asscalar(left_index)
 
 
+def estimate_edge_case(*,
+                       star_mass: float,
+                       star_cooling_time: float,
+                       cooling_time_grid: np.ndarray,
+                       mass_grid: np.ndarray,
+                       pre_wd_lifetime_grid: np.ndarray,
+                       rows_counts: np.ndarray,
+                       interest_sequence_grid: np.ndarray,
+                       by_logarithm: bool) -> float:
+    if star_mass < mass_grid[0]:
+        min_mass_index = 0
+        do_estimation = make_extrapolation
+    elif star_mass >= mass_grid[-1]:
+        min_mass_index = mass_grid.size() - 1
+        do_estimation = make_extrapolation
+    else:
+        min_mass_index = get_mass_index(star_mass=star_mass,
+                                        mass_grid=mass_grid)
+        do_estimation = interpolate_by_mass
+    return do_estimation(
+            star_mass=star_mass,
+            star_cooling_time=star_cooling_time,
+            cooling_time_grid=cooling_time_grid,
+            pre_wd_lifetime_grid=pre_wd_lifetime_grid,
+            rows_counts=rows_counts,
+            min_mass_index=min_mass_index,
+            interest_sequence_grid=interest_sequence_grid,
+            min_mass=mass_grid[min_mass_index],
+            max_mass=mass_grid[min_mass_index + 1],
+            by_logarithm=by_logarithm)
+
+
 def da_db_interpolation(star: pd.Series,
                         *,
                         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
@@ -158,165 +190,42 @@ def da_db_interpolation(star: pd.Series,
     min_metallicity = metallicities[min_metallicity_index]
     max_metallicity = metallicities[min_metallicity_index + 1]
 
-    min_metallicity_cooling_sequences = cooling_sequences[int(
+    min_metallicity_grids = cooling_sequences[int(
             min_metallicity * 1e3)]
-    max_metallicity_cooling_sequences = cooling_sequences[int(
+    max_metallicity_grids = cooling_sequences[int(
             max_metallicity * 1e3)]
 
-    min_metallicity_cooling_time_grid = (
-        min_metallicity_cooling_sequences['cooling_time'])
-    min_metallicity_mass_grid = min_metallicity_cooling_sequences['mass']
-    min_metallicity_pre_wd_lifetime_grid = (
-        min_metallicity_cooling_sequences['pre_wd_lifetime'])
-    min_metallicity_rows_counts = (
-        min_metallicity_cooling_sequences['rows_counts'])
-    min_metallicity_luminosity_grid = (
-        min_metallicity_cooling_sequences['luminosity'])
-    min_metallicity_effective_temperature_grid = (
-        min_metallicity_cooling_sequences['effective_temperature'])
-
-    max_metallicity_cooling_time_grid = (
-        max_metallicity_cooling_sequences['cooling_time'])
-    max_metallicity_mass_grid = max_metallicity_cooling_sequences['mass']
-    max_metallicity_pre_wd_lifetime_grid = (
-        max_metallicity_cooling_sequences['pre_wd_lifetime'])
-    max_metallicity_rows_counts = (
-        max_metallicity_cooling_sequences['rows_counts'])
-    max_metallicity_luminosity_grid = (
-        max_metallicity_cooling_sequences['luminosity'])
-    max_metallicity_effective_temperature_grid = (
-        max_metallicity_cooling_sequences['effective_temperature'])
-
-    do_min_extrapolation = partial(
-            make_extrapolation,
+    estimate_min_case = partial(
+            estimate_edge_case,
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
-            cooling_time_grid=min_metallicity_cooling_time_grid,
-            pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
-            rows_counts=min_metallicity_rows_counts)
-    do_max_extrapolation = partial(
-            make_extrapolation,
+            cooling_time_grid=min_metallicity_grids['cooling_time'],
+            mass_grid=min_metallicity_grids['mass'],
+            pre_wd_lifetime_grid=min_metallicity_grids['pre_wd_lifetime'],
+            rows_counts=min_metallicity_grids['rows_counts'])
+    estimate_max_case = partial(
+            estimate_edge_case,
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
-            cooling_time_grid=max_metallicity_cooling_time_grid,
-            pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
-            rows_counts=max_metallicity_rows_counts)
+            cooling_time_grid=max_metallicity_grids['cooling_time'],
+            mass_grid=max_metallicity_grids['mass'],
+            pre_wd_lifetime_grid=max_metallicity_grids['pre_wd_lifetime'],
+            rows_counts=max_metallicity_grids['rows_counts'])
 
-    if star_mass < min_metallicity_mass_grid[0]:
-        min_luminosity = do_min_extrapolation(
-                min_mass_index=0,
-                interest_sequence_grid=min_metallicity_luminosity_grid,
-                min_mass=min_metallicity_mass_grid[0],
-                max_mass=min_metallicity_mass_grid[1],
-                by_logarithm=False)
-        min_effective_temperature = do_min_extrapolation(
-                min_mass_index=0,
-                interest_sequence_grid=(
-                    min_metallicity_effective_temperature_grid),
-                min_mass=min_metallicity_mass_grid[0],
-                max_mass=min_metallicity_mass_grid[1],
-                by_logarithm=True)
-    elif star_mass >= min_metallicity_mass_grid[-1]:
-        min_mass_index = min_metallicity_mass_grid.size() - 1
-        min_luminosity = do_min_extrapolation(
-                min_mass_index=min_mass_index,
-                interest_sequence_grid=min_metallicity_luminosity_grid,
-                min_mass=min_metallicity_mass_grid[min_mass_index],
-                max_mass=min_metallicity_mass_grid[min_mass_index + 1],
-                by_logarithm=False)
-        min_effective_temperature = do_min_extrapolation(
-                min_mass_index=min_mass_index,
-                interest_sequence_grid=(
-                    min_metallicity_effective_temperature_grid),
-                min_mass=min_metallicity_mass_grid[min_mass_index],
-                max_mass=min_metallicity_mass_grid[min_mass_index + 1],
-                by_logarithm=True)
-    else:
-        min_mass_index = get_mass_index(star_mass=star_mass,
-                                        mass_grid=min_metallicity_mass_grid)
-        min_mass = min_metallicity_mass_grid[min_mass_index]
-        max_mass = min_metallicity_mass_grid[min_mass_index + 1]
-        min_luminosity = interpolate_by_mass(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                min_mass=min_mass,
-                max_mass=max_mass,
-                min_mass_index=min_mass_index,
-                cooling_time_grid=min_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
-                rows_counts=min_metallicity_rows_counts,
-                interest_sequence_grid=min_metallicity_luminosity_grid,
-                by_logarithm=False)
-        min_effective_temperature = interpolate_by_mass(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                min_mass=min_mass,
-                max_mass=max_mass,
-                min_mass_index=min_mass_index,
-                cooling_time_grid=min_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=min_metallicity_pre_wd_lifetime_grid,
-                rows_counts=min_metallicity_rows_counts,
-                interest_sequence_grid=(
-                    min_metallicity_effective_temperature_grid),
-                by_logarithm=True)
-
-    if star_mass < max_metallicity_mass_grid[0]:
-        max_luminosity = do_max_extrapolation(
-                min_mass_index=0,
-                interest_sequence_grid=max_metallicity_luminosity_grid,
-                min_mass=max_metallicity_mass_grid[0],
-                max_mass=max_metallicity_mass_grid[1],
-                by_logarithm=False)
-        max_effective_temperature = do_max_extrapolation(
-                min_mass_index=0,
-                interest_sequence_grid=(
-                    max_metallicity_effective_temperature_grid),
-                min_mass=max_metallicity_mass_grid[0],
-                max_mass=max_metallicity_mass_grid[1],
-                by_logarithm=True)
-    elif star_mass >= max_metallicity_mass_grid[-1]:
-        min_mass_index = max_metallicity_mass_grid.size() - 1
-        max_luminosity = do_max_extrapolation(
-                min_mass_index=min_mass_index,
-                interest_sequence_grid=max_metallicity_luminosity_grid,
-                min_mass=max_metallicity_mass_grid[min_mass_index],
-                max_mass=max_metallicity_mass_grid[min_mass_index + 1],
-                by_logarithm=False)
-        max_effective_temperature = do_max_extrapolation(
-                min_mass_index=min_mass_index,
-                interest_sequence_grid=(
-                    max_metallicity_effective_temperature_grid),
-                min_mass=max_metallicity_mass_grid[min_mass_index],
-                max_mass=max_metallicity_mass_grid[min_mass_index + 1],
-                by_logarithm=True)
-    else:
-        min_mass_index = get_mass_index(star_mass=star_mass,
-                                        mass_grid=max_metallicity_mass_grid)
-        min_mass = max_metallicity_mass_grid[min_mass_index]
-        max_mass = max_metallicity_mass_grid[min_mass_index + 1]
-        max_luminosity = interpolate_by_mass(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                min_mass=min_mass,
-                max_mass=max_mass,
-                min_mass_index=min_mass_index,
-                cooling_time_grid=max_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
-                rows_counts=max_metallicity_rows_counts,
-                interest_sequence_grid=max_metallicity_luminosity_grid,
-                by_logarithm=False)
-        max_effective_temperature = interpolate_by_mass(
-                star_mass=star_mass,
-                star_cooling_time=star_cooling_time,
-                min_mass=min_mass,
-                max_mass=max_mass,
-                min_mass_index=min_mass_index,
-                cooling_time_grid=max_metallicity_cooling_time_grid,
-                pre_wd_lifetime_grid=max_metallicity_pre_wd_lifetime_grid,
-                rows_counts=max_metallicity_rows_counts,
-                interest_sequence_grid=(
-                    max_metallicity_effective_temperature_grid),
-                by_logarithm=True)
+    min_luminosity = estimate_min_case(
+            interest_sequence_grid=min_metallicity_grids['luminosity'],
+            by_logarithm=False)
+    max_luminosity = estimate_max_case(
+            interest_sequence_grid=max_metallicity_grids['luminosity'],
+            by_logarithm=False)
+    min_effective_temperature = estimate_min_case(
+            interest_sequence_grid=min_metallicity_grids[
+                'effective_temperature'],
+            by_logarithm=True)
+    max_effective_temperature = estimate_max_case(
+            interest_sequence_grid=max_metallicity_grids[
+                'effective_temperature'],
+            by_logarithm=True)
 
     star['luminosity'] = -estimate_at(star_metallicity,
                                       x=(min_metallicity, max_metallicity),
