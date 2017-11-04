@@ -124,7 +124,7 @@ def set_estimations_to_da_db_white_dwarf(
         *,
         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
         color_table: Dict[str, np.ndarray],
-        metallicities: List[float]) -> None:
+        metallicities: List[float]) -> pd.Series:
     star_metallicity = star['metallicity']
     star_mass = star['mass']
     star_cooling_time = star['cooling_time']
@@ -170,10 +170,8 @@ def set_estimations_to_da_db_white_dwarf(
             x=(min_metallicity, max_metallicity),
             y=(min_effective_temperature, max_effective_temperature))
 
-    star = star_with_colors(star,
+    return star_with_colors(star,
                             color_table=color_table)
-
-    return star
 
 
 def estimate_edge_case(*,
