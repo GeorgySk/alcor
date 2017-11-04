@@ -79,7 +79,6 @@ def set_estimations_to_oxygen_neon_white_dwarf(
     mass_grid = color_table['mass']
     cooling_time_grid = color_table['cooling_time']
     pre_wd_lifetime_grid = color_table['pre_wd_lifetime_grid']
-    rows_counts = color_table['rows_counts']
 
     min_mass_index = calculate_index(star_mass,
                                      grid=mass_grid)
@@ -97,7 +96,6 @@ def set_estimations_to_oxygen_neon_white_dwarf(
                        min_mass_index=min_mass_index,
                        cooling_time_grid=cooling_time_grid,
                        pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                       rows_counts=rows_counts,
                        by_logarithm=by_logarithm,
                        one_model=one_model)
 
@@ -183,7 +181,6 @@ def estimate_edge_case(*,
     mass_grid = cooling_sequences['mass']
     cooling_time_grid = cooling_sequences['cooling_time']
     pre_wd_lifetime_grid = cooling_sequences['pre_wd_lifetime_grid']
-    rows_counts = cooling_sequences['rows_counts']
     mass_index = calculate_index(star_mass,
                                  grid=mass_grid)
 
@@ -197,7 +194,6 @@ def estimate_edge_case(*,
             star_cooling_time=star_cooling_time,
             cooling_time_grid=cooling_time_grid,
             pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-            rows_counts=rows_counts,
             min_mass_index=mass_index,
             interest_sequence_grid=cooling_sequences[interest_sequence_str],
             min_mass=mass_grid[mass_index],
@@ -212,13 +208,10 @@ def star_with_colors(star: pd.Series,
     star_luminosity = star['luminosity']
     luminosity_grid = color_table['luminosity']
     mass_grid = color_table['mass_grid']
-    rows_counts = color_table['rows_counts']
 
     min_mass_index = calculate_index(star_mass,
                                      grid=mass_grid)
     max_mass_index = min_mass_index + 1
-    rows_count = rows_counts[min_mass_index]
-    next_rows_count = rows_counts[max_mass_index]
 
     colors = ['u_ubvri_absolute',
               'b_ubvri_absolute',
@@ -239,8 +232,8 @@ def star_with_colors(star: pd.Series,
             star_luminosity > max_luminosity_grid[0]):
         min_mass = mass_grid[min_mass_index]
         max_mass = mass_grid[max_mass_index]
-    elif (star_luminosity < min_luminosity_grid[rows_count] or
-            star_luminosity < max_luminosity_grid[next_rows_count]):
+    elif (star_luminosity < min_luminosity_grid[-1] or
+            star_luminosity < max_luminosity_grid[-1]):
         min_mass = mass_grid[min_mass_index]
         max_mass = mass_grid[max_mass_index]
     else:
@@ -315,7 +308,6 @@ def interpolate_interest_value(*,
                                cooling_time_grid: np.ndarray,
                                pre_wd_lifetime_grid: np.ndarray,
                                interest_sequence_grid: np.ndarray,
-                               rows_counts: np.ndarray,
                                by_logarithm: bool,
                                one_model: bool = False) -> float:
     max_mass_index = min_mass_index + 1
@@ -368,46 +360,36 @@ def interpolate_interest_value(*,
                 interest_sequence_grid=max_interest_sequence)
 
     if star_cooling_time < min_cooling_time_grid[0]:
-        x_1 = min_extrapolated_interest_value(min_row_index=1,
-                                              mass_index=min_mass_index)
+        x_1 = min_extrapolated_interest_value(min_row_index=0)
         case_1 = True
-    elif (star_cooling_time
-              >= min_cooling_time_grid[rows_counts[min_mass_index]]):
-        rows_count = rows_counts[min_mass_index]
-        x_1 = min_extrapolated_interest_value(min_row_index=rows_count,
-                                              mass_index=min_mass_index)
+    elif star_cooling_time >= min_cooling_time_grid[-1]:
+        x_1 = min_extrapolated_interest_value(min_row_index=-2)
         case_1 = True
     else:
-        for row_index in range(rows_counts[min_mass_index] - 1):
-            if (min_cooling_time_grid[row_index]
-                    <= star_cooling_time
-                    <= min_cooling_time_grid[row_index + 1]):
-                y_1 = min_cooling_time_grid[row_index]
-                y_2 = min_cooling_time_grid[row_index + 1]
-                x_1 = min_interest_sequence[row_index]
-                x_2 = min_interest_sequence[row_index + 1]
-                case_1 = False
+        row_index = get_cooling_time_index(
+                star_cooling_time,
+                cooling_time_grid=min_cooling_time_grid)
+        y_1 = min_cooling_time_grid[row_index]
+        y_2 = min_cooling_time_grid[row_index + 1]
+        x_1 = min_interest_sequence[row_index]
+        x_2 = min_interest_sequence[row_index + 1]
+        case_1 = False
 
     if star_cooling_time < max_cooling_time_grid[0]:
-        x_3 = max_extrapolated_interest_value(min_row_index=1,
-                                              mass_index=max_mass_index)
+        x_3 = max_extrapolated_interest_value(min_row_index=0)
         case_2 = True
-    elif (star_cooling_time
-              >= max_cooling_time_grid[rows_counts[max_mass_index]]):
-        rows_count = rows_counts[max_mass_index]
-        x_3 = max_extrapolated_interest_value(min_row_index=rows_count,
-                                              mass_index=max_mass_index)
+    elif star_cooling_time >= max_cooling_time_grid[-1]:
+        x_3 = max_extrapolated_interest_value(min_row_index=-2)
         case_2 = True
     else:
-        for row_index in range(rows_counts[max_mass_index] - 1):
-            if (max_cooling_time_grid[row_index]
-                    <= star_cooling_time
-                    <= max_cooling_time_grid[row_index + 1]):
-                y_3 = max_cooling_time_grid[row_index]
-                y_4 = max_cooling_time_grid[row_index + 1]
-                x_3 = max_interest_sequence[row_index]
-                x_4 = max_interest_sequence[row_index + 1]
-                case_2 = False
+        row_index = get_cooling_time_index(
+                star_cooling_time,
+                cooling_time_grid=max_cooling_time_grid)
+        y_3 = max_cooling_time_grid[row_index]
+        y_4 = max_cooling_time_grid[row_index + 1]
+        x_3 = max_interest_sequence[row_index]
+        x_4 = max_interest_sequence[row_index + 1]
+        case_2 = False
 
     if not case_1 and not case_2:
         ym_1 = estimate_at(star_mass,
@@ -446,6 +428,15 @@ def interpolate_interest_value(*,
     return estimate_at(star_mass,
                        x=(min_mass, max_mass),
                        y=(x_1, x_3))
+
+
+def get_cooling_time_index(star_cooling_time: float,
+                           cooling_time_grid: np.ndarray) -> int:
+    for index in range(cooling_time_grid.size - 2):
+        if (cooling_time_grid[index]
+                <= star_cooling_time
+                <= cooling_time_grid[index + 1]):
+            return index
 
 
 def get_interest_value(*,
