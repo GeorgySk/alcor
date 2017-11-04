@@ -51,8 +51,6 @@ def assign_estimated_values(
                 color_table=colo_tables[spectral_type],
                 metallicities=metallicities[spectral_type])
 
-    oxygen_neon_white_dwarfs['cooling_time'] = 9. + log10(
-            oxygen_neon_white_dwarfs['cooling_time'])
     oxygen_neon_white_dwarfs['spectral_type'] = SpectralType.ONe
 
     for _, star in oxygen_neon_white_dwarfs.iterrows():
@@ -468,12 +466,11 @@ def get_interest_value(*,
         else:
             return estimated_value
     else:
-        return estimate_at(
-                star_cooling_time,
-                x=(cooling_time_grid[min_row_index],
-                   cooling_time_grid[min_row_index + 1]),
-                y=(interest_sequence_grid[min_row_index],
-                   interest_sequence_grid[min_row_index + 1]))
+        return estimated_interest_value(
+                min_row_index=min_row_index,
+                star_cooling_time=star_cooling_time,
+                cooling_time_grid=cooling_time_grid,
+                interest_sequence_grid=interest_sequence_grid)
 
 
 def estimated_interest_value(*,
