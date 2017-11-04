@@ -190,11 +190,11 @@ def estimate_edge_case(*,
                                  grid=mass_grid)
 
     if star_mass < mass_grid[0] or star_mass >= mass_grid[-1]:
-        do_estimation = extrapolate_interest_value
+        estimate_interest_value = extrapolate_interest_value
     else:
-        do_estimation = interpolate_interest_value
+        estimate_interest_value = interpolate_interest_value
 
-    return do_estimation(
+    return estimate_interest_value(
             star_mass=star_mass,
             star_cooling_time=star_cooling_time,
             cooling_time_grid=cooling_time_grid,
