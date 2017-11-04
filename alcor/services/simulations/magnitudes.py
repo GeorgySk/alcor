@@ -235,12 +235,12 @@ def star_with_colors(star: pd.Series,
             star_luminosity,
             grid=max_luminosity_grid)
 
-    if (star_luminosity > min_luminosity_grid[0]
-            or star_luminosity > max_luminosity_grid[0]):
+    if (star_luminosity > min_luminosity_grid[0] or
+            star_luminosity > max_luminosity_grid[0]):
         min_mass = mass_grid[min_mass_index]
         max_mass = mass_grid[max_mass_index]
-    elif (star_luminosity < min_luminosity_grid[rows_count]
-          or star_luminosity < max_luminosity_grid[next_rows_count]):
+    elif (star_luminosity < min_luminosity_grid[rows_count] or
+            star_luminosity < max_luminosity_grid[next_rows_count]):
         min_mass = mass_grid[min_mass_index]
         max_mass = mass_grid[max_mass_index]
     else:
@@ -458,8 +458,8 @@ def get_interest_value(*,
     min_row_index = calculate_index(star_cooling_time,
                                     grid=cooling_time_grid)
 
-    if (star_cooling_time < cooling_time_grid[0]
-            or star_cooling_time > cooling_time_grid[-1]):
+    if (star_cooling_time < cooling_time_grid[0] or
+            star_cooling_time > cooling_time_grid[-1]):
         if one_model:
             cooling_time_grid = cooling_time_grid + pre_wd_lifetime
         elif by_logarithm:
@@ -515,8 +515,8 @@ def estimated_log_interest_value(
 def get_min_metallicity_index(*,
                               star_metallicity: float,
                               grid_metallicities: List[float]) -> int:
-    if (star_metallicity < grid_metallicities[0]
-            or star_metallicity > grid_metallicities[-1]):
+    if (star_metallicity < grid_metallicities[0] or
+            star_metallicity > grid_metallicities[-1]):
         raise ValueError(f'There is no support for metallicities '
                          f'lying out of the range of {grid_metallicities}')
     star_metallicity = np.array([star_metallicity])
