@@ -359,39 +359,35 @@ def interpolate_interest_value(*,
                                         + max_pre_wd_lifetime),
                 interest_sequence_grid=max_interest_sequence)
 
-    if star_cooling_time < min_cooling_time_grid[0]:
-        x_1 = min_extrapolated_interest_value(min_row_index=0)
-        case_1 = True
-    elif star_cooling_time >= min_cooling_time_grid[-1]:
-        x_1 = min_extrapolated_interest_value(min_row_index=-2)
-        case_1 = True
-    else:
-        row_index = get_cooling_time_index(
-                star_cooling_time,
-                cooling_time_grid=min_cooling_time_grid)
-        y_1 = min_cooling_time_grid[row_index]
-        y_2 = min_cooling_time_grid[row_index + 1]
-        x_1 = min_interest_sequence[row_index]
-        x_2 = min_interest_sequence[row_index + 1]
-        case_1 = False
+    extrapolating_by_min_cooling_time_grid = extrapolating_by_grid(
+            star_cooling_time,
+            cooling_time_grid=min_cooling_time_grid)
+    min_row_index = calculate_index(star_cooling_time,
+                                    grid=min_cooling_time_grid)
 
-    if star_cooling_time < max_cooling_time_grid[0]:
-        x_3 = max_extrapolated_interest_value(min_row_index=0)
-        case_2 = True
-    elif star_cooling_time >= max_cooling_time_grid[-1]:
-        x_3 = max_extrapolated_interest_value(min_row_index=-2)
-        case_2 = True
+    if extrapolating_by_min_cooling_time_grid:
+        x_1 = min_extrapolated_interest_value(min_row_index=min_row_index)
     else:
-        row_index = get_cooling_time_index(
-                star_cooling_time,
-                cooling_time_grid=max_cooling_time_grid)
-        y_3 = max_cooling_time_grid[row_index]
-        y_4 = max_cooling_time_grid[row_index + 1]
-        x_3 = max_interest_sequence[row_index]
-        x_4 = max_interest_sequence[row_index + 1]
-        case_2 = False
+        y_1 = min_cooling_time_grid[min_row_index]
+        y_2 = min_cooling_time_grid[min_row_index + 1]
+        x_1 = min_interest_sequence[min_row_index]
+        x_2 = min_interest_sequence[min_row_index + 1]
 
-    if not case_1 and not case_2:
+    extrapolating_by_max_cooling_time_grid = extrapolating_by_grid(
+            star_cooling_time,
+            cooling_time_grid=max_cooling_time_grid)
+    max_row_index = calculate_index(star_cooling_time,
+                                    grid=max_cooling_time_grid)
+    if extrapolating_by_max_cooling_time_grid:
+        x_3 = max_extrapolated_interest_value(min_row_index=max_row_index)
+    else:
+        y_3 = min_cooling_time_grid[max_row_index]
+        y_4 = min_cooling_time_grid[max_row_index + 1]
+        x_3 = min_interest_sequence[max_row_index]
+        x_4 = min_interest_sequence[max_row_index + 1]
+
+    if (not extrapolating_by_min_cooling_time_grid and
+            not extrapolating_by_max_cooling_time_grid):
         ym_1 = estimate_at(star_mass,
                            x=(min_mass, max_mass),
                            y=(y_1, y_3))
@@ -409,7 +405,8 @@ def interpolate_interest_value(*,
                            x=(ym_1, ym_2),
                            y=(xm_1, xm_2))
 
-    if not case_1 and case_2:
+    if (not extrapolating_by_min_cooling_time_grid
+            and extrapolating_by_max_cooling_time_grid):
         xm_1 = estimate_at(star_cooling_time,
                            x=(y_1, y_2),
                            y=(x_1, x_2))
@@ -417,7 +414,8 @@ def interpolate_interest_value(*,
                            x=(min_mass, max_mass),
                            y=(xm_1, x_3))
 
-    if case_1 and not case_2:
+    if (extrapolating_by_min_cooling_time_grid and
+            not extrapolating_by_max_cooling_time_grid):
         xm_2 = estimate_at(star_cooling_time,
                            x=(y_3, y_4),
                            y=(x_3, x_4))
@@ -430,13 +428,13 @@ def interpolate_interest_value(*,
                        y=(x_1, x_3))
 
 
-def get_cooling_time_index(star_cooling_time: float,
-                           cooling_time_grid: np.ndarray) -> int:
-    for index in range(cooling_time_grid.size - 2):
-        if (cooling_time_grid[index]
-                <= star_cooling_time
-                <= cooling_time_grid[index + 1]):
-            return index
+def extrapolating_by_grid(star_cooling_time: float,
+                          cooling_time_grid: np.ndarray) -> bool:
+    if (star_cooling_time < cooling_time_grid[0] or
+            star_cooling_time >= cooling_time_grid[-1]):
+        return True
+    else:
+        return False
 
 
 def get_interest_value(*,
