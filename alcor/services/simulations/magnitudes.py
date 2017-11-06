@@ -1,5 +1,4 @@
 from functools import partial
-from math import log10
 from typing import (Dict,
                     Tuple,
                     List)
@@ -69,9 +68,7 @@ def generate_spectral_type(db_to_da_fraction: float) -> SpectralType:
 def set_estimations_to_oxygen_neon_white_dwarf(
         star: pd.Series,
         *,
-        color_table: Dict[str, np.ndarray],
-        one_model: bool = True,
-        by_logarithm: bool = False) -> None:
+        color_table: Dict[str, np.ndarray]) -> None:
     star_mass = star['mass']
     star_cooling_time = star['cooling_time']
     mass_grid = color_table['mass']
@@ -93,26 +90,19 @@ def set_estimations_to_oxygen_neon_white_dwarf(
                        max_mass=mass_grid[min_mass_index + 1],
                        min_mass_index=min_mass_index,
                        cooling_time_grid=cooling_time_grid,
-                       pre_wd_lifetime_grid=pre_wd_lifetime_grid,
-                       by_logarithm=by_logarithm,
-                       one_model=one_model)
+                       pre_wd_lifetime_grid=pre_wd_lifetime_grid)
 
-    star['luminosity'] = estimate(interest_sequence_grid='luminosity')
-    v_ubvri_absolute = estimate(interest_sequence_grid='v_ubvri_absolute')
-    bv_ubvri = estimate(interest_sequence_grid='bv_ubvri')
-    vi_ubvri = estimate(interest_sequence_grid='vi_ubvri')
-    vr_ubvri = estimate(interest_sequence_grid='vr_ubvri')
-    uv_ubvri = estimate(interest_sequence_grid='uv_ubvri')
-    log_effective_temperature = estimate(
-            interest_sequence_grid='log_effective_temperature')
+    parameters_to_estimate = ['luminosity',
+                              'u_ubvri_absolute',
+                              'b_ubvri_absolute',
+                              'v_ubvri_absolute',
+                              'r_ubvri_absolute',
+                              'i_ubvri_absolute',
+                              'j_ubvri_absolute',
+                              'effective_temperature']
 
-    star['effective_temperature'] = 10. ** log_effective_temperature
-
-    star['u_ubvri_absolute'] = uv_ubvri + v_ubvri_absolute
-    star['b_ubvri_absolute'] = bv_ubvri + v_ubvri_absolute
-    star['r_ubvri_absolute'] = v_ubvri_absolute - vr_ubvri
-    star['i_ubvri_absolute'] = v_ubvri_absolute - vi_ubvri
-    star['v_ubvri_absolute'] = v_ubvri_absolute
+    for parameter in parameters_to_estimate:
+        star[parameter] = estimate(interest_sequence_grid='parameter')
 
 
 def set_estimations_to_da_db_white_dwarf(
@@ -142,21 +132,18 @@ def set_estimations_to_da_db_white_dwarf(
 
     min_luminosity = estimate(
             cooling_sequences=min_metallicity_grids,
-            interest_sequence_str='luminosity',
-            by_logarithm=False)
+            interest_sequence_str='luminosity')
     max_luminosity = estimate(
             cooling_sequences=max_metallicity_grids,
-            interest_sequence_str='luminosity',
-            by_logarithm=False)
+            interest_sequence_str='luminosity')
     min_effective_temperature = estimate(
             cooling_sequences=min_metallicity_grids,
-            interest_sequence_str='effective_temperature',
-            by_logarithm=True)
+            interest_sequence_str='effective_temperature')
     max_effective_temperature = estimate(
             cooling_sequences=max_metallicity_grids,
-            interest_sequence_str='effective_temperature',
-            by_logarithm=True)
+            interest_sequence_str='effective_temperature')
 
+    # TODO: why is there minus sign here and no sign for ONe WDs?
     star['luminosity'] = -estimate_at(star_metallicity,
                                       x=(min_metallicity, max_metallicity),
                                       y=(min_luminosity, max_luminosity))
@@ -174,8 +161,7 @@ def estimate_edge_case(*,
                        cooling_sequences: Dict[str, np.ndarray],
                        star_mass: float,
                        star_cooling_time: float,
-                       interest_sequence_str: str,
-                       by_logarithm: bool) -> float:
+                       interest_sequence_str: str) -> float:
     mass_grid = cooling_sequences['mass']
     cooling_time_grid = cooling_sequences['cooling_time']
     pre_wd_lifetime_grid = cooling_sequences['pre_wd_lifetime_grid']
@@ -195,8 +181,7 @@ def estimate_edge_case(*,
             min_mass_index=mass_index,
             interest_sequence_grid=cooling_sequences[interest_sequence_str],
             min_mass=mass_grid[mass_index],
-            max_mass=mass_grid[mass_index + 1],
-            by_logarithm=by_logarithm)
+            max_mass=mass_grid[mass_index + 1])
 
 
 def star_with_colors(star: pd.Series,
@@ -215,7 +200,8 @@ def star_with_colors(star: pd.Series,
               'b_ubvri_absolute',
               'v_ubvri_absolute',
               'r_ubvri_absolute',
-              'i_ubvri_absolute']
+              'i_ubvri_absolute',
+              'j_ubvri_absolute']
 
     min_luminosity_grid = luminosity_grid[min_mass_index, :]
     max_luminosity_grid = luminosity_grid[max_mass_index, :]
@@ -272,13 +258,9 @@ def extrapolate_interest_value(*,
                                interest_sequence_grid: np.ndarray,
                                min_mass_index: int,
                                min_mass: float,
-                               max_mass: float,
-                               by_logarithm: bool,
-                               one_model: bool = False) -> float:
+                               max_mass: float) -> float:
     interest_value = partial(get_interest_value,
-                             star_cooling_time=star_cooling_time,
-                             by_logarithm=by_logarithm,
-                             one_model=one_model)
+                             star_cooling_time=star_cooling_time)
 
     max_mass_index = min_mass_index + 1
 
@@ -305,9 +287,7 @@ def interpolate_interest_value(*,
                                min_mass_index: int,
                                cooling_time_grid: np.ndarray,
                                pre_wd_lifetime_grid: np.ndarray,
-                               interest_sequence_grid: np.ndarray,
-                               by_logarithm: bool,
-                               one_model: bool = False) -> float:
+                               interest_sequence_grid: np.ndarray) -> float:
     max_mass_index = min_mass_index + 1
 
     min_cooling_time_grid = cooling_time_grid[min_mass_index, :]
@@ -317,45 +297,18 @@ def interpolate_interest_value(*,
     min_interest_sequence = interest_sequence_grid[min_mass_index, :]
     max_interest_sequence = interest_sequence_grid[max_mass_index, :]
 
-    if one_model:
-        min_extrapolated_interest_value = partial(
-                estimated_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=(min_cooling_time_grid
-                                   + min_pre_wd_lifetime),
-                interest_sequence_grid=min_interest_sequence)
-        max_extrapolated_interest_value = partial(
-                estimated_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=(max_cooling_time_grid
-                                   + max_pre_wd_lifetime),
-                interest_sequence_grid=max_interest_sequence)
-    elif by_logarithm:
-        min_extrapolated_interest_value = partial(
-                estimated_log_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(min_cooling_time_grid
-                                        + min_pre_wd_lifetime),
-                interest_sequence_grid=log10(min_interest_sequence))
-        max_extrapolated_interest_value = partial(
-                estimated_log_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(max_cooling_time_grid
-                                        + max_pre_wd_lifetime),
-                interest_sequence_grid=log10(max_interest_sequence))
-    else:
-        min_extrapolated_interest_value = partial(
-                estimated_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(min_cooling_time_grid
-                                        + min_pre_wd_lifetime),
-                interest_sequence_grid=min_interest_sequence)
-        max_extrapolated_interest_value = partial(
-                estimated_interest_value,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=log10(max_cooling_time_grid
-                                        + max_pre_wd_lifetime),
-                interest_sequence_grid=max_interest_sequence)
+    min_extrapolated_interest_value = partial(
+            estimated_interest_value,
+            star_cooling_time=star_cooling_time,
+            cooling_time_grid=(min_cooling_time_grid
+                               + min_pre_wd_lifetime),
+            interest_sequence_grid=min_interest_sequence)
+    max_extrapolated_interest_value = partial(
+            estimated_interest_value,
+            star_cooling_time=star_cooling_time,
+            cooling_time_grid=(max_cooling_time_grid
+                               + max_pre_wd_lifetime),
+            interest_sequence_grid=max_interest_sequence)
 
     extrapolating_by_min_cooling_time_grid = extrapolating_by_grid(
             star_cooling_time,
@@ -439,38 +392,19 @@ def get_interest_value(*,
                        star_cooling_time: float,
                        cooling_time_grid: np.ndarray,
                        pre_wd_lifetime: float,
-                       interest_sequence_grid: np.ndarray,
-                       by_logarithm: bool,
-                       one_model: bool = False) -> float:
+                       interest_sequence_grid: np.ndarray) -> float:
     row_index = calculate_index(star_cooling_time,
                                 grid=cooling_time_grid)
 
     if (star_cooling_time < cooling_time_grid[0] or
             star_cooling_time > cooling_time_grid[-1]):
-        if one_model:
-            cooling_time_grid = cooling_time_grid + pre_wd_lifetime
-        elif by_logarithm:
-            cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
-            interest_sequence_grid = np.log10(interest_sequence_grid)
-        else:
-            cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
+        cooling_time_grid = cooling_time_grid + pre_wd_lifetime
 
-        estimated_value = estimated_interest_value(
-                row_index=row_index,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                interest_sequence_grid=interest_sequence_grid)
-
-        if by_logarithm:
-            return 10. ** estimated_value
-        else:
-            return estimated_value
-    else:
-        return estimated_interest_value(
-                row_index=row_index,
-                star_cooling_time=star_cooling_time,
-                cooling_time_grid=cooling_time_grid,
-                interest_sequence_grid=interest_sequence_grid)
+    return estimated_interest_value(
+            row_index=row_index,
+            star_cooling_time=star_cooling_time,
+            cooling_time_grid=cooling_time_grid,
+            interest_sequence_grid=interest_sequence_grid)
 
 
 def estimated_interest_value(*,
@@ -483,19 +417,6 @@ def estimated_interest_value(*,
                           cooling_time_grid[row_index + 1]),
                        y=(interest_sequence_grid[row_index],
                           interest_sequence_grid[row_index + 1]))
-
-
-def estimated_log_interest_value(
-        *,
-        star_cooling_time: float,
-        cooling_time_grid: np.ndarray,
-        interest_sequence_grid: np.ndarray,
-        row_index: int) -> float:
-    return 10. ** estimated_interest_value(
-            star_cooling_time=star_cooling_time,
-            cooling_time_grid=cooling_time_grid,
-            interest_sequence_grid=interest_sequence_grid,
-            row_index=row_index)
 
 
 def get_min_metallicity_index(*,
