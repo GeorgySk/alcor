@@ -364,7 +364,7 @@ def interpolate_interest_value(*,
                                     grid=min_cooling_time_grid)
 
     if extrapolating_by_min_cooling_time_grid:
-        x_1 = min_extrapolated_interest_value(min_row_index=min_row_index)
+        x_1 = min_extrapolated_interest_value(row_index=min_row_index)
     else:
         y_1 = min_cooling_time_grid[min_row_index]
         y_2 = min_cooling_time_grid[min_row_index + 1]
@@ -377,7 +377,7 @@ def interpolate_interest_value(*,
     max_row_index = calculate_index(star_cooling_time,
                                     grid=max_cooling_time_grid)
     if extrapolating_by_max_cooling_time_grid:
-        x_3 = max_extrapolated_interest_value(min_row_index=max_row_index)
+        x_3 = max_extrapolated_interest_value(row_index=max_row_index)
     else:
         y_3 = min_cooling_time_grid[max_row_index]
         y_4 = min_cooling_time_grid[max_row_index + 1]
@@ -442,8 +442,8 @@ def get_interest_value(*,
                        interest_sequence_grid: np.ndarray,
                        by_logarithm: bool,
                        one_model: bool = False) -> float:
-    min_row_index = calculate_index(star_cooling_time,
-                                    grid=cooling_time_grid)
+    row_index = calculate_index(star_cooling_time,
+                                grid=cooling_time_grid)
 
     if (star_cooling_time < cooling_time_grid[0] or
             star_cooling_time > cooling_time_grid[-1]):
@@ -456,7 +456,7 @@ def get_interest_value(*,
             cooling_time_grid = np.log10(cooling_time_grid + pre_wd_lifetime)
 
         estimated_value = estimated_interest_value(
-                min_row_index=min_row_index,
+                row_index=row_index,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=cooling_time_grid,
                 interest_sequence_grid=interest_sequence_grid)
@@ -467,7 +467,7 @@ def get_interest_value(*,
             return estimated_value
     else:
         return estimated_interest_value(
-                min_row_index=min_row_index,
+                row_index=row_index,
                 star_cooling_time=star_cooling_time,
                 cooling_time_grid=cooling_time_grid,
                 interest_sequence_grid=interest_sequence_grid)
@@ -477,12 +477,12 @@ def estimated_interest_value(*,
                              star_cooling_time: float,
                              cooling_time_grid: np.ndarray,
                              interest_sequence_grid: np.ndarray,
-                             min_row_index: int) -> float:
+                             row_index: int) -> float:
     return estimate_at(star_cooling_time,
-                       x=(cooling_time_grid[min_row_index],
-                          cooling_time_grid[min_row_index + 1]),
-                       y=(interest_sequence_grid[min_row_index],
-                          interest_sequence_grid[min_row_index + 1]))
+                       x=(cooling_time_grid[row_index],
+                          cooling_time_grid[row_index + 1]),
+                       y=(interest_sequence_grid[row_index],
+                          interest_sequence_grid[row_index + 1]))
 
 
 def estimated_log_interest_value(
@@ -490,12 +490,12 @@ def estimated_log_interest_value(
         star_cooling_time: float,
         cooling_time_grid: np.ndarray,
         interest_sequence_grid: np.ndarray,
-        min_row_index: int) -> float:
+        row_index: int) -> float:
     return 10. ** estimated_interest_value(
             star_cooling_time=star_cooling_time,
             cooling_time_grid=cooling_time_grid,
             interest_sequence_grid=interest_sequence_grid,
-            min_row_index=min_row_index)
+            row_index=row_index)
 
 
 def get_min_metallicity_index(*,
