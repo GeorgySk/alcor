@@ -22,16 +22,16 @@ def assign_estimated_values(
         max_carbon_oxygen_core_wd_mass: float = 1.14,
         db_to_da_fraction: float = 0.2,
         da_cooling_sequences: Dict[int, Dict[str, np.ndarray]],
-        da_color_table: Dict[str, np.ndarray],
+        da_color_table: Dict[int, pd.DataFrame],
         db_cooling_sequences: Dict[int, Dict[str, np.ndarray]],
-        db_color_table: Dict[str, np.ndarray],
+        db_color_table: Dict[int, pd.DataFrame],
         one_color_table: Dict[int, pd.DataFrame]
         # TODO: we should return DataFrame
         ) -> List[pd.Series]:
     cooling_sequences = {SpectralType.DA: da_cooling_sequences,
                          SpectralType.DB: db_cooling_sequences}
-    colo_tables = {SpectralType.DA: da_color_table,
-                   SpectralType.DB: db_color_table}
+    color_tables = {SpectralType.DA: da_color_table,
+                    SpectralType.DB: db_color_table}
     metallicities = {SpectralType.DA: [0.001, 0.01, 0.03, 0.06],
                      SpectralType.DB: [0.001, 0.01, 0.06]}
 
@@ -47,7 +47,7 @@ def assign_estimated_values(
         set_estimations_to_da_db_white_dwarf(
                 star,
                 cooling_sequences=cooling_sequences[spectral_type],
-                color_table=colo_tables[spectral_type],
+                color_table=color_tables[spectral_type],
                 metallicities=metallicities[spectral_type])
 
     oxygen_neon_white_dwarfs['spectral_type'] = SpectralType.ONe
@@ -120,7 +120,7 @@ def set_estimations_to_da_db_white_dwarf(
         star: pd.Series,
         *,
         cooling_sequences: Dict[int, Dict[str, np.ndarray]],
-        color_table: Dict[str, np.ndarray],
+        color_table: Dict[int, pd.DataFrame],
         metallicities: List[float]) -> pd.Series:
     star_metallicity = star['metallicity']
     star_mass = star['mass']
@@ -197,25 +197,23 @@ def estimate_edge_case(*,
 
 def star_with_colors(star: pd.Series,
                      *,
-                     color_table: Dict[str, np.ndarray]) -> pd.Series:
+                     color_table: Dict[int, pd.DataFrame]) -> pd.Series:
     star_mass = star['mass']
     star_luminosity = star['luminosity']
-    luminosity_grid = color_table['luminosity']
-    mass_grid = color_table['mass_grid']
+    mass_grid = np.array([key / 1e5
+                          for key in color_table.keys()])
+    int_mass_grid = list(color_table.keys())
 
-    min_mass_index = calculate_index(star_mass,
-                                     grid=mass_grid)
-    max_mass_index = min_mass_index + 1
+    lesser_mass_index = calculate_index(star_mass,
+                                        grid=mass_grid)
+    greater_mass_index = lesser_mass_index + 1
+    lesser_int_mass = int_mass_grid[lesser_mass_index]
+    lesser_mass_df = color_table[lesser_int_mass]
+    greater_int_mass = int_mass_grid[greater_mass_index]
+    greater_mass_df = color_table[greater_int_mass]
 
-    colors = ['u_ubvri_absolute',
-              'b_ubvri_absolute',
-              'v_ubvri_absolute',
-              'r_ubvri_absolute',
-              'i_ubvri_absolute',
-              'j_ubvri_absolute']
-
-    min_luminosity_grid = luminosity_grid[min_mass_index, :]
-    max_luminosity_grid = luminosity_grid[max_mass_index, :]
+    min_luminosity_grid = lesser_mass_df['luminosity']
+    max_luminosity_grid = greater_mass_df['luminosity']
 
     row_index = calculate_index(star_luminosity,
                                 grid=min_luminosity_grid)
@@ -225,28 +223,34 @@ def star_with_colors(star: pd.Series,
 
     if (star_luminosity > min_luminosity_grid[0] or
             star_luminosity > max_luminosity_grid[0]):
-        min_mass = mass_grid[min_mass_index]
-        max_mass = mass_grid[max_mass_index]
+        min_mass = mass_grid[lesser_mass_index]
+        max_mass = mass_grid[greater_mass_index]
     elif (star_luminosity < min_luminosity_grid[-1] or
             star_luminosity < max_luminosity_grid[-1]):
-        min_mass = mass_grid[min_mass_index]
-        max_mass = mass_grid[max_mass_index]
+        min_mass = mass_grid[lesser_mass_index]
+        max_mass = mass_grid[greater_mass_index]
     else:
         # TODO: check these indexes, they look suspicious
         min_mass = mass_grid[0]
         max_mass = mass_grid[1]
 
+    colors = ['u_ubvri_absolute',
+              'b_ubvri_absolute',
+              'v_ubvri_absolute',
+              'r_ubvri_absolute',
+              'i_ubvri_absolute',
+              'j_ubvri_absolute']
+
     for color in colors:
-        magnitude_grid = color_table[color]
-        min_magnitude_grid = magnitude_grid[min_mass_index, :]
-        max_magnitude_grid = magnitude_grid[max_mass_index, :]
+        min_magnitude_grid = lesser_mass_df[color]
+        max_magnitude_grid = greater_mass_df[color]
 
         min_magnitude = estimate_at(
                 star_luminosity,
                 x=(min_luminosity_grid[row_index],
                    min_luminosity_grid[row_index + 1]),
                 y=(min_magnitude_grid[row_index],
-                   magnitude_grid[row_index + 1]))
+                   min_magnitude_grid[row_index + 1]))
         max_magnitude = estimate_at(
                 star_luminosity,
                 x=(max_luminosity_grid[next_row_index],
