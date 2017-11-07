@@ -39,6 +39,7 @@ setup(name=PROJECT_NAME,
           'numpy>=1.11.3',  # multidimensional arrays computations
           'matplotlib>=2.0.2',  # plotting
           'h5py>=2.7.1',  # hdf5 files support
+          'scipy>=1.0.0',  # numerical routines
       ],
       setup_requires=['pytest-runner>=2.11.1'],
       tests_require=[
