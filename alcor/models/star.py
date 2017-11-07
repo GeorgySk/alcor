@@ -40,10 +40,10 @@ STAR_PARAMETERS_NAMES = {'mass',
                          'w_velocity',
                          'birth_time',
                          'spectral_type',
-                         'galactic_disk_type'}
+                         'galactic_structure_type'}
 
 
-class GalacticDiskType(enum.IntEnum):
+class GalacticStructureType(enum.IntEnum):
     thin = 1
     thick = 2
     halo = 3
@@ -109,8 +109,8 @@ class Star(Base):
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
                            nullable=True)
-    galactic_disk_type = Column(Enum(GalacticDiskType),
-                                nullable=True)
+    galactic_structure_type = Column(Enum(GalacticStructureType),
+                                     nullable=True)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
@@ -142,7 +142,7 @@ class Star(Base):
                  w_velocity: float = None,
                  birth_time: float = None,
                  spectral_type: int = None,
-                 galactic_disk_type: GalacticDiskType = None):
+                 galactic_structure_type: GalacticStructureType = None):
         self.id = None
         self.group_id = group_id
         self.mass = mass
@@ -171,4 +171,4 @@ class Star(Base):
         self.w_velocity = w_velocity
         self.birth_time = birth_time
         self.spectral_type = spectral_type
-        self.galactic_disk_type = galactic_disk_type
+        self.galactic_structure_type = galactic_structure_type
