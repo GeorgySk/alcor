@@ -5,7 +5,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
 from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.sqltypes import (BigInteger,
-                                     Integer,
                                      Float,
                                      DateTime,
                                      Enum)
@@ -19,7 +18,7 @@ STAR_PARAMETERS_NAMES = {'mass',
                          'proper_motion',
                          'proper_motion_component_b',
                          'proper_motion_component_l',
-                         'proper_motion_component_vr',
+                         'radial_velocity',
                          'right_ascension',
                          'declination',
                          'r_galactocentric',
@@ -40,13 +39,19 @@ STAR_PARAMETERS_NAMES = {'mass',
                          'w_velocity',
                          'birth_time',
                          'spectral_type',
-                         'galactic_disk_type'}
+                         'galactic_structure_type'}
 
 
-class GalacticDiskType(enum.IntEnum):
+class GalacticStructureType(enum.IntEnum):
     thin = 1
     thick = 2
     halo = 3
+
+
+class SpectralType(enum.Enum):
+    DA = 0
+    DB = 1
+    ONe = 2
 
 
 class Star(Base):
@@ -72,7 +77,7 @@ class Star(Base):
                                        nullable=True)
     proper_motion_component_l = Column(Float(),
                                        nullable=True)
-    proper_motion_component_vr = Column(Float(),
+    radial_velocity = Column(Float(),
                                         nullable=True)
     right_ascension = Column(Float(),
                              nullable=True)
@@ -106,16 +111,15 @@ class Star(Base):
                         nullable=True)
     birth_time = Column(Float(),
                         nullable=True)
-    # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
-    spectral_type = Column(Integer(),
+    spectral_type = Column(Enum(SpectralType),
                            nullable=True)
-    galactic_disk_type = Column(Enum(GalacticDiskType),
-                                nullable=True)
+    galactic_structure_type = Column(Enum(GalacticStructureType),
+                                     nullable=True)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
     def __init__(self,
-                 group_id: uuid.UUID,
+                 group_id: uuid.UUID = None,
                  mass: float = None,
                  luminosity: float = None,
                  proper_motion: float = None,
@@ -124,7 +128,7 @@ class Star(Base):
                  z_coordinate: float = None,
                  proper_motion_component_b: float = None,
                  proper_motion_component_l: float = None,
-                 proper_motion_component_vr: float = None,
+                 radial_velocity: float = None,
                  right_ascension: float = None,
                  declination: float = None,
                  right_ascension_proper_motion: float = None,
@@ -141,8 +145,8 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
-                 spectral_type: int = None,
-                 galactic_disk_type: GalacticDiskType = None):
+                 spectral_type: SpectralType = None,
+                 galactic_structure_type: GalacticStructureType = None):
         self.id = None
         self.group_id = group_id
         self.mass = mass
@@ -153,7 +157,7 @@ class Star(Base):
         self.z_coordinate = z_coordinate
         self.proper_motion_component_b = proper_motion_component_b
         self.proper_motion_component_l = proper_motion_component_l
-        self.proper_motion_component_vr = proper_motion_component_vr
+        self.radial_velocity = radial_velocity
         self.right_ascension = right_ascension
         self.declination = declination
         self.right_ascension_proper_motion = right_ascension_proper_motion
@@ -171,4 +175,4 @@ class Star(Base):
         self.w_velocity = w_velocity
         self.birth_time = birth_time
         self.spectral_type = spectral_type
-        self.galactic_disk_type = galactic_disk_type
+        self.galactic_structure_type = galactic_structure_type
