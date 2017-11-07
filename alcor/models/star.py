@@ -5,7 +5,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
 from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.sqltypes import (BigInteger,
-                                     Integer,
                                      Float,
                                      DateTime,
                                      Enum)
@@ -47,6 +46,12 @@ class GalacticStructureType(enum.IntEnum):
     thin = 1
     thick = 2
     halo = 3
+
+
+class SpectralType(enum.Enum):
+    DA = 0
+    DB = 1
+    ONe = 2
 
 
 class Star(Base):
@@ -106,8 +111,7 @@ class Star(Base):
                         nullable=True)
     birth_time = Column(Float(),
                         nullable=True)
-    # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
-    spectral_type = Column(Integer(),
+    spectral_type = Column(Enum(SpectralType),
                            nullable=True)
     galactic_structure_type = Column(Enum(GalacticStructureType),
                                      nullable=True)
@@ -141,7 +145,7 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
-                 spectral_type: int = None,
+                 spectral_type: SpectralType = None,
                  galactic_structure_type: GalacticStructureType = None):
         self.id = None
         self.group_id = group_id
