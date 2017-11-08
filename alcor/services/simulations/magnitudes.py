@@ -64,39 +64,68 @@ def assign_estimated_values(
             db_to_da_fraction=db_to_da_fraction,
             size=carbon_oxygen_white_dwarfs.shape[0])
 
-    for _, star in carbon_oxygen_white_dwarfs.iterrows():
-        spectral_type = star['spectral_type']
-        set_estimations_to_da_db_white_dwarf(
-                star,
+    da_white_dwarfs_mask = (carbon_oxygen_white_dwarfs['spectral_type']
+                            == SpectralType.DA)
+    da_white_dwarfs = carbon_oxygen_white_dwarfs[da_white_dwarfs_mask]
+    db_white_dwarfs = carbon_oxygen_white_dwarfs[~da_white_dwarfs_mask]
+
+    white_dwarfs_by_spectral_types = {SpectralType.DA: da_white_dwarfs,
+                                      SpectralType.DB: db_white_dwarfs}
+
+    colors = ['u_ubvri_absolute',
+              'b_ubvri_absolute',
+              'v_ubvri_absolute',
+              'r_ubvri_absolute',
+              'i_ubvri_absolute',
+              'j_ubvri_absolute']
+
+    for spectral_type, white_dwarfs in white_dwarfs_by_spectral_types.items():
+        # TODO: why is there minus sign here and no sign for ONe WDs?
+        white_dwarfs['luminosity'] = -white_dwarfs.apply(
+                estimate_by_magnitudes,
+                axis=1,
+                metallicity_grid=metallicities[spectral_type],
                 cooling_sequences=cooling_sequences[spectral_type],
-                color_table=color_tables[spectral_type],
-                metallicities=metallicities[spectral_type],
-                pre_wd_lifetimes=pre_wd_lifetimes[spectral_type])
+                pre_wd_lifetimes=pre_wd_lifetimes[spectral_type],
+                interest_parameter='luminosity')
+        white_dwarfs['effective_temperature'] = white_dwarfs.apply(
+                estimate_by_magnitudes,
+                axis=1,
+                metallicity_grid=metallicities[spectral_type],
+                cooling_sequences=cooling_sequences[spectral_type],
+                pre_wd_lifetimes=pre_wd_lifetimes[spectral_type],
+                interest_parameter='effective_temperature')
+
+        for color in colors:
+            white_dwarfs[color] = white_dwarfs.apply(
+                    estimate_color,
+                    axis=1,
+                    color_table=color_tables[spectral_type])
 
     oxygen_neon_white_dwarfs['spectral_type'] = SpectralType.ONe
+    parameters = ['luminosity',
+                  'u_ubvri_absolute',
+                  'b_ubvri_absolute',
+                  'v_ubvri_absolute',
+                  'r_ubvri_absolute',
+                  'i_ubvri_absolute',
+                  'j_ubvri_absolute',
+                  'effective_temperature']
 
-    for _, star in oxygen_neon_white_dwarfs.iterrows():
-        set_estimations_to_oxygen_neon_white_dwarf(star,
-                                                   color_table=one_color_table)
+    for parameter in parameters:
+        oxygen_neon_white_dwarfs.apply(estimate_oxygen_neon_parameters,
+                                       axis=1,
+                                       color_table=one_color_table,
+                                       interest_parameter=parameter)
 
     return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
 
 
-def generate_spectral_types(*,
-                            db_to_da_fraction: float,
-                            size: int) -> np.ndarray:
-    randoms = np.random.rand(size)
-    db_mask = randoms < db_to_da_fraction
-    spectral_types = np.empty(size)
-    spectral_types[db_mask] = SpectralType.DB
-    spectral_types[~db_mask] = SpectralType.DA
-    return spectral_types
-
-
-def set_estimations_to_oxygen_neon_white_dwarf(
+def estimate_oxygen_neon_parameters(
         star: pd.Series,
         *,
-        color_table: Dict[int, pd.DataFrame]) -> None:
+        color_table: Dict[int, pd.DataFrame],
+        interest_parameter: str) -> None:
     pre_wd_lifetime = 0.  # constant for all ONe white dwarfs
 
     star_mass = star['mass']
@@ -128,38 +157,103 @@ def set_estimations_to_oxygen_neon_white_dwarf(
             min_mass=mass_grid[lesser_mass_index],
             max_mass=mass_grid[lesser_mass_index + 1])
 
-    parameters_to_estimate = ['luminosity',
-                              'u_ubvri_absolute',
-                              'b_ubvri_absolute',
-                              'v_ubvri_absolute',
-                              'r_ubvri_absolute',
-                              'i_ubvri_absolute',
-                              'j_ubvri_absolute',
-                              'effective_temperature']
-
-    for parameter in parameters_to_estimate:
-        star[parameter] = estimate(
-                greater_mass_interest_parameter_grid=greater_mass_df[
-                    parameter],
-                lesser_mass_interest_parameter_grid=lesser_mass_df[parameter])
+    return estimate(greater_mass_interest_parameter_grid=greater_mass_df[
+                        interest_parameter],
+                    lesser_mass_interest_parameter_grid=lesser_mass_df[
+                        interest_parameter])
 
 
-def set_estimations_to_da_db_white_dwarf(
+def estimate_color(star: pd.Series,
+                   *,
+                   color_table: Dict[int, pd.DataFrame],
+                   color: str) -> float:
+    star_mass = star['mass']
+    star_luminosity = star['luminosity']
+    mass_grid = np.array([key / 1e5
+                          for key in color_table.keys()])
+    int_mass_grid = list(color_table.keys())
+
+    lesser_mass_index = calculate_index(star_mass,
+                                        grid=mass_grid)
+    greater_mass_index = lesser_mass_index + 1
+    lesser_int_mass = int_mass_grid[lesser_mass_index]
+    lesser_mass_df = color_table[lesser_int_mass]
+    greater_int_mass = int_mass_grid[greater_mass_index]
+    greater_mass_df = color_table[greater_int_mass]
+
+    min_luminosity_grid = lesser_mass_df['luminosity']
+    max_luminosity_grid = greater_mass_df['luminosity']
+
+    row_index = calculate_index(star_luminosity,
+                                grid=min_luminosity_grid)
+    next_row_index = calculate_index(
+            star_luminosity,
+            grid=max_luminosity_grid)
+
+    if (star_luminosity > min_luminosity_grid[0] or
+            star_luminosity > max_luminosity_grid[0]):
+        min_mass = mass_grid[lesser_mass_index]
+        max_mass = mass_grid[greater_mass_index]
+    elif (star_luminosity < min_luminosity_grid[-1] or
+            star_luminosity < max_luminosity_grid[-1]):
+        min_mass = mass_grid[lesser_mass_index]
+        max_mass = mass_grid[greater_mass_index]
+    else:
+        # TODO: check these indexes, they look suspicious
+        min_mass = mass_grid[0]
+        max_mass = mass_grid[1]
+
+    min_magnitude_grid = lesser_mass_df[color]
+    max_magnitude_grid = greater_mass_df[color]
+
+    min_magnitude = estimate_at(
+            star_luminosity,
+            x=(min_luminosity_grid[row_index],
+               min_luminosity_grid[row_index + 1]),
+            y=(min_magnitude_grid[row_index],
+               min_magnitude_grid[row_index + 1]))
+    max_magnitude = estimate_at(
+            star_luminosity,
+            x=(max_luminosity_grid[next_row_index],
+               max_luminosity_grid[next_row_index + 1]),
+            y=(max_magnitude_grid[next_row_index],
+               max_magnitude_grid[next_row_index + 1]))
+
+    return estimate_at(star_mass,
+                       x=(min_mass, max_mass),
+                       y=(min_magnitude, max_magnitude))
+
+
+def generate_spectral_types(*,
+                            db_to_da_fraction: float,
+                            size: int) -> np.ndarray:
+    spectral_types = np.empty(size)
+
+    randoms = np.random.rand(size)
+    db_mask = randoms < db_to_da_fraction
+
+    spectral_types[db_mask] = SpectralType.DB
+    spectral_types[~db_mask] = SpectralType.DA
+
+    return spectral_types
+
+
+def estimate_by_magnitudes(
         star: pd.Series,
         *,
+        metallicity_grid: List[float],
         cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
-        color_table: Dict[int, pd.DataFrame],
-        metallicities: List[float],
-        pre_wd_lifetimes: Dict[int, np.ndarray]) -> pd.Series:
+        pre_wd_lifetimes: Dict[int, np.ndarray],
+        interest_parameter: str) -> float:
     star_metallicity = star['metallicity']
     star_mass = star['mass']
     star_cooling_time = star['cooling_time']
 
     min_metallicity_index = get_min_metallicity_index(
             star_metallicity=star_metallicity,
-            grid_metallicities=metallicities)
-    min_metallicity = metallicities[min_metallicity_index]
-    max_metallicity = metallicities[min_metallicity_index + 1]
+            grid_metallicities=metallicity_grid)
+    min_metallicity = metallicity_grid[min_metallicity_index]
+    max_metallicity = metallicity_grid[min_metallicity_index + 1]
 
     int_min_metallicity = int(min_metallicity * 1e3)
     int_max_metallicity = int(max_metallicity * 1e3)
@@ -172,37 +266,19 @@ def set_estimations_to_da_db_white_dwarf(
 
     estimate = partial(estimate_edge_case,
                        star_mass=star_mass,
-                       star_cooling_time=star_cooling_time)
+                       star_cooling_time=star_cooling_time,
+                       interest_sequence_str=interest_parameter)
 
-    min_luminosity = estimate(
+    min_interest_parameter = estimate(
             cooling_sequences=min_metallicity_grids,
-            interest_sequence_str='luminosity',
             pre_wd_lifetimes=min_metallicity_pre_wd_lifetimes)
-    max_luminosity = estimate(
+    max_interest_parameter = estimate(
             cooling_sequences=max_metallicity_grids,
-            interest_sequence_str='luminosity',
-            pre_wd_lifetimes=max_metallicity_pre_wd_lifetimes)
-    min_effective_temperature = estimate(
-            cooling_sequences=min_metallicity_grids,
-            interest_sequence_str='effective_temperature',
-            pre_wd_lifetimes=min_metallicity_pre_wd_lifetimes)
-    max_effective_temperature = estimate(
-            cooling_sequences=max_metallicity_grids,
-            interest_sequence_str='effective_temperature',
             pre_wd_lifetimes=max_metallicity_pre_wd_lifetimes)
 
-    # TODO: why is there minus sign here and no sign for ONe WDs?
-    star['luminosity'] = -estimate_at(star_metallicity,
-                                      x=(min_metallicity, max_metallicity),
-                                      y=(min_luminosity, max_luminosity))
-
-    star['effective_temperature'] = estimate_at(
-            star_metallicity,
-            x=(min_metallicity, max_metallicity),
-            y=(min_effective_temperature, max_effective_temperature))
-
-    return star_with_colors(star,
-                            color_table=color_table)
+    return estimate_at(star_metallicity,
+                       x=(min_metallicity, max_metallicity),
+                       y=(min_interest_parameter, max_interest_parameter))
 
 
 # TODO: this looks like a case of ONe stars
@@ -242,77 +318,6 @@ def estimate_edge_case(*,
             lesser_mass_pre_wd_lifetime=lesser_mass_pre_wd_lifetime,
             min_mass=mass_grid[mass_index],
             max_mass=mass_grid[mass_index + 1])
-
-
-def star_with_colors(star: pd.Series,
-                     *,
-                     color_table: Dict[int, pd.DataFrame]) -> pd.Series:
-    star_mass = star['mass']
-    star_luminosity = star['luminosity']
-    mass_grid = np.array([key / 1e5
-                          for key in color_table.keys()])
-    int_mass_grid = list(color_table.keys())
-
-    lesser_mass_index = calculate_index(star_mass,
-                                        grid=mass_grid)
-    greater_mass_index = lesser_mass_index + 1
-    lesser_int_mass = int_mass_grid[lesser_mass_index]
-    lesser_mass_df = color_table[lesser_int_mass]
-    greater_int_mass = int_mass_grid[greater_mass_index]
-    greater_mass_df = color_table[greater_int_mass]
-
-    min_luminosity_grid = lesser_mass_df['luminosity']
-    max_luminosity_grid = greater_mass_df['luminosity']
-
-    row_index = calculate_index(star_luminosity,
-                                grid=min_luminosity_grid)
-    next_row_index = calculate_index(
-            star_luminosity,
-            grid=max_luminosity_grid)
-
-    if (star_luminosity > min_luminosity_grid[0] or
-            star_luminosity > max_luminosity_grid[0]):
-        min_mass = mass_grid[lesser_mass_index]
-        max_mass = mass_grid[greater_mass_index]
-    elif (star_luminosity < min_luminosity_grid[-1] or
-            star_luminosity < max_luminosity_grid[-1]):
-        min_mass = mass_grid[lesser_mass_index]
-        max_mass = mass_grid[greater_mass_index]
-    else:
-        # TODO: check these indexes, they look suspicious
-        min_mass = mass_grid[0]
-        max_mass = mass_grid[1]
-
-    colors = ['u_ubvri_absolute',
-              'b_ubvri_absolute',
-              'v_ubvri_absolute',
-              'r_ubvri_absolute',
-              'i_ubvri_absolute',
-              'j_ubvri_absolute']
-
-    for color in colors:
-        min_magnitude_grid = lesser_mass_df[color]
-        max_magnitude_grid = greater_mass_df[color]
-
-        min_magnitude = estimate_at(
-                star_luminosity,
-                x=(min_luminosity_grid[row_index],
-                   min_luminosity_grid[row_index + 1]),
-                y=(min_magnitude_grid[row_index],
-                   min_magnitude_grid[row_index + 1]))
-        max_magnitude = estimate_at(
-                star_luminosity,
-                x=(max_luminosity_grid[next_row_index],
-                   max_luminosity_grid[next_row_index + 1]),
-                y=(max_magnitude_grid[next_row_index],
-                   max_magnitude_grid[next_row_index + 1]))
-        magnitude = estimate_at(star_mass,
-                                x=(min_mass, max_mass),
-                                y=(min_magnitude, max_magnitude))
-        # TODO: find out why we can't have negative values
-        star[color] = max(0., magnitude)
-
-    return star
 
 
 def extrapolating_by_grid(star_cooling_time: float,
