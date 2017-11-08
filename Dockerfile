@@ -26,6 +26,13 @@ RUN python3 -m pip install -r requirements.txt
 
 COPY ./alcor alcor
 COPY ./tests tests
+
+RUN apt-get update && \
+    apt-get install unzip
+
+RUN cd tests/tables && \
+    unzip -o fort_files.zip
+
 COPY ./README.rst README.rst
 COPY ./setup.py setup.py
 COPY ./setup.cfg setup.cfg
