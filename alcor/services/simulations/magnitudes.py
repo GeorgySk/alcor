@@ -25,8 +25,7 @@ def assign_estimated_values(
         da_color_table: Dict[int, pd.DataFrame],
         db_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
         db_color_table: Dict[int, pd.DataFrame],
-        one_color_table: Dict[int, pd.DataFrame]
-        ) -> pd.DataFrame:
+        one_color_table: Dict[int, pd.DataFrame]) -> pd.DataFrame:
     # TODO: probably I should save it as metadata inside hdf5 files
     da_pre_wd_lifetimes = {1: np.zeros(7),
                            10: np.zeros(10),
@@ -40,7 +39,7 @@ def assign_estimated_values(
                            60: np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892,
                                          0.7422, 0.4431, 0.287, 0.114])}
     pre_wd_lifetimes = {SpectralType.DA: da_pre_wd_lifetimes,
-                        SpectralType: db_pre_wd_lifetimes}
+                        SpectralType.DB: db_pre_wd_lifetimes}
     cooling_sequences = {SpectralType.DA: da_cooling_sequences,
                          SpectralType.DB: db_cooling_sequences}
     color_tables = {SpectralType.DA: da_color_table,
@@ -131,9 +130,9 @@ def estimate_oxygen_neon_parameters(
 
     mass = star['mass']
     cooling_time = star['cooling_time']
+    int_mass_grid = sorted(list(color_table.keys()))
     mass_grid = np.array([key / 1e5
-                          for key in color_table.keys()])
-    int_mass_grid = list(color_table.keys())
+                          for key in int_mass_grid])
 
     if mass < mass_grid[0] or mass >= mass_grid[-1]:
         estimate_interest_value = extrapolate_interest_value
@@ -170,9 +169,9 @@ def estimate_color(star: pd.Series,
                    color: str) -> float:
     mass = star['mass']
     star_luminosity = star['luminosity']
+    int_mass_grid = sorted(list(color_table.keys()))
     mass_grid = np.array([key / 1e5
-                          for key in color_table.keys()])
-    int_mass_grid = list(color_table.keys())
+                          for key in int_mass_grid])
 
     lesser_mass_index = calculate_index(mass,
                                         grid=mass_grid)
