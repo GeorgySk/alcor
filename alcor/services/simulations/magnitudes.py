@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
-from alcor.models.star import SpectralType
-
 GRAVITATIONAL_CONST_CM_S_KG = 6.67e-5
 SOLAR_MASS_KG = 1.989e30
 
@@ -38,20 +36,20 @@ def assign_estimated_values(
                                          0.7422, 0.4431, 0.287, 0.114]),
                            60: np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892,
                                          0.7422, 0.4431, 0.287, 0.114])}
-    pre_wd_lifetimes = {SpectralType.DA: da_pre_wd_lifetimes,
-                        SpectralType.DB: db_pre_wd_lifetimes}
-    cooling_sequences = {SpectralType.DA: da_cooling_sequences,
-                         SpectralType.DB: db_cooling_sequences}
-    color_tables = {SpectralType.DA: da_color_table,
-                    SpectralType.DB: db_color_table}
+    pre_wd_lifetimes = {'DA': da_pre_wd_lifetimes,
+                        'DB': db_pre_wd_lifetimes}
+    cooling_sequences = {'DA': da_cooling_sequences,
+                         'DB': db_cooling_sequences}
+    color_tables = {'DA': da_color_table,
+                    'DB': db_color_table}
     da_int_metallicities = sorted(list(da_cooling_sequences.keys()))
     db_int_metallicities = sorted(list(db_cooling_sequences.keys()))
     da_metallicities = [metallicity / 1e3
                         for metallicity in da_int_metallicities]
     db_metallicities = [metallicity / 1e3
                         for metallicity in db_int_metallicities]
-    metallicities = {SpectralType.DA: da_metallicities,
-                     SpectralType.DB: db_metallicities}
+    metallicities = {'DA': da_metallicities,
+                     'DB': db_metallicities}
 
     carbon_oxygen_white_dwarfs_mask = (stars['mass']
                                        < max_carbon_oxygen_core_wd_mass)
@@ -63,12 +61,12 @@ def assign_estimated_values(
             size=carbon_oxygen_white_dwarfs.shape[0])
 
     da_white_dwarfs_mask = (carbon_oxygen_white_dwarfs['spectral_type']
-                            == SpectralType.DA)
+                            == 'DA')
     da_white_dwarfs = carbon_oxygen_white_dwarfs[da_white_dwarfs_mask]
     db_white_dwarfs = carbon_oxygen_white_dwarfs[~da_white_dwarfs_mask]
 
-    white_dwarfs_by_spectral_types = {SpectralType.DA: da_white_dwarfs,
-                                      SpectralType.DB: db_white_dwarfs}
+    white_dwarfs_by_spectral_types = {'DA': da_white_dwarfs,
+                                      'DB': db_white_dwarfs}
 
     colors = ['u_ubvri_absolute',
               'b_ubvri_absolute',
@@ -100,7 +98,7 @@ def assign_estimated_values(
                     axis=1,
                     color_table=color_tables[spectral_type])
 
-    oxygen_neon_white_dwarfs['spectral_type'] = SpectralType.ONe
+    oxygen_neon_white_dwarfs['spectral_type'] = 'ONe'
     parameters = ['luminosity',
                   'u_ubvri_absolute',
                   'b_ubvri_absolute',
@@ -377,7 +375,7 @@ def extrapolate_interest_value(
     max_row_index = calculate_index(cooling_time,
                                     grid=greater_mass_cooling_time_grid)
 
-    # TODO: check why we don't add pre_wd_lifetime when interpolating
+    # TODO: ask why we don't add pre_wd_lifetime when interpolating
     if (cooling_time < lesser_mass_cooling_time_grid[0] or
             cooling_time > lesser_mass_cooling_time_grid[-1]):
         lesser_mass_cooling_time_grid = (lesser_mass_cooling_time_grid +
@@ -406,13 +404,14 @@ def extrapolate_interest_value(
 def generate_spectral_types(*,
                             db_to_da_fraction: float,
                             size: int) -> np.ndarray:
-    spectral_types = np.empty(size)
+    spectral_types = np.empty(size,
+                              dtype='<U3')
 
     randoms = np.random.rand(size)
     db_mask = randoms < db_to_da_fraction
 
-    spectral_types[db_mask] = SpectralType.DB
-    spectral_types[~db_mask] = SpectralType.DA
+    spectral_types[db_mask] = 'DB'
+    spectral_types[~db_mask] = 'DA'
 
     return spectral_types
 
