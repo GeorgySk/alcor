@@ -60,10 +60,12 @@ def assign_estimated_values(
     carbon_oxygen_white_dwarfs = stars[carbon_oxygen_white_dwarfs_mask]
     oxygen_neon_white_dwarfs = stars[~carbon_oxygen_white_dwarfs_mask]
 
-    for _, star in carbon_oxygen_white_dwarfs.iterrows():
-        spectral_type = generate_spectral_type(db_to_da_fraction)
-        star['spectral_type'] = spectral_type
+    carbon_oxygen_white_dwarfs['spectral_type'] = generate_spectral_types(
+            db_to_da_fraction=db_to_da_fraction,
+            size=carbon_oxygen_white_dwarfs.shape[0])
 
+    for _, star in carbon_oxygen_white_dwarfs.iterrows():
+        spectral_type = star['spectral_type']
         set_estimations_to_da_db_white_dwarf(
                 star,
                 cooling_sequences=cooling_sequences[spectral_type],
@@ -80,10 +82,15 @@ def assign_estimated_values(
     return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
 
 
-def generate_spectral_type(db_to_da_fraction: float) -> SpectralType:
-    if np.random.rand() < db_to_da_fraction:
-        return SpectralType.DB
-    return SpectralType.DA
+def generate_spectral_types(*,
+                            db_to_da_fraction: float,
+                            size: int) -> np.ndarray:
+    randoms = np.random.rand(size)
+    db_mask = randoms < db_to_da_fraction
+    spectral_types = np.empty(size)
+    spectral_types[db_mask] = SpectralType.DB
+    spectral_types[~db_mask] = SpectralType.DA
+    return spectral_types
 
 
 def set_estimations_to_oxygen_neon_white_dwarf(
