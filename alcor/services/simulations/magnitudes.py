@@ -26,8 +26,7 @@ def assign_estimated_values(
         db_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
         db_color_table: Dict[int, pd.DataFrame],
         one_color_table: Dict[int, pd.DataFrame]
-        # TODO: we should return DataFrame
-        ) -> List[pd.Series]:
+        ) -> pd.DataFrame:
     # TODO: probably I should save it as metadata inside hdf5 files
     da_pre_wd_lifetimes = {1: np.zeros(7),
                            10: np.zeros(10),
@@ -118,7 +117,9 @@ def assign_estimated_values(
                                        color_table=one_color_table,
                                        interest_parameter=parameter)
 
-    return carbon_oxygen_white_dwarfs + oxygen_neon_white_dwarfs
+    return pd.concat([da_white_dwarfs,
+                      db_white_dwarfs,
+                      oxygen_neon_white_dwarfs])
 
 
 def estimate_oxygen_neon_parameters(
