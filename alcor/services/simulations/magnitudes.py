@@ -128,18 +128,18 @@ def estimate_oxygen_neon_parameters(
         interest_parameter: str) -> None:
     pre_wd_lifetime = 0.  # constant for all ONe white dwarfs
 
-    star_mass = star['mass']
-    star_cooling_time = star['cooling_time']
+    mass = star['mass']
+    cooling_time = star['cooling_time']
     mass_grid = np.array([key / 1e5
                           for key in color_table.keys()])
     int_mass_grid = list(color_table.keys())
 
-    if star_mass < mass_grid[0] or star_mass >= mass_grid[-1]:
+    if mass < mass_grid[0] or mass >= mass_grid[-1]:
         estimate_interest_value = extrapolate_interest_value
     else:
         estimate_interest_value = interpolate_interest_value
 
-    lesser_mass_index = calculate_index(star_mass,
+    lesser_mass_index = calculate_index(mass,
                                         grid=mass_grid)
     lesser_int_mass = int_mass_grid[lesser_mass_index]
     lesser_mass_df = color_table[lesser_int_mass]
@@ -148,8 +148,8 @@ def estimate_oxygen_neon_parameters(
 
     estimate = partial(
             estimate_interest_value,
-            star_mass=star_mass,
-            star_cooling_time=star_cooling_time,
+            mass=mass,
+            cooling_time=cooling_time,
             greater_mass_cooling_time_grid=greater_mass_df['cooling_time'],
             greater_mass_pre_wd_lifetime=pre_wd_lifetime,
             lesser_mass_cooling_time_grid=greater_mass_df['cooling_time'],
@@ -167,13 +167,13 @@ def estimate_color(star: pd.Series,
                    *,
                    color_table: Dict[int, pd.DataFrame],
                    color: str) -> float:
-    star_mass = star['mass']
+    mass = star['mass']
     star_luminosity = star['luminosity']
     mass_grid = np.array([key / 1e5
                           for key in color_table.keys()])
     int_mass_grid = list(color_table.keys())
 
-    lesser_mass_index = calculate_index(star_mass,
+    lesser_mass_index = calculate_index(mass,
                                         grid=mass_grid)
     greater_mass_index = lesser_mass_index + 1
     lesser_int_mass = int_mass_grid[lesser_mass_index]
@@ -219,7 +219,7 @@ def estimate_color(star: pd.Series,
             y=(max_magnitude_grid[next_row_index],
                max_magnitude_grid[next_row_index + 1]))
 
-    return estimate_at(star_mass,
+    return estimate_at(mass,
                        x=(min_mass, max_mass),
                        y=(min_magnitude, max_magnitude))
 
@@ -245,12 +245,12 @@ def estimate_by_magnitudes(
         cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
         pre_wd_lifetimes: Dict[int, np.ndarray],
         interest_parameter: str) -> float:
-    star_metallicity = star['metallicity']
-    star_mass = star['mass']
-    star_cooling_time = star['cooling_time']
+    metallicity = star['metallicity']
+    mass = star['mass']
+    cooling_time = star['cooling_time']
 
     min_metallicity_index = get_min_metallicity_index(
-            star_metallicity=star_metallicity,
+            metallicity=metallicity,
             grid_metallicities=metallicity_grid)
     min_metallicity = metallicity_grid[min_metallicity_index]
     max_metallicity = metallicity_grid[min_metallicity_index + 1]
@@ -265,8 +265,8 @@ def estimate_by_magnitudes(
     max_metallicity_pre_wd_lifetimes = pre_wd_lifetimes[int_max_metallicity]
 
     estimate = partial(estimate_edge_case,
-                       star_mass=star_mass,
-                       star_cooling_time=star_cooling_time,
+                       mass=mass,
+                       cooling_time=cooling_time,
                        interest_sequence_str=interest_parameter)
 
     min_interest_parameter = estimate(
@@ -276,7 +276,7 @@ def estimate_by_magnitudes(
             cooling_sequences=max_metallicity_grids,
             pre_wd_lifetimes=max_metallicity_pre_wd_lifetimes)
 
-    return estimate_at(star_metallicity,
+    return estimate_at(metallicity,
                        x=(min_metallicity, max_metallicity),
                        y=(min_interest_parameter, max_interest_parameter))
 
@@ -284,14 +284,14 @@ def estimate_by_magnitudes(
 # TODO: this looks like a case of ONe stars
 def estimate_edge_case(*,
                        cooling_sequences: Dict[int, pd.DataFrame],
-                       star_mass: float,
-                       star_cooling_time: float,
+                       mass: float,
+                       cooling_time: float,
                        interest_parameter: str,
                        pre_wd_lifetimes: np.ndarray) -> float:
     int_mass_grid = sorted(list(cooling_sequences.keys()))
-    mass_grid = np.array([mass / 1e5
-                          for mass in int_mass_grid])
-    mass_index = calculate_index(star_mass,
+    mass_grid = np.array([int_mass / 1e5
+                          for int_mass in int_mass_grid])
+    mass_index = calculate_index(mass,
                                  grid=mass_grid)
     int_lesser_mass_index = int_mass_grid[mass_index]
     int_greater_mass_index = int_mass_grid[mass_index + 1]
@@ -300,14 +300,14 @@ def estimate_edge_case(*,
     lesser_mass_pre_wd_lifetime = pre_wd_lifetimes[int_lesser_mass_index]
     greater_mass_pre_wd_lifetime = pre_wd_lifetimes[int_greater_mass_index]
 
-    if star_mass < mass_grid[0] or star_mass >= mass_grid[-1]:
+    if mass < mass_grid[0] or mass >= mass_grid[-1]:
         estimate_interest_value = extrapolate_interest_value
     else:
         estimate_interest_value = interpolate_interest_value
 
     return estimate_interest_value(
-            star_mass=star_mass,
-            star_cooling_time=star_cooling_time,
+            mass=mass,
+            cooling_time=cooling_time,
             greater_mass_cooling_time_grid=greater_mass_df['cooling_time'],
             greater_mass_interest_parameter_grid=greater_mass_df[
                 interest_parameter],
@@ -320,25 +320,25 @@ def estimate_edge_case(*,
             max_mass=mass_grid[mass_index + 1])
 
 
-def extrapolating_by_grid(star_cooling_time: float,
+def extrapolating_by_grid(cooling_time: float,
                           *,
                           cooling_time_grid: np.ndarray) -> bool:
-    if (star_cooling_time < cooling_time_grid[0] or
-            star_cooling_time >= cooling_time_grid[-1]):
+    if (cooling_time < cooling_time_grid[0] or
+            cooling_time >= cooling_time_grid[-1]):
         return True
     else:
         return False
 
 
 def get_min_metallicity_index(*,
-                              star_metallicity: float,
+                              metallicity: float,
                               grid_metallicities: List[float]) -> int:
-    if (star_metallicity < grid_metallicities[0] or
-            star_metallicity > grid_metallicities[-1]):
+    if (metallicity < grid_metallicities[0] or
+            metallicity > grid_metallicities[-1]):
         raise ValueError(f'There is no support for metallicities '
                          f'lying out of the range of {grid_metallicities}')
-    star_metallicity = np.array([star_metallicity])
-    left_index = np.searchsorted(grid_metallicities, star_metallicity) - 1.
+    metallicity = np.array([metallicity])
+    left_index = np.searchsorted(grid_metallicities, metallicity) - 1.
     return np.asscalar(left_index)
 
 
@@ -350,8 +350,8 @@ def calculate_index(value: float,
     elif value > grid[-1]:
         # Index of element before the last one
         return -2
-    star_cooling_time = np.array([value])
-    left_index = np.searchsorted(grid, star_cooling_time) - 1
+    cooling_time = np.array([value])
+    left_index = np.searchsorted(grid, cooling_time) - 1
     return np.asscalar(left_index)
 
 
@@ -366,8 +366,8 @@ def estimate_at(x_0: float,
 
 def interpolate_interest_value(
         *,
-        star_mass: float,
-        star_cooling_time: float,
+        mass: float,
+        cooling_time: float,
         greater_mass_cooling_time_grid: np.ndarray,
         greater_mass_interest_parameter_grid: np.ndarray,
         greater_mass_pre_wd_lifetime: float,
@@ -378,21 +378,21 @@ def interpolate_interest_value(
         max_mass: float) -> float:
     min_extrapolated_interest_value = partial(
             estimated_interest_value,
-            star_cooling_time=star_cooling_time,
+            cooling_time=cooling_time,
             cooling_time_grid=(lesser_mass_cooling_time_grid
                                + lesser_mass_pre_wd_lifetime),
             interest_sequence_grid=lesser_mass_interest_parameter_grid)
     max_extrapolated_interest_value = partial(
             estimated_interest_value,
-            star_cooling_time=star_cooling_time,
+            cooling_time=cooling_time,
             cooling_time_grid=(greater_mass_cooling_time_grid
                                + greater_mass_pre_wd_lifetime),
             interest_sequence_grid=greater_mass_interest_parameter_grid)
 
     extrapolating_by_min_cooling_time_grid = extrapolating_by_grid(
-            star_cooling_time,
+            cooling_time,
             cooling_time_grid=lesser_mass_cooling_time_grid)
-    min_row_index = calculate_index(star_cooling_time,
+    min_row_index = calculate_index(cooling_time,
                                     grid=lesser_mass_cooling_time_grid)
 
     if extrapolating_by_min_cooling_time_grid:
@@ -404,9 +404,9 @@ def interpolate_interest_value(
         x_2 = lesser_mass_interest_parameter_grid[min_row_index + 1]
 
     extrapolating_by_max_cooling_time_grid = extrapolating_by_grid(
-            star_cooling_time,
+            cooling_time,
             cooling_time_grid=greater_mass_cooling_time_grid)
-    max_row_index = calculate_index(star_cooling_time,
+    max_row_index = calculate_index(cooling_time,
                                     grid=greater_mass_cooling_time_grid)
     if extrapolating_by_max_cooling_time_grid:
         x_3 = max_extrapolated_interest_value(row_index=max_row_index)
@@ -418,50 +418,50 @@ def interpolate_interest_value(
 
     if (not extrapolating_by_min_cooling_time_grid and
             not extrapolating_by_max_cooling_time_grid):
-        ym_1 = estimate_at(star_mass,
+        ym_1 = estimate_at(mass,
                            x=(min_mass, max_mass),
                            y=(y_1, y_3))
-        ym_2 = estimate_at(star_mass,
+        ym_2 = estimate_at(mass,
                            x=(min_mass, max_mass),
                            y=(y_2, y_4))
-        xm_1 = estimate_at(star_mass,
+        xm_1 = estimate_at(mass,
                            x=(min_mass, max_mass),
                            y=(x_1, x_3))
-        xm_2 = estimate_at(star_mass,
+        xm_2 = estimate_at(mass,
                            x=(min_mass, max_mass),
                            y=(x_2, x_4))
 
-        return estimate_at(star_cooling_time,
+        return estimate_at(cooling_time,
                            x=(ym_1, ym_2),
                            y=(xm_1, xm_2))
 
     if (not extrapolating_by_min_cooling_time_grid
             and extrapolating_by_max_cooling_time_grid):
-        xm_1 = estimate_at(star_cooling_time,
+        xm_1 = estimate_at(cooling_time,
                            x=(y_1, y_2),
                            y=(x_1, x_2))
-        return estimate_at(star_mass,
+        return estimate_at(mass,
                            x=(min_mass, max_mass),
                            y=(xm_1, x_3))
 
     if (extrapolating_by_min_cooling_time_grid and
             not extrapolating_by_max_cooling_time_grid):
-        xm_2 = estimate_at(star_cooling_time,
+        xm_2 = estimate_at(cooling_time,
                            x=(y_3, y_4),
                            y=(x_3, x_4))
-        return estimate_at(star_mass,
+        return estimate_at(mass,
                            x=(min_mass, max_mass),
                            y=(x_1, xm_2))
 
-    return estimate_at(star_mass,
+    return estimate_at(mass,
                        x=(min_mass, max_mass),
                        y=(x_1, x_3))
 
 
 def extrapolate_interest_value(
         *,
-        star_mass: float,
-        star_cooling_time: float,
+        mass: float,
+        cooling_time: float,
         greater_mass_cooling_time_grid: np.ndarray,
         greater_mass_interest_parameter_grid: np.ndarray,
         greater_mass_pre_wd_lifetime: float,
@@ -471,7 +471,7 @@ def extrapolate_interest_value(
         min_mass: float,
         max_mass: float) -> float:
     interest_value = partial(get_interest_value,
-                             star_cooling_time=star_cooling_time)
+                             cooling_time=cooling_time)
     min_interest_value = interest_value(
             cooling_time_grid=lesser_mass_cooling_time_grid,
             interest_sequence_grid=lesser_mass_interest_parameter_grid,
@@ -480,36 +480,36 @@ def extrapolate_interest_value(
             cooling_time_grid=greater_mass_cooling_time_grid,
             interest_sequence_grid=greater_mass_interest_parameter_grid,
             pre_wd_lifetime=greater_mass_pre_wd_lifetime)
-    return estimate_at(star_mass,
+    return estimate_at(mass,
                        x=(min_mass, max_mass),
                        y=(min_interest_value, max_interest_value))
 
 
 def get_interest_value(*,
-                       star_cooling_time: float,
+                       cooling_time: float,
                        cooling_time_grid: np.ndarray,
                        pre_wd_lifetime: float,
                        interest_parameter_grid: np.ndarray) -> float:
-    row_index = calculate_index(star_cooling_time,
+    row_index = calculate_index(cooling_time,
                                 grid=cooling_time_grid)
 
-    if (star_cooling_time < cooling_time_grid[0] or
-            star_cooling_time > cooling_time_grid[-1]):
+    if (cooling_time < cooling_time_grid[0] or
+            cooling_time > cooling_time_grid[-1]):
         cooling_time_grid = cooling_time_grid + pre_wd_lifetime
 
     return estimated_interest_value(
             row_index=row_index,
-            star_cooling_time=star_cooling_time,
+            cooling_time=cooling_time,
             cooling_time_grid=cooling_time_grid,
             interest_parameter_grid=interest_parameter_grid)
 
 
 def estimated_interest_value(*,
-                             star_cooling_time: float,
+                             cooling_time: float,
                              cooling_time_grid: np.ndarray,
                              interest_parameter_grid: np.ndarray,
                              row_index: int) -> float:
-    return estimate_at(star_cooling_time,
+    return estimate_at(cooling_time,
                        x=(cooling_time_grid[row_index],
                           cooling_time_grid[row_index + 1]),
                        y=(interest_parameter_grid[row_index],
