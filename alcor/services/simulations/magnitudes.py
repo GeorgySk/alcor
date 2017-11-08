@@ -111,58 +111,100 @@ def assign_estimated_values(
                   'effective_temperature']
 
     for parameter in parameters:
-        oxygen_neon_white_dwarfs.apply(estimate_oxygen_neon_parameters,
+        oxygen_neon_white_dwarfs.apply(estimate_by_mass,
                                        axis=1,
                                        color_table=one_color_table,
-                                       interest_parameter=parameter)
+                                       interest_parameter=parameter,
+                                       pre_wd_lifetimes=0.)  # Const for ONe
 
     return pd.concat([da_white_dwarfs,
                       db_white_dwarfs,
                       oxygen_neon_white_dwarfs])
 
 
-def estimate_oxygen_neon_parameters(
+def estimate_by_magnitudes(
         star: pd.Series,
         *,
-        color_table: Dict[int, pd.DataFrame],
-        interest_parameter: str) -> None:
-    pre_wd_lifetime = 0.  # constant for all ONe white dwarfs
+        metallicity_grid: List[float],
+        cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
+        pre_wd_lifetimes: Dict[int, np.ndarray],
+        interest_parameter: str) -> float:
+    metallicity = star['metallicity']
 
+    min_metallicity_index = get_min_metallicity_index(
+            metallicity=metallicity,
+            grid_metallicities=metallicity_grid)
+    min_metallicity = metallicity_grid[min_metallicity_index]
+    max_metallicity = metallicity_grid[min_metallicity_index + 1]
+
+    int_min_metallicity = int(min_metallicity * 1e3)
+    int_max_metallicity = int(max_metallicity * 1e3)
+
+    min_metallicity_grids = cooling_sequences[int_min_metallicity]
+    max_metallicity_grids = cooling_sequences[int_max_metallicity]
+
+    min_metallicity_pre_wd_lifetimes = pre_wd_lifetimes[int_min_metallicity]
+    max_metallicity_pre_wd_lifetimes = pre_wd_lifetimes[int_max_metallicity]
+
+    estimate = partial(estimate_by_mass,
+                       star=star,
+                       interest_sequence_str=interest_parameter)
+
+    min_interest_parameter = estimate(
+            tracks=min_metallicity_grids,
+            pre_wd_lifetimes=min_metallicity_pre_wd_lifetimes)
+    max_interest_parameter = estimate(
+            tracks=max_metallicity_grids,
+            pre_wd_lifetimes=max_metallicity_pre_wd_lifetimes)
+
+    return estimate_at(metallicity,
+                       x=(min_metallicity, max_metallicity),
+                       y=(min_interest_parameter, max_interest_parameter))
+
+
+def estimate_by_mass(
+        star: pd.Series,
+        *,
+        tracks: Dict[int, pd.DataFrame],
+        interest_parameter: str,
+        pre_wd_lifetimes: np.ndarray) -> float:
     mass = star['mass']
     cooling_time = star['cooling_time']
-    int_mass_grid = sorted(list(color_table.keys()))
+
+    int_mass_grid = sorted(list(tracks.keys()))
     mass_grid = np.array([key / 1e5
                           for key in int_mass_grid])
+
+    lesser_mass_index = calculate_index(mass,
+                                        grid=mass_grid)
+    lesser_int_mass = int_mass_grid[lesser_mass_index]
+    lesser_mass_df = tracks[lesser_int_mass]
+    greater_int_mass = int_mass_grid[lesser_mass_index + 1]
+    greater_mass_df = tracks[greater_int_mass]
+    lesser_mass_pre_wd_lifetime = pre_wd_lifetimes[lesser_int_mass]
+    greater_mass_pre_wd_lifetime = pre_wd_lifetimes[greater_int_mass]
 
     if mass < mass_grid[0] or mass >= mass_grid[-1]:
         estimate_interest_value = extrapolate_interest_value
     else:
         estimate_interest_value = interpolate_interest_value
 
-    lesser_mass_index = calculate_index(mass,
-                                        grid=mass_grid)
-    lesser_int_mass = int_mass_grid[lesser_mass_index]
-    lesser_mass_df = color_table[lesser_int_mass]
-    greater_int_mass = int_mass_grid[lesser_mass_index + 1]
-    greater_mass_df = color_table[greater_int_mass]
-
-    estimate = partial(
-            estimate_interest_value,
+    return estimate_interest_value(
             mass=mass,
             cooling_time=cooling_time,
             greater_mass_cooling_time_grid=greater_mass_df['cooling_time'],
-            greater_mass_pre_wd_lifetime=pre_wd_lifetime,
-            lesser_mass_cooling_time_grid=greater_mass_df['cooling_time'],
-            lesser_mass_pre_wd_lifetime=pre_wd_lifetime,
+            greater_mass_interest_parameter_grid=greater_mass_df[
+                interest_parameter],
+            greater_mass_pre_wd_lifetime=greater_mass_pre_wd_lifetime,
+            lesser_mass_cooling_time_grid=lesser_mass_df['cooling_time'],
+            lesser_mass_interest_parameter_grid=lesser_mass_df[
+                interest_parameter],
+            lesser_mass_pre_wd_lifetime=lesser_mass_pre_wd_lifetime,
             min_mass=mass_grid[lesser_mass_index],
             max_mass=mass_grid[lesser_mass_index + 1])
 
-    return estimate(greater_mass_interest_parameter_grid=greater_mass_df[
-                        interest_parameter],
-                    lesser_mass_interest_parameter_grid=lesser_mass_df[
-                        interest_parameter])
 
-
+# TODO: why is it different from estimate_by_mass?
 def estimate_color(star: pd.Series,
                    *,
                    color_table: Dict[int, pd.DataFrame],
@@ -222,147 +264,6 @@ def estimate_color(star: pd.Series,
     return estimate_at(mass,
                        x=(min_mass, max_mass),
                        y=(min_magnitude, max_magnitude))
-
-
-def generate_spectral_types(*,
-                            db_to_da_fraction: float,
-                            size: int) -> np.ndarray:
-    spectral_types = np.empty(size)
-
-    randoms = np.random.rand(size)
-    db_mask = randoms < db_to_da_fraction
-
-    spectral_types[db_mask] = SpectralType.DB
-    spectral_types[~db_mask] = SpectralType.DA
-
-    return spectral_types
-
-
-def estimate_by_magnitudes(
-        star: pd.Series,
-        *,
-        metallicity_grid: List[float],
-        cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
-        pre_wd_lifetimes: Dict[int, np.ndarray],
-        interest_parameter: str) -> float:
-    metallicity = star['metallicity']
-    mass = star['mass']
-    cooling_time = star['cooling_time']
-
-    min_metallicity_index = get_min_metallicity_index(
-            metallicity=metallicity,
-            grid_metallicities=metallicity_grid)
-    min_metallicity = metallicity_grid[min_metallicity_index]
-    max_metallicity = metallicity_grid[min_metallicity_index + 1]
-
-    int_min_metallicity = int(min_metallicity * 1e3)
-    int_max_metallicity = int(max_metallicity * 1e3)
-
-    min_metallicity_grids = cooling_sequences[int_min_metallicity]
-    max_metallicity_grids = cooling_sequences[int_max_metallicity]
-
-    min_metallicity_pre_wd_lifetimes = pre_wd_lifetimes[int_min_metallicity]
-    max_metallicity_pre_wd_lifetimes = pre_wd_lifetimes[int_max_metallicity]
-
-    estimate = partial(estimate_edge_case,
-                       mass=mass,
-                       cooling_time=cooling_time,
-                       interest_sequence_str=interest_parameter)
-
-    min_interest_parameter = estimate(
-            cooling_sequences=min_metallicity_grids,
-            pre_wd_lifetimes=min_metallicity_pre_wd_lifetimes)
-    max_interest_parameter = estimate(
-            cooling_sequences=max_metallicity_grids,
-            pre_wd_lifetimes=max_metallicity_pre_wd_lifetimes)
-
-    return estimate_at(metallicity,
-                       x=(min_metallicity, max_metallicity),
-                       y=(min_interest_parameter, max_interest_parameter))
-
-
-# TODO: this looks like a case of ONe stars
-def estimate_edge_case(*,
-                       cooling_sequences: Dict[int, pd.DataFrame],
-                       mass: float,
-                       cooling_time: float,
-                       interest_parameter: str,
-                       pre_wd_lifetimes: np.ndarray) -> float:
-    int_mass_grid = sorted(list(cooling_sequences.keys()))
-    mass_grid = np.array([int_mass / 1e5
-                          for int_mass in int_mass_grid])
-    mass_index = calculate_index(mass,
-                                 grid=mass_grid)
-    int_lesser_mass_index = int_mass_grid[mass_index]
-    int_greater_mass_index = int_mass_grid[mass_index + 1]
-    lesser_mass_df = cooling_sequences[int_lesser_mass_index]
-    greater_mass_df = cooling_sequences[int_greater_mass_index]
-    lesser_mass_pre_wd_lifetime = pre_wd_lifetimes[int_lesser_mass_index]
-    greater_mass_pre_wd_lifetime = pre_wd_lifetimes[int_greater_mass_index]
-
-    if mass < mass_grid[0] or mass >= mass_grid[-1]:
-        estimate_interest_value = extrapolate_interest_value
-    else:
-        estimate_interest_value = interpolate_interest_value
-
-    return estimate_interest_value(
-            mass=mass,
-            cooling_time=cooling_time,
-            greater_mass_cooling_time_grid=greater_mass_df['cooling_time'],
-            greater_mass_interest_parameter_grid=greater_mass_df[
-                interest_parameter],
-            greater_mass_pre_wd_lifetime=greater_mass_pre_wd_lifetime,
-            lesser_mass_cooling_time_grid=lesser_mass_df['cooling_time'],
-            lesser_mass_interest_parameter_grid=lesser_mass_df[
-                interest_parameter],
-            lesser_mass_pre_wd_lifetime=lesser_mass_pre_wd_lifetime,
-            min_mass=mass_grid[mass_index],
-            max_mass=mass_grid[mass_index + 1])
-
-
-def extrapolating_by_grid(cooling_time: float,
-                          *,
-                          cooling_time_grid: np.ndarray) -> bool:
-    if (cooling_time < cooling_time_grid[0] or
-            cooling_time >= cooling_time_grid[-1]):
-        return True
-    else:
-        return False
-
-
-def get_min_metallicity_index(*,
-                              metallicity: float,
-                              grid_metallicities: List[float]) -> int:
-    if (metallicity < grid_metallicities[0] or
-            metallicity > grid_metallicities[-1]):
-        raise ValueError('There is no support for metallicities '
-                         'lying out of the range of {grid_metallicities}'
-                         .format(grid_metallicities=grid_metallicities))
-    metallicity = np.array([metallicity])
-    left_index = np.searchsorted(grid_metallicities, metallicity) - 1.
-    return np.asscalar(left_index)
-
-
-def calculate_index(value: float,
-                    *,
-                    grid: np.ndarray) -> int:
-    if value <= grid[0]:
-        return 0
-    elif value > grid[-1]:
-        # Index of element before the last one
-        return -2
-    cooling_time = np.array([value])
-    left_index = np.searchsorted(grid, cooling_time) - 1
-    return np.asscalar(left_index)
-
-
-def estimate_at(x_0: float,
-                *,
-                x: Tuple[float, float],
-                y: Tuple[float, float]) -> float:
-    spline = linear_estimation(x=x,
-                               y=y)
-    return spline(x_0)
 
 
 def interpolate_interest_value(
@@ -471,38 +372,72 @@ def extrapolate_interest_value(
         lesser_mass_pre_wd_lifetime: float,
         min_mass: float,
         max_mass: float) -> float:
-    interest_value = partial(get_interest_value,
-                             cooling_time=cooling_time)
-    min_interest_value = interest_value(
+    min_row_index = calculate_index(cooling_time,
+                                    grid=lesser_mass_cooling_time_grid)
+    max_row_index = calculate_index(cooling_time,
+                                    grid=greater_mass_cooling_time_grid)
+
+    # TODO: check why we don't add pre_wd_lifetime when interpolating
+    if (cooling_time < lesser_mass_cooling_time_grid[0] or
+            cooling_time > lesser_mass_cooling_time_grid[-1]):
+        lesser_mass_cooling_time_grid = (lesser_mass_cooling_time_grid +
+                                         lesser_mass_pre_wd_lifetime)
+    if (cooling_time < greater_mass_cooling_time_grid[0] or
+            cooling_time > greater_mass_cooling_time_grid[-1]):
+        greater_mass_cooling_time_grid = (greater_mass_cooling_time_grid +
+                                          greater_mass_pre_wd_lifetime)
+
+    min_interest_value = estimated_interest_value(
+            row_index=min_row_index,
+            cooling_time=cooling_time,
             cooling_time_grid=lesser_mass_cooling_time_grid,
-            interest_sequence_grid=lesser_mass_interest_parameter_grid,
-            pre_wd_lifetime=lesser_mass_pre_wd_lifetime)
-    max_interest_value = interest_value(
+            interest_parameter_grid=lesser_mass_interest_parameter_grid)
+    max_interest_value = estimated_interest_value(
+            row_index=max_row_index,
+            cooling_time=cooling_time,
             cooling_time_grid=greater_mass_cooling_time_grid,
-            interest_sequence_grid=greater_mass_interest_parameter_grid,
-            pre_wd_lifetime=greater_mass_pre_wd_lifetime)
+            interest_parameter_grid=greater_mass_interest_parameter_grid)
+
     return estimate_at(mass,
                        x=(min_mass, max_mass),
                        y=(min_interest_value, max_interest_value))
 
 
-def get_interest_value(*,
-                       cooling_time: float,
-                       cooling_time_grid: np.ndarray,
-                       pre_wd_lifetime: float,
-                       interest_parameter_grid: np.ndarray) -> float:
-    row_index = calculate_index(cooling_time,
-                                grid=cooling_time_grid)
+def generate_spectral_types(*,
+                            db_to_da_fraction: float,
+                            size: int) -> np.ndarray:
+    spectral_types = np.empty(size)
 
+    randoms = np.random.rand(size)
+    db_mask = randoms < db_to_da_fraction
+
+    spectral_types[db_mask] = SpectralType.DB
+    spectral_types[~db_mask] = SpectralType.DA
+
+    return spectral_types
+
+
+def get_min_metallicity_index(metallicity: float,
+                              *,
+                              grid_metallicities: List[float]) -> int:
+    if (metallicity < grid_metallicities[0] or
+            metallicity > grid_metallicities[-1]):
+        raise ValueError('There is no support for metallicities '
+                         'lying out of the range of {grid_metallicities}'
+                         .format(grid_metallicities=grid_metallicities))
+    metallicity = np.array([metallicity])
+    left_index = np.searchsorted(grid_metallicities, metallicity) - 1.
+    return np.asscalar(left_index)
+
+
+def extrapolating_by_grid(cooling_time: float,
+                          *,
+                          cooling_time_grid: np.ndarray) -> bool:
     if (cooling_time < cooling_time_grid[0] or
-            cooling_time > cooling_time_grid[-1]):
-        cooling_time_grid = cooling_time_grid + pre_wd_lifetime
-
-    return estimated_interest_value(
-            row_index=row_index,
-            cooling_time=cooling_time,
-            cooling_time_grid=cooling_time_grid,
-            interest_parameter_grid=interest_parameter_grid)
+            cooling_time >= cooling_time_grid[-1]):
+        return True
+    else:
+        return False
 
 
 def estimated_interest_value(*,
@@ -515,3 +450,25 @@ def estimated_interest_value(*,
                           cooling_time_grid[row_index + 1]),
                        y=(interest_parameter_grid[row_index],
                           interest_parameter_grid[row_index + 1]))
+
+
+def calculate_index(value: float,
+                    *,
+                    grid: np.ndarray) -> int:
+    if value <= grid[0]:
+        return 0
+    elif value > grid[-1]:
+        # Index of element before the last one
+        return -2
+    cooling_time = np.array([value])
+    left_index = np.searchsorted(grid, cooling_time) - 1
+    return np.asscalar(left_index)
+
+
+def estimate_at(x_0: float,
+                *,
+                x: Tuple[float, float],
+                y: Tuple[float, float]) -> float:
+    spline = linear_estimation(x=x,
+                               y=y)
+    return spline(x_0)
