@@ -335,8 +335,9 @@ def get_min_metallicity_index(*,
                               grid_metallicities: List[float]) -> int:
     if (metallicity < grid_metallicities[0] or
             metallicity > grid_metallicities[-1]):
-        raise ValueError(f'There is no support for metallicities '
-                         f'lying out of the range of {grid_metallicities}')
+        raise ValueError('There is no support for metallicities '
+                         'lying out of the range of {grid_metallicities}'
+                         .format(grid_metallicities=grid_metallicities))
     metallicity = np.array([metallicity])
     left_index = np.searchsorted(grid_metallicities, metallicity) - 1.
     return np.asscalar(left_index)
