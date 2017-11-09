@@ -187,6 +187,11 @@ def estimate_by_mass(
     else:
         estimate_interest_value = interpolate_interest_value
 
+    min_row_index = calculate_index(cooling_time,
+                                    grid=lesser_mass_df['cooling_time'])
+    max_row_index = calculate_index(cooling_time,
+                                    grid=greater_mass_df['cooling_time'])
+
     return estimate_interest_value(
             mass=mass,
             cooling_time=cooling_time,
@@ -199,7 +204,9 @@ def estimate_by_mass(
                 interest_parameter],
             lesser_mass_pre_wd_lifetime=lesser_mass_pre_wd_lifetime,
             min_mass=mass_grid[lesser_mass_index],
-            max_mass=mass_grid[lesser_mass_index + 1])
+            max_mass=mass_grid[lesser_mass_index + 1],
+            min_row_index=min_row_index,
+            max_row_index=max_row_index)
 
 
 # TODO: why is it different from estimate_by_mass?
@@ -275,7 +282,9 @@ def interpolate_interest_value(
         lesser_mass_interest_parameter_grid: np.ndarray,
         lesser_mass_pre_wd_lifetime: float,
         min_mass: float,
-        max_mass: float) -> float:
+        max_mass: float,
+        min_row_index: int,
+        max_row_index: int) -> float:
     min_extrapolated_interest_value = partial(
             estimated_interest_value,
             cooling_time=cooling_time,
@@ -292,8 +301,6 @@ def interpolate_interest_value(
     extrapolating_by_min_cooling_time_grid = extrapolating_by_grid(
             cooling_time,
             cooling_time_grid=lesser_mass_cooling_time_grid)
-    min_row_index = calculate_index(cooling_time,
-                                    grid=lesser_mass_cooling_time_grid)
 
     if extrapolating_by_min_cooling_time_grid:
         x_1 = min_extrapolated_interest_value(row_index=min_row_index)
@@ -306,8 +313,6 @@ def interpolate_interest_value(
     extrapolating_by_max_cooling_time_grid = extrapolating_by_grid(
             cooling_time,
             cooling_time_grid=greater_mass_cooling_time_grid)
-    max_row_index = calculate_index(cooling_time,
-                                    grid=greater_mass_cooling_time_grid)
     if extrapolating_by_max_cooling_time_grid:
         x_3 = max_extrapolated_interest_value(row_index=max_row_index)
     else:
@@ -369,12 +374,9 @@ def extrapolate_interest_value(
         lesser_mass_interest_parameter_grid: np.ndarray,
         lesser_mass_pre_wd_lifetime: float,
         min_mass: float,
-        max_mass: float) -> float:
-    min_row_index = calculate_index(cooling_time,
-                                    grid=lesser_mass_cooling_time_grid)
-    max_row_index = calculate_index(cooling_time,
-                                    grid=greater_mass_cooling_time_grid)
-
+        max_mass: float,
+        min_row_index: int,
+        max_row_index: int) -> float:
     # TODO: ask why we don't add pre_wd_lifetime when interpolating
     if (cooling_time < lesser_mass_cooling_time_grid[0] or
             cooling_time > lesser_mass_cooling_time_grid[-1]):
