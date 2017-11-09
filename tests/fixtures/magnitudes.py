@@ -14,9 +14,9 @@ def float_value() -> float:
 
 
 @pytest.fixture(scope='function')
-def floats_tuple() -> Tuple[float, float]:
-    return (example(strategies.floats),
-            example(strategies.floats))
+def floats_tuple() -> Tuple[float, ...]:
+    # TODO: find out how to get sorted tuple
+    return 0.2456, 1.545645
 
 
 @pytest.fixture(scope='function')
@@ -32,9 +32,7 @@ def cooling_time() -> float:
 
 @pytest.fixture(scope='function')
 def cooling_time_grid() -> np.ndarray:
-    return np.random.uniform(low=0.,
-                             high=12.,
-                             size=10)
+    return np.linspace(0., 9., 10)
 
 
 @pytest.fixture(scope='function')
@@ -44,7 +42,7 @@ def interest_parameter_grid() -> np.ndarray:
 
 @pytest.fixture(scope='function')
 def row_index() -> int:
-    return random.choice(range(10))
+    return random.choice(range(9))
 
 
 @pytest.fixture(scope='function')

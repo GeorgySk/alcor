@@ -426,6 +426,7 @@ def get_min_metallicity_index(metallicity: float,
                          .format(grid_metallicities=grid_metallicities))
     metallicity = np.array([metallicity])
     left_index = np.searchsorted(grid_metallicities, metallicity) - 1.
+    left_index = left_index.astype(int)
     return np.asscalar(left_index)
 
 
@@ -466,8 +467,8 @@ def calculate_index(value: float,
 
 def estimate_at(x_0: float,
                 *,
-                x: Tuple[float, float],
-                y: Tuple[float, float]) -> float:
+                x: Tuple[float, ...],
+                y: Tuple[float, ...]) -> float:
     spline = linear_estimation(x=x,
                                y=y)
-    return spline(x_0)
+    return np.asscalar(spline(x_0))

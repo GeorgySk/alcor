@@ -1,10 +1,14 @@
-from typing import Tuple, List
+from typing import (Tuple,
+                    List)
 
 import numpy as np
 
-from alcor.services.simulations.magnitudes import estimate_at, \
-    estimated_interest_value, calculate_index, extrapolating_by_grid, \
-    get_min_metallicity_index, generate_spectral_types
+from alcor.services.simulations.magnitudes import (estimate_at,
+                                                   estimated_interest_value,
+                                                   calculate_index,
+                                                   extrapolating_by_grid,
+                                                   get_min_metallicity_index,
+                                                   generate_spectral_types)
 
 
 def test_estimate_at(float_value: float,
