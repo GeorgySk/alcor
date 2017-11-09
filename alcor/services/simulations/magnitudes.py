@@ -216,6 +216,7 @@ def estimate_color(star: pd.Series,
                    color: str) -> float:
     mass = star['mass']
     star_luminosity = star['luminosity']
+
     int_mass_grid = sorted(list(color_table.keys()))
     mass_grid = np.array([key / 1e5
                           for key in int_mass_grid])
@@ -285,25 +286,17 @@ def interpolate_interest_value(
         max_mass: float,
         min_row_index: int,
         max_row_index: int) -> float:
-    min_extrapolated_interest_value = partial(
-            estimated_interest_value,
-            cooling_time=cooling_time,
-            cooling_time_grid=(lesser_mass_cooling_time_grid
-                               + lesser_mass_pre_wd_lifetime),
-            interest_sequence_grid=lesser_mass_interest_parameter_grid)
-    max_extrapolated_interest_value = partial(
-            estimated_interest_value,
-            cooling_time=cooling_time,
-            cooling_time_grid=(greater_mass_cooling_time_grid
-                               + greater_mass_pre_wd_lifetime),
-            interest_sequence_grid=greater_mass_interest_parameter_grid)
-
     extrapolating_by_min_cooling_time_grid = extrapolating_by_grid(
             cooling_time,
             cooling_time_grid=lesser_mass_cooling_time_grid)
 
     if extrapolating_by_min_cooling_time_grid:
-        x_1 = min_extrapolated_interest_value(row_index=min_row_index)
+        x_1 = estimated_interest_value(
+                row_index=min_row_index,
+                cooling_time=cooling_time,
+                cooling_time_grid=(lesser_mass_cooling_time_grid
+                                   + lesser_mass_pre_wd_lifetime),
+                interest_parameter_grid=lesser_mass_interest_parameter_grid)
     else:
         y_1 = lesser_mass_cooling_time_grid[min_row_index]
         y_2 = lesser_mass_cooling_time_grid[min_row_index + 1]
@@ -314,7 +307,12 @@ def interpolate_interest_value(
             cooling_time,
             cooling_time_grid=greater_mass_cooling_time_grid)
     if extrapolating_by_max_cooling_time_grid:
-        x_3 = max_extrapolated_interest_value(row_index=max_row_index)
+        x_3 = estimated_interest_value(
+                row_index=max_row_index,
+                cooling_time=cooling_time,
+                cooling_time_grid=(greater_mass_cooling_time_grid
+                                   + greater_mass_pre_wd_lifetime),
+                interest_parameter_grid=greater_mass_interest_parameter_grid)
     else:
         y_3 = greater_mass_cooling_time_grid[max_row_index]
         y_4 = greater_mass_cooling_time_grid[max_row_index + 1]
