@@ -24,20 +24,6 @@ def assign_estimated_values(
         db_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
         db_color_table: Dict[int, pd.DataFrame],
         one_color_table: Dict[int, pd.DataFrame]) -> pd.DataFrame:
-    # TODO: probably I should save it as metadata inside hdf5 files
-    da_pre_wd_lifetimes = {1: np.zeros(7),
-                           10: np.zeros(10),
-                           30: np.array([11.117, 2.7004, 1.699, 1.2114,
-                                         0.9892, 0.7422, 0.4431, 0.0]),
-                           60: np.array([11.117, 2.7004, 1.699, 1.2114,
-                                         0.9892, 0.7422, 0.4431, 0.0])}
-    db_pre_wd_lifetimes = {1: np.zeros(7),
-                           10: np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892,
-                                         0.7422, 0.4431, 0.287, 0.114]),
-                           60: np.array([11.117, 2.7004, 1.699, 1.2114, 0.9892,
-                                         0.7422, 0.4431, 0.287, 0.114])}
-    pre_wd_lifetimes = {'DA': da_pre_wd_lifetimes,
-                        'DB': db_pre_wd_lifetimes}
     cooling_sequences = {'DA': da_cooling_sequences,
                          'DB': db_cooling_sequences}
     color_tables = {'DA': da_color_table,
@@ -82,14 +68,12 @@ def assign_estimated_values(
                 axis=1,
                 metallicity_grid=metallicities[spectral_type],
                 cooling_sequences=cooling_sequences[spectral_type],
-                pre_wd_lifetimes=pre_wd_lifetimes[spectral_type],
                 interest_parameter='luminosity')
         white_dwarfs['effective_temperature'] = white_dwarfs.apply(
                 estimate_by_magnitudes,
                 axis=1,
                 metallicity_grid=metallicities[spectral_type],
                 cooling_sequences=cooling_sequences[spectral_type],
-                pre_wd_lifetimes=pre_wd_lifetimes[spectral_type],
                 interest_parameter='effective_temperature')
 
         for color in colors:
@@ -112,8 +96,7 @@ def assign_estimated_values(
         oxygen_neon_white_dwarfs.apply(estimate_by_mass,
                                        axis=1,
                                        color_table=one_color_table,
-                                       interest_parameter=parameter,
-                                       pre_wd_lifetimes=0.)  # Const for ONe
+                                       interest_parameter=parameter)
 
     return pd.concat([da_white_dwarfs,
                       db_white_dwarfs,
@@ -125,7 +108,6 @@ def estimate_by_magnitudes(
         *,
         metallicity_grid: List[float],
         cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
-        pre_wd_lifetimes: Dict[int, np.ndarray],
         interest_parameter: str) -> float:
     metallicity = star['metallicity']
 
@@ -141,19 +123,12 @@ def estimate_by_magnitudes(
     min_metallicity_grids = cooling_sequences[int_min_metallicity]
     max_metallicity_grids = cooling_sequences[int_max_metallicity]
 
-    min_metallicity_pre_wd_lifetimes = pre_wd_lifetimes[int_min_metallicity]
-    max_metallicity_pre_wd_lifetimes = pre_wd_lifetimes[int_max_metallicity]
-
     estimate = partial(estimate_by_mass,
                        star=star,
                        interest_sequence_str=interest_parameter)
 
-    min_interest_parameter = estimate(
-            tracks=min_metallicity_grids,
-            pre_wd_lifetimes=min_metallicity_pre_wd_lifetimes)
-    max_interest_parameter = estimate(
-            tracks=max_metallicity_grids,
-            pre_wd_lifetimes=max_metallicity_pre_wd_lifetimes)
+    min_interest_parameter = estimate(tracks=min_metallicity_grids)
+    max_interest_parameter = estimate(tracks=max_metallicity_grids)
 
     return estimate_at(metallicity,
                        x=(min_metallicity, max_metallicity),
@@ -164,8 +139,7 @@ def estimate_by_mass(
         star: pd.Series,
         *,
         tracks: Dict[int, pd.DataFrame],
-        interest_parameter: str,
-        pre_wd_lifetimes: np.ndarray) -> float:
+        interest_parameter: str) -> float:
     mass = star['mass']
     cooling_time = star['cooling_time']
 
@@ -179,8 +153,6 @@ def estimate_by_mass(
     lesser_mass_df = tracks[lesser_int_mass]
     greater_int_mass = int_mass_grid[lesser_mass_index + 1]
     greater_mass_df = tracks[greater_int_mass]
-    lesser_mass_pre_wd_lifetime = pre_wd_lifetimes[lesser_int_mass]
-    greater_mass_pre_wd_lifetime = pre_wd_lifetimes[greater_int_mass]
 
     if mass < mass_grid[0] or mass >= mass_grid[-1]:
         estimate_interest_value = extrapolate_interest_value
@@ -197,12 +169,11 @@ def estimate_by_mass(
             cooling_time=cooling_time,
             greater_mass_cooling_time_grid=greater_mass_df['cooling_time'],
             greater_mass_interest_parameter_grid=greater_mass_df[
-                interest_parameter],
-            greater_mass_pre_wd_lifetime=greater_mass_pre_wd_lifetime,
-            lesser_mass_cooling_time_grid=lesser_mass_df['cooling_time'],
+                interest_parameter].values,
+            lesser_mass_cooling_time_grid=(
+                lesser_mass_df['cooling_time'].values),
             lesser_mass_interest_parameter_grid=lesser_mass_df[
-                interest_parameter],
-            lesser_mass_pre_wd_lifetime=lesser_mass_pre_wd_lifetime,
+                interest_parameter].values,
             min_mass=mass_grid[lesser_mass_index],
             max_mass=mass_grid[lesser_mass_index + 1],
             min_row_index=min_row_index,
@@ -278,10 +249,8 @@ def interpolate_interest_value(
         cooling_time: float,
         greater_mass_cooling_time_grid: np.ndarray,
         greater_mass_interest_parameter_grid: np.ndarray,
-        greater_mass_pre_wd_lifetime: float,
         lesser_mass_cooling_time_grid: np.ndarray,
         lesser_mass_interest_parameter_grid: np.ndarray,
-        lesser_mass_pre_wd_lifetime: float,
         min_mass: float,
         max_mass: float,
         min_row_index: int,
@@ -289,13 +258,11 @@ def interpolate_interest_value(
     extrapolating_by_min_cooling_time_grid = extrapolating_by_grid(
             cooling_time,
             cooling_time_grid=lesser_mass_cooling_time_grid)
-
     if extrapolating_by_min_cooling_time_grid:
         x_1 = estimated_interest_value(
                 row_index=min_row_index,
                 cooling_time=cooling_time,
-                cooling_time_grid=(lesser_mass_cooling_time_grid
-                                   + lesser_mass_pre_wd_lifetime),
+                cooling_time_grid=lesser_mass_cooling_time_grid,
                 interest_parameter_grid=lesser_mass_interest_parameter_grid)
     else:
         y_1 = lesser_mass_cooling_time_grid[min_row_index]
@@ -310,8 +277,7 @@ def interpolate_interest_value(
         x_3 = estimated_interest_value(
                 row_index=max_row_index,
                 cooling_time=cooling_time,
-                cooling_time_grid=(greater_mass_cooling_time_grid
-                                   + greater_mass_pre_wd_lifetime),
+                cooling_time_grid=greater_mass_cooling_time_grid,
                 interest_parameter_grid=greater_mass_interest_parameter_grid)
     else:
         y_3 = greater_mass_cooling_time_grid[max_row_index]
@@ -367,24 +333,12 @@ def extrapolate_interest_value(
         cooling_time: float,
         greater_mass_cooling_time_grid: np.ndarray,
         greater_mass_interest_parameter_grid: np.ndarray,
-        greater_mass_pre_wd_lifetime: float,
         lesser_mass_cooling_time_grid: np.ndarray,
         lesser_mass_interest_parameter_grid: np.ndarray,
-        lesser_mass_pre_wd_lifetime: float,
         min_mass: float,
         max_mass: float,
         min_row_index: int,
         max_row_index: int) -> float:
-    # TODO: ask why we don't add pre_wd_lifetime when interpolating
-    if (cooling_time < lesser_mass_cooling_time_grid[0] or
-            cooling_time > lesser_mass_cooling_time_grid[-1]):
-        lesser_mass_cooling_time_grid = (lesser_mass_cooling_time_grid +
-                                         lesser_mass_pre_wd_lifetime)
-    if (cooling_time < greater_mass_cooling_time_grid[0] or
-            cooling_time > greater_mass_cooling_time_grid[-1]):
-        greater_mass_cooling_time_grid = (greater_mass_cooling_time_grid +
-                                          greater_mass_pre_wd_lifetime)
-
     min_interest_value = estimated_interest_value(
             row_index=min_row_index,
             cooling_time=cooling_time,
