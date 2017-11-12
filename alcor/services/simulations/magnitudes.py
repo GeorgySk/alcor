@@ -216,18 +216,8 @@ def estimate_color(star: pd.Series,
             star_luminosity,
             grid=max_luminosity_grid)
 
-    if (star_luminosity > min_luminosity_grid[0] or
-            star_luminosity > max_luminosity_grid[0]):
-        min_mass = mass_grid[lesser_mass_index]
-        max_mass = mass_grid[greater_mass_index]
-    elif (star_luminosity < min_luminosity_grid[-1] or
-            star_luminosity < max_luminosity_grid[-1]):
-        min_mass = mass_grid[lesser_mass_index]
-        max_mass = mass_grid[greater_mass_index]
-    else:
-        # TODO: check these indexes, they look suspicious
-        min_mass = mass_grid[0]
-        max_mass = mass_grid[1]
+    min_mass = mass_grid[lesser_mass_index]
+    max_mass = mass_grid[greater_mass_index]
 
     min_magnitude_grid = lesser_mass_df[color].values
     max_magnitude_grid = greater_mass_df[color].values
