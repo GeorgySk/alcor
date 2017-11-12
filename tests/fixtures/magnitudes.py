@@ -203,14 +203,14 @@ def cooling_sequences() -> Dict[int, Dict[int, pd.DataFrame]]:
 def stars() -> pd.DataFrame:
     return pd.DataFrame(dict(mass=[1., 1.1],
                              luminosity=[0., 1.],
-                             metallicity=[0.01, 0.06],
+                             metallicity=[0.01, 0.001],
                              cooling_time=[3., 4.]))
 
 
 @pytest.fixture(scope='function')
 def stars_without_luminosity() -> pd.DataFrame:
     return pd.DataFrame(dict(mass=[1., 1.1],
-                             metallicity=[0.01, 0.06],
+                             metallicity=[0.01, 0.001],
                              cooling_time=[3., 4.]))
 
 
