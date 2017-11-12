@@ -62,26 +62,30 @@ def assign_estimated_values(
               'j_ubvri_absolute']
 
     for spectral_type, white_dwarfs in white_dwarfs_by_spectral_types.items():
+        if white_dwarfs.shape[0] == 0:
+            continue
         # TODO: why is there minus sign here and no sign for ONe WDs?
-        white_dwarfs['luminosity'] = -white_dwarfs.apply(
-                estimate_by_magnitudes,
+        white_dwarfs.loc[:, 'luminosity'] = -white_dwarfs.apply(
+                estimate_by_metallicities,
                 axis=1,
                 metallicity_grid=metallicities[spectral_type],
                 cooling_sequences=cooling_sequences[spectral_type],
                 interest_parameter='luminosity')
-        white_dwarfs['effective_temperature'] = white_dwarfs.apply(
-                estimate_by_magnitudes,
+        white_dwarfs.loc[:, 'effective_temperature'] = white_dwarfs.apply(
+                estimate_by_metallicities,
                 axis=1,
                 metallicity_grid=metallicities[spectral_type],
                 cooling_sequences=cooling_sequences[spectral_type],
                 interest_parameter='effective_temperature')
 
         for color in colors:
-            white_dwarfs[color] = white_dwarfs.apply(
+            if white_dwarfs.shape[0] == 0:
+                continue
+            white_dwarfs.loc[:, color] = white_dwarfs.apply(
                     estimate_color,
                     axis=1,
-                    color_table=color_tables[spectral_type])
-
+                    color_table=color_tables[spectral_type],
+                    color=color)
     oxygen_neon_white_dwarfs['spectral_type'] = 'ONe'
     parameters = ['luminosity',
                   'u_ubvri_absolute',
