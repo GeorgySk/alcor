@@ -115,7 +115,6 @@ def estimate_by_metallicities(
         interest_parameter: str) -> float:
     metallicity = star['metallicity']
 
-    # TODO: fix cases when values are equal
     min_metallicity_index = get_min_metallicity_index(
             metallicity=metallicity,
             grid_metallicities=metallicity_grid)
@@ -379,7 +378,12 @@ def get_min_metallicity_index(metallicity: float,
     metallicity = np.array([metallicity])
     left_index = np.searchsorted(grid_metallicities, metallicity) - 1.
     left_index = left_index.astype(int)
-    return np.asscalar(left_index)
+    left_index = np.asscalar(left_index)
+
+    if metallicity == grid_metallicities[left_index + 1]:
+        return left_index + 1
+
+    return left_index
 
 
 def extrapolating_by_grid(cooling_time: float,
