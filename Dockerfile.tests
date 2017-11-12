@@ -5,6 +5,8 @@ FROM python:${PYTHON3_VERSION}
 # Requirement of PyCharm's debugger
 RUN python3 -m pip install pydevd>=1.1.1
 
+RUN python3 -m pip install pydevd>=1.1.1
+
 WORKDIR /alcor
 
 COPY ./alcor alcor
