@@ -166,14 +166,16 @@ def estimate_by_mass(
         estimate_interest_value = interpolate_interest_value
 
     min_row_index = calculate_index(cooling_time,
-                                    grid=lesser_mass_df['cooling_time'])
-    max_row_index = calculate_index(cooling_time,
-                                    grid=greater_mass_df['cooling_time'])
+                                    grid=lesser_mass_df['cooling_time'].values)
+    max_row_index = calculate_index(
+            cooling_time,
+            grid=greater_mass_df['cooling_time'].values)
 
     return estimate_interest_value(
             mass=mass,
             cooling_time=cooling_time,
-            greater_mass_cooling_time_grid=greater_mass_df['cooling_time'],
+            greater_mass_cooling_time_grid=(
+                greater_mass_df['cooling_time'].values),
             greater_mass_interest_parameter_grid=greater_mass_df[
                 interest_parameter].values,
             lesser_mass_cooling_time_grid=(
@@ -205,8 +207,8 @@ def estimate_color(star: pd.Series,
     greater_int_mass = int_mass_grid[greater_mass_index]
     greater_mass_df = color_table[greater_int_mass]
 
-    min_luminosity_grid = lesser_mass_df['luminosity']
-    max_luminosity_grid = greater_mass_df['luminosity']
+    min_luminosity_grid = lesser_mass_df['luminosity'].values
+    max_luminosity_grid = greater_mass_df['luminosity'].values
 
     row_index = calculate_index(star_luminosity,
                                 grid=min_luminosity_grid)
@@ -227,8 +229,8 @@ def estimate_color(star: pd.Series,
         min_mass = mass_grid[0]
         max_mass = mass_grid[1]
 
-    min_magnitude_grid = lesser_mass_df[color]
-    max_magnitude_grid = greater_mass_df[color]
+    min_magnitude_grid = lesser_mass_df[color].values
+    max_magnitude_grid = greater_mass_df[color].values
 
     min_magnitude = estimate_at(
             star_luminosity,
