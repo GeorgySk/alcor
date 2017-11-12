@@ -115,6 +115,7 @@ def estimate_by_metallicities(
         interest_parameter: str) -> float:
     metallicity = star['metallicity']
 
+    # TODO: fix cases when values are equal
     min_metallicity_index = get_min_metallicity_index(
             metallicity=metallicity,
             grid_metallicities=metallicity_grid)
@@ -129,7 +130,7 @@ def estimate_by_metallicities(
 
     estimate = partial(estimate_by_mass,
                        star=star,
-                       interest_sequence_str=interest_parameter)
+                       interest_parameter=interest_parameter)
 
     min_interest_parameter = estimate(tracks=min_metallicity_grids)
     max_interest_parameter = estimate(tracks=max_metallicity_grids)
@@ -155,7 +156,8 @@ def estimate_by_mass(
                                         grid=mass_grid)
     lesser_int_mass = int_mass_grid[lesser_mass_index]
     lesser_mass_df = tracks[lesser_int_mass]
-    greater_int_mass = int_mass_grid[lesser_mass_index + 1]
+    greater_mass_index = lesser_mass_index + 1
+    greater_int_mass = int_mass_grid[greater_mass_index]
     greater_mass_df = tracks[greater_int_mass]
 
     if mass < mass_grid[0] or mass >= mass_grid[-1]:
@@ -179,12 +181,11 @@ def estimate_by_mass(
             lesser_mass_interest_parameter_grid=lesser_mass_df[
                 interest_parameter].values,
             min_mass=mass_grid[lesser_mass_index],
-            max_mass=mass_grid[lesser_mass_index + 1],
+            max_mass=mass_grid[greater_mass_index],
             min_row_index=min_row_index,
             max_row_index=max_row_index)
 
 
-# TODO: why is it different from estimate_by_mass?
 def estimate_color(star: pd.Series,
                    *,
                    color_table: Dict[int, pd.DataFrame],
@@ -198,9 +199,9 @@ def estimate_color(star: pd.Series,
 
     lesser_mass_index = calculate_index(mass,
                                         grid=mass_grid)
-    greater_mass_index = lesser_mass_index + 1
     lesser_int_mass = int_mass_grid[lesser_mass_index]
     lesser_mass_df = color_table[lesser_int_mass]
+    greater_mass_index = lesser_mass_index + 1
     greater_int_mass = int_mass_grid[greater_mass_index]
     greater_mass_df = color_table[greater_int_mass]
 
@@ -368,6 +369,7 @@ def generate_spectral_types(*,
     randoms = np.random.rand(size)
     db_mask = randoms < db_to_da_fraction
 
+    # TODO: use SpectralType.DB.value
     spectral_types[db_mask] = 'DB'
     spectral_types[~db_mask] = 'DA'
 
