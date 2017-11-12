@@ -107,7 +107,7 @@ def assign_estimated_values(
                       oxygen_neon_white_dwarfs])
 
 
-def estimate_by_magnitudes(
+def estimate_by_metallicities(
         star: pd.Series,
         *,
         metallicity_grid: List[float],
