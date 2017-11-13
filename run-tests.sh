@@ -2,7 +2,7 @@
 
 set -e
 
-docker-compose up --exit-code-from alcor
+docker-compose up --build --exit-code-from alcor
 
 STATUS=$?
 
