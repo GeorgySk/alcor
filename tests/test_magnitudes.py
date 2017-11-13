@@ -58,10 +58,10 @@ def test_calculate_index(float_value: float,
 
 def test_extrapolating_by_grid(cooling_time: float,
                                cooling_time_grid: np.ndarray) -> None:
-    res = extrapolating_by_grid(cooling_time,
-                                cooling_time_grid=cooling_time_grid)
+    result = extrapolating_by_grid(cooling_time,
+                                   cooling_time_grid=cooling_time_grid)
 
-    assert isinstance(res, bool)
+    assert isinstance(result, bool)
 
 
 def test_get_min_metallicity_index(metallicity: float,
