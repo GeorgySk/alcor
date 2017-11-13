@@ -30,8 +30,8 @@ def assign_estimated_values(
                          SpectralType.DB: db_cooling_sequences}
     color_tables = {SpectralType.DA: da_color_table,
                     SpectralType.DB: db_color_table}
-    da_int_metallicities = sorted(list(da_cooling_sequences.keys()))
-    db_int_metallicities = sorted(list(db_cooling_sequences.keys()))
+    da_int_metallicities = sorted(da_cooling_sequences.keys())
+    db_int_metallicities = sorted(db_cooling_sequences.keys())
     da_metallicities = [metallicity / 1e3
                         for metallicity in da_int_metallicities]
     db_metallicities = [metallicity / 1e3
@@ -149,7 +149,7 @@ def estimate_by_mass(
     mass = star['mass']
     cooling_time = star['cooling_time']
 
-    int_mass_grid = sorted(list(tracks.keys()))
+    int_mass_grid = sorted(tracks.keys())
     mass_grid = np.array([key / 1e5
                           for key in int_mass_grid])
 
@@ -196,7 +196,7 @@ def estimate_color(star: pd.Series,
     mass = star['mass']
     star_luminosity = star['luminosity']
 
-    int_mass_grid = sorted(list(color_table.keys()))
+    int_mass_grid = sorted(color_table.keys())
     mass_grid = np.array([key / 1e5
                           for key in int_mass_grid])
 
