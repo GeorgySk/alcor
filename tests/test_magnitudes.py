@@ -2,6 +2,7 @@ from typing import (Dict,
                     Tuple,
                     List)
 
+import math
 import numpy as np
 import pandas as pd
 
@@ -25,8 +26,12 @@ def test_estimate_at(float_value: float,
     estimated_value = estimate_at(float_value,
                                   x=floats_tuple,
                                   y=other_floats_tuple)
+    other_estimated_value = estimate_at(float_value,
+                                        x=floats_tuple,
+                                        y=(float_value, float_value))
 
     assert isinstance(estimated_value, float)
+    assert math.isclose(float_value, other_estimated_value)
 
 
 def test_estimated_interest_value(cooling_time: float,
