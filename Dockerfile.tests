@@ -2,6 +2,7 @@ ARG PYTHON3_VERSION=3
 
 FROM python:${PYTHON3_VERSION}
 
+# Requirement of PyCharm's debugger
 RUN python3 -m pip install pydevd>=1.1.1
 
 WORKDIR /alcor
