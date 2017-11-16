@@ -1,3 +1,4 @@
+from .magnitudes import floats_lists
 from .processing import filtration_methods
 from .stars import (defined_stars,
                     defined_stars_lists,

@@ -346,3 +346,73 @@ def one_color_table() -> Dict[int, pd.DataFrame]:
                     u_ubvri_absolute=np.array([-15., -5., 8., 20.]),
                     luminosity=np.array([-3., -1., 0., 2.]),
                     cooling_time=np.array([2., 4., 6., 8.])))}
+
+
+@pytest.fixture(scope='function')
+def random_grid() -> np.ndarray:
+    floats_list = example(strategies.floats_lists)
+    sorted_floats_list = sorted(example(strategies.floats_lists))
+    return np.array([sorted_floats_list,
+                     floats_list])
+
+
+@pytest.fixture(scope='function')
+def random_grid_points(random_grid: np.ndarray) -> Tuple[Tuple[float, float],
+                                                         Tuple[float, float]]:
+    index = random.randrange(random_grid.shape[1] - 1)
+
+    return ((random_grid[0, index], random_grid[0, index + 1]),
+            (random_grid[1, index], random_grid[1, index + 1]))
+
+
+@pytest.fixture(scope='function')
+def min_slope(random_grid: np.ndarray) -> float:
+    x_array = random_grid[0]
+    y_array = random_grid[1]
+
+    x_amplitude = x_array[-1] - x_array[0]
+    y_min_distance = array_min_distance(y_array)
+
+    return y_min_distance / x_amplitude
+
+
+@pytest.fixture(scope='function')
+def min_term(random_grid: np.ndarray) -> float:
+    x_array = random_grid[0]
+    y_array = random_grid[1]
+
+    y_array.sort()
+    y_max_distance = y_array[-1] - y_array[0]
+    x_min_distance = array_min_distance(x_array)
+
+    return y_array.min() - abs(x_array[1]) * y_max_distance / x_min_distance
+
+
+@pytest.fixture(scope='function')
+def max_slope(random_grid: np.ndarray) -> float:
+    x_array = random_grid[0]
+    y_array = random_grid[1]
+
+    x_min_distance = array_min_distance(x_array)
+    y_array.sort()
+    y_amplitude = y_array[-1] - y_array[0]
+
+    return y_amplitude / x_min_distance
+
+
+@pytest.fixture(scope='function')
+def max_term(random_grid: np.ndarray) -> float:
+    x_array = random_grid[0]
+    y_array = random_grid[1]
+
+    y_array.sort()
+    y_max_distance = y_array[-1] - y_array[0]
+    x_min_distance = array_min_distance(x_array)
+
+    return y_array.max() + abs(x_array[1]) * y_max_distance / x_min_distance
+
+
+def array_min_distance(array: np.ndarray) -> float:
+    array.sort()
+    shifted_array = np.roll(array, 1)
+    return (array[1:] - shifted_array[1:]).min()
