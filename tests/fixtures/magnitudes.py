@@ -59,12 +59,12 @@ def grid_metallicities() -> List[float]:
 
 @pytest.fixture(scope='function')
 def db_to_da_fraction() -> float:
-    return example(strategies.fraction_float)
+    return example(strategies.fraction_floats)
 
 
 @pytest.fixture(scope='function')
 def size() -> int:
-    return 10
+    return example(strategies.dataframe_sizes)
 
 
 @pytest.fixture(scope='function')
