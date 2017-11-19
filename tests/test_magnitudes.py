@@ -151,7 +151,7 @@ def test_estimate_color(star_series: pd.Series,
                            color_table=color_table,
                            color=color)
 
-    isinstance(color, float)
+    assert isinstance(color, float)
 
 
 def test_estimate_by_mass(star_series: pd.Series,
@@ -161,7 +161,7 @@ def test_estimate_by_mass(star_series: pd.Series,
                                  tracks=tracks,
                                  interest_parameter=interest_parameter)
 
-    isinstance(parameter, float)
+    assert isinstance(parameter, float)
 
 
 def test_estimate_by_metallicities(
@@ -175,7 +175,7 @@ def test_estimate_by_metallicities(
             cooling_sequences=cooling_sequences,
             interest_parameter=interest_parameter)
 
-    isinstance(parameter, float)
+    assert isinstance(parameter, float)
 
 
 def test_assign_estimated_values(
@@ -185,12 +185,14 @@ def test_assign_estimated_values(
         db_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
         db_color_table: Dict[int, pd.DataFrame],
         one_color_table: Dict[int, pd.DataFrame]) -> None:
-    stars_without_luminosity = assign_estimated_values(
-            stars_without_luminosity,
-            da_cooling_sequences=da_cooling_sequences,
-            da_color_table=da_color_table,
-            db_cooling_sequences=db_cooling_sequences,
-            db_color_table=db_color_table,
-            one_color_table=one_color_table)
+    parameters_before = stars_without_luminosity.columns.values
+    stars = assign_estimated_values(stars_without_luminosity,
+                                    da_cooling_sequences=da_cooling_sequences,
+                                    da_color_table=da_color_table,
+                                    db_cooling_sequences=db_cooling_sequences,
+                                    db_color_table=db_color_table,
+                                    one_color_table=one_color_table)
+    parameters_after = stars.columns.values
 
-    isinstance(stars_without_luminosity, pd.DataFrame)
+    assert isinstance(stars_without_luminosity, pd.DataFrame)
+    assert parameters_after.size > parameters_before.size
