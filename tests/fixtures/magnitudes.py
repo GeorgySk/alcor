@@ -23,12 +23,6 @@ def floats_tuple() -> Tuple[float, ...]:
 
 
 @pytest.fixture(scope='function')
-def other_floats_tuple() -> Tuple[float, float]:
-    return (example(strategies.floats),
-            example(strategies.floats))
-
-
-@pytest.fixture(scope='function')
 def cooling_time() -> float:
     return random.uniform(0., 12.)
 

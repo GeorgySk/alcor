@@ -22,7 +22,6 @@ from alcor.services.simulations.magnitudes import (estimate_at,
 
 def test_estimate_at(float_value: float,
                      floats_tuple: Tuple[float, float],
-                     other_floats_tuple: Tuple[float, float],
                      random_grid_points: Tuple[Tuple[float, float],
                                                Tuple[float, float]],
                      max_slope: float,
@@ -31,18 +30,14 @@ def test_estimate_at(float_value: float,
                      min_term: float) -> None:
     estimated_value = estimate_at(float_value,
                                   x=floats_tuple,
-                                  y=other_floats_tuple)
+                                  y=(float_value, float_value))
     other_estimated_value = estimate_at(float_value,
-                                        x=floats_tuple,
-                                        y=(float_value, float_value))
-    one_more_estimated_value = estimate_at(float_value,
-                                           x=random_grid_points[0],
-                                           y=random_grid_points[1])
+                                        x=random_grid_points[0],
+                                        y=random_grid_points[1])
 
-    assert isinstance(estimated_value, float)
-    assert math.isclose(float_value, other_estimated_value)
-    assert one_more_estimated_value < max_slope * float_value + max_term
-    assert one_more_estimated_value > min_slope * float_value + min_term
+    assert math.isclose(float_value, estimated_value)
+    assert other_estimated_value < max_slope * float_value + max_term
+    assert other_estimated_value > min_slope * float_value + min_term
 
 
 def test_estimated_interest_value(cooling_time: float,
