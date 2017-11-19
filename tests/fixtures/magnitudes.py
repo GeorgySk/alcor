@@ -381,8 +381,7 @@ def min_term(random_grid: np.ndarray) -> float:
     x_array = random_grid[0]
     y_array = random_grid[1]
 
-    y_array.sort()
-    y_max_distance = y_array[-1] - y_array[0]
+    y_max_distance = y_array.max() - y_array.min()
     x_min_distance = array_min_distance(x_array)
 
     return y_array.min() - abs(x_array[1]) * y_max_distance / x_min_distance
@@ -394,8 +393,7 @@ def max_slope(random_grid: np.ndarray) -> float:
     y_array = random_grid[1]
 
     x_min_distance = array_min_distance(x_array)
-    y_array.sort()
-    y_amplitude = y_array[-1] - y_array[0]
+    y_amplitude = y_array.max() - y_array.min()
 
     return y_amplitude / x_min_distance
 
@@ -405,8 +403,7 @@ def max_term(random_grid: np.ndarray) -> float:
     x_array = random_grid[0]
     y_array = random_grid[1]
 
-    y_array.sort()
-    y_max_distance = y_array[-1] - y_array[0]
+    y_max_distance = y_array.max() - y_array.min()
     x_min_distance = array_min_distance(x_array)
 
     return y_array.max() + abs(x_array[1]) * y_max_distance / x_min_distance
