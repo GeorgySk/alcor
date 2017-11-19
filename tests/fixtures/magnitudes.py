@@ -410,6 +410,6 @@ def max_term(random_grid: np.ndarray) -> float:
 
 
 def array_min_distance(array: np.ndarray) -> float:
-    array.sort()
-    shifted_array = np.roll(array, 1)
-    return (array[1:] - shifted_array[1:]).min()
+    sorted_array = np.sort(array)
+    shifted_array = np.roll(sorted_array, 1)
+    return (sorted_array[1:] - shifted_array[1:]).min()
