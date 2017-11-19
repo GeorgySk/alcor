@@ -77,6 +77,7 @@ def test_get_min_metallicity_index(metallicity: float,
             grid_metallicities=grid_metallicities)
 
     assert isinstance(metallicity_index, int)
+    assert metallicity_index == -2 or metallicity_index >= 0
 
 
 def test_generate_spectral_types(db_to_da_fraction: float,
