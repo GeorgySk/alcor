@@ -16,4 +16,4 @@ fraction_floats = strategies.floats(allow_nan=False,
                                     min_value=0.,
                                     max_value=1.)
 
-dataframe_sizes = strategies.integers(min_value=0)
+dataframes_sizes = strategies.integers(min_value=0)

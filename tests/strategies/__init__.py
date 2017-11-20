@@ -1,4 +1,4 @@
-from .magnitudes import (dataframe_sizes,
+from .magnitudes import (dataframes_sizes,
                          floats_lists,
                          fraction_floats)
 from .processing import filtration_methods

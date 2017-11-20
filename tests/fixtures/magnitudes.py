@@ -64,7 +64,7 @@ def db_to_da_fraction() -> float:
 
 @pytest.fixture(scope='function')
 def size() -> int:
-    return example(strategies.dataframe_sizes)
+    return example(strategies.dataframes_sizes)
 
 
 @pytest.fixture(scope='function')
