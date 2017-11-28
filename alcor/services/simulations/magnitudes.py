@@ -1,5 +1,6 @@
 from functools import partial
-from typing import (Dict,
+from typing import (Union,
+                    Dict,
                     Tuple,
                     List)
 
@@ -425,8 +426,8 @@ def calculate_index(value: float,
 
 def estimate_at(x_0: float,
                 *,
-                x: Tuple[float, ...],
-                y: Tuple[float, ...]) -> float:
+                x: Union[Tuple[float, ...], np.ndarray],
+                y: Union[Tuple[float, ...], np.ndarray]) -> float:
     spline = linear_estimation(x=x,
                                y=y)
     return np.asscalar(spline(x_0))
