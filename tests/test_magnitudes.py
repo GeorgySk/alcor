@@ -1,5 +1,6 @@
 from typing import (Dict,
-                    List, Tuple)
+                    Tuple,
+                    List)
 
 import math
 import numpy as np
@@ -64,7 +65,7 @@ def test_calculate_index(float_value: float,
                             grid=x_array)
 
     assert isinstance(index, int)
-    assert (index == -2) or (index >= 0)
+    assert index == -2 or index >= 0
 
 
 def test_extrapolating_by_grid(cooling_time: float,
