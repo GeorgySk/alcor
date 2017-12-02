@@ -17,14 +17,14 @@ def float_value() -> float:
 
 @pytest.fixture(scope='function')
 def same_values_grid() -> Tuple[np.ndarray, np.ndarray]:
-    return example(strategies.x_and_one_value_y_arrays(
+    return example(strategies.same_value_grids(
             size=strategies.grid_lengths,
             elements=strategies.floats))
 
 
 @pytest.fixture(scope='function')
 def grid() -> Tuple[np.ndarray, np.ndarray]:
-    return example(strategies.x_and_y_arrays(
+    return example(strategies.grids(
             size=strategies.grid_lengths,
             elements=strategies.floats))
 
@@ -88,7 +88,7 @@ def cooling_time() -> float:
 
 @pytest.fixture(scope='function')
 def grid_and_index() -> Tuple[np.ndarray, np.ndarray, float]:
-    return example(strategies.x_y_arrays_and_index(
+    return example(strategies.grids_and_indices(
             size=strategies.grid_lengths,
             elements=strategies.floats))
 
@@ -125,14 +125,14 @@ def mass() -> float:
 
 @pytest.fixture(scope='function')
 def greater_mass_grid() -> Tuple[np.ndarray, np.ndarray]:
-    return example(strategies.x_and_y_arrays(
+    return example(strategies.grids(
             size=strategies.grid_lengths,
             elements=strategies.floats))
 
 
 @pytest.fixture(scope='function')
 def lesser_mass_grid() -> Tuple[np.ndarray, np.ndarray]:
-    return example(strategies.x_and_y_arrays(
+    return example(strategies.grids(
             size=strategies.grid_lengths,
             elements=strategies.floats))
 
@@ -179,3 +179,33 @@ def tracks() -> Dict[int, pd.DataFrame]:
 @pytest.fixture(scope='function')
 def interest_parameter() -> str:
     return example(strategies.interest_parameters)
+
+
+@pytest.fixture(scope='function')
+def stars() -> pd.DataFrame:
+    return example(strategies.stars_df)
+
+
+@pytest.fixture(scope='function')
+def da_cooling_sequences() -> Dict[int, Dict[int, pd.DataFrame]]:
+    return example(strategies.da_cooling_tracks)
+
+
+@pytest.fixture(scope='function')
+def db_cooling_sequences() -> Dict[int, Dict[int, pd.DataFrame]]:
+    return example(strategies.db_cooling_tracks)
+
+
+@pytest.fixture(scope='function')
+def da_color_table() -> Dict[int, pd.DataFrame]:
+    return example(strategies.cooling_tracks)
+
+
+@pytest.fixture(scope='function')
+def db_color_table() -> Dict[int, pd.DataFrame]:
+    return example(strategies.cooling_tracks)
+
+
+@pytest.fixture(scope='function')
+def one_color_table() -> Dict[int, pd.DataFrame]:
+    return example(strategies.cooling_tracks)

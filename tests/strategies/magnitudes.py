@@ -1,4 +1,5 @@
 from functools import partial
+from itertools import repeat
 from typing import (Any,
                     Callable)
 
@@ -51,10 +52,10 @@ metallicities = strategies.sampled_from(VALID_METALLICITIES)
 
 
 @strategies.composite
-def x_and_y_arrays(draw: Callable[[SearchStrategy], Any],
-                   size: SearchStrategy,
-                   elements: SearchStrategy,
-                   dtype: np.dtype = np.float64) -> Any:
+def grids(draw: Callable[[SearchStrategy], Any],
+          size: SearchStrategy,
+          elements: SearchStrategy,
+          dtype: np.dtype = np.float64) -> Any:
     x_array = draw(arrays(dtype=dtype,
                           shape=size,
                           elements=elements,
@@ -66,10 +67,10 @@ def x_and_y_arrays(draw: Callable[[SearchStrategy], Any],
 
 
 @strategies.composite
-def x_y_arrays_and_index(draw: Callable[[SearchStrategy], Any],
-                         size: SearchStrategy,
-                         elements: SearchStrategy,
-                         dtype: np.dtype = np.float64) -> Any:
+def grids_and_indices(draw: Callable[[SearchStrategy], Any],
+                      size: SearchStrategy,
+                      elements: SearchStrategy,
+                      dtype: np.dtype = np.float64) -> Any:
     x_array = draw(arrays(dtype=dtype,
                           shape=size,
                           elements=elements,
@@ -85,10 +86,10 @@ def x_y_arrays_and_index(draw: Callable[[SearchStrategy], Any],
 
 
 @strategies.composite
-def x_and_one_value_y_arrays(draw: Callable[[SearchStrategy], Any],
-                             size: SearchStrategy,
-                             elements: SearchStrategy,
-                             dtype: np.dtype = np.float64) -> Any:
+def same_value_grids(draw: Callable[[SearchStrategy], Any],
+                     size: SearchStrategy,
+                     elements: SearchStrategy,
+                     dtype: np.dtype = np.float64) -> Any:
     x_array = draw(arrays(dtype=dtype,
                           shape=size,
                           elements=elements,
@@ -129,10 +130,11 @@ color_tables = strategies.dictionaries(
                                            dtype=float,
                                            unique=True),
                            rows=strategies.tuples(*[floats] * 7),
-                           index=range_indexes(min_size=2)
+                           index=range_indexes(min_size=2,
+                                               max_size=5)
                            ).map(sort_luminosity_column),
         min_size=2,
-        max_size=10)
+        max_size=5)
 
 colors = strategies.sampled_from(COLORS_LIST)
 
@@ -143,11 +145,26 @@ cooling_tracks = strategies.dictionaries(
                                            dtype=float,
                                            unique=True),
                            rows=strategies.tuples(*[floats] * 9),
-                           index=range_indexes(min_size=2)
+                           index=range_indexes(min_size=2,
+                                               max_size=5)
                            ).map(sort_luminosity_column)
                             .map(sort_cooling_time_column)
                             .map(sort_effective_temperature_column),
         min_size=2,
-        max_size=10)
+        max_size=5)
 
 interest_parameters = strategies.sampled_from(INTEREST_PARAMETERS_LIST)
+
+stars_df = data_frames(
+        columns=columns(['mass', 'metallicity', 'cooling_time'],
+                        dtype=float),
+        index=range_indexes(min_size=2,
+                            max_size=5),
+        rows=strategies.tuples(nonnegative_floats,
+                               strategies.sampled_from(VALID_METALLICITIES),
+                               nonnegative_floats))
+
+da_cooling_tracks = strategies.fixed_dictionaries(dict(zip(
+        DA_METALLICITIES_BY_THOUSAND, repeat(cooling_tracks))))
+db_cooling_tracks = strategies.fixed_dictionaries(dict(zip(
+        DB_METALLICITIES_BY_THOUSAND, repeat(cooling_tracks))))

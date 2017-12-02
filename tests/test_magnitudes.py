@@ -15,20 +15,19 @@ from alcor.services.simulations.magnitudes import (estimate_at,
                                                    extrapolate_interest_value,
                                                    interpolate_interest_value,
                                                    estimate_color,
-                                                   estimate_by_mass)
+                                                   estimate_by_mass,
+                                                   assign_estimated_values)
 
 
 def test_estimate_at(float_value: float,
-                     same_values_grid: Tuple[np.ndarray, np.ndarray, int],
-                     grid: Tuple[np.ndarray, np.ndarray, int],
+                     same_values_grid: Tuple[np.ndarray, np.ndarray],
+                     grid: Tuple[np.ndarray, np.ndarray],
                      max_slope: float,
                      max_term: float,
                      min_slope: float,
                      min_term: float) -> None:
-    same_values_grid_x_array = same_values_grid[0]
-    same_values_grid_y_array = same_values_grid[1]
-    grid_x_array = grid[0]
-    grid_y_array = grid[1]
+    same_values_grid_x_array, same_values_grid_y_array = same_values_grid
+    grid_x_array, grid_y_array = grid
 
     estimated_value = estimate_at(float_value,
                                   x=same_values_grid_x_array,
@@ -45,9 +44,7 @@ def test_estimate_at(float_value: float,
 def test_estimated_interest_value(
         cooling_time: float,
         grid_and_index: Tuple[np.ndarray, np.ndarray, int]) -> None:
-    cooling_time_grid = grid_and_index[0]
-    interest_parameter_grid = grid_and_index[1]
-    row_index = grid_and_index[2]
+    cooling_time_grid, interest_parameter_grid, row_index = grid_and_index
     value = estimated_interest_value(
             cooling_time=cooling_time,
             cooling_time_grid=cooling_time_grid,
@@ -105,10 +102,10 @@ def test_extrapolate_interest_value(
         min_and_max_mass: Tuple[float, float],
         min_row_index: int,
         max_row_index: int) -> None:
-    greater_mass_cooling_time_grid = greater_mass_grid[0]
-    greater_mass_interest_parameter_grid = greater_mass_grid[1]
-    lesser_mass_cooling_time_grid = lesser_mass_grid[0]
-    lesser_mass_interest_parameter_grid = lesser_mass_grid[1]
+    greater_mass_cooling_time_grid, greater_mass_interest_parameter_grid = (
+        greater_mass_grid)
+    lesser_mass_cooling_time_grid, lesser_mass_interest_parameter_grid = (
+        lesser_mass_grid)
     min_mass = min_and_max_mass[0]
     max_mass = min_and_max_mass[1] + 1.
 
@@ -138,10 +135,10 @@ def test_interpolate_interest_value(
         min_and_max_mass: Tuple[float, float],
         min_row_index: int,
         max_row_index: int) -> None:
-    greater_mass_cooling_time_grid = greater_mass_grid[0]
-    greater_mass_interest_parameter_grid = greater_mass_grid[1]
-    lesser_mass_cooling_time_grid = lesser_mass_grid[0]
-    lesser_mass_interest_parameter_grid = lesser_mass_grid[1]
+    greater_mass_cooling_time_grid, greater_mass_interest_parameter_grid = (
+        greater_mass_grid)
+    lesser_mass_cooling_time_grid, lesser_mass_interest_parameter_grid = (
+        lesser_mass_grid)
     min_mass = min_and_max_mass[0]
     max_mass = min_and_max_mass[1] + 1.
 
@@ -183,3 +180,23 @@ def test_estimate_by_mass(star_series: pd.Series,
 
     assert isinstance(parameter, float)
     assert math.isfinite(parameter)
+
+
+def test_assign_estimated_values(
+        stars: pd.DataFrame,
+        da_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
+        da_color_table: Dict[int, pd.DataFrame],
+        db_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
+        db_color_table: Dict[int, pd.DataFrame],
+        one_color_table: Dict[int, pd.DataFrame]) -> None:
+    parameters_before = stars.columns.values
+    stars = assign_estimated_values(stars,
+                                    da_cooling_sequences=da_cooling_sequences,
+                                    da_color_table=da_color_table,
+                                    db_cooling_sequences=db_cooling_sequences,
+                                    db_color_table=db_color_table,
+                                    one_color_table=one_color_table)
+    parameters_after = stars.columns.values
+
+    assert isinstance(stars, pd.DataFrame)
+    assert parameters_after.size > parameters_before.size
