@@ -2,8 +2,8 @@ ARG PYTHON3_VERSION
 
 FROM python:${PYTHON3_VERSION}
 
-# Requirement of PyCharm's debugger
-RUN python3 -m pip install pydevd>=1.1.1
+RUN apt-get update && \
+    apt-get install -y unzip
 
 RUN python3 -m pip install pydevd>=1.1.1
 
