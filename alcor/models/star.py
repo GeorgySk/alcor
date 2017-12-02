@@ -48,7 +48,7 @@ class GalacticDiskType(enum.IntEnum):
     halo = 3
 
 
-class SpectralType(enum.Enum):
+class SpectralType(enum.IntEnum):
     DA = 0
     DB = 1
     ONe = 2
