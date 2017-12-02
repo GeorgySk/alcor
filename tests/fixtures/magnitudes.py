@@ -1,6 +1,6 @@
-import random
 from typing import (Dict,
-                    List, Tuple)
+                    Tuple,
+                    List)
 
 import numpy as np
 import pandas as pd
@@ -105,7 +105,7 @@ def metallicity() -> np.ndarray:
 
 @pytest.fixture(scope='function')
 def grid_metallicities() -> List[float]:
-    return [0.001, 0.01, 0.03, 0.06]
+    return strategies.VALID_METALLICITIES
 
 
 @pytest.fixture(scope='function')
@@ -179,33 +179,3 @@ def tracks() -> Dict[int, pd.DataFrame]:
 @pytest.fixture(scope='function')
 def interest_parameter() -> str:
     return example(strategies.interest_parameters)
-
-
-@pytest.fixture(scope='function')
-def stars() -> pd.DataFrame:
-    return example(strategies.stars_df)
-
-
-@pytest.fixture(scope='function')
-def da_cooling_sequences() -> Dict[int, Dict[int, pd.DataFrame]]:
-    return example(strategies.da_cooling_tracks)
-
-
-@pytest.fixture(scope='function')
-def db_cooling_sequences() -> Dict[int, Dict[int, pd.DataFrame]]:
-    return example(strategies.db_cooling_tracks)
-
-
-@pytest.fixture(scope='function')
-def da_color_table() -> Dict[int, pd.DataFrame]:
-    return example(strategies.cooling_tracks)
-
-
-@pytest.fixture(scope='function')
-def db_color_table() -> Dict[int, pd.DataFrame]:
-    return example(strategies.cooling_tracks)
-
-
-@pytest.fixture(scope='function')
-def one_color_table() -> Dict[int, pd.DataFrame]:
-    return example(strategies.cooling_tracks)

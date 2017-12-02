@@ -363,7 +363,6 @@ def generate_spectral_types(*,
     randoms = np.random.rand(size)
     db_mask = randoms < db_to_da_fraction
 
-    # TODO: use SpectralType.DB.value
     spectral_types[db_mask] = SpectralType.DB.value
     spectral_types[~db_mask] = SpectralType.DA.value
 

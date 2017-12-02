@@ -1,5 +1,6 @@
 from functools import partial
-from typing import Callable, Any
+from typing import (Any,
+                    Callable)
 
 from hypothesis import strategies
 from hypothesis.extra.numpy import arrays
@@ -20,57 +21,33 @@ COLORS_LIST = ['u_ubvri_absolute',
                'r_ubvri_absolute',
                'i_ubvri_absolute',
                'j_ubvri_absolute']
-INTEREST_PARAMETERS_LIST = ['luminosity',
-                            'u_ubvri_absolute',
-                            'b_ubvri_absolute',
-                            'v_ubvri_absolute',
-                            'r_ubvri_absolute',
-                            'i_ubvri_absolute',
-                            'j_ubvri_absolute',
-                            'effective_temperature']
+INTEREST_PARAMETERS_LIST = COLORS_LIST + ['luminosity',
+                                          'effective_temperature']
 
 
 floats = strategies.floats(allow_nan=False,
                            allow_infinity=False,
                            min_value=-1e15,
                            max_value=1e15)
-
 nonnegative_floats = strategies.floats(allow_nan=False,
                                        allow_infinity=False,
                                        min_value=0,
                                        max_value=1e15)
-
-floats_lists = strategies.lists(elements=floats,
-                                min_size=20,
-                                max_size=20,
-                                unique=True)
-
 fraction_floats = strategies.floats(allow_nan=False,
                                     allow_infinity=False,
                                     min_value=0.,
                                     max_value=1.)
 
 nonnegative_integers = strategies.integers(min_value=0)
-
-
 grid_lengths = strategies.integers(min_value=2,
-                                   max_value=100)
+                                   max_value=20)
 
+sorted_arrays_of_unique_values = arrays(dtype=np.float64,
+                                        shape=grid_lengths,
+                                        elements=floats,
+                                        unique=True)
 
-@strategies.composite
-def x_and_one_value_y_arrays(draw: Callable[[SearchStrategy], Any],
-                             size: SearchStrategy,
-                             elements: SearchStrategy,
-                             dtype: np.dtype = np.float64) -> Any:
-    x_array = draw(arrays(dtype=dtype,
-                          shape=size,
-                          elements=elements,
-                          unique=True).map(np.sort))
-    y_value = draw(elements)
-    y_array = draw(arrays(dtype=dtype,
-                          shape=x_array.size,
-                          elements=strategies.just(y_value)))
-    return x_array, y_array
+metallicities = strategies.sampled_from(VALID_METALLICITIES)
 
 
 @strategies.composite
@@ -107,17 +84,20 @@ def x_y_arrays_and_index(draw: Callable[[SearchStrategy], Any],
     return x_array, y_array, index
 
 
-white_dwarfs_cooling_time_grids = arrays(dtype=np.float64,
-                                         shape=grid_lengths,
-                                         elements=nonnegative_floats)
-
-
-sorted_arrays_of_unique_values = arrays(dtype=np.float64,
-                                        shape=grid_lengths,
-                                        elements=floats,
-                                        unique=True)
-
-metallicities = strategies.sampled_from(VALID_METALLICITIES)
+@strategies.composite
+def x_and_one_value_y_arrays(draw: Callable[[SearchStrategy], Any],
+                             size: SearchStrategy,
+                             elements: SearchStrategy,
+                             dtype: np.dtype = np.float64) -> Any:
+    x_array = draw(arrays(dtype=dtype,
+                          shape=size,
+                          elements=elements,
+                          unique=True).map(np.sort))
+    y_value = draw(elements)
+    y_array = draw(arrays(dtype=dtype,
+                          shape=x_array.size,
+                          elements=strategies.just(y_value)))
+    return x_array, y_array
 
 
 @strategies.composite
@@ -158,10 +138,8 @@ colors = strategies.sampled_from(COLORS_LIST)
 
 cooling_tracks = strategies.dictionaries(
         keys=nonnegative_integers,
-        values=data_frames(columns=columns(COLORS_LIST
-                                           + ['luminosity',
-                                              'cooling_time',
-                                              'effective_temperature'],
+        values=data_frames(columns=columns(INTEREST_PARAMETERS_LIST
+                                           + ['cooling_time'],
                                            dtype=float,
                                            unique=True),
                            rows=strategies.tuples(*[floats] * 9),
@@ -173,20 +151,3 @@ cooling_tracks = strategies.dictionaries(
         max_size=10)
 
 interest_parameters = strategies.sampled_from(INTEREST_PARAMETERS_LIST)
-
-stars_df = data_frames(
-        columns=columns(['mass', 'metallicity', 'cooling_time'],
-                        dtype=float),
-        index=range_indexes(min_size=2),
-        rows=strategies.tuples(nonnegative_floats,
-                               strategies.sampled_from(VALID_METALLICITIES),
-                               nonnegative_floats))
-
-da_cooling_tracks = strategies.dictionaries(
-        keys=strategies.sampled_from(DA_METALLICITIES_BY_THOUSAND),
-        values=cooling_tracks,
-        min_size=len(DA_METALLICITIES_BY_THOUSAND))
-db_cooling_tracks = strategies.dictionaries(
-        keys=strategies.sampled_from(DB_METALLICITIES_BY_THOUSAND),
-        values=cooling_tracks,
-        min_size=len(DB_METALLICITIES_BY_THOUSAND))

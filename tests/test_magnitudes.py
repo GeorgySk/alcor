@@ -15,8 +15,7 @@ from alcor.services.simulations.magnitudes import (estimate_at,
                                                    extrapolate_interest_value,
                                                    interpolate_interest_value,
                                                    estimate_color,
-                                                   estimate_by_mass,
-                                                   assign_estimated_values)
+                                                   estimate_by_mass)
 
 
 def test_estimate_at(float_value: float,
@@ -65,7 +64,7 @@ def test_calculate_index(float_value: float,
                             grid=x_array)
 
     assert isinstance(index, int)
-    assert index == -2 or index >= 0
+    assert index == -2 or 0 <= index <= x_array.size - 1
 
 
 def test_extrapolating_by_grid(cooling_time: float,
@@ -84,7 +83,8 @@ def test_get_min_metallicity_index(metallicity: float,
             grid_metallicities=grid_metallicities)
 
     assert isinstance(metallicity_index, int)
-    assert metallicity_index == -2 or metallicity_index >= 0
+    assert (metallicity_index == -2 or
+            0 <= metallicity_index <= len(grid_metallicities) - 1)
 
 
 def test_generate_spectral_types(db_to_da_fraction: float,
@@ -94,6 +94,7 @@ def test_generate_spectral_types(db_to_da_fraction: float,
             size=size)
 
     assert isinstance(spectral_types, np.ndarray)
+    assert spectral_types.size == size
 
 
 def test_extrapolate_interest_value(
@@ -126,6 +127,7 @@ def test_extrapolate_interest_value(
             max_row_index=max_row_index)
 
     assert isinstance(value, float)
+    assert math.isfinite(value)
 
 
 def test_interpolate_interest_value(
@@ -158,6 +160,7 @@ def test_interpolate_interest_value(
             max_row_index=max_row_index)
 
     assert isinstance(value, float)
+    assert math.isfinite(value)
 
 
 def test_estimate_color(star_series: pd.Series,
@@ -168,6 +171,7 @@ def test_estimate_color(star_series: pd.Series,
                            color=color)
 
     assert isinstance(color, float)
+    assert math.isfinite(color)
 
 
 def test_estimate_by_mass(star_series: pd.Series,
@@ -178,23 +182,4 @@ def test_estimate_by_mass(star_series: pd.Series,
                                  interest_parameter=interest_parameter)
 
     assert isinstance(parameter, float)
-
-
-def test_assign_estimated_values(
-        stars: pd.DataFrame,
-        da_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
-        da_color_table: Dict[int, pd.DataFrame],
-        db_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],
-        db_color_table: Dict[int, pd.DataFrame],
-        one_color_table: Dict[int, pd.DataFrame]) -> None:
-    parameters_before = stars.columns.values
-    stars = assign_estimated_values(stars,
-                                    da_cooling_sequences=da_cooling_sequences,
-                                    da_color_table=da_color_table,
-                                    db_cooling_sequences=db_cooling_sequences,
-                                    db_color_table=db_color_table,
-                                    one_color_table=one_color_table)
-    parameters_after = stars.columns.values
-
-    assert isinstance(stars, pd.DataFrame)
-    assert parameters_after.size > parameters_before.size
+    assert math.isfinite(parameter)
