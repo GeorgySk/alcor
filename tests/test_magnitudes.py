@@ -1,3 +1,4 @@
+import os
 from typing import (Dict,
                     Tuple,
                     List)
@@ -5,6 +6,7 @@ from typing import (Dict,
 import math
 import numpy as np
 import pandas as pd
+import pytest
 
 from alcor.services.simulations.magnitudes import (estimate_at,
                                                    estimated_interest_value,
@@ -182,6 +184,8 @@ def test_estimate_by_mass(star_series: pd.Series,
     assert math.isfinite(parameter)
 
 
+@pytest.mark.skipif(not os.getenv('CI'),
+                    reason='Takes a lot of time')
 def test_assign_estimated_values(
         stars: pd.DataFrame,
         da_cooling_sequences: Dict[int, Dict[int, pd.DataFrame]],

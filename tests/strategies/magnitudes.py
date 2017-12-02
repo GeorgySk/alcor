@@ -130,11 +130,9 @@ color_tables = strategies.dictionaries(
                                            dtype=float,
                                            unique=True),
                            rows=strategies.tuples(*[floats] * 7),
-                           index=range_indexes(min_size=2,
-                                               max_size=5)
+                           index=range_indexes(min_size=2)
                            ).map(sort_luminosity_column),
-        min_size=2,
-        max_size=5)
+        min_size=2)
 
 colors = strategies.sampled_from(COLORS_LIST)
 
@@ -150,16 +148,14 @@ cooling_tracks = strategies.dictionaries(
                            ).map(sort_luminosity_column)
                             .map(sort_cooling_time_column)
                             .map(sort_effective_temperature_column),
-        min_size=2,
-        max_size=5)
+        min_size=2)
 
 interest_parameters = strategies.sampled_from(INTEREST_PARAMETERS_LIST)
 
 stars_df = data_frames(
         columns=columns(['mass', 'metallicity', 'cooling_time'],
                         dtype=float),
-        index=range_indexes(min_size=2,
-                            max_size=5),
+        index=range_indexes(min_size=2),
         rows=strategies.tuples(nonnegative_floats,
                                strategies.sampled_from(VALID_METALLICITIES),
                                nonnegative_floats))
