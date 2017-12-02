@@ -1,10 +1,14 @@
-ARG PYTHON3_VERSION=3
+ARG PYTHON3_VERSION
 
 FROM python:${PYTHON3_VERSION}
 
 RUN apt-get update && \
     apt-get install -y gfortran \
-                       unzip
+                       unzip \
+                       # scipy's dependencies
+                       libblas-dev \
+                       liblapack-dev \
+                       libatlas-base-dev
 
 WORKDIR /alcor
 
@@ -28,6 +32,9 @@ COPY ./setup.cfg setup.cfg
 RUN python3 -m pip install .
 
 COPY ./manage.py manage.py
+
+RUN cd tests/tables && \
+    unzip -o fort_files.zip
 
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
 ENTRYPOINT ["/alcor/docker-entrypoint.sh"]

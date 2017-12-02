@@ -1,8 +1,10 @@
-ARG PYTHON3_VERSION=3
+ARG PYTHON3_VERSION
 
 FROM python:${PYTHON3_VERSION}
 
-# Requirement of PyCharm's debugger
+RUN apt-get update && \
+    apt-get install -y unzip
+
 RUN python3 -m pip install pydevd>=1.1.1
 
 WORKDIR /alcor
@@ -13,6 +15,9 @@ COPY ./README.rst README.rst
 COPY ./setup.py setup.py
 COPY ./setup.cfg setup.cfg
 RUN python3 -m pip install -e .
+
+RUN cd tests/tables && \
+    unzip -o fort_files.zip
 
 COPY ./run-plain-tests.sh run-plain-tests.sh
 ENTRYPOINT ["./run-plain-tests.sh"]
