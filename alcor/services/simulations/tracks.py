@@ -6,7 +6,6 @@ from contextlib import (contextmanager,
 from functools import partial
 from typing import (Dict,
                     Tuple,
-                    Set,
                     List)
 
 import h5py
@@ -65,7 +64,7 @@ read_db_cooling = partial(read_cooling,
 
 def fill_colors_or_one_table(*,
                              file: h5py.File,
-                             interest_parameters: Set[str]
+                             interest_parameters: List[str]
                              ) -> Dict[int, pd.DataFrame]:
     for mass_group in file:
         tracks = OrderedDict((parameter, file[join_group(mass_group,
@@ -76,7 +75,7 @@ def fill_colors_or_one_table(*,
 
 def read_colors_or_one_table(path: str,
                              *,
-                             interest_parameters: Set[str]
+                             interest_parameters: List[str]
                              ) -> Dict[int, pd.DataFrame]:
     with open_hdf5(path) as file:
         return OrderedDict(fill_colors_or_one_table(
@@ -85,8 +84,7 @@ def read_colors_or_one_table(path: str,
 
 
 read_da_db_colors = partial(read_colors_or_one_table,
-                            interest_parameters=frozenset(['luminosity']
-                                                          + COLORS))
+                            interest_parameters=['luminosity'] + COLORS)
 
 read_da_colors = partial(read_da_db_colors,
                          path='input_data/da_colors.hdf5')
@@ -96,11 +94,10 @@ read_db_colors = partial(read_da_db_colors,
 
 read_one_tables = partial(read_colors_or_one_table,
                           path='input_data/one_wds_tracks.hdf5',
-                          interest_parameters=frozenset(
-                                  ['luminosity',
-                                   'cooling_time',
-                                   'effective_temperature']
-                                  + COLORS))
+                          interest_parameters=(['luminosity',
+                                                'cooling_time',
+                                                'effective_temperature']
+                                               + COLORS))
 
 
 @contextmanager
