@@ -62,10 +62,9 @@ read_db_cooling = partial(read_cooling,
                           metallicities=(1, 10, 60))
 
 
-def fill_colors_or_one_table(*,
-                             file: h5py.File,
-                             interest_parameters: List[str]
-                             ) -> Dict[int, pd.DataFrame]:
+def fill_table(*,
+               file: h5py.File,
+               interest_parameters: List[str]) -> Dict[int, pd.DataFrame]:
     for mass_group in file:
         tracks = OrderedDict((parameter, file[join_group(mass_group,
                                                          parameter)])
@@ -73,17 +72,16 @@ def fill_colors_or_one_table(*,
         yield int(mass_group), pd.DataFrame(tracks)
 
 
-def read_colors_or_one_table(path: str,
-                             *,
-                             interest_parameters: List[str]
-                             ) -> Dict[int, pd.DataFrame]:
+def read_table(path: str,
+               *,
+               interest_parameters: List[str]) -> Dict[int, pd.DataFrame]:
     with open_hdf5(path) as file:
-        return OrderedDict(fill_colors_or_one_table(
+        return OrderedDict(fill_table(
                 file=file,
                 interest_parameters=interest_parameters))
 
 
-read_da_db_colors = partial(read_colors_or_one_table,
+read_da_db_colors = partial(read_table,
                             interest_parameters=['luminosity'] + COLORS)
 
 read_da_colors = partial(read_da_db_colors,
@@ -92,7 +90,7 @@ read_da_colors = partial(read_da_db_colors,
 read_db_colors = partial(read_da_db_colors,
                          path='input_data/db_colors.hdf5')
 
-read_one_tables = partial(read_colors_or_one_table,
+read_one_tables = partial(read_table,
                           path='input_data/one_wds_tracks.hdf5',
                           interest_parameters=(['luminosity',
                                                 'cooling_time',
