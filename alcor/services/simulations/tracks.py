@@ -66,9 +66,8 @@ def fill_table(*,
                file: h5py.File,
                interest_parameters: List[str]) -> Dict[int, pd.DataFrame]:
     for mass_group in file:
-        tracks = OrderedDict((parameter, file[join_group(mass_group,
-                                                         parameter)])
-                             for parameter in interest_parameters)
+        tracks = {parameter: file[join_group(mass_group, parameter)]
+                  for parameter in interest_parameters}
         yield int(mass_group), pd.DataFrame(tracks)
 
 
