@@ -35,12 +35,13 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
         metallicity_group = str(metallicity)
         masses_strings = sort_mass_indexes(file[metallicity_group])
 
-        for mass in masses_strings:
-            mass_group = join_group(metallicity_group, mass)
+        for mass_string in masses_strings:
+            mass_group = join_group(metallicity_group, mass_string)
             tracks = OrderedDict((parameter, file[join_group(mass_group,
                                                              parameter)])
                                  for parameter in interest_parameters)
-            cooling_tracks_by_metallicity[int(mass)] = pd.DataFrame(tracks)
+            cooling_tracks_by_metallicity[int(mass_string)] = (
+                pd.DataFrame(tracks))
 
 
 def read_cooling(path: str,
