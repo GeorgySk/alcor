@@ -45,7 +45,7 @@ def fill_cooling_tracks(cooling_tracks: Dict[int, Dict],
 
 
 def read_cooling(path: str,
-                 metallicities: Tuple[int, ...],
+                 metallicities: List[int],
                  interest_parameters: List[str]
                  ) -> Dict[int, Dict[int, pd.DataFrame]]:
     with open_hdf5(path) as file:
@@ -61,11 +61,11 @@ def read_cooling(path: str,
 # TODO: all the paths must be passed from upper level module
 read_da_cooling = partial(read_cooling,
                           path='input_data/da_cooling.hdf5',
-                          metallicities=(1, 10, 30, 60),
+                          metallicities=[1, 10, 30, 60],
                           interest_parameters=DA_DB_INTEREST_PARAMETERS)
 read_db_cooling = partial(read_cooling,
                           path='input_data/db_cooling.hdf5',
-                          metallicities=(1, 10, 60),
+                          metallicities=[1, 10, 60],
                           interest_parameters=DA_DB_INTEREST_PARAMETERS)
 
 
