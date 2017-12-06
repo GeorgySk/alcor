@@ -14,13 +14,8 @@ def halo_stars_formation_time(halo_birth_init_time: float) -> float:
 
 
 @pytest.fixture(scope='function')
-def thin_disk_birth_init_time() -> float:
+def bin_initial_time() -> float:
     return random() * 15.
-
-
-@pytest.fixture(scope='function')
-def time_bin() -> float:
-    return random()
 
 
 @pytest.fixture(scope='function')

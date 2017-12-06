@@ -4,6 +4,8 @@ from typing import (Union,
                     List)
 from random import random
 
+import numpy as np
+
 from alcor.models.star import GalacticStructureType
 
 
@@ -50,12 +52,14 @@ def generate_stars(*,
     galactic_structure_types = []
     birth_times = []
 
-    for time_bin in range(time_bins_count):
-        current_bin_init_time = (thin_disk_birth_init_time
-                                 + time_bin * time_increment)
+    time_bins_initial_times = np.linspace(start=thin_disk_birth_init_time,
+                                          stop=max_age,
+                                          num=time_bins_count,
+                                          endpoint=False)
 
+    for bin_initial_time in np.nditer(time_bins_initial_times):
         # TODO: implement birth rate function
-        if current_bin_init_time >= burst_init_time:
+        if bin_initial_time >= burst_init_time:
             birth_rate = burst_birth_rate
 
         total_bin_mass = 0.
@@ -89,8 +93,7 @@ def generate_stars(*,
                         halo_stars_formation_time=halo_stars_formation_time))
             else:
                 birth_times.append(thin_disk_star_birth_time(
-                        thin_disk_birth_init_time=thin_disk_birth_init_time,
-                        time_bin=time_bin,
+                        bin_initial_time=bin_initial_time,
                         time_increment=time_increment))
 
             if galactic_structure_type != GalacticStructureType.thin:
@@ -155,12 +158,9 @@ def halo_star_birth_time(*,
 
 
 def thin_disk_star_birth_time(*,
-                              thin_disk_birth_init_time: float,
-                              time_bin: int,
+                              bin_initial_time: float,
                               time_increment: float) -> float:
-    return (thin_disk_birth_init_time
-            + time_bin * time_increment
-            + time_increment * random())
+    return bin_initial_time + time_increment * random()
 
 
 def get_galactic_structure_type(*,

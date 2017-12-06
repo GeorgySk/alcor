@@ -13,13 +13,11 @@ def test_halo_star_birth_time(halo_birth_init_time: float,
     assert birth_time < birth_time + halo_stars_formation_time
 
 
-def test_thin_disk_star_birth_time(thin_disk_birth_init_time: float,
-                                   time_bin: int,
+def test_thin_disk_star_birth_time(bin_initial_time: float,
                                    time_increment: float) -> None:
     birth_time = thin_disk_star_birth_time(
-            thin_disk_birth_init_time=thin_disk_birth_init_time,
-            time_bin=time_bin,
+            bin_initial_time=bin_initial_time,
             time_increment=time_increment)
 
     assert isinstance(birth_time, float)
-    assert birth_time > thin_disk_birth_init_time
+    assert birth_time > bin_initial_time
