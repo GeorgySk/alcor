@@ -1,6 +1,7 @@
 import math
 from typing import (Union,
                     Dict,
+                    Tuple,
                     List)
 from random import random
 
@@ -45,9 +46,6 @@ def generate_stars(*,
     thick_disk_max_sfr = (thick_disk_max_sfr_relative_time
                           * math.exp(-thick_disk_max_sfr_relative_time
                                      / thick_disk_sfr_param))
-
-    stars_count = 0
-
     progenitors_masses = []
     galactic_structure_types = []
     birth_times = []
@@ -63,48 +61,87 @@ def generate_stars(*,
 
     for bin_initial_time, birth_rate in np.column_stack(
             (time_bins_initial_times, birth_rates)):
-        total_bin_mass = 0.
+        (bin_progenitors_masses,
+         bin_galactic_structure_types,
+         bin_birth_times) = generate_stars_in_time_bin(
+                birth_rate=birth_rate,
+                initial_mass_function_parameter=initial_mass_function_param,
+                thick_disk_stars_fraction=thick_disk_stars_fraction,
+                halo_stars_fraction=halo_stars_fraction,
+                thick_disk_age=thick_disk_age,
+                thick_disk_sfr_param=thick_disk_sfr_param,
+                thick_disk_max_sfr=thick_disk_max_sfr,
+                thick_disk_birth_init_time=thick_disk_birth_init_time,
+                halo_birth_init_time=halo_birth_init_time,
+                halo_stars_formation_time=halo_stars_formation_time,
+                bin_initial_time=bin_initial_time,
+                time_increment=time_increment)
 
-        while total_bin_mass < birth_rate:
-            stars_count += 1
+        progenitors_masses.extend(bin_progenitors_masses)
+        galactic_structure_types.extend(bin_galactic_structure_types)
+        birth_times.extend(bin_birth_times)
 
-            if stars_count > max_stars_count:
-                raise OverflowError('Number of stars is too high - '
-                                    'decrease mass reduction factor.')
-
-            star_mass = salpeter_initial_mass_function(
-                    parameter=initial_mass_function_param)
-            progenitors_masses.append(star_mass)
-
-            galactic_structure_type = get_galactic_structure_type(
-                    thick_disk_stars_fraction=thick_disk_stars_fraction,
-                    halo_stars_fraction=halo_stars_fraction)
-            galactic_structure_types.append(galactic_structure_type)
-
-            if galactic_structure_type == GalacticStructureType.thick:
-                # TODO: implement MonteCarlo method function/Smirnov transform
-                birth_times.append(thick_disk_star_birth_time(
-                        thick_disk_age=thick_disk_age,
-                        thick_disk_sfr_param=thick_disk_sfr_param,
-                        thick_disk_max_sfr=thick_disk_max_sfr,
-                        thick_disk_birth_init_time=thick_disk_birth_init_time))
-            elif galactic_structure_type == GalacticStructureType.halo:
-                birth_times.append(halo_star_birth_time(
-                        halo_birth_init_time=halo_birth_init_time,
-                        halo_stars_formation_time=halo_stars_formation_time))
-            else:
-                birth_times.append(thin_disk_star_birth_time(
-                        bin_initial_time=bin_initial_time,
-                        time_increment=time_increment))
-
-            if galactic_structure_type != GalacticStructureType.thin:
-                continue
-
-            total_bin_mass += star_mass
+    if len(progenitors_masses) > max_stars_count:
+        raise OverflowError('Number of stars is too high - '
+                            'decrease mass reduction factor.')
 
     return dict(progenitors_masses=progenitors_masses,
                 galactic_structure_types=galactic_structure_types,
                 birth_times=birth_times)
+
+
+def generate_stars_in_time_bin(*,
+                               birth_rate: float,
+                               initial_mass_function_parameter: float,
+                               thick_disk_stars_fraction: float,
+                               halo_stars_fraction: float,
+                               thick_disk_age: float,
+                               thick_disk_sfr_param: float,
+                               thick_disk_max_sfr: float,
+                               thick_disk_birth_init_time: float,
+                               halo_birth_init_time: float,
+                               halo_stars_formation_time: float,
+                               bin_initial_time: float,
+                               time_increment: float
+                               ) -> Tuple[List[float],
+                                          List[float],
+                                          List[float]]:
+    progenitors_masses = []
+    galactic_structure_types = []
+    birth_times = []
+
+    total_bin_mass = 0.
+    while total_bin_mass < birth_rate:
+        star_mass = salpeter_initial_mass_function(
+                initial_mass_function_parameter)
+        progenitors_masses.append(star_mass)
+
+        galactic_structure_type = get_galactic_structure_type(
+                thick_disk_stars_fraction=thick_disk_stars_fraction,
+                halo_stars_fraction=halo_stars_fraction)
+        galactic_structure_types.append(galactic_structure_type)
+
+        if galactic_structure_type == GalacticStructureType.thin:
+            total_bin_mass += star_mass
+
+    for galactic_structure_type in galactic_structure_types:
+        if galactic_structure_type == GalacticStructureType.thick:
+            # TODO: implement MonteCarlo method function/Smirnov transform
+            birth_times.append(thick_disk_star_birth_time(
+                    thick_disk_age=thick_disk_age,
+                    thick_disk_sfr_param=thick_disk_sfr_param,
+                    thick_disk_max_sfr=thick_disk_max_sfr,
+                    thick_disk_birth_init_time=thick_disk_birth_init_time))
+        elif galactic_structure_type == GalacticStructureType.halo:
+            birth_times.append(halo_star_birth_time(
+                    halo_birth_init_time=halo_birth_init_time,
+                    halo_stars_formation_time=halo_stars_formation_time))
+        else:
+            birth_times.append(thin_disk_star_birth_time(
+                    bin_initial_time=bin_initial_time,
+                    time_increment=time_increment))
+
+    return progenitors_masses, galactic_structure_types, birth_times
 
 
 def get_birth_rates(times: np.ndarray,
@@ -129,8 +166,8 @@ def normalization_const(*,
 
 
 # TODO: implement inverse transform sampling
-def salpeter_initial_mass_function(*,
-                                   parameter: float,
+def salpeter_initial_mass_function(parameter: float,
+                                   *,
                                    min_mass: float = 0.4,
                                    max_mass: float = 50.) -> float:
     y_max = min_mass ** parameter
