@@ -51,8 +51,6 @@ def generate_stars(*,
     birth_times = []
 
     for time_bin in range(time_bins_count):
-        total_bin_mass = 0.
-
         current_bin_init_time = (thin_disk_birth_init_time
                                  + time_bin * time_increment)
 
@@ -60,7 +58,9 @@ def generate_stars(*,
         if current_bin_init_time >= burst_init_time:
             birth_rate = burst_birth_rate
 
-        while True:
+        total_bin_mass = 0.
+
+        while total_bin_mass < birth_rate:
             stars_count += 1
 
             if stars_count > max_stars_count:
@@ -97,9 +97,6 @@ def generate_stars(*,
                 continue
 
             total_bin_mass += star_mass
-
-            if total_bin_mass > birth_rate:
-                break
 
     return dict(progenitors_masses=progenitors_masses,
                 galactic_structure_types=galactic_structure_types,
