@@ -56,12 +56,13 @@ def generate_stars(*,
                                           stop=max_age,
                                           num=time_bins_count,
                                           endpoint=False)
+    birth_rates = get_birth_rates(time_bins_initial_times,
+                                  burst_init_time=burst_init_time,
+                                  birth_rate=birth_rate,
+                                  burst_birth_rate=burst_birth_rate)
 
-    for bin_initial_time in np.nditer(time_bins_initial_times):
-        # TODO: implement birth rate function
-        if bin_initial_time >= burst_init_time:
-            birth_rate = burst_birth_rate
-
+    for bin_initial_time, birth_rate in np.column_stack(
+            (time_bins_initial_times, birth_rates)):
         total_bin_mass = 0.
 
         while total_bin_mass < birth_rate:
@@ -104,6 +105,17 @@ def generate_stars(*,
     return dict(progenitors_masses=progenitors_masses,
                 galactic_structure_types=galactic_structure_types,
                 birth_times=birth_times)
+
+
+def get_birth_rates(times: np.ndarray,
+                    *,
+                    burst_init_time: float,
+                    birth_rate: float,
+                    burst_birth_rate: float) -> np.ndarray:
+    burst_times_mask = times >= burst_init_time
+    return np.piecewise(times,
+                        [~burst_times_mask, burst_times_mask],
+                        [birth_rate, burst_birth_rate])
 
 
 def normalization_const(*,
