@@ -168,3 +168,18 @@ def thick_disk_age() -> float:
 @pytest.fixture(scope='function')
 def thick_disk_sfr_param() -> float:
     return example(strategies.small_floats.filter(lambda x: x != 0))
+
+
+@pytest.fixture(scope='function')
+def halo_stars_fraction() -> float:
+    return example(strategies.fractions)
+
+
+@pytest.fixture(scope='function')
+def halo_age() -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def halo_stars_formation_time() -> float:
+    return example(strategies.small_floats)
