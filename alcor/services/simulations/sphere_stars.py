@@ -1,5 +1,5 @@
 import math
-from random import random
+import random
 
 import numpy as np
 import pandas as pd
@@ -205,19 +205,16 @@ def normalization_const(*,
 
 
 # TODO: implement inverse transform sampling
-def initial_star_mass_by_salpeter(parameter: float,
+def initial_star_mass_by_salpeter(exponent: float,
                                   *,
                                   min_mass: float = 0.4,
                                   max_mass: float = 50.) -> float:
-    y_max = min_mass ** parameter
+    y_max = min_mass ** exponent
 
-    mass_amplitude = max_mass - min_mass
     while True:
-        # TODO: implement seeds tracking
-        y = y_max * random()
-        mass = min_mass + mass_amplitude * random()
-        y_imf = mass ** parameter
-        if y <= y_imf:
+        mass = random.uniform(min_mass, max_mass)
+        y_mass = mass ** exponent
+        if random.uniform(0, y_max) <= y_mass:
             return mass
 
 
@@ -232,9 +229,9 @@ def thick_disk_star_birth_time(*,
     https://www.google.es/search?q=star+formation+rate
     """
     while True:
-        time_try = thick_disk_age * random()
+        time_try = thick_disk_age * random.random()
         time_try_sfr = time_try * math.exp(-time_try / thick_disk_sfr_param)
-        sfr_try = thick_disk_max_sfr * random()
+        sfr_try = thick_disk_max_sfr * random.random()
         if sfr_try <= time_try_sfr:
             return time_try + thick_disk_birth_init_time
 
@@ -242,20 +239,20 @@ def thick_disk_star_birth_time(*,
 def halo_star_birth_time(*,
                          halo_birth_init_time: float,
                          halo_stars_formation_time: float) -> float:
-    return halo_birth_init_time + halo_stars_formation_time * random()
+    return halo_birth_init_time + halo_stars_formation_time * random.random()
 
 
 def thin_disk_star_birth_time(*,
                               bin_initial_time: float,
                               time_increment: float) -> float:
-    return bin_initial_time + time_increment * random()
+    return bin_initial_time + time_increment * random.random()
 
 
 def get_galactic_structure_type(*,
                                 thick_disk_stars_fraction: float,
                                 halo_stars_fraction: float
                                 ) -> GalacticStructureType:
-    random_number = random()
+    random_number = random.random()
 
     if random_number <= thick_disk_stars_fraction:
         return GalacticStructureType.thick
@@ -276,9 +273,9 @@ def z_coordinate(*,
     # TODO: implement function for inverse transform sampling
     # Inverse transform sampling for y = exp(-z / H)
     coordinate = (-scale_height * math.log(
-            1. - random() * (1.0 - math.exp(-sector_radius_kpc
+            1. - random.random() * (1.0 - math.exp(-sector_radius_kpc
                                             / scale_height))))
     # TODO: find a better way to assign a random sign
-    random_sign = float(1. - 2. * int(2.0 * random()))
+    random_sign = float(1. - 2. * int(2.0 * random.random()))
 
     return coordinate * random_sign
