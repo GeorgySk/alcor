@@ -1,4 +1,5 @@
 import math
+import sys
 
 import numpy as np
 import pytest
@@ -68,19 +69,18 @@ def max_mass(min_mass) -> float:
 
 @pytest.fixture(scope='function')
 def star_formation_rate_param() -> float:
-    return example(strategies.floats.filter(lambda x: x != 0))
+    return example(strategies.small_floats.filter(lambda x: x != 0))
 
 
 @pytest.fixture(scope='function')
-def thin_disk_age_gyr(star_formation_rate_param) -> float:
+def thin_disk_age_gyr() -> float:
     return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE)
-                   .filter(
-        lambda x: x != 0 and math.exp(-x / star_formation_rate_param) != 1.))
+                   .filter(lambda x: x != 0))
 
 
 @pytest.fixture(scope='function')
 def sigma() -> float:
-    return example(strategies.floats)
+    return example(strategies.small_floats)
 
 
 @pytest.fixture(scope='function')
@@ -95,9 +95,49 @@ def burst_init_time() -> float:
 
 @pytest.fixture(scope='function')
 def birth_rate() -> float:
-    return example(strategies.floats)
+    return example(strategies.small_floats)
 
 
 @pytest.fixture(scope='function')
 def burst_birth_rate() -> float:
-    return example(strategies.floats)
+    return example(strategies.small_floats)
+
+
+@pytest.fixture(scope='function')
+def max_age() -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def time_bins_count() -> float:
+    return example(strategies.positive_integers)
+
+
+@pytest.fixture(scope='function')
+def burst_age() -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def initial_mass_function_parameter() -> float:
+    return example(strategies.small_floats)
+
+
+@pytest.fixture(scope='function')
+def max_stars_count() -> float:
+    return example(strategies.positive_integers)
+
+
+@pytest.fixture(scope='function')
+def sector_radius_kpc() -> float:
+    return example(strategies.small_floats)
+
+
+@pytest.fixture(scope='function')
+def burst_formation_factor() -> float:
+    return example(strategies.small_floats)
+
+
+@pytest.fixture(scope='function')
+def mass_reduction_factor() -> float:
+    return example(strategies.small_floats)

@@ -1,6 +1,8 @@
 from .processing import filtration_methods
 from .sphere_stars import (nonnegative_floats,
-                           numpy_arrays)
+                           numpy_arrays,
+                           positive_integers,
+                           small_floats)
 from .stars import (defined_stars,
                     defined_stars_lists,
                     undefined_stars_lists)

@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+import pandas as pd
 
 from alcor.services.simulations.sphere_stars import (
     halo_star_birth_time,
@@ -8,10 +9,12 @@ from alcor.services.simulations.sphere_stars import (
     thick_disk_star_birth_time,
     initial_star_mass_by_salpeter,
     normalization_const,
-    get_birth_rates)
+    get_birth_rates,
+    generate_thin_disk_stars)
 
 
 UNIVERSE_AGE = 14.
+
 
 # TODO: find out how to test RNGs
 def test_halo_star_birth_time(halo_birth_initial_time: float,
@@ -84,3 +87,29 @@ def test_get_birth_rates(times: np.ndarray,
 
     assert isinstance(birth_rates, np.ndarray)
     assert birth_rates.size == times.size
+
+
+def test_generate_thin_disk_stars(max_age: float,
+                                  time_bins_count: int,
+                                  burst_age: float,
+                                  initial_mass_function_parameter: float,
+                                  thin_disk_age_gyr: float,
+                                  max_stars_count: int,
+                                  sector_radius_kpc: float,
+                                  burst_formation_factor: float,
+                                  star_formation_rate_param: float,
+                                  mass_reduction_factor: float) -> None:
+    thin_disk_stars = generate_thin_disk_stars(
+            max_age=max_age,
+            time_bins_count=time_bins_count,
+            burst_age=burst_age,
+            initial_mass_function_parameter=initial_mass_function_parameter,
+            thin_disk_age=thin_disk_age_gyr,
+            max_stars_count=max_stars_count,
+            sector_radius_kpc=sector_radius_kpc,
+            burst_formation_factor=burst_formation_factor,
+            star_formation_rate_param=star_formation_rate_param,
+            mass_reduction_factor=mass_reduction_factor)
+
+    assert isinstance(thin_disk_stars, pd.DataFrame)
+    assert thin_disk_stars.columns.size > 0
