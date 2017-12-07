@@ -16,42 +16,18 @@ def generate_stars(*,
                    halo_age: float = 14.,
                    halo_stars_formation_time: float = 1.,
                    burst_age: float = 0.6,
-                   burst_formation_factor: float = 5.,
-                   star_formation_rate_param: float = 25.,
                    thick_disk_sfr_param: float = 2.,
                    thick_disk_stars_fraction: float = 0.8,
                    halo_stars_fraction: float = 0.05,
-                   sector_radius_kpc: float = 0.05,
-                   mass_reduction_factor: float = 0.03,
                    initial_mass_function_param: float = -2.35) -> pd.DataFrame:
-    time_increment = thin_disk_age / time_bins_count
-    sector_area = math.pi * sector_radius_kpc ** 2
-    birth_rate = (time_increment * sector_area * 1E6  # TODO: what is 1E6?
-                  * mass_reduction_factor
-                  * normalization_const(
-                        star_formation_rate_param=star_formation_rate_param,
-                        thin_disk_age_gyr=thin_disk_age))
-    burst_birth_rate = birth_rate * burst_formation_factor
     max_age = max(thin_disk_age, thick_disk_age, halo_age)
-    burst_init_time = max_age - burst_age
-    thin_disk_birth_init_time = max_age - thin_disk_age
-    thick_disk_birth_init_time = max_age - thick_disk_age
-    halo_birth_init_time = max_age - halo_age
-    # This can be proved by taking derivative from y = t * exp(-t / tau)
-    thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
-    thick_disk_max_sfr = (thick_disk_max_sfr_relative_time
-                          * math.exp(-thick_disk_max_sfr_relative_time
-                                     / thick_disk_sfr_param))
 
     thin_disk_stars = generate_thin_disk_stars(
-            thin_disk_birth_init_time=thin_disk_birth_init_time,
             max_age=max_age,
             time_bins_count=time_bins_count,
-            burst_init_time=burst_init_time,
-            birth_rate=birth_rate,
-            burst_birth_rate=burst_birth_rate,
+            burst_age=burst_age,
             initial_mass_function_parameter=initial_mass_function_param,
-            time_increment=time_increment,
+            thin_disk_age=thin_disk_age,
             max_stars_count=max_stars_count)
 
     thick_disk_stars = generate_thick_disk_stars(
@@ -61,8 +37,7 @@ def generate_stars(*,
             thin_disk_stars_count=thin_disk_stars.shape[0],
             initial_mass_function_parameter=initial_mass_function_param,
             thick_disk_age=thick_disk_age,
-            thick_disk_birth_init_time=thick_disk_birth_init_time,
-            thick_disk_max_sfr=thick_disk_max_sfr,
+            max_age=max_age,
             thick_disk_sfr_param=thick_disk_sfr_param)
 
     halo_stars = generate_halo_stars(
@@ -71,7 +46,8 @@ def generate_stars(*,
             thin_disk_stars_fraction=(1. - thick_disk_stars_fraction
                                       - halo_stars_fraction),
             initial_mass_function_parameter=initial_mass_function_param,
-            halo_birth_init_time=halo_birth_init_time,
+            max_age=max_age,
+            halo_age=halo_age,
             halo_stars_formation_time=halo_stars_formation_time)
 
     return pd.concat([thin_disk_stars, thick_disk_stars, halo_stars])
@@ -82,11 +58,14 @@ def generate_halo_stars(*,
                         halo_stars_fraction: float,
                         thin_disk_stars_fraction: float,
                         initial_mass_function_parameter: float,
-                        halo_birth_init_time: float,
+                        max_age: float,
+                        halo_age: float,
                         halo_stars_formation_time: float) -> pd.DataFrame:
     halo_stars_count = int(thin_disk_stars_count
                            * halo_stars_fraction
                            / thin_disk_stars_fraction)
+    halo_birth_init_time = max_age - halo_age
+
     progenitors_masses = []
     birth_times = []
 
@@ -110,12 +89,18 @@ def generate_thick_disk_stars(*,
                               thin_disk_stars_count: int,
                               initial_mass_function_parameter: float,
                               thick_disk_age: float,
-                              thick_disk_birth_init_time: float,
-                              thick_disk_max_sfr: float,
+                              max_age: float,
                               thick_disk_sfr_param: float) -> pd.DataFrame:
     thick_disk_stars_count = int(thin_disk_stars_count
                                  * thick_disk_stars_fraction
                                  / thin_disk_stars_fraction)
+    thick_disk_birth_init_time = max_age - thick_disk_age
+    # This can be proved by taking derivative from y = t * exp(-t / tau)
+    thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
+    thick_disk_max_sfr = (thick_disk_max_sfr_relative_time
+                          * math.exp(-thick_disk_max_sfr_relative_time
+                                     / thick_disk_sfr_param))
+
     progenitors_masses = []
     birth_times = []
 
@@ -136,15 +121,28 @@ def generate_thick_disk_stars(*,
 
 
 def generate_thin_disk_stars(*,
-                             thin_disk_birth_init_time: float,
                              max_age: float,
                              time_bins_count: int,
-                             burst_init_time: float,
-                             birth_rate: float,
-                             burst_birth_rate: float,
+                             burst_age: float,
                              initial_mass_function_parameter: float,
-                             time_increment: float,
-                             max_stars_count: int) -> pd.DataFrame:
+                             thin_disk_age: float,
+                             max_stars_count: int,
+                             sector_radius_kpc: float = 0.05,
+                             burst_formation_factor: float = 5.,
+                             star_formation_rate_param: float = 25.,
+                             mass_reduction_factor: float = 0.03
+                             ) -> pd.DataFrame:
+    time_increment = thin_disk_age / time_bins_count
+    sector_area = math.pi * sector_radius_kpc ** 2
+    birth_rate = (time_increment * sector_area * 1E6  # TODO: what is 1E6?
+                  * mass_reduction_factor
+                  * normalization_const(
+                        star_formation_rate_param=star_formation_rate_param,
+                        thin_disk_age_gyr=thin_disk_age))
+    burst_birth_rate = birth_rate * burst_formation_factor
+    burst_init_time = max_age - burst_age
+    thin_disk_birth_init_time = max_age - thin_disk_age
+
     time_bins_initial_times = np.linspace(start=thin_disk_birth_init_time,
                                           stop=max_age,
                                           num=time_bins_count,
