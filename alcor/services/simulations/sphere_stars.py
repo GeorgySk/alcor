@@ -239,8 +239,7 @@ def thick_disk_star_birth_time(
         time_try = uniform_rng(0, age)
         time_try_sfr = time_try * math.exp(-time_try
                                            / formation_rate_parameter)
-        sfr_try = uniform_rng(0, max_formation_rate)
-        if sfr_try <= time_try_sfr:
+        if uniform_rng(0, max_formation_rate) <= time_try_sfr:
             return time_try + birth_initial_time
 
 

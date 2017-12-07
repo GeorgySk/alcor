@@ -1,5 +1,10 @@
-from alcor.services.simulations.sphere_stars import (halo_star_birth_time,
-                                                     thin_disk_star_birth_time)
+from alcor.services.simulations.sphere_stars import (
+        halo_star_birth_time,
+        thin_disk_star_birth_time,
+        thick_disk_star_birth_time)
+
+
+UNIVERSE_AGE = 14.
 
 
 def test_halo_star_birth_time(halo_birth_initial_time: float,
@@ -20,4 +25,20 @@ def test_thin_disk_star_birth_time(bin_initial_time: float,
             time_increment=time_increment)
 
     assert isinstance(birth_time, float)
-    assert birth_time >= bin_initial_time
+    assert UNIVERSE_AGE >= birth_time >= bin_initial_time
+
+
+# TODO: find out what to do with RNG
+def test_thick_disk_star_birth_time(age: float,
+                                    formation_rate_parameter: float,
+                                    max_formation_rate: float,
+                                    thick_disk_birth_initial_time: float
+                                    ) -> None:
+    birth_time = thick_disk_star_birth_time(
+            age=age,
+            formation_rate_parameter=formation_rate_parameter,
+            max_formation_rate=max_formation_rate,
+            birth_initial_time=thick_disk_birth_initial_time)
+
+    assert isinstance(birth_time, float)
+    assert UNIVERSE_AGE >= birth_time >= thick_disk_birth_initial_time
