@@ -10,7 +10,7 @@ from alcor.services.simulations.sphere_stars import (
     initial_star_mass_by_salpeter,
     normalization_const,
     get_birth_rates,
-    generate_thin_disk_stars)
+    generate_thin_disk_stars, generate_thick_disk_stars)
 
 
 UNIVERSE_AGE = 14.
@@ -113,3 +113,23 @@ def test_generate_thin_disk_stars(max_age: float,
 
     assert isinstance(thin_disk_stars, pd.DataFrame)
     assert thin_disk_stars.columns.size > 0
+
+
+def test_generate_thick_disk_stars(thin_disk_stars_fraction: float,
+                                   thick_disk_stars_fraction: float,
+                                   thin_disk_stars_count: int,
+                                   initial_mass_function_parameter: float,
+                                   thick_disk_age: float,
+                                   max_age: float,
+                                   thick_disk_sfr_param) -> None:
+    thick_disk_stars = generate_thick_disk_stars(
+            thin_disk_stars_fraction=thin_disk_stars_fraction,
+            thick_disk_stars_fraction=thick_disk_stars_fraction,
+            thin_disk_stars_count=thin_disk_stars_count,
+            initial_mass_function_parameter=initial_mass_function_parameter,
+            thick_disk_age=thick_disk_age,
+            max_age=max_age,
+            thick_disk_sfr_param=thick_disk_sfr_param)
+
+    assert isinstance(thick_disk_stars, pd.DataFrame)
+    assert thick_disk_stars.columns.size > 0

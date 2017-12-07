@@ -1,6 +1,3 @@
-import math
-import sys
-
 import numpy as np
 import pytest
 
@@ -141,3 +138,33 @@ def burst_formation_factor() -> float:
 @pytest.fixture(scope='function')
 def mass_reduction_factor() -> float:
     return example(strategies.small_floats)
+
+
+@pytest.fixture(scope='function')
+def thin_disk_stars_fraction() -> float:
+    return example(strategies.fractions.filter(lambda x: x != 0))
+
+
+@pytest.fixture(scope='function')
+def thick_disk_stars_fraction() -> float:
+    return example(strategies.fractions)
+
+
+@pytest.fixture(scope='function')
+def thin_disk_stars_count() -> float:
+    return example(strategies.positive_integers)
+
+
+@pytest.fixture(scope='function')
+def initial_mass_function_parameter() -> float:
+    return example(strategies.small_floats)
+
+
+@pytest.fixture(scope='function')
+def thick_disk_age() -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def thick_disk_sfr_param() -> float:
+    return example(strategies.small_floats.filter(lambda x: x != 0))

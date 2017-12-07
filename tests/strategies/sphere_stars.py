@@ -29,3 +29,9 @@ small_floats = strategies.floats(min_value=-1e15,
                                  max_value=1e15,
                                  allow_nan=False,
                                  allow_infinity=False)
+
+
+fractions = strategies.floats(min_value=0.,
+                              max_value=1.,
+                              allow_nan=False,
+                              allow_infinity=False)
