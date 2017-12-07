@@ -1,6 +1,8 @@
 import math
 import random
-from typing import Callable, Iterable, Any
+from typing import (Any,
+                    Callable,
+                    Iterable)
 
 import numpy as np
 import pandas as pd
