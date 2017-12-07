@@ -1,5 +1,6 @@
 import math
 import random
+from typing import Callable, Iterable, Any
 
 import numpy as np
 import pandas as pd
@@ -203,50 +204,60 @@ def normalization_const(*,
 
 
 # TODO: implement inverse transform sampling
-def initial_star_mass_by_salpeter(exponent: float,
-                                  *,
-                                  min_mass: float = 0.4,
-                                  max_mass: float = 50.) -> float:
+def initial_star_mass_by_salpeter(
+        exponent: float,
+        *,
+        min_mass: float = 0.4,
+        max_mass: float = 50.,
+        uniform_rng: Callable[[float, float], float] = random.uniform
+        ) -> float:
     y_max = min_mass ** exponent
 
     while True:
-        mass = random.uniform(min_mass, max_mass)
+        mass = uniform_rng(min_mass, max_mass)
         y_mass = mass ** exponent
-        if random.uniform(0, y_max) <= y_mass:
+        if uniform_rng(0, y_max) <= y_mass:
             return mass
 
 
-def thick_disk_star_birth_time(*,
-                               age: float,
-                               formation_rate_parameter: float,
-                               max_formation_rate: float,
-                               birth_initial_time: float) -> float:
+def thick_disk_star_birth_time(
+        *,
+        age: float,
+        formation_rate_parameter: float,
+        max_formation_rate: float,
+        birth_initial_time: float,
+        uniform_rng: Callable[[float, float], float] = random.uniform
+        ) -> float:
     """
     Return birth time of a thick disk star by using Monte Carlo method.
     SFR - star formation rate. More info at:
     https://www.google.es/search?q=star+formation+rate
     """
     while True:
-        time_try = random.uniform(0, age)
+        time_try = uniform_rng(0, age)
         time_try_sfr = time_try * math.exp(-time_try
                                            / formation_rate_parameter)
-        sfr_try = random.uniform(0, max_formation_rate)
+        sfr_try = uniform_rng(0, max_formation_rate)
         if sfr_try <= time_try_sfr:
             return time_try + birth_initial_time
 
 
-def halo_star_birth_time(*,
-                         birth_initial_time: float,
-                         formation_time: float) -> float:
-    return random.uniform(birth_initial_time,
-                          birth_initial_time + formation_time)
+def halo_star_birth_time(
+        *,
+        birth_initial_time: float,
+        formation_time: float,
+        uniform_rng: Callable[[float, float], float] = random.uniform
+        ) -> float:
+    return uniform_rng(birth_initial_time, birth_initial_time + formation_time)
 
 
-def thin_disk_star_birth_time(*,
-                              bin_initial_time: float,
-                              time_increment: float) -> float:
-    return random.uniform(bin_initial_time,
-                          bin_initial_time + time_increment)
+def thin_disk_star_birth_time(
+        *,
+        bin_initial_time: float,
+        time_increment: float,
+        uniform_rng: Callable[[float, float], float] = random.uniform
+        ) -> float:
+    return uniform_rng(bin_initial_time, bin_initial_time + time_increment)
 
 
 # TODO: move this to 'polar' module
@@ -254,12 +265,14 @@ def thin_disk_star_birth_time(*,
 # thick_disk_scale_height_kpc: float = 0.9,
 def z_coordinate(*,
                  scale_height: float,
-                 sector_radius_kpc: float) -> float:
+                 sector_radius_kpc: float,
+                 rng: Callable[[], float] = random.random,
+                 rng_choice: Callable[[Iterable[Any]], Any] = random.choice
+                 ) -> float:
     # TODO: implement function for inverse transform sampling
     # Inverse transform sampling for y = exp(-z / H)
     coordinate = (-scale_height * math.log(
-            1. - random.random() * (1.0 - math.exp(-sector_radius_kpc
-                                                   / scale_height))))
-    random_sign = random.choice([-1, 1])
+            1. - rng() * (1.0 - math.exp(-sector_radius_kpc / scale_height))))
+    random_sign = rng_choice([-1, 1])
 
     return coordinate * random_sign
