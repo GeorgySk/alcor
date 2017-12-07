@@ -227,10 +227,10 @@ def thick_disk_star_birth_time(*,
     https://www.google.es/search?q=star+formation+rate
     """
     while True:
-        time_try = age * random.random()
+        time_try = random.uniform(0, age)
         time_try_sfr = time_try * math.exp(-time_try
                                            / formation_rate_parameter)
-        sfr_try = max_formation_rate * random.random()
+        sfr_try = random.uniform(0, max_formation_rate)
         if sfr_try <= time_try_sfr:
             return time_try + birth_initial_time
 
@@ -238,13 +238,15 @@ def thick_disk_star_birth_time(*,
 def halo_star_birth_time(*,
                          birth_initial_time: float,
                          formation_time: float) -> float:
-    return birth_initial_time + formation_time * random.random()
+    return random.uniform(birth_initial_time,
+                          birth_initial_time + formation_time)
 
 
 def thin_disk_star_birth_time(*,
                               bin_initial_time: float,
                               time_increment: float) -> float:
-    return bin_initial_time + time_increment * random.random()
+    return random.uniform(bin_initial_time,
+                          bin_initial_time + time_increment)
 
 
 # TODO: move this to 'polar' module
