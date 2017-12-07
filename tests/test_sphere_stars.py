@@ -1,8 +1,10 @@
+import math
+
 from alcor.services.simulations.sphere_stars import (
     halo_star_birth_time,
     thin_disk_star_birth_time,
     thick_disk_star_birth_time,
-    initial_star_mass_by_salpeter)
+    initial_star_mass_by_salpeter, normalization_const)
 
 
 UNIVERSE_AGE = 14.
@@ -53,3 +55,15 @@ def test_initial_star_mass_by_salpeter(exponent: float,
 
     assert isinstance(mass, float)
     assert min_mass <= mass <= max_mass
+
+
+def test_normalization_const(star_formation_rate_param: float,
+                             thin_disk_age_gyr: float,
+                             sigma: float) -> None:
+    normalization_constant = normalization_const(
+            star_formation_rate_param=star_formation_rate_param,
+            thin_disk_age_gyr=thin_disk_age_gyr,
+            sigma=sigma)
+
+    assert isinstance(normalization_constant, float)
+    assert math.isfinite(normalization_constant)

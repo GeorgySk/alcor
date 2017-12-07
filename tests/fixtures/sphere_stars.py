@@ -1,3 +1,4 @@
+import math
 import pytest
 
 from tests import strategies
@@ -61,3 +62,20 @@ def min_mass() -> float:
 def max_mass(min_mass) -> float:
     return example(strategies.nonnegative_floats()
                    .filter(lambda x: x > min_mass))
+
+
+@pytest.fixture(scope='function')
+def star_formation_rate_param() -> float:
+    return example(strategies.floats.filter(lambda x: x != 0))
+
+
+@pytest.fixture(scope='function')
+def thin_disk_age_gyr(star_formation_rate_param) -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE)
+                   .filter(
+        lambda x: x != 0 and math.exp(-x / star_formation_rate_param) != 1.))
+
+
+@pytest.fixture(scope='function')
+def sigma() -> float:
+    return example(strategies.floats)

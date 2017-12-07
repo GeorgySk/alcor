@@ -184,6 +184,7 @@ def generate_thin_disk_stars(*,
     return thin_disk_stars
 
 
+# TODO: find out the meaning
 def get_birth_rates(times: np.ndarray,
                     *,
                     burst_init_time: float,
@@ -195,6 +196,7 @@ def get_birth_rates(times: np.ndarray,
                         [birth_rate, burst_birth_rate])
 
 
+# TODO: find out the meaning
 def normalization_const(*,
                         star_formation_rate_param: float,
                         thin_disk_age_gyr: float,
