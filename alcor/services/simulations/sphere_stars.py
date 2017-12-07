@@ -260,7 +260,6 @@ def z_coordinate(*,
     coordinate = (-scale_height * math.log(
             1. - random.random() * (1.0 - math.exp(-sector_radius_kpc
                                                    / scale_height))))
-    # TODO: find a better way to assign a random sign
-    random_sign = float(1. - 2. * int(2.0 * random.random()))
+    random_sign = random.choice([-1, 1])
 
     return coordinate * random_sign
