@@ -249,22 +249,6 @@ def thin_disk_star_birth_time(*,
     return bin_initial_time + time_increment * random.random()
 
 
-def get_galactic_structure_type(*,
-                                thick_disk_stars_fraction: float,
-                                halo_stars_fraction: float
-                                ) -> GalacticStructureType:
-    random_number = random.random()
-
-    if random_number <= thick_disk_stars_fraction:
-        return GalacticStructureType.thick
-
-    if (thick_disk_stars_fraction < random_number
-            <= thick_disk_stars_fraction + halo_stars_fraction):
-        return GalacticStructureType.halo
-
-    return GalacticStructureType.thin
-
-
 # TODO: move this to 'polar' module
 # thin_disk_scale_height_kpc: float = 0.25,
 # thick_disk_scale_height_kpc: float = 0.9,
