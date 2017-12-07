@@ -1,10 +1,14 @@
 import math
 
+import numpy as np
+
 from alcor.services.simulations.sphere_stars import (
     halo_star_birth_time,
     thin_disk_star_birth_time,
     thick_disk_star_birth_time,
-    initial_star_mass_by_salpeter, normalization_const)
+    initial_star_mass_by_salpeter,
+    normalization_const,
+    get_birth_rates)
 
 
 UNIVERSE_AGE = 14.
@@ -67,3 +71,16 @@ def test_normalization_const(star_formation_rate_param: float,
 
     assert isinstance(normalization_constant, float)
     assert math.isfinite(normalization_constant)
+
+
+def test_get_birth_rates(times: np.ndarray,
+                         burst_init_time: float,
+                         birth_rate: float,
+                         burst_birth_rate: float) -> None:
+    birth_rates = get_birth_rates(times=times,
+                                  burst_init_time=burst_init_time,
+                                  birth_rate=birth_rate,
+                                  burst_birth_rate=burst_birth_rate)
+
+    assert isinstance(birth_rates, np.ndarray)
+    assert birth_rates.size == times.size

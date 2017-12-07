@@ -1,4 +1,6 @@
 import math
+
+import numpy as np
 import pytest
 
 from tests import strategies
@@ -78,4 +80,24 @@ def thin_disk_age_gyr(star_formation_rate_param) -> float:
 
 @pytest.fixture(scope='function')
 def sigma() -> float:
+    return example(strategies.floats)
+
+
+@pytest.fixture(scope='function')
+def times() -> np.ndarray:
+    return example(strategies.numpy_arrays)
+
+
+@pytest.fixture(scope='function')
+def burst_init_time() -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def birth_rate() -> float:
+    return example(strategies.floats)
+
+
+@pytest.fixture(scope='function')
+def burst_birth_rate() -> float:
     return example(strategies.floats)
