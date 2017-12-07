@@ -45,3 +45,19 @@ def max_formation_rate() -> float:
 @pytest.fixture(scope='function')
 def thick_disk_birth_initial_time() -> float:
     return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def exponent() -> float:
+    return example(strategies.floats)
+
+
+@pytest.fixture(scope='function')
+def min_mass() -> float:
+    return example(strategies.nonnegative_floats())
+
+
+@pytest.fixture(scope='function')
+def max_mass(min_mass) -> float:
+    return example(strategies.nonnegative_floats()
+                   .filter(lambda x: x > min_mass))
