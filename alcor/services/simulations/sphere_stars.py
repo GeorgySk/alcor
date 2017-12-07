@@ -94,8 +94,8 @@ def generate_halo_stars(*,
         progenitors_masses.append(
                 initial_star_mass_by_salpeter(initial_mass_function_parameter))
         birth_times.append(halo_star_birth_time(
-                    halo_birth_init_time=halo_birth_init_time,
-                    halo_stars_formation_time=halo_stars_formation_time))
+                    birth_initial_time=halo_birth_init_time,
+                    formation_time=halo_stars_formation_time))
 
     halo_stars = pd.DataFrame(dict(progenitor_mass=progenitors_masses,
                                    birth_time=birth_times))
@@ -123,10 +123,10 @@ def generate_thick_disk_stars(*,
         progenitors_masses.append(
                 initial_star_mass_by_salpeter(initial_mass_function_parameter))
         birth_times.append(thick_disk_star_birth_time(
-                thick_disk_age=thick_disk_age,
-                thick_disk_birth_init_time=thick_disk_birth_init_time,
-                thick_disk_max_sfr=thick_disk_max_sfr,
-                thick_disk_sfr_param=thick_disk_sfr_param))
+                age=thick_disk_age,
+                birth_initial_time=thick_disk_birth_init_time,
+                max_formation_rate=thick_disk_max_sfr,
+                formation_rate_parameter=thick_disk_sfr_param))
 
     thick_disk_stars = pd.DataFrame(dict(progenitor_mass=progenitors_masses,
                                          birth_time=birth_times))
@@ -219,27 +219,28 @@ def initial_star_mass_by_salpeter(exponent: float,
 
 
 def thick_disk_star_birth_time(*,
-                               thick_disk_age: float,
-                               thick_disk_sfr_param: float,
-                               thick_disk_max_sfr: float,
-                               thick_disk_birth_init_time: float) -> float:
+                               age: float,
+                               formation_rate_parameter: float,
+                               max_formation_rate: float,
+                               birth_initial_time: float) -> float:
     """
     Return birth time of a thick disk star by using Monte Carlo method.
     SFR - star formation rate. More info at:
     https://www.google.es/search?q=star+formation+rate
     """
     while True:
-        time_try = thick_disk_age * random.random()
-        time_try_sfr = time_try * math.exp(-time_try / thick_disk_sfr_param)
-        sfr_try = thick_disk_max_sfr * random.random()
+        time_try = age * random.random()
+        time_try_sfr = time_try * math.exp(-time_try
+                                           / formation_rate_parameter)
+        sfr_try = max_formation_rate * random.random()
         if sfr_try <= time_try_sfr:
-            return time_try + thick_disk_birth_init_time
+            return time_try + birth_initial_time
 
 
 def halo_star_birth_time(*,
-                         halo_birth_init_time: float,
-                         halo_stars_formation_time: float) -> float:
-    return halo_birth_init_time + halo_stars_formation_time * random.random()
+                         birth_initial_time: float,
+                         formation_time: float) -> float:
+    return birth_initial_time + formation_time * random.random()
 
 
 def thin_disk_star_birth_time(*,
@@ -274,7 +275,7 @@ def z_coordinate(*,
     # Inverse transform sampling for y = exp(-z / H)
     coordinate = (-scale_height * math.log(
             1. - random.random() * (1.0 - math.exp(-sector_radius_kpc
-                                            / scale_height))))
+                                                   / scale_height))))
     # TODO: find a better way to assign a random sign
     random_sign = float(1. - 2. * int(2.0 * random.random()))
 
