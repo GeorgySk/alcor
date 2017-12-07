@@ -99,7 +99,7 @@ def generate_thick_disk_stars(*,
                                  / thin_disk_stars_fraction)
     thick_disk_birth_init_time = max_age - thick_disk_age
     # This can be proved by taking derivative from y = t * exp(-t / tau)
-    thick_disk_max_sfr_relative_time = thick_disk_birth_init_time
+    thick_disk_max_sfr_relative_time = thick_disk_sfr_param
     thick_disk_max_sfr = (thick_disk_max_sfr_relative_time
                           * math.exp(-thick_disk_max_sfr_relative_time
                                      / thick_disk_sfr_param))
