@@ -233,7 +233,8 @@ def thick_disk_star_birth_time(
         uniform_rng: Callable[[float, float], float] = random.uniform
         ) -> float:
     """
-    Return birth time of a thick disk star by using Monte Carlo method.
+    Returns birth time of a thick disk star
+    calculated by using Monte Carlo method.
     SFR - star formation rate. More info at:
     https://www.google.es/search?q=star+formation+rate
     """
