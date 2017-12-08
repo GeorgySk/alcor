@@ -22,14 +22,12 @@ numpy_arrays = arrays(dtype=np.float64,
                       shape=arrays_lengths,
                       elements=floats)
 
-
 positive_integers = strategies.integers(min_value=1)
 
 small_floats = strategies.floats(min_value=-1e15,
                                  max_value=1e15,
                                  allow_nan=False,
                                  allow_infinity=False)
-
 
 fractions = strategies.floats(min_value=0.,
                               max_value=1.,

@@ -10,8 +10,9 @@ from alcor.services.simulations.sphere_stars import (
     initial_star_mass_by_salpeter,
     normalization_const,
     get_birth_rates,
-    generate_thin_disk_stars, generate_thick_disk_stars, generate_halo_stars)
-
+    generate_thin_disk_stars,
+    generate_thick_disk_stars,
+    generate_halo_stars)
 
 UNIVERSE_AGE = 14.
 
