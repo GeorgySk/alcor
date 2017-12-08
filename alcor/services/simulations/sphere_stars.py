@@ -73,15 +73,13 @@ def generate_halo_stars(*,
                            / thin_disk_stars_fraction)
     halo_birth_init_time = max_age - halo_age
 
-    progenitors_masses = []
-    birth_times = []
-
-    for _ in range(halo_stars_count):
-        progenitors_masses.append(
-                initial_star_mass_by_salpeter(initial_mass_function_parameter))
-        birth_times.append(halo_star_birth_time(
-                birth_initial_time=halo_birth_init_time,
-                formation_time=halo_stars_formation_time))
+    progenitors_masses = [
+        initial_star_mass_by_salpeter(initial_mass_function_parameter)
+        for _ in range(halo_stars_count)]
+    birth_times = [halo_star_birth_time(
+            birth_initial_time=halo_birth_init_time,
+            formation_time=halo_stars_formation_time)
+        for _ in range(halo_stars_count)]
 
     halo_stars = pd.DataFrame(dict(progenitor_mass=progenitors_masses,
                                    birth_time=birth_times))
@@ -108,17 +106,15 @@ def generate_thick_disk_stars(*,
                           * math.exp(-thick_disk_max_sfr_relative_time
                                      / thick_disk_sfr_param))
 
-    progenitors_masses = []
-    birth_times = []
-
-    for _ in range(thick_disk_stars_count):
-        progenitors_masses.append(
-                initial_star_mass_by_salpeter(initial_mass_function_parameter))
-        birth_times.append(thick_disk_star_birth_time(
-                age=thick_disk_age,
-                birth_initial_time=thick_disk_birth_init_time,
-                max_formation_rate=thick_disk_max_sfr,
-                formation_rate_parameter=thick_disk_sfr_param))
+    progenitors_masses = [
+        initial_star_mass_by_salpeter(initial_mass_function_parameter)
+        for _ in range(thick_disk_stars_count)]
+    birth_times = [thick_disk_star_birth_time(
+            age=thick_disk_age,
+            birth_initial_time=thick_disk_birth_init_time,
+            max_formation_rate=thick_disk_max_sfr,
+            formation_rate_parameter=thick_disk_sfr_param)
+        for _ in range(thick_disk_stars_count)]
 
     thick_disk_stars = pd.DataFrame(dict(progenitor_mass=progenitors_masses,
                                          birth_time=birth_times))
