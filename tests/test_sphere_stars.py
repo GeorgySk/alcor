@@ -110,7 +110,7 @@ def test_generate_thin_disk_stars(max_age: float,
             time_bins_count=time_bins_count,
             burst_age=burst_age,
             initial_mass_function_parameter=initial_mass_function_parameter,
-            thin_disk_age=thin_disk_age_gyr,
+            age=thin_disk_age_gyr,
             max_stars_count=max_stars_count,
             sector_radius_kpc=sector_radius_kpc,
             burst_formation_factor=burst_formation_factor,
@@ -134,9 +134,9 @@ def test_generate_thick_disk_stars(thin_disk_stars_fraction: float,
             thick_disk_stars_fraction=thick_disk_stars_fraction,
             thin_disk_stars_count=thin_disk_stars_count,
             initial_mass_function_parameter=initial_mass_function_parameter,
-            thick_disk_age=thick_disk_age,
+            age=thick_disk_age,
             max_age=max_age,
-            thick_disk_sfr_param=thick_disk_sfr_param,
+            formation_rate_parameter=thick_disk_sfr_param,
             generator=random.uniform)
 
     assert isinstance(thick_disk_stars, pd.DataFrame)
@@ -157,7 +157,7 @@ def test_generate_halo_stars(thin_disk_stars_count: int,
             initial_mass_function_parameter=initial_mass_function_parameter,
             max_age=max_age,
             halo_age=halo_age,
-            halo_stars_formation_time=halo_stars_formation_time,
+            formation_time=halo_stars_formation_time,
             generator=random.uniform)
 
     assert isinstance(halo_stars, pd.DataFrame)
