@@ -26,7 +26,13 @@ def generate_stars(*,
                    thick_disk_sfr_param: float = 2.,
                    thick_disk_stars_fraction: float = 0.8,
                    halo_stars_fraction: float = 0.05,
-                   initial_mass_function_param: float = -2.35) -> pd.DataFrame:
+                   initial_mass_function_param: float = -2.35,
+                   sector_radius_kpc: float = 0.05,
+                   burst_formation_factor: float = 5.,
+                   star_formation_rate_param: float = 25.,
+                   mass_reduction_factor: float = 0.03,
+                   generator: Callable[[float, float], float] = random.uniform
+                   ) -> pd.DataFrame:
     max_age = max(thin_disk_age, thick_disk_age, halo_age)
 
     thin_disk_stars = generate_thin_disk_stars(
@@ -35,7 +41,12 @@ def generate_stars(*,
             burst_age=burst_age,
             initial_mass_function_parameter=initial_mass_function_param,
             thin_disk_age=thin_disk_age,
-            max_stars_count=max_stars_count)
+            max_stars_count=max_stars_count,
+            sector_radius_kpc=sector_radius_kpc,
+            burst_formation_factor=burst_formation_factor,
+            star_formation_rate_param=star_formation_rate_param,
+            mass_reduction_factor=mass_reduction_factor,
+            generator=generator)
 
     thick_disk_stars = generate_thick_disk_stars(
             thin_disk_stars_fraction=(1. - thick_disk_stars_fraction
@@ -45,7 +56,8 @@ def generate_stars(*,
             initial_mass_function_parameter=initial_mass_function_param,
             thick_disk_age=thick_disk_age,
             max_age=max_age,
-            thick_disk_sfr_param=thick_disk_sfr_param)
+            thick_disk_sfr_param=thick_disk_sfr_param,
+            generator=generator)
 
     halo_stars = generate_halo_stars(
             thin_disk_stars_count=thin_disk_stars.shape[0],
@@ -55,7 +67,8 @@ def generate_stars(*,
             initial_mass_function_parameter=initial_mass_function_param,
             max_age=max_age,
             halo_age=halo_age,
-            halo_stars_formation_time=halo_stars_formation_time)
+            halo_stars_formation_time=halo_stars_formation_time,
+            generator=generator)
 
     return pd.concat([thin_disk_stars, thick_disk_stars, halo_stars])
 
@@ -67,25 +80,28 @@ def generate_halo_stars(*,
                         initial_mass_function_parameter: float,
                         max_age: float,
                         halo_age: float,
-                        halo_stars_formation_time: float) -> pd.DataFrame:
+                        halo_stars_formation_time: float,
+                        generator: Callable[[float, float], float]
+                        ) -> pd.DataFrame:
     halo_stars_count = int(thin_disk_stars_count
                            * halo_stars_fraction
                            / thin_disk_stars_fraction)
     halo_birth_init_time = max_age - halo_age
 
     progenitors_masses = [
-        initial_star_mass_by_salpeter(initial_mass_function_parameter)
+        initial_star_mass_by_salpeter(initial_mass_function_parameter,
+                                      generator=generator)
         for _ in range(halo_stars_count)]
     birth_times = [halo_star_birth_time(
             birth_initial_time=halo_birth_init_time,
-            formation_time=halo_stars_formation_time)
+            formation_time=halo_stars_formation_time,
+            generator=generator)
         for _ in range(halo_stars_count)]
 
-    halo_stars = pd.DataFrame(dict(progenitor_mass=progenitors_masses,
-                                   birth_time=birth_times))
-    halo_stars['galactic_structure_type'] = GalacticStructureType.halo
-
-    return halo_stars
+    return pd.DataFrame(dict(
+            progenitor_mass=progenitors_masses,
+            birth_time=birth_times,
+            galactic_structure_type=GalacticStructureType.halo))
 
 
 def generate_thick_disk_stars(*,
@@ -95,7 +111,9 @@ def generate_thick_disk_stars(*,
                               initial_mass_function_parameter: float,
                               thick_disk_age: float,
                               max_age: float,
-                              thick_disk_sfr_param: float) -> pd.DataFrame:
+                              thick_disk_sfr_param: float,
+                              generator: Callable[[float, float], float]
+                              ) -> pd.DataFrame:
     thick_disk_stars_count = int(thin_disk_stars_count
                                  * thick_disk_stars_fraction
                                  / thin_disk_stars_fraction)
@@ -107,20 +125,21 @@ def generate_thick_disk_stars(*,
                                      / thick_disk_sfr_param))
 
     progenitors_masses = [
-        initial_star_mass_by_salpeter(initial_mass_function_parameter)
+        initial_star_mass_by_salpeter(initial_mass_function_parameter,
+                                      generator=generator)
         for _ in range(thick_disk_stars_count)]
     birth_times = [thick_disk_star_birth_time(
             age=thick_disk_age,
             birth_initial_time=thick_disk_birth_init_time,
             max_formation_rate=thick_disk_max_sfr,
-            formation_rate_parameter=thick_disk_sfr_param)
+            formation_rate_parameter=thick_disk_sfr_param,
+            generator=generator)
         for _ in range(thick_disk_stars_count)]
 
-    thick_disk_stars = pd.DataFrame(dict(progenitor_mass=progenitors_masses,
-                                         birth_time=birth_times))
-    thick_disk_stars['galactic_structure_type'] = GalacticStructureType.thick
-
-    return thick_disk_stars
+    return pd.DataFrame(dict(
+            progenitor_mass=progenitors_masses,
+            birth_time=birth_times,
+            galactic_structure_type=GalacticStructureType.thick))
 
 
 def generate_thin_disk_stars(*,
@@ -130,10 +149,11 @@ def generate_thin_disk_stars(*,
                              initial_mass_function_parameter: float,
                              thin_disk_age: float,
                              max_stars_count: int,
-                             sector_radius_kpc: float = 0.05,
-                             burst_formation_factor: float = 5.,
-                             star_formation_rate_param: float = 25.,
-                             mass_reduction_factor: float = 0.03
+                             sector_radius_kpc: float,
+                             burst_formation_factor: float,
+                             star_formation_rate_param: float,
+                             mass_reduction_factor: float,
+                             generator: Callable[[float, float], float]
                              ) -> pd.DataFrame:
     time_increment = thin_disk_age / time_bins_count
     sector_area = math.pi * sector_radius_kpc ** 2
@@ -157,10 +177,12 @@ def generate_thin_disk_stars(*,
                                   burst_birth_rate=burst_birth_rate)
 
     star_mass_generator = partial(initial_star_mass_by_salpeter,
-                                  initial_mass_function_parameter)
+                                  initial_mass_function_parameter,
+                                  generator=generator)
     birth_time_generators = [partial(thin_disk_star_birth_time,
                                      bin_initial_time=bin_initial_time,
-                                     time_increment=time_increment)
+                                     time_increment=time_increment,
+                                     generator=generator)
                              for bin_initial_time in time_bins_initial_times]
 
     columns = birth_rates, birth_time_generators
@@ -172,11 +194,10 @@ def generate_thin_disk_stars(*,
                     max_stars_count=max_stars_count)
             for birth_rate, birth_time_generator in np.column_stack(columns)))
 
-    thin_disk_stars = pd.DataFrame(dict(progenitor_mass=progenitors_masses,
-                                        birth_time=birth_times))
-    thin_disk_stars['galactic_structure_type'] = GalacticStructureType.thin
-
-    return thin_disk_stars
+    return pd.DataFrame(dict(
+            progenitor_mass=progenitors_masses,
+            birth_time=birth_times,
+            galactic_structure_type=GalacticStructureType.thin))
 
 
 def progenitors_masses_births_times(*,
@@ -228,14 +249,13 @@ def initial_star_mass_by_salpeter(
         *,
         min_mass: float = 0.4,
         max_mass: float = 50.,
-        uniform_rng: Callable[[float, float], float] = random.uniform
-) -> float:
+        generator: Callable[[float, float], float]) -> float:
     y_max = min_mass ** exponent
 
     while True:
-        mass = uniform_rng(min_mass, max_mass)
+        mass = generator(min_mass, max_mass)
         y_mass = mass ** exponent
-        if uniform_rng(0, y_max) <= y_mass:
+        if generator(0, y_max) <= y_mass:
             return mass
 
 
@@ -245,8 +265,8 @@ def thick_disk_star_birth_time(
         formation_rate_parameter: float,
         max_formation_rate: float,
         birth_initial_time: float,
-        uniform_rng: Callable[[float, float], float] = random.uniform
-) -> float:
+        generator: Callable[[float, float], float]
+        ) -> float:
     """
     Returns birth time of a thick disk star
     calculated by using Monte Carlo method.
@@ -254,10 +274,10 @@ def thick_disk_star_birth_time(
     https://www.google.es/search?q=star+formation+rate
     """
     while True:
-        time_try = uniform_rng(0, age)
+        time_try = generator(0, age)
         time_try_sfr = time_try * math.exp(-time_try
                                            / formation_rate_parameter)
-        if uniform_rng(0, max_formation_rate) <= time_try_sfr:
+        if generator(0, max_formation_rate) <= time_try_sfr:
             return time_try + birth_initial_time
 
 
@@ -265,18 +285,18 @@ def halo_star_birth_time(
         *,
         birth_initial_time: float,
         formation_time: float,
-        uniform_rng: Callable[[float, float], float] = random.uniform
-) -> float:
-    return uniform_rng(birth_initial_time, birth_initial_time + formation_time)
+        generator: Callable[[float, float], float]
+        ) -> float:
+    return generator(birth_initial_time, birth_initial_time + formation_time)
 
 
 def thin_disk_star_birth_time(
         *,
         bin_initial_time: float,
         time_increment: float,
-        uniform_rng: Callable[[float, float], float] = random.uniform
-) -> float:
-    return uniform_rng(bin_initial_time, bin_initial_time + time_increment)
+        generator: Callable[[float, float], float]
+        ) -> float:
+    return generator(bin_initial_time, bin_initial_time + time_increment)
 
 
 # TODO: move this to 'polar' module

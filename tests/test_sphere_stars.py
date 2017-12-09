@@ -1,4 +1,5 @@
 import math
+import random
 
 import numpy as np
 import pandas as pd
@@ -22,7 +23,8 @@ def test_halo_star_birth_time(halo_birth_initial_time: float,
                               halo_stars_formation_time: float) -> None:
     birth_time = halo_star_birth_time(
             birth_initial_time=halo_birth_initial_time,
-            formation_time=halo_stars_formation_time)
+            formation_time=halo_stars_formation_time,
+            generator=random.uniform)
 
     assert isinstance(birth_time, float)
     assert birth_time >= halo_birth_initial_time
@@ -33,7 +35,8 @@ def test_thin_disk_star_birth_time(bin_initial_time: float,
                                    time_increment: float) -> None:
     birth_time = thin_disk_star_birth_time(
             bin_initial_time=bin_initial_time,
-            time_increment=time_increment)
+            time_increment=time_increment,
+            generator=random.uniform)
 
     assert isinstance(birth_time, float)
     assert UNIVERSE_AGE >= birth_time >= bin_initial_time
@@ -48,7 +51,8 @@ def test_thick_disk_star_birth_time(age: float,
             age=age,
             formation_rate_parameter=formation_rate_parameter,
             max_formation_rate=max_formation_rate,
-            birth_initial_time=thick_disk_birth_initial_time)
+            birth_initial_time=thick_disk_birth_initial_time,
+            generator=random.uniform    )
 
     assert isinstance(birth_time, float)
     assert UNIVERSE_AGE >= birth_time >= thick_disk_birth_initial_time
@@ -59,7 +63,8 @@ def test_initial_star_mass_by_salpeter(exponent: float,
                                        max_mass: float) -> None:
     mass = initial_star_mass_by_salpeter(exponent=exponent,
                                          min_mass=min_mass,
-                                         max_mass=max_mass)
+                                         max_mass=max_mass,
+                                         generator=random.uniform)
 
     assert isinstance(mass, float)
     assert min_mass <= mass <= max_mass
@@ -110,7 +115,8 @@ def test_generate_thin_disk_stars(max_age: float,
             sector_radius_kpc=sector_radius_kpc,
             burst_formation_factor=burst_formation_factor,
             star_formation_rate_param=star_formation_rate_param,
-            mass_reduction_factor=mass_reduction_factor)
+            mass_reduction_factor=mass_reduction_factor,
+            generator=random.uniform)
 
     assert isinstance(thin_disk_stars, pd.DataFrame)
     assert thin_disk_stars.columns.size > 0
@@ -130,7 +136,8 @@ def test_generate_thick_disk_stars(thin_disk_stars_fraction: float,
             initial_mass_function_parameter=initial_mass_function_parameter,
             thick_disk_age=thick_disk_age,
             max_age=max_age,
-            thick_disk_sfr_param=thick_disk_sfr_param)
+            thick_disk_sfr_param=thick_disk_sfr_param,
+            generator=random.uniform)
 
     assert isinstance(thick_disk_stars, pd.DataFrame)
     assert thick_disk_stars.columns.size > 0
@@ -150,7 +157,8 @@ def test_generate_halo_stars(thin_disk_stars_count: int,
             initial_mass_function_parameter=initial_mass_function_parameter,
             max_age=max_age,
             halo_age=halo_age,
-            halo_stars_formation_time=halo_stars_formation_time)
+            halo_stars_formation_time=halo_stars_formation_time,
+            generator=random.uniform)
 
     assert isinstance(halo_stars, pd.DataFrame)
     assert halo_stars.columns.size > 0

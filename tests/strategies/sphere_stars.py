@@ -24,8 +24,8 @@ numpy_arrays = arrays(dtype=np.float64,
 
 positive_integers = strategies.integers(min_value=1)
 
-small_floats = strategies.floats(min_value=-1e15,
-                                 max_value=1e15,
+small_floats = strategies.floats(min_value=-1e14,
+                                 max_value=1e14,
                                  allow_nan=False,
                                  allow_infinity=False)
 
