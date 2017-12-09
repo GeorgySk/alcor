@@ -183,3 +183,8 @@ def halo_age() -> float:
 @pytest.fixture(scope='function')
 def halo_stars_formation_time() -> float:
     return example(strategies.small_floats)
+
+
+@pytest.fixture(scope='function')
+def stars_count() -> float:
+    return example(strategies.small_nonnegative_integers)

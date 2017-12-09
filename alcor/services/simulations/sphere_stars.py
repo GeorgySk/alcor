@@ -34,6 +34,8 @@ def generate_stars(*,
                    generator: Callable[[float, float], float] = random.uniform
                    ) -> pd.DataFrame:
     max_age = max(thin_disk_age, thick_disk_age, halo_age)
+    thin_disk_stars_fraction = (1. - thick_disk_stars_fraction
+                                - halo_stars_fraction)
 
     thin_disk_stars = generate_thin_disk_stars(
             max_age=max_age,
@@ -48,22 +50,21 @@ def generate_stars(*,
             mass_reduction_factor=mass_reduction_factor,
             generator=generator)
 
+    thick_disk_stars_count = int(thin_disk_stars.shape[0]
+                                 * thick_disk_stars_fraction
+                                 / thin_disk_stars_fraction)
     thick_disk_stars = generate_thick_disk_stars(
-            thin_disk_stars_fraction=(1. - thick_disk_stars_fraction
-                                      - halo_stars_fraction),
-            thick_disk_stars_fraction=thick_disk_stars_fraction,
-            thin_disk_stars_count=thin_disk_stars.shape[0],
+            stars_count=thick_disk_stars_count,
             initial_mass_function_parameter=initial_mass_function_param,
             age=thick_disk_age,
             max_age=max_age,
             formation_rate_parameter=thick_disk_formation_rate_param,
             generator=generator)
 
+    halo_stars_count = int(thin_disk_stars.shape[0] * halo_stars_fraction
+                           / thin_disk_stars_fraction)
     halo_stars = generate_halo_stars(
-            thin_disk_stars_count=thin_disk_stars.shape[0],
-            halo_stars_fraction=halo_stars_fraction,
-            thin_disk_stars_fraction=(1. - thick_disk_stars_fraction
-                                      - halo_stars_fraction),
+            stars_count=halo_stars_count,
             initial_mass_function_parameter=initial_mass_function_param,
             max_age=max_age,
             halo_age=halo_age,
@@ -74,17 +75,13 @@ def generate_stars(*,
 
 
 def generate_halo_stars(*,
-                        thin_disk_stars_count: float,
-                        halo_stars_fraction: float,
-                        thin_disk_stars_fraction: float,
+                        stars_count: int,
                         initial_mass_function_parameter: float,
                         max_age: float,
                         halo_age: float,
                         formation_time: float,
                         generator: Callable[[float, float], float]
                         ) -> pd.DataFrame:
-    stars_count = int(thin_disk_stars_count * halo_stars_fraction
-                      / thin_disk_stars_fraction)
     birth_initial_time = max_age - halo_age
 
     progenitors_masses = [
@@ -104,21 +101,16 @@ def generate_halo_stars(*,
 
 
 def generate_thick_disk_stars(*,
-                              thin_disk_stars_fraction: float,
-                              thick_disk_stars_fraction: float,
-                              thin_disk_stars_count: int,
+                              stars_count: int,
                               initial_mass_function_parameter: float,
                               age: float,
                               max_age: float,
                               formation_rate_parameter: float,
                               generator: Callable[[float, float], float]
                               ) -> pd.DataFrame:
-    stars_count = int(thin_disk_stars_count * thick_disk_stars_fraction
-                      / thin_disk_stars_fraction)
     birth_init_time = max_age - age
     # This can be proved by taking derivative from y = t * exp(-t / tau)
-    max_formation_rate_relative_time = formation_rate_parameter
-    max_formation_rate = max_formation_rate_relative_time / math.e
+    max_formation_rate = formation_rate_parameter / math.e
 
     progenitors_masses = [
         initial_star_mass_by_salpeter(initial_mass_function_parameter,

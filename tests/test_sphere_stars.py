@@ -52,7 +52,7 @@ def test_thick_disk_star_birth_time(age: float,
             formation_rate_parameter=formation_rate_parameter,
             max_formation_rate=max_formation_rate,
             birth_initial_time=thick_disk_birth_initial_time,
-            generator=random.uniform    )
+            generator=random.uniform)
 
     assert isinstance(birth_time, float)
     assert UNIVERSE_AGE >= birth_time >= thick_disk_birth_initial_time
@@ -122,17 +122,13 @@ def test_generate_thin_disk_stars(max_age: float,
     assert thin_disk_stars.columns.size > 0
 
 
-def test_generate_thick_disk_stars(thin_disk_stars_fraction: float,
-                                   thick_disk_stars_fraction: float,
-                                   thin_disk_stars_count: int,
+def test_generate_thick_disk_stars(stars_count: int,
                                    initial_mass_function_parameter: float,
                                    thick_disk_age: float,
                                    max_age: float,
                                    thick_disk_sfr_param) -> None:
     thick_disk_stars = generate_thick_disk_stars(
-            thin_disk_stars_fraction=thin_disk_stars_fraction,
-            thick_disk_stars_fraction=thick_disk_stars_fraction,
-            thin_disk_stars_count=thin_disk_stars_count,
+            stars_count=stars_count,
             initial_mass_function_parameter=initial_mass_function_parameter,
             age=thick_disk_age,
             max_age=max_age,
@@ -143,17 +139,13 @@ def test_generate_thick_disk_stars(thin_disk_stars_fraction: float,
     assert thick_disk_stars.columns.size > 0
 
 
-def test_generate_halo_stars(thin_disk_stars_count: int,
-                             halo_stars_fraction: float,
-                             thin_disk_stars_fraction: float,
+def test_generate_halo_stars(stars_count: int,
                              initial_mass_function_parameter: float,
                              max_age: float,
                              halo_age: float,
                              halo_stars_formation_time: float) -> None:
     halo_stars = generate_halo_stars(
-            thin_disk_stars_count=thin_disk_stars_count,
-            halo_stars_fraction=halo_stars_fraction,
-            thin_disk_stars_fraction=thin_disk_stars_fraction,
+            stars_count=stars_count,
             initial_mass_function_parameter=initial_mass_function_parameter,
             max_age=max_age,
             halo_age=halo_age,
