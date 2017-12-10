@@ -42,7 +42,7 @@ def generate_stars(*,
             time_bins_count=time_bins_count,
             burst_age=burst_age,
             initial_mass_function_parameter=initial_mass_function_param,
-            age=thin_disk_age,
+            disk_age=thin_disk_age,
             max_stars_count=max_stars_count,
             sector_radius_kpc=sector_radius_kpc,
             burst_formation_factor=burst_formation_factor,
@@ -56,8 +56,8 @@ def generate_stars(*,
     thick_disk_stars = generate_thick_disk_stars(
             stars_count=thick_disk_stars_count,
             initial_mass_function_parameter=initial_mass_function_param,
-            age=thick_disk_age,
-            max_age=max_age,
+            disk_age=thick_disk_age,
+            birth_initial_time=max_age - thick_disk_age,
             formation_rate_parameter=thick_disk_formation_rate_param,
             generator=generator)
 
@@ -66,8 +66,7 @@ def generate_stars(*,
     halo_stars = generate_halo_stars(
             stars_count=halo_stars_count,
             initial_mass_function_parameter=initial_mass_function_param,
-            max_age=max_age,
-            halo_age=halo_age,
+            birth_initial_time=max_age - halo_age,
             formation_time=halo_stars_formation_time,
             generator=generator)
 
@@ -77,13 +76,10 @@ def generate_stars(*,
 def generate_halo_stars(*,
                         stars_count: int,
                         initial_mass_function_parameter: float,
-                        max_age: float,
-                        halo_age: float,
+                        birth_initial_time: float,
                         formation_time: float,
                         generator: Callable[[float, float], float]
                         ) -> pd.DataFrame:
-    birth_initial_time = max_age - halo_age
-
     progenitors_masses = [
         initial_star_mass_by_salpeter(initial_mass_function_parameter,
                                       generator=generator)
@@ -103,12 +99,11 @@ def generate_halo_stars(*,
 def generate_thick_disk_stars(*,
                               stars_count: int,
                               initial_mass_function_parameter: float,
-                              age: float,
-                              max_age: float,
+                              disk_age: float,
+                              birth_initial_time: float,
                               formation_rate_parameter: float,
                               generator: Callable[[float, float], float]
                               ) -> pd.DataFrame:
-    birth_init_time = max_age - age
     # This can be proved by taking derivative from y = t * exp(-t / tau)
     max_formation_rate = formation_rate_parameter / math.e
 
@@ -117,8 +112,8 @@ def generate_thick_disk_stars(*,
                                       generator=generator)
         for _ in range(stars_count)]
     birth_times = [thick_disk_star_birth_time(
-            age=age,
-            birth_initial_time=birth_init_time,
+            disk_age=disk_age,
+            birth_initial_time=birth_initial_time,
             max_formation_rate=max_formation_rate,
             formation_rate_parameter=formation_rate_parameter,
             generator=generator)
@@ -135,7 +130,7 @@ def generate_thin_disk_stars(*,
                              time_bins_count: int,
                              burst_age: float,
                              initial_mass_function_parameter: float,
-                             age: float,
+                             disk_age: float,
                              max_stars_count: int,
                              sector_radius_kpc: float,
                              burst_formation_factor: float,
@@ -143,24 +138,24 @@ def generate_thin_disk_stars(*,
                              mass_reduction_factor: float,
                              generator: Callable[[float, float], float]
                              ) -> pd.DataFrame:
-    time_increment = age / time_bins_count
+    time_increment = disk_age / time_bins_count
     sector_area = math.pi * sector_radius_kpc ** 2
     birth_rate = (
         time_increment * sector_area * 1E6  # TODO: what is 1E6?
         * mass_reduction_factor
         * normalization_const(
                 star_formation_rate_param=star_formation_rate_param,
-                thin_disk_age_gyr=age))
+                thin_disk_age_gyr=disk_age))
     burst_birth_rate = birth_rate * burst_formation_factor
-    burst_init_time = max_age - burst_age
-    birth_initial_time = max_age - age
+    burst_initial_time = max_age - burst_age
+    birth_initial_time = max_age - disk_age
 
     time_bins_initial_times = np.linspace(start=birth_initial_time,
                                           stop=max_age,
                                           num=time_bins_count,
                                           endpoint=False)
     birth_rates = get_birth_rates(time_bins_initial_times,
-                                  burst_init_time=burst_init_time,
+                                  burst_initial_time=burst_initial_time,
                                   birth_rate=birth_rate,
                                   burst_birth_rate=burst_birth_rate)
 
@@ -211,10 +206,10 @@ def progenitors_masses_births_times(*,
 # TODO: find out the meaning
 def get_birth_rates(times: np.ndarray,
                     *,
-                    burst_init_time: float,
+                    burst_initial_time: float,
                     birth_rate: float,
                     burst_birth_rate: float) -> np.ndarray:
-    burst_times_mask = times >= burst_init_time
+    burst_times_mask = times >= burst_initial_time
     return np.piecewise(times,
                         [~burst_times_mask, burst_times_mask],
                         [birth_rate, burst_birth_rate])
@@ -249,7 +244,7 @@ def initial_star_mass_by_salpeter(
 
 def thick_disk_star_birth_time(
         *,
-        age: float,
+        disk_age: float,
         formation_rate_parameter: float,
         max_formation_rate: float,
         birth_initial_time: float,
@@ -262,7 +257,7 @@ def thick_disk_star_birth_time(
     https://www.google.es/search?q=star+formation+rate
     """
     while True:
-        time_try = generator(0, age)
+        time_try = generator(0, disk_age)
         time_try_formation_rate = time_try * math.exp(
                 -time_try / formation_rate_parameter)
         if generator(0, max_formation_rate) <= time_try_formation_rate:

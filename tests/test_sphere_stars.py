@@ -48,7 +48,7 @@ def test_thick_disk_star_birth_time(age: float,
                                     thick_disk_birth_initial_time: float
                                     ) -> None:
     birth_time = thick_disk_star_birth_time(
-            age=age,
+            disk_age=age,
             formation_rate_parameter=formation_rate_parameter,
             max_formation_rate=max_formation_rate,
             birth_initial_time=thick_disk_birth_initial_time,
@@ -83,11 +83,11 @@ def test_normalization_const(star_formation_rate_param: float,
 
 
 def test_get_birth_rates(times: np.ndarray,
-                         burst_init_time: float,
+                         burst_initial_time: float,
                          birth_rate: float,
                          burst_birth_rate: float) -> None:
     birth_rates = get_birth_rates(times=times,
-                                  burst_init_time=burst_init_time,
+                                  burst_initial_time=burst_initial_time,
                                   birth_rate=birth_rate,
                                   burst_birth_rate=burst_birth_rate)
 
@@ -110,7 +110,7 @@ def test_generate_thin_disk_stars(max_age: float,
             time_bins_count=time_bins_count,
             burst_age=burst_age,
             initial_mass_function_parameter=initial_mass_function_parameter,
-            age=thin_disk_age_gyr,
+            disk_age=thin_disk_age_gyr,
             max_stars_count=max_stars_count,
             sector_radius_kpc=sector_radius_kpc,
             burst_formation_factor=burst_formation_factor,
@@ -125,13 +125,13 @@ def test_generate_thin_disk_stars(max_age: float,
 def test_generate_thick_disk_stars(stars_count: int,
                                    initial_mass_function_parameter: float,
                                    thick_disk_age: float,
-                                   max_age: float,
-                                   thick_disk_sfr_param) -> None:
+                                   thick_disk_sfr_param: float,
+                                   birth_initial_time: float) -> None:
     thick_disk_stars = generate_thick_disk_stars(
             stars_count=stars_count,
             initial_mass_function_parameter=initial_mass_function_parameter,
-            age=thick_disk_age,
-            max_age=max_age,
+            disk_age=thick_disk_age,
+            birth_initial_time=birth_initial_time,
             formation_rate_parameter=thick_disk_sfr_param,
             generator=random.uniform)
 
@@ -141,14 +141,12 @@ def test_generate_thick_disk_stars(stars_count: int,
 
 def test_generate_halo_stars(stars_count: int,
                              initial_mass_function_parameter: float,
-                             max_age: float,
-                             halo_age: float,
+                             birth_initial_time: float,
                              halo_stars_formation_time: float) -> None:
     halo_stars = generate_halo_stars(
             stars_count=stars_count,
             initial_mass_function_parameter=initial_mass_function_parameter,
-            max_age=max_age,
-            halo_age=halo_age,
+            birth_initial_time=birth_initial_time,
             formation_time=halo_stars_formation_time,
             generator=random.uniform)
 

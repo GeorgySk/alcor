@@ -188,3 +188,13 @@ def halo_stars_formation_time() -> float:
 @pytest.fixture(scope='function')
 def stars_count() -> float:
     return example(strategies.small_nonnegative_integers)
+
+
+@pytest.fixture(scope='function')
+def birth_initial_time() -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def burst_initial_time() -> float:
+    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
