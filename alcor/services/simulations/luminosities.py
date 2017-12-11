@@ -180,6 +180,13 @@ def estimate_lifetime(*,
 
 
 def white_dwarf_masses(progenitor_masses: np.ndarray) -> np.ndarray:
+    """
+    IFMR (Initial-to-final mass relationship)
+    according to model by Catalan et al. 2008).
+    Combination with a model by Iben for masses greater than 6 solar masses
+    :param progenitor_masses: masses of main sequence stars
+    :return: masses of resulting white dwarfs
+    """
     masses = np.empty(progenitor_masses.size)
 
     low_progenitor_masses_mask = progenitor_masses < 2.7
