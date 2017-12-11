@@ -258,7 +258,7 @@ def monte_carlo_generator(*,
                           max_y: float,
                           generator: Callable[[float, float], float],
                           min_y: float = 0.,
-                          max_iterations_count: int = int(1e9)
+                          max_iterations_count: int = 10 ** 9
                           ) -> float:
     for _ in range(max_iterations_count):
         x_value = generator(min_x, max_x)
