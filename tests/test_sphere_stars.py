@@ -41,12 +41,12 @@ def test_thin_disk_star_birth_time(bin_initial_time: float,
     assert UNIVERSE_AGE >= birth_time >= bin_initial_time
 
 
-def test_normalization_const(star_formation_rate_param: float,
-                             thin_disk_age_gyr: float,
+def test_normalization_const(formation_rate_parameter: float,
+                             disk_age: float,
                              sigma: float) -> None:
     normalization_constant = normalization_const(
-            formation_rate_parameter=star_formation_rate_param,
-            thin_disk_age_gyr=thin_disk_age_gyr,
+            formation_rate_parameter=formation_rate_parameter,
+            thin_disk_age=disk_age,
             sigma=sigma)
 
     assert isinstance(normalization_constant, float)
@@ -70,22 +70,22 @@ def test_generate_thin_disk_stars(
         max_age: float,
         time_bins_count: int,
         burst_age: float,
-        thin_disk_age_gyr: float,
+        disk_age: float,
         max_stars_count: int,
         sector_radius_kpc: float,
         burst_formation_factor: float,
-        star_formation_rate_param: float,
+        formation_rate_parameter: float,
         mass_reduction_factor: float,
         initial_mass_generator: Callable[[float], float]) -> None:
     thin_disk_stars = generate_thin_disk_stars(
             max_age=max_age,
             time_bins_count=time_bins_count,
             burst_age=burst_age,
-            disk_age=thin_disk_age_gyr,
+            disk_age=disk_age,
             max_stars_count=max_stars_count,
             sector_radius_kpc=sector_radius_kpc,
             burst_formation_factor=burst_formation_factor,
-            formation_rate_parameter=star_formation_rate_param,
+            formation_rate_parameter=formation_rate_parameter,
             mass_reduction_factor=mass_reduction_factor,
             generator=random.uniform,
             initial_mass_generator=initial_mass_generator)
@@ -97,14 +97,14 @@ def test_generate_thin_disk_stars(
 def test_generate_thick_disk_stars(
         stars_count: int,
         thick_disk_age: float,
-        thick_disk_sfr_param: float,
+        formation_rate_exponent: float,
         birth_initial_time: float,
         initial_mass_generator: Callable[[float], float]) -> None:
     thick_disk_stars = generate_thick_disk_stars(
             stars_count=stars_count,
             disk_age=thick_disk_age,
             birth_initial_time=birth_initial_time,
-            formation_rate_exponent=thick_disk_sfr_param,
+            formation_rate_exponent=formation_rate_exponent,
             generator=random.uniform,
             initial_mass_generator=initial_mass_generator)
 

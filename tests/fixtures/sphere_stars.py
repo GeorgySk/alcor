@@ -11,7 +11,6 @@ from tests.test_sphere_stars import UNIVERSE_AGE
 from tests.utils import example
 
 
-# TODO: check unused fixtures
 @pytest.fixture(scope='function')
 def halo_birth_initial_time() -> float:
     return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
@@ -33,32 +32,8 @@ def time_increment() -> float:
     return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
 
 
-@pytest.fixture(scope='function')
-def age() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
-
-
-@pytest.fixture(scope='function')
-def formation_rate_parameter() -> float:
-    # TODO: is it a good way to filter out zero?
-    return example(strategies.floats.filter(lambda x: x != 0))
-
-
-@pytest.fixture(scope='function')
-def max_formation_rate() -> float:
-    return example(strategies.nonnegative_floats())
-
-
-@pytest.fixture(scope='function')
-def thick_disk_birth_initial_time() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
-
-
-@pytest.fixture(scope='function')
-def exponent() -> float:
-    return example(strategies.floats)
-
-
+# TODO: should this be a fixture? It is not used in test_sphere_stars.py
+# but it is used in another fixture
 @pytest.fixture(scope='function')
 def min_mass() -> float:
     return example(strategies.nonnegative_floats())
@@ -71,12 +46,12 @@ def max_mass(min_mass) -> float:
 
 
 @pytest.fixture(scope='function')
-def star_formation_rate_param() -> float:
+def formation_rate_parameter() -> float:
     return example(strategies.small_floats.filter(lambda x: x != 0))
 
 
 @pytest.fixture(scope='function')
-def thin_disk_age_gyr() -> float:
+def disk_age() -> float:
     return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE)
                    .filter(lambda x: x != 0))
 
@@ -89,11 +64,6 @@ def sigma() -> float:
 @pytest.fixture(scope='function')
 def times() -> np.ndarray:
     return example(strategies.numpy_arrays)
-
-
-@pytest.fixture(scope='function')
-def burst_init_time() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
 
 
 @pytest.fixture(scope='function')
@@ -142,21 +112,6 @@ def mass_reduction_factor() -> float:
 
 
 @pytest.fixture(scope='function')
-def thin_disk_stars_fraction() -> float:
-    return example(strategies.fractions.filter(lambda x: x != 0))
-
-
-@pytest.fixture(scope='function')
-def thick_disk_stars_fraction() -> float:
-    return example(strategies.fractions)
-
-
-@pytest.fixture(scope='function')
-def thin_disk_stars_count() -> float:
-    return example(strategies.positive_integers)
-
-
-@pytest.fixture(scope='function')
 def initial_mass_function_parameter() -> float:
     return example(strategies.small_floats)
 
@@ -167,23 +122,8 @@ def thick_disk_age() -> float:
 
 
 @pytest.fixture(scope='function')
-def thick_disk_sfr_param() -> float:
+def formation_rate_exponent() -> float:
     return example(strategies.small_floats.filter(lambda x: x != 0))
-
-
-@pytest.fixture(scope='function')
-def halo_stars_fraction() -> float:
-    return example(strategies.fractions)
-
-
-@pytest.fixture(scope='function')
-def halo_age() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
-
-
-@pytest.fixture(scope='function')
-def halo_stars_formation_time() -> float:
-    return example(strategies.small_floats)
 
 
 @pytest.fixture(scope='function')

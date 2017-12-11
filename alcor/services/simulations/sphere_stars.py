@@ -169,7 +169,7 @@ def generate_thin_disk_stars(*,
         * mass_reduction_factor
         * normalization_const(
                 formation_rate_parameter=formation_rate_parameter,
-                thin_disk_age_gyr=disk_age))
+                thin_disk_age=disk_age))
     burst_birth_rate = birth_rate * burst_formation_factor
     burst_initial_time = max_age - burst_age
     birth_initial_time = max_age - disk_age
@@ -239,11 +239,11 @@ def get_birth_rates(times: np.ndarray,
 # TODO: find out the meaning
 def normalization_const(*,
                         formation_rate_parameter: float,
-                        thin_disk_age_gyr: float,
+                        thin_disk_age: float,
                         sigma: float = 51.  # TODO: what is sigma?
                         ) -> float:
     return sigma / (formation_rate_parameter
-                    * (1 - math.exp(-thin_disk_age_gyr
+                    * (1 - math.exp(-thin_disk_age
                                     / formation_rate_parameter)))
 
 
