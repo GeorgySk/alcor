@@ -285,21 +285,3 @@ def thin_disk_star_birth_time(
         generator: Callable[[float, float], float]
         ) -> float:
     return generator(bin_initial_time, bin_initial_time + time_increment)
-
-
-# TODO: move this to 'polar' module
-# thin_disk_scale_height_kpc: float = 0.25,
-# thick_disk_scale_height_kpc: float = 0.9,
-def z_coordinate(*,
-                 scale_height: float,
-                 sector_radius_kpc: float,
-                 rng: Callable[[], float] = random.random,
-                 rng_choice: Callable[[Iterable[Any]], Any] = random.choice
-                 ) -> float:
-    # TODO: implement function for inverse transform sampling
-    # Inverse transform sampling for y = exp(-z / H)
-    coordinate = (-scale_height * math.log(
-            1. - rng() * (1.0 - math.exp(-sector_radius_kpc / scale_height))))
-    random_sign = rng_choice([-1, 1])
-
-    return coordinate * random_sign
