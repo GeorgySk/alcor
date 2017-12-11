@@ -1,11 +1,17 @@
+import random
+from functools import partial
+from typing import Callable
+
 import numpy as np
 import pytest
 
+from alcor.services.simulations.sphere_stars import monte_carlo_generator
 from tests import strategies
 from tests.test_sphere_stars import UNIVERSE_AGE
 from tests.utils import example
 
 
+# TODO: check unused fixtures
 @pytest.fixture(scope='function')
 def halo_birth_initial_time() -> float:
     return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
@@ -116,11 +122,6 @@ def burst_age() -> float:
 
 
 @pytest.fixture(scope='function')
-def initial_mass_function_parameter() -> float:
-    return example(strategies.small_floats)
-
-
-@pytest.fixture(scope='function')
 def max_stars_count() -> float:
     return example(strategies.positive_integers)
 
@@ -198,3 +199,37 @@ def birth_initial_time() -> float:
 @pytest.fixture(scope='function')
 def burst_initial_time() -> float:
     return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+
+
+@pytest.fixture(scope='function')
+def generator() -> float:
+    return random.uniform
+
+
+@pytest.fixture(scope='function')
+def initial_mass_function(initial_mass_function_parameter
+                          ) -> Callable[[float], float]:
+    def function(x: float,
+                 exponent: float) -> float:
+        return x ** exponent
+
+    return partial(function,
+                   exponent=initial_mass_function_parameter)
+
+
+# TODO: find out what to do with this
+@pytest.fixture(scope='function')
+def initial_mass_generator(generator,
+                           min_mass,
+                           max_mass,
+                           initial_mass_function,
+                           initial_mass_function_parameter) -> float:
+    max_y = (initial_mass_function(min_mass)
+             if initial_mass_function_parameter < 0
+             else initial_mass_function(max_mass))
+    return partial(monte_carlo_generator,
+                   function=initial_mass_function,
+                   min_x=min_mass,
+                   max_x=max_mass,
+                   max_y=max_y,
+                   generator=generator)
