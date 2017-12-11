@@ -137,7 +137,7 @@ def estimated_times(*,
                     masses: np.ndarray,
                     model_masses: np.ndarray,
                     model_times: np.ndarray) -> np.ndarray:
-    times = np.empty(masses.shape[0])
+    times = np.empty(masses.size)
 
     spline = InterpolatedUnivariateSpline(x=model_masses,
                                           y=model_times,
@@ -180,7 +180,7 @@ def estimate_lifetime(*,
 
 
 def white_dwarf_masses(progenitor_masses: np.ndarray) -> np.ndarray:
-    masses = np.empty(progenitor_masses.shape[0])
+    masses = np.empty(progenitor_masses.size)
 
     low_progenitor_masses_mask = progenitor_masses < 2.7
     low_progenitor_masses = progenitor_masses[low_progenitor_masses_mask]
