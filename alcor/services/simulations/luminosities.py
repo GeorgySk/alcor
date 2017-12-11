@@ -1,3 +1,6 @@
+from typing import (Any,
+                    Iterable)
+
 import numpy as np
 import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
@@ -6,6 +9,7 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 def white_dwarfs(stars: pd.DataFrame,
                  *,
                  max_galactic_structure_age: float,
+                 # TODO: rename, IFMR - initial-to-finall mass relationship
                  ifmr_parameter: float = 1.,
                  chandrasekhar_limit: float = 1.4,
                  max_mass: float = 10.5,
@@ -80,26 +84,36 @@ def set_masses(stars: pd.DataFrame,
             progenitor_masses=stars['progenitor_mass'])
 
 
+def immutable_array(elements: Iterable[Any]) -> np.ndarray:
+    result = np.array(elements)
+    result.setflags(write=False)
+    return result
+
+
 def get_main_sequence_lifetimes(*,
                                 masses: np.ndarray,
                                 metallicities: np.ndarray,
                                 solar_metallicity: float,
-                                subsolar_metallicity: float) -> np.ndarray:
+                                subsolar_metallicity: float,
+                                model_solar_masses: immutable_array(
+                                        [1.00, 1.50, 1.75, 2.00, 2.25,
+                                         2.50, 3.00, 3.50, 4.00, 5.00]),
+                                model_solar_times: immutable_array(
+                                        [8.614, 1.968, 1.249, 0.865, 0.632,
+                                         0.480, 0.302, 0.226, 0.149, 0.088]),
+                                model_subsolar_masses: immutable_array(
+                                        [0.85, 1.00, 1.25, 1.50,
+                                         1.75, 2.00, 3.00]),
+                                model_subsolar_times: immutable_array(
+                                        [10.34, 5.756, 2.623, 1.412,
+                                         0.905, 0.639, 0.245])
+                                ) -> np.ndarray:
     """
     Calculates lifetime of a main sequence star
     according to model by Leandro & Renedo et al.(2010).
     Solar metallicity values from Althaus priv. comm (X = 0.725, Y = 0.265)
     Sub-solar metallicity values from Althaus priv. comm (X = 0.752, Y = 0.247)
     """
-    model_solar_masses = np.array([1.00, 1.50, 1.75, 2.00, 2.25,
-                                   2.50, 3.00, 3.50, 4.00, 5.00])
-    model_solar_times = np.array([8.614, 1.968, 1.249, 0.865, 0.632,
-                                  0.480, 0.302, 0.226, 0.149, 0.088])
-    model_subsolar_masses = np.array([0.85, 1.00, 1.25, 1.50,
-                                      1.75, 2.00, 3.00])
-    model_subsolar_times = np.array([10.34, 5.756, 2.623, 1.412,
-                                     0.905, 0.639, 0.245])
-
     solar_main_sequence_lifetimes = estimated_times(
             masses=masses,
             model_masses=model_solar_masses,
