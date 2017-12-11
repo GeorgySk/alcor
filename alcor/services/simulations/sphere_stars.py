@@ -134,7 +134,7 @@ def generate_thick_disk_stars(*,
                                    max_x=disk_age,
                                    max_y=max_formation_rate,
                                    generator=generator)
-    birth_times = [birth_time_generator
+    birth_times = [birth_time_generator()
                    + birth_initial_time  # Shifting distribution
                    for _ in range(stars_count)]
 
