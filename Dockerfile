@@ -1,10 +1,11 @@
-ARG PYTHON3_VERSION=3
+ARG PYTHON3_VERSION
 
 FROM python:${PYTHON3_VERSION}
 
 RUN apt-get update && \
     apt-get install -y gfortran \
                        unzip \
+                       # scipy's dependencies
                        libblas-dev \
                        liblapack-dev \
                        libatlas-base-dev
@@ -12,7 +13,7 @@ RUN apt-get update && \
 WORKDIR /alcor
 
 ARG FORTRAN_COMPILER_OPTIONS
-ENV FORTRAN_COMPILER_OPTIONS ${FORTRAN_COMPILER_OPTIONS}
+ENV FORTRAN_COMPILER_OPTIONS=${FORTRAN_COMPILER_OPTIONS}
 
 COPY ./test_project test_project
 RUN cd test_project && \
@@ -31,6 +32,9 @@ COPY ./setup.cfg setup.cfg
 RUN python3 -m pip install .
 
 COPY ./manage.py manage.py
+
+RUN cd tests/tables && \
+    unzip -o fort_files.zip
 
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
 ENTRYPOINT ["/alcor/docker-entrypoint.sh"]
