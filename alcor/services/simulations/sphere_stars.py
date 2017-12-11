@@ -87,6 +87,7 @@ def generate_stars(*,
 
 
 def initial_mass_function(mass: float,
+                          *,
                           exponent: float) -> float:
     return mass ** exponent
 
@@ -145,6 +146,7 @@ def generate_thick_disk_stars(*,
 
 
 def thick_disk_star_birth_time(time: float,
+                               *,
                                exponent: float) -> float:
     return time * math.exp(-time / exponent)
 
