@@ -262,8 +262,9 @@ def monte_carlo_generator(*,
         x_value = generator(min_x, max_x)
         if generator(min_y, max_y) <= function(x_value):
             return x_value
-    raise OverflowError(f'Exceeded maximum number of iterations '
-                        f'in Monte Carlo generator for {function}')
+    raise OverflowError('Exceeded maximum number of iterations '
+                        'in Monte Carlo generator for {function}'
+                        .format(function=function))
 
 
 def halo_star_birth_time(
