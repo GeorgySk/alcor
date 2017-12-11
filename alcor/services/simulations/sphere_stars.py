@@ -120,23 +120,33 @@ def generate_thick_disk_stars(*,
                               generator: Callable[[float, float], float],
                               initial_mass_generator: Callable[[float], float]
                               ) -> pd.DataFrame:
+    progenitors_masses = [initial_mass_generator()
+                          for _ in range(stars_count)]
+
     # This can be proved by taking derivative from y = t * exp(-t / tau)
     max_formation_rate = formation_rate_exponent / math.e
 
-    progenitors_masses = [initial_mass_generator()
-                          for _ in range(stars_count)]
-    birth_times = [thick_disk_star_birth_time(
-            disk_age=disk_age,
-            birth_initial_time=birth_initial_time,
-            max_formation_rate=max_formation_rate,
-            formation_rate_exponent=formation_rate_exponent,
-            generator=generator)
-        for _ in range(stars_count)]
+    birth_time_function = partial(thick_disk_star_birth_time,
+                                  exponent=formation_rate_exponent)
+    birth_time_generator = partial(monte_carlo_generator,
+                                   function=birth_time_function,
+                                   min_x=0.,
+                                   max_x=disk_age,
+                                   max_y=max_formation_rate,
+                                   generator=generator)
+    birth_times = [birth_time_generator
+                   + birth_initial_time  # Shifting distribution
+                   for _ in range(stars_count)]
 
     return pd.DataFrame(dict(
             progenitor_mass=progenitors_masses,
             birth_time=birth_times,
             galactic_structure_type=GalacticStructureType.thick))
+
+
+def thick_disk_star_birth_time(time: float,
+                               exponent: float) -> float:
+    return time * math.exp(-time / exponent)
 
 
 def generate_thin_disk_stars(*,
@@ -254,28 +264,6 @@ def monte_carlo_generator(*,
             return x_value
     raise OverflowError(f'Exceeded maximum number of iterations '
                         f'in Monte Carlo generator for {function}')
-
-
-def thick_disk_star_birth_time(
-        *,
-        disk_age: float,
-        formation_rate_exponent: float,
-        max_formation_rate: float,
-        birth_initial_time: float,
-        generator: Callable[[float, float], float]
-        ) -> float:
-    """
-    Returns birth time of a thick disk star
-    calculated by using Monte Carlo method.
-    SFR - star formation rate. More info at:
-    https://www.google.es/search?q=star+formation+rate
-    """
-    while True:
-        time_try = generator(0, disk_age)
-        time_try_formation_rate = time_try * math.exp(
-                -time_try / formation_rate_exponent)
-        if generator(0, max_formation_rate) <= time_try_formation_rate:
-            return time_try + birth_initial_time
 
 
 def halo_star_birth_time(

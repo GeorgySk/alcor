@@ -8,7 +8,6 @@ import pandas as pd
 from alcor.services.simulations.sphere_stars import (
     halo_star_birth_time,
     thin_disk_star_birth_time,
-    thick_disk_star_birth_time,
     normalization_const,
     get_birth_rates,
     generate_thin_disk_stars,
@@ -40,22 +39,6 @@ def test_thin_disk_star_birth_time(bin_initial_time: float,
 
     assert isinstance(birth_time, float)
     assert UNIVERSE_AGE >= birth_time >= bin_initial_time
-
-
-def test_thick_disk_star_birth_time(age: float,
-                                    formation_rate_parameter: float,
-                                    max_formation_rate: float,
-                                    thick_disk_birth_initial_time: float
-                                    ) -> None:
-    birth_time = thick_disk_star_birth_time(
-            disk_age=age,
-            formation_rate_exponent=formation_rate_parameter,
-            max_formation_rate=max_formation_rate,
-            birth_initial_time=thick_disk_birth_initial_time,
-            generator=random.uniform)
-
-    assert isinstance(birth_time, float)
-    assert UNIVERSE_AGE >= birth_time >= thick_disk_birth_initial_time
 
 
 def test_normalization_const(star_formation_rate_param: float,
