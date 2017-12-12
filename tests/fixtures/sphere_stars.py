@@ -11,25 +11,30 @@ from tests.test_sphere_stars import UNIVERSE_AGE
 from tests.utils import example
 
 
+@pytest.fixture(scope='session')
+def universe_age() -> float:
+    return UNIVERSE_AGE
+
+
 @pytest.fixture(scope='function')
-def halo_birth_initial_time() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def halo_birth_initial_time(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
 def halo_stars_formation_time(halo_birth_initial_time: float) -> float:
-    return example(strategies.nonnegative_floats(
-            max_value=UNIVERSE_AGE - halo_birth_initial_time))
+    max_formation_time = UNIVERSE_AGE - halo_birth_initial_time
+    return example(strategies.nonnegative_floats(max_value=max_formation_time))
 
 
 @pytest.fixture(scope='function')
-def bin_initial_time() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def bin_initial_time(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
-def time_increment() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def time_increment(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 # TODO: should this be a fixture? It is not used in test_sphere_stars.py
@@ -47,13 +52,12 @@ def max_mass(min_mass) -> float:
 
 @pytest.fixture(scope='function')
 def formation_rate_parameter() -> float:
-    return example(strategies.small_floats.filter(lambda x: x != 0))
+    return example(strategies.non_zero_small_floats)
 
 
 @pytest.fixture(scope='function')
-def disk_age() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE)
-                   .filter(lambda x: x != 0))
+def disk_age(universe_age) -> float:
+    return example(strategies.positive_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
@@ -77,8 +81,8 @@ def burst_birth_rate() -> float:
 
 
 @pytest.fixture(scope='function')
-def max_age() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def max_age(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
@@ -87,8 +91,8 @@ def time_bins_count() -> float:
 
 
 @pytest.fixture(scope='function')
-def burst_age() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def burst_age(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
@@ -117,13 +121,13 @@ def initial_mass_function_parameter() -> float:
 
 
 @pytest.fixture(scope='function')
-def thick_disk_age() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def thick_disk_age(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
 def formation_rate_exponent() -> float:
-    return example(strategies.small_floats.filter(lambda x: x != 0))
+    return example(strategies.non_zero_small_floats)
 
 
 @pytest.fixture(scope='function')
@@ -132,13 +136,13 @@ def stars_count() -> float:
 
 
 @pytest.fixture(scope='function')
-def birth_initial_time() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def birth_initial_time(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
-def burst_initial_time() -> float:
-    return example(strategies.nonnegative_floats(max_value=UNIVERSE_AGE))
+def burst_initial_time(universe_age) -> float:
+    return example(strategies.nonnegative_floats(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')

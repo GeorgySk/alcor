@@ -15,6 +15,13 @@ def nonnegative_floats(max_value: Optional[float] = None):
                              allow_infinity=False)
 
 
+def positive_floats(max_value: Optional[float] = None):
+    return strategies.floats(min_value=0.,
+                             max_value=max_value,
+                             allow_nan=False,
+                             allow_infinity=False).filter(lambda x: x != 0)
+
+
 arrays_lengths = strategies.integers(min_value=1,
                                      max_value=20)
 
@@ -35,3 +42,5 @@ fractions = strategies.floats(min_value=0.,
                               max_value=1.,
                               allow_nan=False,
                               allow_infinity=False)
+
+non_zero_small_floats = small_floats.filter(lambda x: x != 0)
