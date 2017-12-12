@@ -1,3 +1,4 @@
+
 import enum
 import uuid
 
@@ -5,7 +6,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import Column
 from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.sqltypes import (BigInteger,
-                                     Integer,
                                      Float,
                                      DateTime,
                                      Enum)
@@ -40,13 +40,19 @@ STAR_PARAMETERS_NAMES = {'mass',
                          'w_velocity',
                          'birth_time',
                          'spectral_type',
-                         'galactic_structure_type'}
+                         'galactic_disk_type'}
 
 
-class GalacticStructureType(enum.IntEnum):
+class GalacticDiskType(enum.IntEnum):
     thin = 1
     thick = 2
     halo = 3
+
+
+class SpectralType(enum.IntEnum):
+    DA = 0
+    DB = 1
+    ONe = 2
 
 
 class Star(Base):
@@ -106,11 +112,10 @@ class Star(Base):
                         nullable=True)
     birth_time = Column(Float(),
                         nullable=True)
-    # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
-    spectral_type = Column(Integer(),
+    spectral_type = Column(Enum(SpectralType),
                            nullable=True)
-    galactic_structure_type = Column(Enum(GalacticStructureType),
-                                     nullable=True)
+    galactic_disk_type = Column(Enum(GalacticDiskType),
+                                nullable=True)
     updated_timestamp = Column(DateTime(),
                                server_default=func.now())
 
@@ -141,8 +146,8 @@ class Star(Base):
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
-                 spectral_type: int = None,
-                 galactic_structure_type: GalacticStructureType = None):
+                 spectral_type: SpectralType = None,
+                 galactic_disk_type: GalacticDiskType = None):
         self.id = None
         self.group_id = group_id
         self.mass = mass
@@ -171,4 +176,4 @@ class Star(Base):
         self.w_velocity = w_velocity
         self.birth_time = birth_time
         self.spectral_type = spectral_type
-        self.galactic_structure_type = galactic_structure_type
+        self.galactic_disk_type = galactic_disk_type

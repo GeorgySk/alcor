@@ -11,7 +11,7 @@ from typing import (Any,
 import numpy as np
 import pandas as pd
 
-from alcor.models.star import GalacticStructureType
+from alcor.models.star import GalacticDiskType
 
 
 # TODO: take these consts to settings file
@@ -110,7 +110,7 @@ def generate_halo_stars(*,
     return pd.DataFrame(dict(
             progenitor_mass=progenitors_masses,
             birth_time=birth_times,
-            galactic_structure_type=GalacticStructureType.halo))
+            galactic_structure_type=GalacticDiskType.halo))
 
 
 def generate_thick_disk_stars(*,
@@ -142,7 +142,7 @@ def generate_thick_disk_stars(*,
     return pd.DataFrame(dict(
             progenitor_mass=progenitors_masses,
             birth_time=birth_times,
-            galactic_structure_type=GalacticStructureType.thick))
+            galactic_structure_type=GalacticDiskType.thick))
 
 
 def thick_disk_star_birth_time(time: float,
@@ -203,7 +203,7 @@ def generate_thin_disk_stars(*,
     return pd.DataFrame(dict(
             progenitor_mass=progenitors_masses,
             birth_time=birth_times,
-            galactic_structure_type=GalacticStructureType.thin))
+            galactic_structure_type=GalacticDiskType.thin))
 
 
 def progenitors_masses_births_times(*,
