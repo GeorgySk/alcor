@@ -2,9 +2,7 @@ import math
 import random
 from functools import partial
 from itertools import chain
-from typing import (Any,
-                    Callable,
-                    Iterable,
+from typing import (Callable,
                     Iterator,
                     Tuple)
 
