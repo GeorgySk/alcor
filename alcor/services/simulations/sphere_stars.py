@@ -250,7 +250,7 @@ def normalization_const(*,
 # TODO: should we make it a generator and can we?
 # TODO: implement inverse transform sampling
 def monte_carlo_generator(*,
-                          function: Callable[[float], float],  # TODO: rename
+                          function: Callable[[float], float],
                           min_x: float,
                           max_x: float,
                           max_y: float,

@@ -155,7 +155,7 @@ def burst_initial_time(universe_age: float) -> float:
             strategies.finite_nonnegative_floats(max_value=universe_age))
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def generator() -> Callable[[float, float], float]:
     return random.uniform
 
@@ -163,12 +163,10 @@ def generator() -> Callable[[float, float], float]:
 @pytest.fixture(scope='function')
 def initial_mass_function(initial_mass_function_parameter: float
                           ) -> Callable[[float], float]:
-    def function(x: float,
-                 exponent: float) -> float:
-        return x ** exponent
+    def function(x: float) -> float:
+        return x ** initial_mass_function_parameter
 
-    return partial(function,
-                   exponent=initial_mass_function_parameter)
+    return function
 
 
 # TODO: find out what to do with this
