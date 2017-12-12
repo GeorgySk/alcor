@@ -17,26 +17,27 @@ def universe_age() -> float:
 
 
 @pytest.fixture(scope='function')
-def halo_birth_initial_time(universe_age) -> float:
+def halo_birth_initial_time(universe_age: float) -> float:
     return example(strategies.nonnegative_floats_w_upper_limit(
             max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
-def halo_stars_formation_time(halo_birth_initial_time: float) -> float:
-    max_formation_time = UNIVERSE_AGE - halo_birth_initial_time
+def halo_stars_formation_time(halo_birth_initial_time: float,
+                              universe_age: float) -> float:
+    max_formation_time = universe_age - halo_birth_initial_time
     return example(strategies.nonnegative_floats_w_upper_limit(
         max_value=max_formation_time))
 
 
 @pytest.fixture(scope='function')
-def bin_initial_time(universe_age) -> float:
+def bin_initial_time(universe_age: float) -> float:
     return example(
         strategies.nonnegative_floats_w_upper_limit(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
-def time_increment(universe_age) -> float:
+def time_increment(universe_age: float) -> float:
     return example(
         strategies.nonnegative_floats_w_upper_limit(max_value=universe_age))
 
@@ -49,7 +50,7 @@ def min_mass() -> float:
 
 
 @pytest.fixture(scope='function')
-def max_mass(min_mass) -> float:
+def max_mass(min_mass: float) -> float:
     return example(strategies.nonnegative_floats_w_upper_limit()
                    .filter(lambda x: x > min_mass))
 
@@ -60,7 +61,7 @@ def formation_rate_parameter() -> float:
 
 
 @pytest.fixture(scope='function')
-def disk_age(universe_age) -> float:
+def disk_age(universe_age: float) -> float:
     return example(strategies.positive_floats(max_value=universe_age))
 
 
@@ -85,7 +86,7 @@ def burst_birth_rate() -> float:
 
 
 @pytest.fixture(scope='function')
-def max_age(universe_age) -> float:
+def max_age(universe_age: float) -> float:
     return example(
         strategies.nonnegative_floats_w_upper_limit(max_value=universe_age))
 
@@ -96,7 +97,7 @@ def time_bins_count() -> float:
 
 
 @pytest.fixture(scope='function')
-def burst_age(universe_age) -> float:
+def burst_age(universe_age: float) -> float:
     return example(
         strategies.nonnegative_floats_w_upper_limit(max_value=universe_age))
 
@@ -127,7 +128,7 @@ def initial_mass_function_parameter() -> float:
 
 
 @pytest.fixture(scope='function')
-def thick_disk_age(universe_age) -> float:
+def thick_disk_age(universe_age: float) -> float:
     return example(
         strategies.nonnegative_floats_w_upper_limit(max_value=universe_age))
 
@@ -143,24 +144,24 @@ def stars_count() -> float:
 
 
 @pytest.fixture(scope='function')
-def birth_initial_time(universe_age) -> float:
+def birth_initial_time(universe_age: float) -> float:
     return example(
         strategies.nonnegative_floats_w_upper_limit(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
-def burst_initial_time(universe_age) -> float:
+def burst_initial_time(universe_age: float) -> float:
     return example(
         strategies.nonnegative_floats_w_upper_limit(max_value=universe_age))
 
 
 @pytest.fixture(scope='function')
-def generator() -> float:
+def generator() -> Callable[[float, float], float]:
     return random.uniform
 
 
 @pytest.fixture(scope='function')
-def initial_mass_function(initial_mass_function_parameter
+def initial_mass_function(initial_mass_function_parameter: float
                           ) -> Callable[[float], float]:
     def function(x: float,
                  exponent: float) -> float:
@@ -172,11 +173,11 @@ def initial_mass_function(initial_mass_function_parameter
 
 # TODO: find out what to do with this
 @pytest.fixture(scope='function')
-def initial_mass_generator(generator,
-                           min_mass,
-                           max_mass,
-                           initial_mass_function,
-                           initial_mass_function_parameter) -> float:
+def initial_mass_generator(generator: Callable[[float, float], float],
+                           min_mass: float,
+                           max_mass: float,
+                           initial_mass_function: Callable[[float], float],
+                           initial_mass_function_parameter: float) -> float:
     max_y = (initial_mass_function(min_mass)
              if initial_mass_function_parameter < 0
              else initial_mass_function(max_mass))
