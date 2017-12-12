@@ -179,7 +179,7 @@ def initial_mass_generator(generator: Callable[[float, float], float],
                            initial_mass_function: Callable[[float], float],
                            initial_mass_function_parameter: float) -> float:
     max_y = (initial_mass_function(min_mass)
-             if initial_mass_function_parameter < 0
+             if initial_mass_function_parameter < 0.
              else initial_mass_function(max_mass))
     return partial(monte_carlo_generator,
                    function=initial_mass_function,
