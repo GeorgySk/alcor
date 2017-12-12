@@ -3,19 +3,21 @@ from typing import Optional
 from hypothesis import strategies
 from hypothesis.extra.numpy import arrays
 import numpy as np
+from hypothesis.searchstrategy import SearchStrategy
 
 from tests.strategies.utils import floats
 
 
 # TODO: is this a good way to make a strategy?
-def nonnegative_floats_w_upper_limit(max_value: Optional[float] = None):
+def finite_nonnegative_floats(max_value: Optional[float] = None
+                              ) -> SearchStrategy:
     return strategies.floats(min_value=0.,
                              max_value=max_value,
                              allow_nan=False,
                              allow_infinity=False)
 
 
-def positive_floats(max_value: Optional[float] = None):
+def positive_floats(max_value: Optional[float] = None) -> SearchStrategy:
     return strategies.floats(min_value=0.,
                              max_value=max_value,
                              allow_nan=False,

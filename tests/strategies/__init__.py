@@ -1,6 +1,6 @@
 from .processing import filtration_methods
 from .sphere_stars import (non_zero_small_floats,
-                           nonnegative_floats_w_upper_limit,
+                           finite_nonnegative_floats,
                            numpy_arrays,
                            positive_integers,
                            positive_floats,
