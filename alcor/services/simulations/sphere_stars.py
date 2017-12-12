@@ -267,7 +267,7 @@ def monte_carlo_generator(*,
     else:
         raise OverflowError('Exceeded maximum number of iterations '
                             'in Monte Carlo generator for {function}'
-                            .format(function=function))
+                            .format(function=function.__qualname__))
 
 
 def halo_star_birth_time(
