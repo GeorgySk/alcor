@@ -8,7 +8,7 @@ from tests.strategies.utils import floats
 
 
 # TODO: is this a good way to make a strategy?
-def nonnegative_floats(max_value: Optional[float] = None):
+def nonnegative_floats_w_upper_limit(max_value: Optional[float] = None):
     return strategies.floats(min_value=0.,
                              max_value=max_value,
                              allow_nan=False,
