@@ -55,7 +55,7 @@ def set_metallicities(stars: pd.DataFrame,
     stars['metallicity'] = np.empty(stars.shape[0])
 
     halo_stars_mask = (stars['galactic_disk_type'] == 'halo')
-    non_halo_stars_mask = (stars['galactic_disk_type'] != 'halo')
+    non_halo_stars_mask = ~halo_stars_mask
 
     stars.loc[halo_stars_mask, 'metallicity'] = subsolar_metallicity
     stars.loc[non_halo_stars_mask, 'metallicity'] = solar_metallicity
@@ -95,18 +95,24 @@ def get_main_sequence_lifetimes(*,
                                 metallicities: np.ndarray,
                                 solar_metallicity: float,
                                 subsolar_metallicity: float,
-                                model_solar_masses: immutable_array(
-                                        [1.00, 1.50, 1.75, 2.00, 2.25,
-                                         2.50, 3.00, 3.50, 4.00, 5.00]),
-                                model_solar_times: immutable_array(
-                                        [8.614, 1.968, 1.249, 0.865, 0.632,
-                                         0.480, 0.302, 0.226, 0.149, 0.088]),
-                                model_subsolar_masses: immutable_array(
-                                        [0.85, 1.00, 1.25, 1.50,
-                                         1.75, 2.00, 3.00]),
-                                model_subsolar_times: immutable_array(
-                                        [10.34, 5.756, 2.623, 1.412,
-                                         0.905, 0.639, 0.245])
+                                model_solar_masses: np.ndarray = (
+                                        immutable_array(
+                                                [1.00, 1.50, 1.75, 2.00, 2.25,
+                                                 2.50, 3.00, 3.50, 4.00,
+                                                 5.00])),
+                                model_solar_times: np.ndarray = (
+                                        immutable_array(
+                                                [8.614, 1.968, 1.249, 0.865,
+                                                 0.632, 0.480, 0.302, 0.226,
+                                                 0.149, 0.088])),
+                                model_subsolar_masses: np.ndarray = (
+                                        immutable_array(
+                                                [0.85, 1.00, 1.25, 1.50, 1.75,
+                                                 2.00, 3.00])),
+                                model_subsolar_times: np.ndarray = (
+                                        immutable_array(
+                                                [10.34, 5.756, 2.623, 1.412,
+                                                 0.905, 0.639, 0.245]))
                                 ) -> np.ndarray:
     """
     Calculates lifetime of a main sequence star
