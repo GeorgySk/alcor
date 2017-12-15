@@ -16,5 +16,8 @@ COPY ./setup.py setup.py
 COPY ./setup.cfg setup.cfg
 RUN python3 -m pip install -e .
 
+RUN cd tests/tables && \
+    unzip -o fort_files.zip
+
 COPY ./run-plain-tests.sh run-plain-tests.sh
-ENTRYPOINT ["./run-plain-tests.sh"]
+ENTRYPOINT ["./run-plain-tests.sh"]"]
