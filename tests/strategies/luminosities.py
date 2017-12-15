@@ -1,27 +1,22 @@
 from functools import partial
-from itertools import repeat
-from typing import (Any,
-                    Callable)
 
 from hypothesis import strategies
 from hypothesis.extra.numpy import arrays
 from hypothesis.extra.pandas import (data_frames,
                                      columns,
                                      range_indexes)
-from hypothesis.searchstrategy import SearchStrategy
 import numpy as np
-import pandas as pd
 
-from alcor.models.star import GalacticStructureType
+from alcor.models.star import GalacticDiskType
 
 GALACTIC_STRUCTURES = [attribute
-                       for attribute in dir(GalacticStructureType)
+                       for attribute in dir(GalacticDiskType)
                        if not attribute.startswith('_')]
 
 ASSIGNED_METALLICITIES = [0.001, 0.01]
 
 dataframes_w_galactic_structure_types = data_frames(
-        columns=columns(['galactic_structure_type'],
+        columns=columns(['galactic_disk_type'],
                         dtype='<U5'),
         rows=strategies.tuples(strategies.sampled_from(GALACTIC_STRUCTURES)),
         index=range_indexes(min_size=1,
