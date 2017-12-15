@@ -20,4 +20,4 @@ RUN cd tests/tables && \
     unzip -o fort_files.zip
 
 COPY ./run-plain-tests.sh run-plain-tests.sh
-ENTRYPOINT ["./run-plain-tests.sh"]"]
+ENTRYPOINT ["./run-plain-tests.sh"]
