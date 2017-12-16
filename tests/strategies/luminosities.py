@@ -7,11 +7,7 @@ from hypothesis.extra.pandas import (data_frames,
                                      range_indexes)
 import numpy as np
 
-from alcor.models.star import GalacticDiskType
-
-GALACTIC_STRUCTURES = [attribute
-                       for attribute in dir(GalacticDiskType)
-                       if not attribute.startswith('_')]
+GALACTIC_STRUCTURES = ['thin', 'thick', 'halo']
 
 ASSIGNED_METALLICITIES = [0.001, 0.01]
 

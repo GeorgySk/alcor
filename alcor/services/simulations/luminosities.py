@@ -1,15 +1,35 @@
 from functools import partial
-from typing import (Any,
-                    Iterable,
-                    Callable)
+from typing import Callable
 
 import numpy as np
 import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
+from .utils import (immutable_array,
+                    linear_function)
+
 # TODO: we have this in another module. take to utils after merge
 linear_estimation = partial(InterpolatedUnivariateSpline,
                             k=1)
+
+
+MODEL_SOLAR_MASSES = immutable_array([1.00, 1.50, 1.75, 2.00, 2.25,
+                                      2.50, 3.00, 3.50, 4.00, 5.00])
+MODEL_SOLAR_TIMES = immutable_array([8.614, 1.968, 1.249, 0.865, 0.632,
+                                     0.480, 0.302, 0.226, 0.149, 0.088])
+MODEL_SUBSOLAR_MASSES = immutable_array([0.85, 1.00, 1.25, 1.50,
+                                         1.75, 2.00, 3.00])
+MODEL_SUBSOLAR_TIMES = immutable_array([10.34, 5.756, 2.623, 1.412,
+                                        0.905, 0.639, 0.245])
+LOW_MASS_FUNCTION = partial(linear_function,
+                            factor=0.096,
+                            const=0.429)
+MEDIUM_MASS_FUNCTION = partial(linear_function,
+                               factor=0.137,
+                               const=0.3183)
+HIGH_MASS_FUNCTION = partial(linear_function,
+                             factor=0.1057,
+                             const=0.5061)
 
 
 def white_dwarfs(stars: pd.DataFrame,
@@ -46,7 +66,7 @@ def white_dwarfs(stars: pd.DataFrame,
             subsolar_metallicity=subsolar_metallicity,
             solar_metallicity=solar_metallicity)
 
-    main_sequence_lifetimes = get_main_sequence_lifetimes(
+    main_sequence_lifetimes = main_sequence_stars_lifetimes(
             masses=stars['progenitor_mass'].values,
             metallicities=stars['metallicity'].values,
             solar_metallicity=solar_metallicity,
@@ -78,36 +98,18 @@ def get_metallicities(*,
     return result
 
 
-def immutable_array(elements: Iterable[Any]) -> np.ndarray:
-    result = np.array(elements)
-    result.setflags(write=False)
-    return result
-
-
-def get_main_sequence_lifetimes(*,
-                                masses: np.ndarray,
-                                metallicities: np.ndarray,
-                                solar_metallicity: float,
-                                subsolar_metallicity: float,
-                                model_solar_masses: np.ndarray = (
-                                        immutable_array(
-                                                [1.00, 1.50, 1.75, 2.00,
-                                                 2.25, 2.50, 3.00, 3.50,
-                                                 4.00, 5.00])),
-                                model_solar_times: np.ndarray = (
-                                        immutable_array(
-                                                [8.614, 1.968, 1.249, 0.865,
-                                                 0.632, 0.480, 0.302, 0.226,
-                                                 0.149, 0.088])),
-                                model_subsolar_masses: np.ndarray = (
-                                        immutable_array(
-                                                [0.85, 1.00, 1.25, 1.50,
-                                                 1.75, 2.00, 3.00])),
-                                model_subsolar_times: np.ndarray = (
-                                        immutable_array(
-                                                [10.34, 5.756, 2.623, 1.412,
-                                                 0.905, 0.639, 0.245]))
-                                ) -> np.ndarray:
+# TODO: check after merge if it's worth to take this to a separate module
+def main_sequence_stars_lifetimes(
+        *,
+        masses: np.ndarray,
+        metallicities: np.ndarray,
+        solar_metallicity: float,
+        subsolar_metallicity: float,
+        model_solar_masses: np.ndarray = MODEL_SOLAR_MASSES,
+        model_solar_times: np.ndarray = MODEL_SOLAR_TIMES,
+        model_subsolar_masses: np.ndarray = MODEL_SUBSOLAR_MASSES,
+        model_subsolar_times: np.ndarray = MODEL_SUBSOLAR_MASSES
+        ) -> np.ndarray:
     """
     Calculates lifetime of a main sequence star
     according to model by Leandro & Renedo et al.(2010).
@@ -147,25 +149,27 @@ def estimated_times(*,
                     spline: InterpolatedUnivariateSpline,
                     rightmost_model_mass: float,
                     rightmost_model_time: float) -> np.ndarray:
-    extrapolate_times = partial(extrapolated_times,
-                                rightmost_mass=rightmost_model_mass,
-                                rightmost_time=rightmost_model_time)
+    extrapolating_function = partial(extrapolate_main_sequence_lifetimes,
+                                     rightmost_mass=rightmost_model_mass,
+                                     rightmost_time=rightmost_model_time)
 
     lt_max_masses_mask = masses < rightmost_model_mass
 
     return np.piecewise(masses,
                         condlist=[lt_max_masses_mask, ~lt_max_masses_mask],
-                        funclist=[spline, extrapolate_times])
+                        funclist=[spline, extrapolating_function])
 
 
-def extrapolated_times(masses: np.ndarray,
-                       *,
-                       rightmost_mass: float,
-                       rightmost_time: float) -> np.ndarray:
+def extrapolate_main_sequence_lifetimes(masses: np.ndarray,
+                                        *,
+                                        rightmost_mass: float,
+                                        rightmost_time: float) -> np.ndarray:
     """
     Extrapolates main sequence stars' (progenitors)
     lifetime vs mass to the right.
-    Makes sure that no negative values will be produced.
+    Unlike linear extrapolation this one makes sure
+    that no negative values will be produced
+    by the fact that 1 / x > 0 for x → ∞
     """
     return rightmost_time * rightmost_mass / masses
 
@@ -183,30 +187,17 @@ def estimate_lifetime(*,
     return spline(metallicity)
 
 
-def linear_function(values: np.ndarray,
-                    *,
-                    factor: float,
-                    const: float) -> np.ndarray:
-    return values * factor + const
-
-
 def white_dwarf_masses(
         progenitor_masses: np.ndarray,
         *,
         low_mass: float = 2.7,
         high_mass: float = 6.,
-        low_mass_function: Callable[[np.ndarray], np.ndarray] = partial(
-                linear_function,
-                factor=0.096,
-                const=0.429),
-        medium_mass_function: Callable[[np.ndarray], np.ndarray] = partial(
-                linear_function,
-                factor=0.137,
-                const=0.3183),
-        high_mass_function: Callable[[np.ndarray], np.ndarray] = partial(
-                linear_function,
-                factor=0.1057,
-                const=0.5061)) -> np.ndarray:
+        low_mass_function: Callable[[np.ndarray], np.ndarray] = (
+                LOW_MASS_FUNCTION),
+        medium_mass_function: Callable[[np.ndarray], np.ndarray] = (
+                MEDIUM_MASS_FUNCTION),
+        high_mass_function: Callable[[np.ndarray], np.ndarray] = (
+                HIGH_MASS_FUNCTION)) -> np.ndarray:
     """
     IFMR (Initial-to-Final Mass Relation)
     according to model by Catalan et al. 2008.

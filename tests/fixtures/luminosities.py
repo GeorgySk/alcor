@@ -13,12 +13,12 @@ def stars_w_galactic_structure_types() -> pd.DataFrame:
     return example(strategies.dataframes_w_galactic_structure_types)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def solar_metallicity() -> float:
     return 0.01
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def subsolar_metallicity() -> float:
     return 0.001
 
@@ -62,9 +62,14 @@ def stars_without_masses() -> pd.DataFrame:
 
 
 @pytest.fixture(scope='function')
-def main_sequence_stars() -> pd.DataFrame:
+def galactic_disks_types() -> np.ndarray:
+    return np.array(['thin', 'thick', 'halo'])
+
+
+@pytest.fixture(scope='function')
+def main_sequence_stars(galactic_disks_types) -> pd.DataFrame:
     return pd.DataFrame(dict(progenitor_mass=[0.5, 1., 2.],
-                             galactic_disk_type=['thin', 'thick', 'halo'],
+                             galactic_disk_type=galactic_disks_types,
                              birth_time=[3., 5., 1.]))
 
 
@@ -85,8 +90,3 @@ def spline(model_solar_masses: np.ndarray,
            model_solar_times: np.ndarray) -> np.ndarray:
     return linear_estimation(x=model_solar_masses,
                              y=model_solar_times)
-
-
-@pytest.fixture(scope='function')
-def galactic_disks_types() -> np.ndarray:
-    return np.array(['thin', 'thick', 'halo'])

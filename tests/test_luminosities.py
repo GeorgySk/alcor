@@ -13,7 +13,7 @@ from alcor.services.simulations.luminosities import get_metallicities
 def test_extrapolated_times(masses: np.ndarray,
                             rightmost_mass: float,
                             rightmost_time: float) -> None:
-    times = luminosities.extrapolated_times(
+    times = luminosities.extrapolate_main_sequence_lifetimes(
             masses=masses,
             rightmost_mass=rightmost_mass,
             rightmost_time=rightmost_time)
@@ -54,7 +54,7 @@ def test_get_main_sequence_lifetimes(masses: np.ndarray,
                                      metallicities: np.ndarray,
                                      solar_metallicity: float,
                                      subsolar_metallicity: float) -> None:
-    main_sequence_lifetimes = luminosities.get_main_sequence_lifetimes(
+    main_sequence_lifetimes = luminosities.main_sequence_stars_lifetimes(
             masses=masses,
             metallicities=metallicities,
             solar_metallicity=solar_metallicity,
