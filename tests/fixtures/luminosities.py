@@ -25,12 +25,12 @@ def subsolar_metallicity() -> float:
 
 @pytest.fixture(scope='function')
 def rightmost_mass() -> float:
-    return example(strategies.positive_floats)
+    return example(strategies.positive_floats(max_value=1e14))
 
 
 @pytest.fixture(scope='function')
 def rightmost_time() -> float:
-    return example(strategies.positive_floats)
+    return example(strategies.positive_floats(max_value=1e14))
 
 
 @pytest.fixture(scope='function')
