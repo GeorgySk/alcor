@@ -10,7 +10,17 @@ import numpy as np
 ASSIGNED_METALLICITIES = [0.001, 0.01]
 
 floats = strategies.floats(allow_nan=False,
-                           allow_infinity=False)
+                           allow_infinity=False,
+                           min_value=-1e15,
+                           max_value=1e15)
+
+
+def positive_floats(max_value: Optional[float] = None) -> SearchStrategy:
+    return strategies.floats(min_value=0.,
+                             max_value=max_value,
+                             allow_nan=False,
+                             allow_infinity=False).filter(lambda x: x != 0.)
+
 
 
 def positive_floats(max_value: Optional[float] = None) -> SearchStrategy:

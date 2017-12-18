@@ -71,22 +71,37 @@ Plain
 
 .. code-block:: bash
 
-    python3 setup.py test
+    ./run-plain-tests.sh
 
 Inside ``Docker`` container
 
 .. code-block:: bash
 
-    docker-compose up
+    docker-compose up --build
 
 Inside ``Docker`` container with remote debugger
 
 .. code-block:: bash
 
-    ./set-dockerhost.sh docker-compose up
+    ./set-dockerhost.sh docker-compose up --build
 
-Bash script (e.g. can be used in ``Git`` hooks)
+Inside ``Docker`` container with bash script
+(e.g. can be used in ``Git`` hooks)
 
 .. code-block:: bash
 
     ./run-tests.sh
+
+.. note::
+  After running tests in ``Docker``
+  do not forget to restore permission to files
+
+  .. code-block:: bash
+
+      sudo chown -R $USER .
+
+  and remove ``Python`` compiled bytecode files
+
+  .. code-block:: bash
+
+      find . | grep -E __pycache__ | xargs rm -rf

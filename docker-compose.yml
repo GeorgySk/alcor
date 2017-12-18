@@ -14,5 +14,6 @@ services:
       - ./README.rst:/alcor/README.rst
       - ./setup.py:/alcor/setup.py
       - ./setup.cfg:/alcor/setup.cfg
+      - ./run-plain-tests.sh:/alcor/run-plain-tests.sh
     extra_hosts:
       - "dockerhost:$DOCKERHOST"  # for debugging
