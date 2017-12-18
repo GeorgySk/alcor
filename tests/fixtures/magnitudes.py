@@ -100,7 +100,7 @@ def x_array() ->np.ndarray:
 
 @pytest.fixture(scope='function')
 def metallicity() -> np.ndarray:
-    return example(strategies.metallicities)
+    return example(strategies.valid_metallicities)
 
 
 @pytest.fixture(scope='function')
@@ -157,7 +157,7 @@ def star_series() -> pd.Series:
     return pd.Series(dict(
         mass=example(strategies.nonnegative_floats),
         luminosity=example(strategies.floats),
-        metallicity=example(strategies.metallicities),
+        metallicity=example(strategies.valid_metallicities),
         cooling_time=example(strategies.nonnegative_floats)))
 
 

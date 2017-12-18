@@ -7,7 +7,7 @@ from .magnitudes import (VALID_METALLICITIES,
                          fraction_floats,
                          grid_lengths,
                          interest_parameters,
-                         metallicities,
+                         valid_metallicities,
                          min_and_max_masses,
                          nonnegative_integers,
                          nonnegative_floats,
@@ -21,7 +21,6 @@ from .sphere_stars import (non_zero_small_floats,
                            finite_nonnegative_floats,
                            numpy_arrays,
                            positive_integers,
-                           positive_floats,
                            small_floats,
                            small_nonnegative_integers,
                            fractions)
@@ -29,4 +28,5 @@ from .stars import (defined_stars,
                     defined_stars_lists,
                     undefined_stars_lists)
 from .utils import (floats,
-                    non_float_strings)
+                    non_float_strings,
+                    positive_floats)

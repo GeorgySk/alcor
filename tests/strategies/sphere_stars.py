@@ -17,13 +17,6 @@ def finite_nonnegative_floats(max_value: Optional[float] = None
                              allow_infinity=False)
 
 
-def positive_floats(max_value: Optional[float] = None) -> SearchStrategy:
-    return strategies.floats(min_value=0.,
-                             max_value=max_value,
-                             allow_nan=False,
-                             allow_infinity=False).filter(lambda x: x != 0.)
-
-
 arrays_lengths = strategies.integers(min_value=1,
                                      max_value=20)
 

@@ -48,7 +48,7 @@ sorted_arrays_of_unique_values = arrays(dtype=np.float64,
                                         elements=floats,
                                         unique=True)
 
-metallicities = strategies.sampled_from(VALID_METALLICITIES)
+valid_metallicities = strategies.sampled_from(VALID_METALLICITIES)
 
 
 @strategies.composite
