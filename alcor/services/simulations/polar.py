@@ -29,9 +29,10 @@ def assign_polar_coordinates(
                                            / solar_galactocentric_distance)
     radial_distrib_max = math.exp(-min_sector_radius / scale_length)
 
-    set_thetas_cylindrical(stars,
-                           angle_covering_sector=angle_covering_sector,
-                           generator=generator)
+    stars['theta_cylindrical'] = set_thetas_cylindrical(
+            stars,
+            angle_covering_sector=angle_covering_sector,
+            generator=generator)
     set_r_cylindrical(stars,
                       min_sector_radius=min_sector_radius,
                       max_sector_radius=max_sector_radius,
@@ -166,11 +167,11 @@ def set_thetas_cylindrical(
         stars: pd.DataFrame,
         *,
         angle_covering_sector: float,
-        generator: Callable[[float, float, float], np.ndarray]) -> None:
+        generator: Callable[[float, float, float], np.ndarray]) -> np.ndarray:
     stars_count = stars.shape[0]
     thetas_cylindrical = generator(low=-angle_covering_sector / 2.,
                                    high=angle_covering_sector / 2.,
                                    size=stars_count)
     thetas_cylindrical[thetas_cylindrical < 0.] += 2. * math.pi
 
-    stars['theta_cylindrical'] = thetas_cylindrical
+    return thetas_cylindrical
