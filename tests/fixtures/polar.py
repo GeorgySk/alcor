@@ -20,3 +20,39 @@ def angle_covering_sector() -> float:
 @pytest.fixture(scope='function')
 def generator() -> Callable[[float, float, float], np.ndarray]:
     return np.random.uniform
+
+
+@pytest.fixture(scope='function')
+def galactic_structures() -> np.ndarray:
+    return example(strategies.galactic_structures)
+
+
+@pytest.fixture(scope='function')
+def min_sector_radius() -> float:
+    return example(strategies.nonnegative_floats)
+
+
+@pytest.fixture(scope='function')
+def max_sector_radius(min_sector_radius) -> float:
+    return example(strategies.floats_w_lower_limit(
+            min_value=min_sector_radius))
+
+
+@pytest.fixture(scope='function')
+def halo_core_radius() -> float:
+    return example(strategies.positive_floats)
+
+
+@pytest.fixture(scope='function')
+def sector_diameter() -> float:
+    return example(strategies.nonnegative_floats)
+
+
+@pytest.fixture(scope='function')
+def scale_length() -> float:
+    return example(strategies.positive_floats)
+
+
+@pytest.fixture(scope='function')
+def radial_distrib_max() -> float:
+    return example(strategies.nonnegative_floats)

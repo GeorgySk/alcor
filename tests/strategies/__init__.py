@@ -1,5 +1,9 @@
 from .polar import (angles,
-                    array_sizes)
+                    array_sizes,
+                    floats_w_lower_limit,
+                    galactic_structures,
+                    nonnegative_floats,
+                    positive_floats)
 from .processing import filtration_methods
 from .stars import (defined_stars,
                     defined_stars_lists,

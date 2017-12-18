@@ -114,7 +114,7 @@ def set_r_cylindrical(stars: pd.DataFrame,
                       squared_min_sector_radius: float,
                       squared_radii_difference: float) -> None:
     radii_tries = get_radii_tries(
-            stars,
+            galactic_structures=stars['galactic_disk_type'],
             min_sector_radius=min_sector_radius,
             max_sector_radius=max_sector_radius,
             halo_core_radius=halo_core_radius,
@@ -128,18 +128,19 @@ def set_r_cylindrical(stars: pd.DataFrame,
                                      + squared_min_sector_radius)
 
 
-def get_radii_tries(stars: pd.DataFrame,
+def get_radii_tries(*,
+                    galactic_structures: np.ndarray,
                     min_sector_radius: float,
                     max_sector_radius: float,
                     halo_core_radius: float,
                     sector_diameter: float,
                     scale_length: float,
                     radial_distrib_max: float) -> np.ndarray:
-    radii_tries = np.empty(stars.shape[0])
-    halo_stars_mask = stars['galactic_disk_type'] == 'halo'
+    radii_tries = np.empty(galactic_structures.size)
+    halo_stars_mask = galactic_structures == 'halo'
     disks_stars_mask = ~halo_stars_mask
-    halo_stars_count = stars[halo_stars_mask].shape[0]
-    disk_stars_count = stars[disks_stars_mask].shape[0]
+    halo_stars_count = galactic_structures[halo_stars_mask].size
+    disk_stars_count = galactic_structures[disks_stars_mask].size
 
     # Inverse transform sampling for halo distribution.
     # See (4) at "Simulating Gaia performances on white
