@@ -1,20 +1,20 @@
-import math
-import random
 from typing import Callable
 
 import numpy as np
-import pandas as pd
 import pytest
+
+from tests import strategies
+from tests.utils import example
 
 
 @pytest.fixture(scope='function')
-def stars_without_theta() -> pd.DataFrame:
-    return pd.DataFrame(dict(something=[1, 2, 3]))
+def size() -> int:
+    return example(strategies.array_sizes)
 
 
 @pytest.fixture(scope='function')
 def angle_covering_sector() -> float:
-    return random.uniform(-2. * math.pi, 2. * math.pi)
+    return example(strategies.angles)
 
 
 @pytest.fixture(scope='function')
