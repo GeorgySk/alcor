@@ -1,19 +1,23 @@
 import math
 from random import random
+from typing import Callable
 
 import numpy as np
 import pandas as pd
 
 
-def assign_polar_coordinates(stars: pd.DataFrame,
-                             sector_radius: float,
-                             scale_length: float,
-                             solar_galactocentric_distance: float,
-                             thin_disk_scale_height: float,
-                             thick_disk_scale_height: float,
-                             halo_core_radius: float = 5.,
-                             alpha_centauri_distance: float = 1.5e-6
-                             ) -> pd.DataFrame:
+def assign_polar_coordinates(
+        stars: pd.DataFrame,
+        sector_radius: float,
+        scale_length: float,
+        solar_galactocentric_distance: float,
+        thin_disk_scale_height: float,
+        thick_disk_scale_height: float,
+        halo_core_radius: float = 5.,
+        alpha_centauri_distance: float = 1.5e-6,
+        generator: Callable[[float, float, float], np.ndarray] = (
+                np.random.uniform),
+        ) -> pd.DataFrame:
     min_sector_radius = solar_galactocentric_distance - sector_radius
     max_sector_radius = solar_galactocentric_distance + sector_radius
     sector_diameter = max_sector_radius - min_sector_radius
@@ -26,7 +30,8 @@ def assign_polar_coordinates(stars: pd.DataFrame,
     radial_distrib_max = math.exp(-min_sector_radius / scale_length)
 
     set_thetas_cylindrical(stars,
-                           angle_covering_sector=angle_covering_sector)
+                           angle_covering_sector=angle_covering_sector,
+                           generator=generator)
     set_r_cylindrical(stars,
                       min_sector_radius=min_sector_radius,
                       max_sector_radius=max_sector_radius,
@@ -157,13 +162,15 @@ def get_radii_tries(stars: pd.DataFrame,
     return radii_tries
 
 
-def set_thetas_cylindrical(stars: pd.DataFrame,
-                           *,
-                           angle_covering_sector: float) -> None:
+def set_thetas_cylindrical(
+        stars: pd.DataFrame,
+        *,
+        angle_covering_sector: float,
+        generator: Callable[[float, float, float], np.ndarray]) -> None:
     stars_count = stars.shape[0]
-    thetas_cylindrical = np.random.uniform(low=-angle_covering_sector / 2.,
-                                           high=angle_covering_sector / 2.,
-                                           size=stars_count)
+    thetas_cylindrical = generator(low=-angle_covering_sector / 2.,
+                                   high=angle_covering_sector / 2.,
+                                   size=stars_count)
     thetas_cylindrical[thetas_cylindrical < 0.] += 2. * math.pi
 
     stars['theta_cylindrical'] = thetas_cylindrical
