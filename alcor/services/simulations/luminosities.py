@@ -1,17 +1,16 @@
 from functools import partial
-from typing import Callable
 
 import numpy as np
 import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
+from alcor.types import ArrayOperatorType
 from .utils import (immutable_array,
                     linear_function)
 
 # TODO: we have this in another module. take to utils after merge
 linear_estimation = partial(InterpolatedUnivariateSpline,
                             k=1)
-
 
 MODEL_SOLAR_MASSES = immutable_array([1.00, 1.50, 1.75, 2.00, 2.25,
                                       2.50, 3.00, 3.50, 4.00, 5.00])
@@ -192,12 +191,10 @@ def white_dwarf_masses(
         *,
         low_mass: float = 2.7,
         high_mass: float = 6.,
-        low_mass_function: Callable[[np.ndarray], np.ndarray] = (
-                LOW_MASS_FUNCTION),
-        medium_mass_function: Callable[[np.ndarray], np.ndarray] = (
-                MEDIUM_MASS_FUNCTION),
-        high_mass_function: Callable[[np.ndarray], np.ndarray] = (
-                HIGH_MASS_FUNCTION)) -> np.ndarray:
+        low_mass_function: ArrayOperatorType = LOW_MASS_FUNCTION,
+        medium_mass_function: ArrayOperatorType = MEDIUM_MASS_FUNCTION,
+        high_mass_function: ArrayOperatorType = HIGH_MASS_FUNCTION
+        ) -> np.ndarray:
     """
     IFMR (Initial-to-Final Mass Relation)
     according to model by Catalan et al. 2008.
