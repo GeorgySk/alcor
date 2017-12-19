@@ -1,3 +1,4 @@
+from functools import partial
 from typing import (Callable,
                     Tuple)
 
@@ -73,3 +74,19 @@ def squared_radii_difference() -> float:
 @pytest.fixture(scope='function')
 def r_cylindrical() -> float:
     return example(strategies.positive_floats_arrays)
+
+
+@pytest.fixture(scope='function')
+def sector_radius() -> float:
+    return example(strategies.nonnegative_floats)
+
+
+@pytest.fixture(scope='function')
+def scale_height() -> float:
+    return example(strategies.positive_floats)
+
+
+@pytest.fixture(scope='function')
+def sign_generator() -> float:
+    return partial(np.random.choice,
+                   [-1, 1])

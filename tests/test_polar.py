@@ -8,7 +8,8 @@ from alcor.services.simulations.polar import (thetas_cylindrical,
                                               disks_stars_radii_tries,
                                               halo_r_cylindrical,
                                               disks_r_cylindrical,
-                                              halo_z_coordinates)
+                                              halo_z_coordinates,
+                                              disk_z_coordinates)
 
 
 def test_theta_cylindrical(
@@ -110,7 +111,7 @@ def test_disks_r_cylindrical(
 def test_halo_z_coordinates(
         angle_covering_sector: float,
         r_cylindrical: np.ndarray,
-        generator: Callable[[float, float, float], np.ndarray])-> None:
+        generator: Callable[[float, float, float], np.ndarray]) -> None:
     coordinates = halo_z_coordinates(
             angle_covering_sector=angle_covering_sector,
             r_cylindrical=r_cylindrical,
@@ -119,3 +120,21 @@ def test_halo_z_coordinates(
     assert (isinstance(coordinates, float) or
             isinstance(coordinates, np.ndarray))
     assert coordinates.size == r_cylindrical.size
+
+
+def test_disk_z_coordinates(
+        size: int,
+        scale_height: float,
+        sector_radius: float,
+        unit_range_generator: Callable[[Tuple[int, ...]], np.ndarray],
+        sign_generator: Callable[[int], np.ndarray]) -> None:
+    coordinates = disk_z_coordinates(
+            size=size,
+            scale_height=scale_height,
+            sector_radius=sector_radius,
+            generator=unit_range_generator,
+            sign_generator=sign_generator)
+
+    assert (isinstance(coordinates, float) or
+            isinstance(coordinates, np.ndarray))
+    assert coordinates.size == size

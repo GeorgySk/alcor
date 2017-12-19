@@ -1,6 +1,5 @@
 import math
 from functools import partial
-from random import random
 from typing import (Callable,
                     Tuple)
 
@@ -10,15 +9,19 @@ import pandas as pd
 
 def assign_polar_coordinates(
         stars: pd.DataFrame,
+        *,
         sector_radius: float,
         scale_length: float,
         solar_galactocentric_distance: float,
         thin_disk_scale_height: float,
         thick_disk_scale_height: float,
         halo_core_radius: float = 5.,
-        alpha_centauri_distance: float = 1.5e-6,
         generator: Callable[[float, float, float], np.ndarray] = (
                 np.random.uniform),
+        unit_range_generator: Callable[[Tuple[int, ...]], np.ndarray] = (
+                np.random.rand),
+        sign_generator: Callable[[int], np.ndarray] = partial(np.random.choice,
+                                                              [-1, 1])
         ) -> pd.DataFrame:
     min_sector_radius = solar_galactocentric_distance - sector_radius
     max_sector_radius = solar_galactocentric_distance + sector_radius
@@ -47,7 +50,7 @@ def assign_polar_coordinates(
             halo_core_radius=halo_core_radius,
             squared_min_sector_radius=squared_min_sector_radius,
             squared_radii_difference=squared_radii_difference,
-            generator=np.random.rand)
+            generator=unit_range_generator)
 
     disks_stars['r_cylindrical'] = disks_r_cylindrical(
             size=disks_stars.shape[0],
@@ -57,24 +60,51 @@ def assign_polar_coordinates(
             radial_distrib_max=radial_distrib_max,
             squared_min_sector_radius=squared_min_sector_radius,
             squared_radii_difference=squared_radii_difference,
-            generator=np.random.uniform)
+            generator=generator)
+
+    thin_disk_stars_mask = disks_stars['galactic_disk_type'] == 'thin'
+
+    thin_disk_stars = disks_stars[thin_disk_stars_mask]
+    thick_disk_stars = disks_stars[~thin_disk_stars_mask]
 
     halo_stars['z_coordinate'] = halo_z_coordinates(
             angle_covering_sector=angle_covering_sector,
-            r_cylindrical=disks_stars['r_cylindrical'],
-            generator=np.random.uniform)
+            r_cylindrical=disks_stars['r_cylindrical'].values,
+            generator=generator)
 
-    set_z_coordinate(stars,
-                     angle_covering_sector=angle_covering_sector,
-                     thin_disk_scale_height=thin_disk_scale_height,
-                     thick_disk_scale_height=thick_disk_scale_height,
-                     sector_radius=sector_radius)
-    stars = replace_too_close_to_the_sun_stars(
-            stars,
-            min_distance=alpha_centauri_distance,
-            solar_galactocentric_distance=solar_galactocentric_distance)
+    thin_disk_stars['z_coordinate'] = disk_z_coordinates(
+            size=thin_disk_stars.shape[0],
+            scale_height=thin_disk_scale_height,
+            sector_radius=sector_radius,
+            generator=unit_range_generator,
+            sign_generator=sign_generator)
 
-    return stars
+    thick_disk_stars['z_coordinate'] = disk_z_coordinates(
+            size=thick_disk_stars.shape[0],
+            scale_height=thick_disk_scale_height,
+            sector_radius=sector_radius,
+            generator=unit_range_generator,
+            sign_generator=sign_generator)
+
+    # TODO: here we had filtering out too close stars to the Sun.
+    # Do we really need to do that? (alpha_centauri_distance = 1.5e-6)
+
+    return pd.concat(halo_stars, thin_disk_stars, thick_disk_stars)
+
+
+def disk_z_coordinates(*,
+                       size: int,
+                       scale_height: float,
+                       sector_radius: float,
+                       generator: Callable[[Tuple[int, ...]], np.ndarray],
+                       sign_generator: Callable[[int], np.ndarray]
+                       ) -> np.ndarray:
+    abs_z_coordinates = (-scale_height
+                         * np.log(1. - generator(size)
+                                  * (1. - math.exp(-sector_radius
+                                                   / scale_height))))
+    return np.multiply(abs_z_coordinates,
+                       sign_generator(size=size))
 
 
 def halo_z_coordinates(*,
@@ -177,55 +207,6 @@ def disks_stars_radii_tries(
 
     return np.array([disks_radii_distribution()
                      for _ in range(size)])
-
-
-# TODO: figure out workflow for these stars
-def replace_too_close_to_the_sun_stars(stars: pd.DataFrame,
-                                       min_distance: float,
-                                       solar_galactocentric_distance: float
-                                       ) -> pd.DataFrame:
-    return stars
-
-
-def set_z_coordinate(stars: pd.DataFrame,
-                     *,
-                     angle_covering_sector: float,
-                     thin_disk_scale_height: float,
-                     thick_disk_scale_height: float,
-                     sector_radius: float) -> None:
-    stars['z_coordinate'] = np.nan
-
-    halo_stars_mask = stars['galactic_disk_type'] == 'halo'
-    halo_stars_count = stars[halo_stars_mask].shape[0]
-
-    random_angles = (angle_covering_sector * np.random.rand(halo_stars_count)
-                     - angle_covering_sector / 2)
-    stars.loc[halo_stars_mask, 'z_coordinate'] = (stars['r_cylindrical']
-                                                  * np.sin(random_angles))
-
-    thin_disk_stars_mask = stars['galactic_disk_type'] == 'thin'
-    thin_disk_stars_count = stars[thin_disk_stars_mask].shape[0]
-
-    abs_z_coordinates = (-thin_disk_scale_height
-                         * np.log(1.
-                                  - np.random.rand(thin_disk_stars_count)
-                                    * (1.
-                                       - math.exp(-sector_radius
-                                                  / thin_disk_scale_height))))
-    stars.loc[thin_disk_stars_mask, 'z_coordinate'] = (
-        abs_z_coordinates * random.choice([1., -1.]))
-
-    thick_disk_stars_mask = stars['galactic_disk_type'] == 'thick'
-    thick_disk_stars_count = stars[thick_disk_stars_mask].shape[0]
-
-    abs_z_coordinates = (-thick_disk_scale_height
-                         * np.log(1.
-                                  - np.random.rand(thick_disk_stars_count)
-                                  * (1.
-                                     - math.exp(-sector_radius
-                                                / thick_disk_scale_height))))
-    stars.loc[thick_disk_stars_mask, 'z_coordinate'] = (
-        abs_z_coordinates * random.choice([1., -1.]))
 
 
 def disk_stars_radius(value: float,
