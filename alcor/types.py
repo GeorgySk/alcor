@@ -1,6 +1,6 @@
 from typing import (Union,
-                    Dict,
                     Callable,
+                    Dict,
                     Tuple)
 
 import numpy as np
@@ -11,3 +11,4 @@ GridParametersInfoType = Dict[str, Union[NumericType,
 CSVParametersInfoType = Dict[str, Dict[str, Union[str, int]]]
 GeneratorType = Callable[[float, float, float], np.ndarray]
 UnitRangeGeneratorType = Callable[[Tuple[int, ...]], np.ndarray]
+ArrayOperatorType = Callable[[np.ndarray], np.ndarray]
