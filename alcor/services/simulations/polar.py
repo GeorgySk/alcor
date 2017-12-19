@@ -1,6 +1,7 @@
 import math
 from functools import partial
-from typing import Callable
+from typing import (Callable,
+                    Union)
 
 import numpy as np
 import pandas as pd
@@ -99,7 +100,7 @@ def disk_z_coordinates(*,
                        sector_radius: float,
                        generator: UnitRangeGeneratorType,
                        signs_generator: Callable[[int], np.ndarray]
-                       ) -> np.ndarray:
+                       ) -> Union[float, np.ndarray]:
     abs_z_coordinates = (-scale_height
                          * np.log(1. - generator(size)
                                   * (1. - math.exp(-sector_radius
@@ -111,7 +112,7 @@ def disk_z_coordinates(*,
 def halo_z_coordinates(*,
                        angle_covering_sector: float,
                        r_cylindrical: np.ndarray,
-                       generator: GeneratorType) -> np.ndarray:
+                       generator: GeneratorType) -> Union[float, np.ndarray]:
     random_angles = generator(low=-angle_covering_sector / 2.,
                               high=angle_covering_sector / 2.,
                               size=r_cylindrical.size)
@@ -126,7 +127,7 @@ def disks_r_cylindrical(*,
                         radial_distrib_max: float,
                         squared_min_sector_radius: float,
                         squared_radii_difference: float,
-                        generator: GeneratorType) -> np.ndarray:
+                        generator: GeneratorType) -> Union[float, np.ndarray]:
     radii_tries = disks_stars_radii_tries(
             size=size,
             min_sector_radius=min_sector_radius,
@@ -152,7 +153,7 @@ def halo_r_cylindrical_coordinates(*,
                                    squared_min_sector_radius: float,
                                    squared_radii_difference: float,
                                    generator: UnitRangeGeneratorType
-                                   ) -> np.ndarray:
+                                   ) -> Union[float, np.ndarray]:
     radii_tries = halo_stars_radii_tries(size=size,
                                          min_sector_radius=min_sector_radius,
                                          max_sector_radius=max_sector_radius,
@@ -172,7 +173,8 @@ def halo_stars_radii_tries(*,
                            min_sector_radius: float,
                            max_sector_radius: float,
                            halo_core_radius: float,
-                           generator: UnitRangeGeneratorType) -> np.ndarray:
+                           generator: UnitRangeGeneratorType
+                           ) -> Union[float, np.ndarray]:
     """
     Inverse transform sampling for halo distribution.
     See (4) at "Simulating Gaia performances on white
@@ -191,7 +193,8 @@ def disks_stars_radii_tries(*,
                             max_sector_radius: float,
                             scale_length: float,
                             radial_distrib_max: float,
-                            generator: GeneratorType) -> np.ndarray:
+                            generator: GeneratorType
+                            ) -> Union[float, np.ndarray]:
     disk_stars_radii_function = partial(disk_stars_radius,
                                         scale_length=scale_length)
     disks_radii_distribution = partial(monte_carlo_generator,
@@ -232,7 +235,7 @@ def monte_carlo_generator(*,
 def thetas_cylindrical(*,
                        size: int,
                        angle_covering_sector: float,
-                       generator: GeneratorType) -> np.ndarray:
+                       generator: GeneratorType) -> Union[float, np.ndarray]:
     thetas = generator(low=-angle_covering_sector / 2.,
                        high=angle_covering_sector / 2.,
                        size=size)
