@@ -6,7 +6,7 @@ import numpy as np
 from alcor.services.simulations.polar import (thetas_cylindrical,
                                               halo_stars_radii_tries,
                                               disks_stars_radii_tries,
-                                              halo_r_cylindrical,
+                                              halo_r_cylindrical_coordinates,
                                               disks_r_cylindrical,
                                               halo_z_coordinates,
                                               disk_z_coordinates)
@@ -57,8 +57,7 @@ def test_disks_stars_radii_tries(
             radial_distrib_max=radial_distrib_max,
             generator=generator)
 
-    assert (isinstance(radii_tries, float) or
-            isinstance(radii_tries, np.ndarray))
+    assert isinstance(radii_tries, (float, np.ndarray))
     assert radii_tries.size == size
 
 
@@ -70,7 +69,7 @@ def test_halo_r_cylindrical(
         squared_min_sector_radius: float,
         squared_radii_difference: float,
         unit_range_generator: Callable[[Tuple[int, ...]], np.ndarray]) -> None:
-    coordinates = halo_r_cylindrical(
+    coordinates = halo_r_cylindrical_coordinates(
             size=size,
             min_sector_radius=min_sector_radius,
             max_sector_radius=max_sector_radius,
@@ -79,8 +78,7 @@ def test_halo_r_cylindrical(
             squared_radii_difference=squared_radii_difference,
             generator=unit_range_generator)
 
-    assert (isinstance(coordinates, float) or
-            isinstance(coordinates, np.ndarray))
+    assert isinstance(coordinates, (float, np.ndarray))
     assert coordinates.size == size
 
 
@@ -103,8 +101,7 @@ def test_disks_r_cylindrical(
             squared_radii_difference=squared_radii_difference,
             generator=generator)
 
-    assert (isinstance(coordinates, float) or
-            isinstance(coordinates, np.ndarray))
+    assert isinstance(coordinates, (float, np.ndarray))
     assert coordinates.size == size
 
 
@@ -117,8 +114,7 @@ def test_halo_z_coordinates(
             r_cylindrical=r_cylindrical,
             generator=generator)
 
-    assert (isinstance(coordinates, float) or
-            isinstance(coordinates, np.ndarray))
+    assert isinstance(coordinates, (float, np.ndarray))
     assert coordinates.size == r_cylindrical.size
 
 
@@ -135,6 +131,5 @@ def test_disk_z_coordinates(
             generator=unit_range_generator,
             signs_generator=signs_generator)
 
-    assert (isinstance(coordinates, float) or
-            isinstance(coordinates, np.ndarray))
+    assert isinstance(coordinates, (float, np.ndarray))
     assert coordinates.size == size

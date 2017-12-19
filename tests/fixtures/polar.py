@@ -1,10 +1,10 @@
-from functools import partial
 from typing import (Callable,
                     Tuple)
 
 import numpy as np
 import pytest
 
+from alcor.services.simulations.polar import random_signs
 from tests import strategies
 from tests.utils import example
 
@@ -88,5 +88,4 @@ def scale_height() -> float:
 
 @pytest.fixture(scope='function')
 def signs_generator() -> float:
-    return partial(np.random.choice,
-                   [-1, 1])
+    return random_signs

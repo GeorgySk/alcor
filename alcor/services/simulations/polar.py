@@ -1,11 +1,12 @@
 import math
 from functools import partial
-from typing import (Callable,
-                    Tuple)
+from typing import Callable
 
 import numpy as np
 import pandas as pd
 
+from alcor.types import (GeneratorType,
+                         UnitRangeGeneratorType)
 
 random_signs = partial(np.random.choice, [-1, 1])
 
@@ -19,10 +20,8 @@ def assign_polar_coordinates(
         thin_disk_scale_height: float,
         thick_disk_scale_height: float,
         halo_core_radius: float = 5.,
-        generator: Callable[[float, float, float], np.ndarray] = (
-                np.random.uniform),
-        unit_range_generator: Callable[[Tuple[int, ...]], np.ndarray] = (
-                np.random.rand),
+        generator: GeneratorType = np.random.uniform,
+        unit_range_generator: UnitRangeGeneratorType = np.random.rand,
         signs_generator: Callable[[int], np.ndarray] = random_signs
         ) -> pd.DataFrame:
     min_sector_radius = solar_galactocentric_distance - sector_radius
@@ -45,7 +44,7 @@ def assign_polar_coordinates(
     halo_stars = stars[halo_stars_mask]
     disks_stars = stars[~halo_stars_mask]
 
-    halo_stars['r_cylindrical'] = halo_r_cylindrical(
+    halo_stars['r_cylindrical'] = halo_r_cylindrical_coordinates(
             size=halo_stars.shape[0],
             min_sector_radius=min_sector_radius,
             max_sector_radius=max_sector_radius,
@@ -98,7 +97,7 @@ def disk_z_coordinates(*,
                        size: int,
                        scale_height: float,
                        sector_radius: float,
-                       generator: Callable[[Tuple[int, ...]], np.ndarray],
+                       generator: UnitRangeGeneratorType,
                        signs_generator: Callable[[int], np.ndarray]
                        ) -> np.ndarray:
     abs_z_coordinates = (-scale_height
@@ -112,8 +111,7 @@ def disk_z_coordinates(*,
 def halo_z_coordinates(*,
                        angle_covering_sector: float,
                        r_cylindrical: np.ndarray,
-                       generator: Callable[[float, float, float], np.ndarray]
-                       ) -> np.ndarray:
+                       generator: GeneratorType) -> np.ndarray:
     random_angles = generator(low=-angle_covering_sector / 2.,
                               high=angle_covering_sector / 2.,
                               size=r_cylindrical.size)
@@ -128,8 +126,7 @@ def disks_r_cylindrical(*,
                         radial_distrib_max: float,
                         squared_min_sector_radius: float,
                         squared_radii_difference: float,
-                        generator: Callable[[float, float, float], np.ndarray]
-                        ) -> np.ndarray:
+                        generator: GeneratorType) -> np.ndarray:
     radii_tries = disks_stars_radii_tries(
             size=size,
             min_sector_radius=min_sector_radius,
@@ -147,15 +144,15 @@ def disks_r_cylindrical(*,
                    + squared_min_sector_radius)
 
 
-def halo_r_cylindrical(*,
-                       size: int,
-                       min_sector_radius: float,
-                       max_sector_radius: float,
-                       halo_core_radius: float,
-                       squared_min_sector_radius: float,
-                       squared_radii_difference: float,
-                       generator: Callable[[Tuple[int, ...]], np.ndarray]
-                       ) -> np.ndarray:
+def halo_r_cylindrical_coordinates(*,
+                                   size: int,
+                                   min_sector_radius: float,
+                                   max_sector_radius: float,
+                                   halo_core_radius: float,
+                                   squared_min_sector_radius: float,
+                                   squared_radii_difference: float,
+                                   generator: UnitRangeGeneratorType
+                                   ) -> np.ndarray:
     radii_tries = halo_stars_radii_tries(size=size,
                                          min_sector_radius=min_sector_radius,
                                          max_sector_radius=max_sector_radius,
@@ -175,8 +172,7 @@ def halo_stars_radii_tries(*,
                            min_sector_radius: float,
                            max_sector_radius: float,
                            halo_core_radius: float,
-                           generator: Callable[[Tuple[int, ...]], np.ndarray]
-                           ) -> np.ndarray:
+                           generator: UnitRangeGeneratorType) -> np.ndarray:
     """
     Inverse transform sampling for halo distribution.
     See (4) at "Simulating Gaia performances on white
@@ -189,24 +185,21 @@ def halo_stars_radii_tries(*,
                               + min_atan))
 
 
-def disks_stars_radii_tries(
-        *,
-        size: int,
-        min_sector_radius: float,
-        max_sector_radius: float,
-        scale_length: float,
-        radial_distrib_max: float,
-        generator: Callable[[float, float, float], np.ndarray]) -> np.ndarray:
+def disks_stars_radii_tries(*,
+                            size: int,
+                            min_sector_radius: float,
+                            max_sector_radius: float,
+                            scale_length: float,
+                            radial_distrib_max: float,
+                            generator: GeneratorType) -> np.ndarray:
     disk_stars_radii_function = partial(disk_stars_radius,
                                         scale_length=scale_length)
-
     disks_radii_distribution = partial(monte_carlo_generator,
                                        function=disk_stars_radii_function,
                                        min_x=min_sector_radius,
                                        max_x=max_sector_radius,
                                        max_y=radial_distrib_max,
                                        generator=generator)
-
     return np.array([disks_radii_distribution()
                      for _ in range(size)])
 
@@ -236,14 +229,12 @@ def monte_carlo_generator(*,
                             .format(function=function.__qualname__))
 
 
-def thetas_cylindrical(
-        *,
-        size: int,
-        angle_covering_sector: float,
-        generator: Callable[[float, float, float], np.ndarray]) -> np.ndarray:
+def thetas_cylindrical(*,
+                       size: int,
+                       angle_covering_sector: float,
+                       generator: GeneratorType) -> np.ndarray:
     thetas = generator(low=-angle_covering_sector / 2.,
                        high=angle_covering_sector / 2.,
                        size=size)
     thetas[thetas < 0.] += 2. * np.pi
-
     return thetas
