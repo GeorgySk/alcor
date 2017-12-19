@@ -35,17 +35,13 @@ def min_sector_radius() -> float:
 @pytest.fixture(scope='function')
 def max_sector_radius(min_sector_radius) -> float:
     return example(strategies.floats_w_lower_limit(
-            min_value=min_sector_radius))
+            min_value=min_sector_radius).filter(lambda x:
+                                                x != min_sector_radius))
 
 
 @pytest.fixture(scope='function')
 def halo_core_radius() -> float:
     return example(strategies.positive_floats)
-
-
-@pytest.fixture(scope='function')
-def sector_diameter() -> float:
-    return example(strategies.nonnegative_floats)
 
 
 @pytest.fixture(scope='function')
@@ -55,4 +51,14 @@ def scale_length() -> float:
 
 @pytest.fixture(scope='function')
 def radial_distrib_max() -> float:
+    return example(strategies.nonnegative_floats)
+
+
+@pytest.fixture(scope='function')
+def squared_min_sector_radius() -> float:
+    return example(strategies.nonnegative_floats)
+
+
+@pytest.fixture(scope='function')
+def squared_radii_difference() -> float:
     return example(strategies.nonnegative_floats)

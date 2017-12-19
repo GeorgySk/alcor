@@ -1,6 +1,8 @@
 import math
+from functools import partial
 from random import random
-from typing import Callable
+from typing import (Callable,
+                    Tuple)
 
 import numpy as np
 import pandas as pd
@@ -20,7 +22,6 @@ def assign_polar_coordinates(
         ) -> pd.DataFrame:
     min_sector_radius = solar_galactocentric_distance - sector_radius
     max_sector_radius = solar_galactocentric_distance + sector_radius
-    sector_diameter = max_sector_radius - min_sector_radius
     squared_max_sector_radius = max_sector_radius ** 2
     squared_min_sector_radius = min_sector_radius ** 2
     squared_radii_difference = (squared_max_sector_radius
@@ -33,15 +34,29 @@ def assign_polar_coordinates(
             size=stars.shape[0],
             angle_covering_sector=angle_covering_sector,
             generator=generator)
-    set_r_cylindrical(stars,
-                      min_sector_radius=min_sector_radius,
-                      max_sector_radius=max_sector_radius,
-                      halo_core_radius=halo_core_radius,
-                      sector_diameter=sector_diameter,
-                      scale_length=scale_length,
-                      radial_distrib_max=radial_distrib_max,
-                      squared_min_sector_radius=squared_min_sector_radius,
-                      squared_radii_difference=squared_radii_difference)
+
+    halo_stars_mask = stars['galactic_disk_type'] == 'halo'
+
+    halo_stars = stars[halo_stars_mask]
+    disks_stars = stars[~halo_stars_mask]
+
+    halo_stars['r_cylindrical'] = halo_r_cylindrical(
+            size=halo_stars.shape[0],
+            min_sector_radius=min_sector_radius,
+            max_sector_radius=max_sector_radius,
+            halo_core_radius=halo_core_radius,
+            squared_min_sector_radius=squared_min_sector_radius,
+            squared_radii_difference=squared_radii_difference)
+
+    disks_stars['r_cylindrical'] = disks_r_cylindrical(
+            size=disks_stars.shape[0],
+            min_sector_radius=min_sector_radius,
+            max_sector_radius=max_sector_radius,
+            scale_length=scale_length,
+            radial_distrib_max=radial_distrib_max,
+            squared_min_sector_radius=squared_min_sector_radius,
+            squared_radii_difference=squared_radii_difference)
+
     set_z_coordinate(stars,
                      angle_covering_sector=angle_covering_sector,
                      thin_disk_scale_height=thin_disk_scale_height,
@@ -53,6 +68,90 @@ def assign_polar_coordinates(
             solar_galactocentric_distance=solar_galactocentric_distance)
 
     return stars
+
+
+def disks_r_cylindrical(*,
+                        size: int,
+                        min_sector_radius: float,
+                        max_sector_radius: float,
+                        scale_length: float,
+                        radial_distrib_max: float,
+                        squared_min_sector_radius: float,
+                        squared_radii_difference: float) -> np.ndarray:
+    radii_tries = disks_stars_radii_tries(
+            size=size,
+            min_sector_radius=min_sector_radius,
+            max_sector_radius=max_sector_radius,
+            scale_length=scale_length,
+            radial_distrib_max=radial_distrib_max)
+
+    # TODO: put this in a function
+    # Inverse transform sampling method for generating stars
+    # uniformly in a circle sector in polar coordinates
+    random_values = (radii_tries - min_sector_radius) / (max_sector_radius
+                                                         - min_sector_radius)
+    return np.sqrt(squared_radii_difference * random_values
+                   + squared_min_sector_radius)
+
+
+def halo_r_cylindrical(*,
+                       size: int,
+                       min_sector_radius: float,
+                       max_sector_radius: float,
+                       halo_core_radius: float,
+                       squared_min_sector_radius: float,
+                       squared_radii_difference: float) -> np.ndarray:
+    radii_tries = halo_stars_radii_tries(size=size,
+                                         min_sector_radius=min_sector_radius,
+                                         max_sector_radius=max_sector_radius,
+                                         halo_core_radius=halo_core_radius,
+                                         generator=np.random.rand)
+
+    # Inverse transform sampling method for generating stars
+    # uniformly in a circle sector in polar coordinates
+    random_values = (radii_tries - min_sector_radius) / (max_sector_radius
+                                                         - min_sector_radius)
+    return np.sqrt(squared_radii_difference * random_values
+                   + squared_min_sector_radius)
+
+
+def halo_stars_radii_tries(*,
+                           size: int,
+                           min_sector_radius: float,
+                           max_sector_radius: float,
+                           halo_core_radius: float,
+                           generator: Callable[[Tuple[int, ...]], np.ndarray]
+                           ) -> np.ndarray:
+    """
+    Inverse transform sampling for halo distribution.
+    See (4) at "Simulating Gaia performances on white
+    dwarfs" by Torres et al. 2005
+    """
+    min_atan = math.atan(min_sector_radius / halo_core_radius)
+    max_atan = math.atan(max_sector_radius / halo_core_radius)
+    return np.multiply(halo_core_radius,
+                       np.tan(generator(size) * (max_atan - min_atan)
+                              + min_atan))
+
+
+def disks_stars_radii_tries(*,
+                            size: int,
+                            min_sector_radius: float,
+                            max_sector_radius: float,
+                            scale_length: float,
+                            radial_distrib_max: float) -> np.ndarray:
+    disk_stars_radii_function = partial(disk_stars_radius,
+                                        scale_length=scale_length)
+
+    disks_radii_distribution = partial(monte_carlo_generator,
+                                       function=disk_stars_radii_function,
+                                       min_x=min_sector_radius,
+                                       max_x=max_sector_radius,
+                                       max_y=radial_distrib_max,
+                                       generator=np.random.uniform)
+
+    return np.array([disks_radii_distribution()
+                     for _ in range(size)])
 
 
 # TODO: figure out workflow for these stars
@@ -104,64 +203,29 @@ def set_z_coordinate(stars: pd.DataFrame,
         abs_z_coordinates * random.choice([1., -1.]))
 
 
-def set_r_cylindrical(stars: pd.DataFrame,
-                      min_sector_radius: float,
-                      max_sector_radius: float,
-                      halo_core_radius: float,
-                      sector_diameter: float,
-                      scale_length: float,
-                      radial_distrib_max: float,
-                      squared_min_sector_radius: float,
-                      squared_radii_difference: float) -> None:
-    radii_tries = get_radii_tries(
-            galactic_structures=stars['galactic_disk_type'],
-            min_sector_radius=min_sector_radius,
-            max_sector_radius=max_sector_radius,
-            halo_core_radius=halo_core_radius,
-            sector_diameter=sector_diameter,
-            scale_length=scale_length,
-            radial_distrib_max=radial_distrib_max)
-    # Inverse transform sampling method for generating stars
-    # uniformly in a circle sector in polar coordinates
-    random_values = (radii_tries - min_sector_radius) / sector_diameter
-    stars['r_cylindrical'] = np.sqrt(squared_radii_difference * random_values
-                                     + squared_min_sector_radius)
+def disk_stars_radius(value: float,
+                      *,
+                      scale_length: float) -> float:
+    return math.exp(-value / scale_length)
 
 
-def get_radii_tries(*,
-                    galactic_structures: np.ndarray,
-                    min_sector_radius: float,
-                    max_sector_radius: float,
-                    halo_core_radius: float,
-                    sector_diameter: float,
-                    scale_length: float,
-                    radial_distrib_max: float) -> np.ndarray:
-    radii_tries = np.empty(galactic_structures.size)
-    halo_stars_mask = galactic_structures == 'halo'
-    disks_stars_mask = ~halo_stars_mask
-    halo_stars_count = galactic_structures[halo_stars_mask].size
-    disk_stars_count = galactic_structures[disks_stars_mask].size
-
-    # Inverse transform sampling for halo distribution.
-    # See (4) at "Simulating Gaia performances on white
-    # dwarfs" by Torres et al. 2005
-    min_atan = math.atan(min_sector_radius / halo_core_radius)
-    max_atan = math.atan(max_sector_radius / halo_core_radius)
-    radii_tries[halo_stars_mask] = (halo_core_radius * np.tan(
-            np.random.rand(halo_stars_count) * (max_atan - min_atan)
-            + min_atan))
-
-    # Accepting-rejecting method
-    disk_stars_radii_tries = []
-    while len(disk_stars_radii_tries) != disk_stars_count:
-        radius_try = min_sector_radius + sector_diameter * random()
-        radius_try_distrib = math.exp(-radius_try / scale_length)
-        radial_distrib_random = radial_distrib_max * random()
-        if radial_distrib_random <= radius_try_distrib:
-            disk_stars_radii_tries.append(radius_try)
-    radii_tries[disks_stars_mask] = disk_stars_radii_tries
-
-    return radii_tries
+def monte_carlo_generator(*,
+                          function: Callable[[float], float],
+                          min_x: float,
+                          max_x: float,
+                          max_y: float,
+                          generator: Callable[[float, float], float],
+                          min_y: float = 0.,
+                          max_iterations_count: int = 10 ** 9
+                          ) -> float:
+    for _ in range(max_iterations_count):
+        x_value = generator(min_x, max_x)
+        if generator(min_y, max_y) <= function(x_value):
+            return x_value
+    else:
+        raise OverflowError('Exceeded maximum number of iterations '
+                            'in Monte Carlo generator for "{function}"'
+                            .format(function=function.__qualname__))
 
 
 def thetas_cylindrical(
