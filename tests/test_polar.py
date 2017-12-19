@@ -127,13 +127,13 @@ def test_disk_z_coordinates(
         scale_height: float,
         sector_radius: float,
         unit_range_generator: Callable[[Tuple[int, ...]], np.ndarray],
-        sign_generator: Callable[[int], np.ndarray]) -> None:
+        signs_generator: Callable[[int], np.ndarray]) -> None:
     coordinates = disk_z_coordinates(
             size=size,
             scale_height=scale_height,
             sector_radius=sector_radius,
             generator=unit_range_generator,
-            sign_generator=sign_generator)
+            signs_generator=signs_generator)
 
     assert (isinstance(coordinates, float) or
             isinstance(coordinates, np.ndarray))

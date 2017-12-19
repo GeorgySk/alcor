@@ -87,6 +87,6 @@ def scale_height() -> float:
 
 
 @pytest.fixture(scope='function')
-def sign_generator() -> float:
+def signs_generator() -> float:
     return partial(np.random.choice,
                    [-1, 1])

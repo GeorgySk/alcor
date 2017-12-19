@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 
 
+random_signs = partial(np.random.choice, [-1, 1])
+
+
 def assign_polar_coordinates(
         stars: pd.DataFrame,
         *,
@@ -20,8 +23,7 @@ def assign_polar_coordinates(
                 np.random.uniform),
         unit_range_generator: Callable[[Tuple[int, ...]], np.ndarray] = (
                 np.random.rand),
-        sign_generator: Callable[[int], np.ndarray] = partial(np.random.choice,
-                                                              [-1, 1])
+        signs_generator: Callable[[int], np.ndarray] = random_signs
         ) -> pd.DataFrame:
     min_sector_radius = solar_galactocentric_distance - sector_radius
     max_sector_radius = solar_galactocentric_distance + sector_radius
@@ -77,14 +79,14 @@ def assign_polar_coordinates(
             scale_height=thin_disk_scale_height,
             sector_radius=sector_radius,
             generator=unit_range_generator,
-            sign_generator=sign_generator)
+            signs_generator=signs_generator)
 
     thick_disk_stars['z_coordinate'] = disk_z_coordinates(
             size=thick_disk_stars.shape[0],
             scale_height=thick_disk_scale_height,
             sector_radius=sector_radius,
             generator=unit_range_generator,
-            sign_generator=sign_generator)
+            signs_generator=signs_generator)
 
     # TODO: here we had filtering out too close stars to the Sun.
     # Do we really need to do that? (alpha_centauri_distance = 1.5e-6)
@@ -97,14 +99,14 @@ def disk_z_coordinates(*,
                        scale_height: float,
                        sector_radius: float,
                        generator: Callable[[Tuple[int, ...]], np.ndarray],
-                       sign_generator: Callable[[int], np.ndarray]
+                       signs_generator: Callable[[int], np.ndarray]
                        ) -> np.ndarray:
     abs_z_coordinates = (-scale_height
                          * np.log(1. - generator(size)
                                   * (1. - math.exp(-sector_radius
                                                    / scale_height))))
     return np.multiply(abs_z_coordinates,
-                       sign_generator(size=size))
+                       signs_generator(size=size))
 
 
 def halo_z_coordinates(*,
