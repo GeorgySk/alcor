@@ -3,7 +3,8 @@ from .polar import (angles,
                     floats_w_lower_limit,
                     galactic_structures,
                     nonnegative_floats,
-                    positive_floats)
+                    positive_floats,
+                    positive_floats_arrays)
 from .processing import filtration_methods
 from .stars import (defined_stars,
                     defined_stars_lists,

@@ -46,7 +46,8 @@ def assign_polar_coordinates(
             max_sector_radius=max_sector_radius,
             halo_core_radius=halo_core_radius,
             squared_min_sector_radius=squared_min_sector_radius,
-            squared_radii_difference=squared_radii_difference)
+            squared_radii_difference=squared_radii_difference,
+            generator=np.random.rand)
 
     disks_stars['r_cylindrical'] = disks_r_cylindrical(
             size=disks_stars.shape[0],
@@ -55,7 +56,13 @@ def assign_polar_coordinates(
             scale_length=scale_length,
             radial_distrib_max=radial_distrib_max,
             squared_min_sector_radius=squared_min_sector_radius,
-            squared_radii_difference=squared_radii_difference)
+            squared_radii_difference=squared_radii_difference,
+            generator=np.random.uniform)
+
+    halo_stars['z_coordinate'] = halo_z_coordinates(
+            angle_covering_sector=angle_covering_sector,
+            r_cylindrical=disks_stars['r_cylindrical'],
+            generator=np.random.uniform)
 
     set_z_coordinate(stars,
                      angle_covering_sector=angle_covering_sector,
@@ -70,6 +77,17 @@ def assign_polar_coordinates(
     return stars
 
 
+def halo_z_coordinates(*,
+                       angle_covering_sector: float,
+                       r_cylindrical: np.ndarray,
+                       generator: Callable[[float, float, float], np.ndarray]
+                       ) -> np.ndarray:
+    random_angles = generator(low=-angle_covering_sector / 2.,
+                              high=angle_covering_sector / 2.,
+                              size=r_cylindrical.size)
+    return r_cylindrical * np.sin(random_angles)
+
+
 def disks_r_cylindrical(*,
                         size: int,
                         min_sector_radius: float,
@@ -77,13 +95,16 @@ def disks_r_cylindrical(*,
                         scale_length: float,
                         radial_distrib_max: float,
                         squared_min_sector_radius: float,
-                        squared_radii_difference: float) -> np.ndarray:
+                        squared_radii_difference: float,
+                        generator: Callable[[float, float, float], np.ndarray]
+                        ) -> np.ndarray:
     radii_tries = disks_stars_radii_tries(
             size=size,
             min_sector_radius=min_sector_radius,
             max_sector_radius=max_sector_radius,
             scale_length=scale_length,
-            radial_distrib_max=radial_distrib_max)
+            radial_distrib_max=radial_distrib_max,
+            generator=generator)
 
     # TODO: put this in a function
     # Inverse transform sampling method for generating stars
@@ -100,12 +121,14 @@ def halo_r_cylindrical(*,
                        max_sector_radius: float,
                        halo_core_radius: float,
                        squared_min_sector_radius: float,
-                       squared_radii_difference: float) -> np.ndarray:
+                       squared_radii_difference: float,
+                       generator: Callable[[Tuple[int, ...]], np.ndarray]
+                       ) -> np.ndarray:
     radii_tries = halo_stars_radii_tries(size=size,
                                          min_sector_radius=min_sector_radius,
                                          max_sector_radius=max_sector_radius,
                                          halo_core_radius=halo_core_radius,
-                                         generator=np.random.rand)
+                                         generator=generator)
 
     # Inverse transform sampling method for generating stars
     # uniformly in a circle sector in polar coordinates
@@ -134,12 +157,14 @@ def halo_stars_radii_tries(*,
                               + min_atan))
 
 
-def disks_stars_radii_tries(*,
-                            size: int,
-                            min_sector_radius: float,
-                            max_sector_radius: float,
-                            scale_length: float,
-                            radial_distrib_max: float) -> np.ndarray:
+def disks_stars_radii_tries(
+        *,
+        size: int,
+        min_sector_radius: float,
+        max_sector_radius: float,
+        scale_length: float,
+        radial_distrib_max: float,
+        generator: Callable[[float, float, float], np.ndarray]) -> np.ndarray:
     disk_stars_radii_function = partial(disk_stars_radius,
                                         scale_length=scale_length)
 
@@ -148,7 +173,7 @@ def disks_stars_radii_tries(*,
                                        min_x=min_sector_radius,
                                        max_x=max_sector_radius,
                                        max_y=radial_distrib_max,
-                                       generator=np.random.uniform)
+                                       generator=generator)
 
     return np.array([disks_radii_distribution()
                      for _ in range(size)])

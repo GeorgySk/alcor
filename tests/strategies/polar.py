@@ -33,3 +33,7 @@ floats_w_lower_limit = partial(strategies.floats,
                                allow_nan=False,
                                allow_infinity=False,
                                max_value=1e14)
+
+positive_floats_arrays = arrays(dtype=float,
+                                shape=array_sizes,
+                                elements=positive_floats)

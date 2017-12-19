@@ -1,4 +1,5 @@
-from typing import Callable
+from typing import (Callable,
+                    Tuple)
 
 import numpy as np
 import pytest
@@ -20,6 +21,11 @@ def angle_covering_sector() -> float:
 @pytest.fixture(scope='function')
 def generator() -> Callable[[float, float, float], np.ndarray]:
     return np.random.uniform
+
+
+@pytest.fixture(scope='function')
+def unit_range_generator() -> Callable[[Tuple[int, ...]], np.ndarray]:
+    return np.random.rand
 
 
 @pytest.fixture(scope='function')
@@ -62,3 +68,8 @@ def squared_min_sector_radius() -> float:
 @pytest.fixture(scope='function')
 def squared_radii_difference() -> float:
     return example(strategies.nonnegative_floats)
+
+
+@pytest.fixture(scope='function')
+def r_cylindrical() -> float:
+    return example(strategies.positive_floats_arrays)
