@@ -15,11 +15,11 @@ from alcor.services.simulations.polar import (thetas_cylindrical,
 def test_theta_cylindrical(
         size: int,
         angle_covering_sector: float,
-        generator: Callable[[float, float, float], np.ndarray]) -> None:
+        array_generator: Callable[[float, float, float], np.ndarray]) -> None:
     thetas = thetas_cylindrical(
             size=size,
             angle_covering_sector=angle_covering_sector,
-            generator=generator)
+            generator=array_generator)
 
     assert isinstance(thetas, np.ndarray)
     assert thetas.size == size
@@ -30,12 +30,13 @@ def test_halo_stars_radii_tries(
         min_sector_radius: float,
         max_sector_radius: float,
         halo_core_radius: float,
-        generator: Callable[[Tuple[int, ...]], np.ndarray]) -> None:
+        array_generator: Callable[[Tuple[int, ...]], np.ndarray]
+        ) -> None:
     radii_tries = halo_stars_radii_tries(size=size,
                                          min_sector_radius=min_sector_radius,
                                          max_sector_radius=max_sector_radius,
                                          halo_core_radius=halo_core_radius,
-                                         generator=generator)
+                                         generator=array_generator)
 
     assert (isinstance(radii_tries, float) or
             isinstance(radii_tries, np.ndarray))
@@ -48,14 +49,14 @@ def test_disks_stars_radii_tries(
         max_sector_radius: float,
         scale_length: float,
         radial_distrib_max: float,
-        generator: Callable[[float, float, float], np.ndarray]) -> None:
+        array_generator: Callable[[float, float, float], np.ndarray]) -> None:
     radii_tries = disks_stars_radii_tries(
             size=size,
             min_sector_radius=min_sector_radius,
             max_sector_radius=max_sector_radius,
             scale_length=scale_length,
             radial_distrib_max=radial_distrib_max,
-            generator=generator)
+            generator=array_generator)
 
     assert isinstance(radii_tries, (float, np.ndarray))
     assert radii_tries.size == size
@@ -90,7 +91,7 @@ def test_disks_r_cylindrical(
         radial_distrib_max: float,
         squared_min_sector_radius: float,
         squared_radii_difference: float,
-        generator: Callable[[float, float, float], np.ndarray]) -> None:
+        array_generator: Callable[[float, float, float], np.ndarray]) -> None:
     coordinates = disks_r_cylindrical(
             size=size,
             min_sector_radius=min_sector_radius,
@@ -99,7 +100,7 @@ def test_disks_r_cylindrical(
             radial_distrib_max=radial_distrib_max,
             squared_min_sector_radius=squared_min_sector_radius,
             squared_radii_difference=squared_radii_difference,
-            generator=generator)
+            generator=array_generator)
 
     assert isinstance(coordinates, (float, np.ndarray))
     assert coordinates.size == size
@@ -108,11 +109,11 @@ def test_disks_r_cylindrical(
 def test_halo_z_coordinates(
         angle_covering_sector: float,
         r_cylindrical: np.ndarray,
-        generator: Callable[[float, float, float], np.ndarray]) -> None:
+        array_generator: Callable[[float, float, float], np.ndarray]) -> None:
     coordinates = halo_z_coordinates(
             angle_covering_sector=angle_covering_sector,
             r_cylindrical=r_cylindrical,
-            generator=generator)
+            generator=array_generator)
 
     assert isinstance(coordinates, (float, np.ndarray))
     assert coordinates.size == r_cylindrical.size

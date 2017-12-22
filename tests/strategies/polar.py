@@ -4,6 +4,8 @@ from hypothesis import strategies
 from hypothesis.extra.numpy import arrays
 import numpy as np
 
+from .utils import positive_floats
+
 GALACTIC_STRUCTURES = ['thin', 'thick', 'halo']
 
 angles = strategies.floats(allow_nan=False,
@@ -24,11 +26,6 @@ nonnegative_floats = strategies.floats(allow_nan=False,
                                        min_value=0.,
                                        max_value=1e14)
 
-positive_floats = strategies.floats(allow_nan=False,
-                                    allow_infinity=False,
-                                    min_value=0.,
-                                    max_value=1e14).filter(lambda x: x != 0.)
-
 floats_w_lower_limit = partial(strategies.floats,
                                allow_nan=False,
                                allow_infinity=False,
@@ -36,4 +33,4 @@ floats_w_lower_limit = partial(strategies.floats,
 
 positive_floats_arrays = arrays(dtype=float,
                                 shape=array_sizes,
-                                elements=positive_floats)
+                                elements=positive_floats(max_value=1e14))

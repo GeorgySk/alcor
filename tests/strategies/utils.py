@@ -22,14 +22,6 @@ def positive_floats(max_value: Optional[float] = None) -> SearchStrategy:
                              allow_infinity=False).filter(lambda x: x != 0.)
 
 
-
-def positive_floats(max_value: Optional[float] = None) -> SearchStrategy:
-    return strategies.floats(min_value=0.,
-                             max_value=max_value,
-                             allow_nan=False,
-                             allow_infinity=False).filter(lambda x: x != 0.)
-
-
 non_numbers_alphabet = strategies.characters(
         blacklist_characters=string.digits)
 non_float_strings = strategies.text(non_numbers_alphabet)

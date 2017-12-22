@@ -20,7 +20,7 @@ def angle_covering_sector() -> float:
 
 
 @pytest.fixture(scope='function')
-def generator() -> Callable[[float, float, float], np.ndarray]:
+def array_generator() -> Callable[[float, float, float], np.ndarray]:
     return np.random.uniform
 
 
@@ -48,12 +48,12 @@ def max_sector_radius(min_sector_radius) -> float:
 
 @pytest.fixture(scope='function')
 def halo_core_radius() -> float:
-    return example(strategies.positive_floats)
+    return example(strategies.positive_floats(max_value=1e14))
 
 
 @pytest.fixture(scope='function')
 def scale_length() -> float:
-    return example(strategies.positive_floats)
+    return example(strategies.positive_floats(max_value=1e14))
 
 
 @pytest.fixture(scope='function')
@@ -83,7 +83,7 @@ def sector_radius() -> float:
 
 @pytest.fixture(scope='function')
 def scale_height() -> float:
-    return example(strategies.positive_floats)
+    return example(strategies.positive_floats(max_value=1e14))
 
 
 @pytest.fixture(scope='function')
