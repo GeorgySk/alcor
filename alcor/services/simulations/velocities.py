@@ -21,7 +21,9 @@ def set_velocities(stars: pd.DataFrame,
                    lsr_velocity: float = -220.,
                    solar_galactocentric_distance: float,
                    oort_a_const: float,
-                   oort_b_const: float) -> None:
+                   oort_b_const: float,
+                   generator: GaussianGeneratorType = np.random.normal
+                   ) -> None:
     halo_stars_mask = stars['galactic_disk_type'] == 'halo'
     thin_disk_stars_mask = stars['galactic_disk_type'] == 'thin'
     thick_disk_stars_mask = stars['galactic_disk_type'] == 'thick'
@@ -40,7 +42,7 @@ def set_velocities(stars: pd.DataFrame,
             w_peculiar_solar_velocity=w_peculiar_solar_velocity,
             lsr_velocity=lsr_velocity,
             spherical_velocity_component_sigma=lsr_velocity / np.sqrt(2.),
-            generator=np.random.normal)
+            generator=generator)
 
     stars_velocities = partial(
             disk_stars_velocities,
@@ -49,7 +51,8 @@ def set_velocities(stars: pd.DataFrame,
             w_peculiar_solar_velocity=w_peculiar_solar_velocity,
             solar_galactocentric_distance=solar_galactocentric_distance,
             oort_a_const=oort_a_const,
-            oort_b_const=oort_b_const)
+            oort_b_const=oort_b_const,
+            generator=generator)
 
     (thin_disk_stars['u_velocity'],
      thin_disk_stars['v_velocity'],
@@ -80,7 +83,8 @@ def disk_stars_velocities(*,
                           oort_b_const: float,
                           u_velocity_dispersion: float,
                           v_velocity_dispersion: float,
-                          w_velocity_dispersion: float
+                          w_velocity_dispersion: float,
+                          generator: GaussianGeneratorType
                           ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     # TODO: find out what it means
     uops = (u_peculiar_solar_velocity
@@ -95,11 +99,11 @@ def disk_stars_velocities(*,
 
     stars_count = r_cylindrical.size
 
-    u_velocities = (u_velocity_dispersion * np.random.normal(size=stars_count)
+    u_velocities = (u_velocity_dispersion * generator(size=stars_count)
                     + uops)
-    v_velocities = (v_velocity_dispersion * np.random.normal(size=stars_count)
+    v_velocities = (v_velocity_dispersion * generator(size=stars_count)
                     + vops - u_velocity_dispersion ** 2 / 120.)
-    w_velocities = (w_velocity_dispersion * np.random.normal(size=stars_count)
+    w_velocities = (w_velocity_dispersion * generator(size=stars_count)
                     + w_peculiar_solar_velocity)
 
     return u_velocities, v_velocities, w_velocities
