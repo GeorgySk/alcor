@@ -1,9 +1,5 @@
 from functools import partial
-import math
-from typing import (Callable,
-                    Union,
-                    Iterable,
-                    Tuple)
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -37,68 +33,76 @@ def set_velocities(stars: pd.DataFrame,
     (halo_stars['u_velocity'],
      halo_stars['v_velocity'],
      halo_stars['w_velocity']) = halo_stars_velocities(
-            galactic_longitudes=halo_stars['galactic_longitude'],
-            thetas_cylindrical=halo_stars['theta_cylindrical'],
+            galactic_longitudes=halo_stars['galactic_longitude'].values,
+            thetas_cylindrical=halo_stars['theta_cylindrical'].values,
             u_peculiar_solar_velocity=u_peculiar_solar_velocity,
             v_peculiar_solar_velocity=v_peculiar_solar_velocity,
             w_peculiar_solar_velocity=w_peculiar_solar_velocity,
             lsr_velocity=lsr_velocity,
             spherical_velocity_component_sigma=lsr_velocity / np.sqrt(2.),
             generator=np.random.normal)
-    set_stars_velocities = partial(
-            set_disk_stars_velocities,
+
+    stars_velocities = partial(
+            disk_stars_velocities,
             u_peculiar_solar_velocity=u_peculiar_solar_velocity,
             v_peculiar_solar_velocity=v_peculiar_solar_velocity,
             w_peculiar_solar_velocity=w_peculiar_solar_velocity,
             solar_galactocentric_distance=solar_galactocentric_distance,
             oort_a_const=oort_a_const,
             oort_b_const=oort_b_const)
-    set_stars_velocities(
-            thin_disk_stars,
+
+    (thin_disk_stars['u_velocity'],
+     thin_disk_stars['v_velocity'],
+     thin_disk_stars['w_velocity']) = stars_velocities(
+            r_cylindrical=thin_disk_stars['r_cylindrical'],
+            thetas_cylindrical=thin_disk_stars['theta_cylindrical'],
             u_velocity_dispersion=u_velocity_std_thin_disk,
             v_velocity_dispersion=v_velocity_std_thin_disk,
             w_velocity_dispersion=w_velocity_std_thin_disk)
-    set_stars_velocities(
-            thick_disk_stars,
+    (thick_disk_stars['u_velocity'],
+     thick_disk_stars['v_velocity'],
+     thick_disk_stars['w_velocity']) = stars_velocities(
+            r_cylindrical=thick_disk_stars['r_cylindrical'],
+            thetas_cylindrical=thick_disk_stars['theta_cylindrical'],
             u_velocity_dispersion=u_velocity_std_thick_disk,
             v_velocity_dispersion=v_velocity_std_thick_disk,
             w_velocity_dispersion=w_velocity_std_thick_disk)
 
 
-def set_disk_stars_velocities(stars: pd.DataFrame,
-                              *,
-                              u_peculiar_solar_velocity: float,
-                              v_peculiar_solar_velocity: float,
-                              w_peculiar_solar_velocity: float,
-                              solar_galactocentric_distance: float,
-                              oort_a_const: float,
-                              oort_b_const: float,
-                              u_velocity_dispersion: float,
-                              v_velocity_dispersion: float,
-                              w_velocity_dispersion: float) -> None:
+def disk_stars_velocities(*,
+                          r_cylindrical: np.ndarray,
+                          thetas_cylindrical: np.ndarray,
+                          u_peculiar_solar_velocity: float,
+                          v_peculiar_solar_velocity: float,
+                          w_peculiar_solar_velocity: float,
+                          solar_galactocentric_distance: float,
+                          oort_a_const: float,
+                          oort_b_const: float,
+                          u_velocity_dispersion: float,
+                          v_velocity_dispersion: float,
+                          w_velocity_dispersion: float
+                          ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     # TODO: find out what it means
     uops = (u_peculiar_solar_velocity
-            + ((3. - (2. * stars['r_cylindrical'])
-                     / solar_galactocentric_distance)
-               * oort_a_const - oort_b_const) * stars['r_cylindrical']
-              * np.sin(stars['theta_cylindrical']))
+            + ((3. - (2. * r_cylindrical) / solar_galactocentric_distance)
+               * oort_a_const - oort_b_const) * r_cylindrical
+            * np.sin(thetas_cylindrical))
     vops = (v_peculiar_solar_velocity
-            + ((3. - (2. * stars['r_cylindrical'])
-                     / solar_galactocentric_distance)
-               * oort_a_const - oort_b_const) * stars['r_cylindrical']
-              * np.cos(stars['theta_cylindrical'])
+            + ((3. - (2. * r_cylindrical) / solar_galactocentric_distance)
+               * oort_a_const - oort_b_const) * r_cylindrical
+            * np.cos(thetas_cylindrical)
             - (oort_a_const - oort_b_const) * solar_galactocentric_distance)
 
-    stars_count = stars.shape[0]
+    stars_count = r_cylindrical.size
 
-    stars['u_velocity'] = (u_velocity_dispersion
-                           * np.random.normal(size=stars_count) + uops)
-    stars['v_velocity'] = (v_velocity_dispersion *
-                           np.random.normal(size=stars_count) + vops
-                           - u_velocity_dispersion ** 2 / 120.)
-    stars['w_velocity'] = (w_velocity_dispersion
-                           * np.random.normal(size=stars_count)
-                           + w_peculiar_solar_velocity)
+    u_velocities = (u_velocity_dispersion * np.random.normal(size=stars_count)
+                    + uops)
+    v_velocities = (v_velocity_dispersion * np.random.normal(size=stars_count)
+                    + vops - u_velocity_dispersion ** 2 / 120.)
+    w_velocities = (w_velocity_dispersion * np.random.normal(size=stars_count)
+                    + w_peculiar_solar_velocity)
+
+    return u_velocities, v_velocities, w_velocities
 
 
 # TODO: find out what is going on here
