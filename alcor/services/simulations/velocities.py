@@ -1,8 +1,14 @@
 from functools import partial
 import math
+from typing import (Callable,
+                    Union,
+                    Iterable,
+                    Tuple)
 
 import numpy as np
 import pandas as pd
+
+from alcor.types import GaussianGeneratorType
 
 
 def set_velocities(stars: pd.DataFrame,
@@ -16,6 +22,7 @@ def set_velocities(stars: pd.DataFrame,
                    u_peculiar_solar_velocity: float = -11.,
                    v_peculiar_solar_velocity: float = -12.,
                    w_peculiar_solar_velocity: float = -7.,
+                   lsr_velocity: float = -220.,
                    solar_galactocentric_distance: float,
                    oort_a_const: float,
                    oort_b_const: float) -> None:
@@ -27,11 +34,17 @@ def set_velocities(stars: pd.DataFrame,
     thin_disk_stars = stars[thin_disk_stars_mask]
     thick_disk_stars = stars[thick_disk_stars_mask]
 
-    set_halo_stars_velocities(
-            halo_stars,
+    (halo_stars['u_velocity'],
+     halo_stars['v_velocity'],
+     halo_stars['w_velocity']) = halo_stars_velocities(
+            galactic_longitudes=halo_stars['galactic_longitude'],
+            thetas_cylindrical=halo_stars['theta_cylindrical'],
             u_peculiar_solar_velocity=u_peculiar_solar_velocity,
             v_peculiar_solar_velocity=v_peculiar_solar_velocity,
-            w_peculiar_solar_velocity=w_peculiar_solar_velocity)
+            w_peculiar_solar_velocity=w_peculiar_solar_velocity,
+            lsr_velocity=lsr_velocity,
+            spherical_velocity_component_sigma=lsr_velocity / np.sqrt(2.),
+            generator=np.random.normal)
     set_stars_velocities = partial(
             set_disk_stars_velocities,
             u_peculiar_solar_velocity=u_peculiar_solar_velocity,
@@ -89,65 +102,57 @@ def set_disk_stars_velocities(stars: pd.DataFrame,
 
 
 # TODO: find out what is going on here
-# More details at: "Simulating Gaia performances on white dwarfs" by S.Torres
-def set_halo_stars_velocities(stars: pd.DataFrame,
-                              *,
-                              u_peculiar_solar_velocity: float,
-                              v_peculiar_solar_velocity: float,
-                              w_peculiar_solar_velocity: float,
-                              ro_param: float = 10.5,
-                              l_param: float = 5.5,
-                              sigo_param: float = 80.,
-                              sigm_param: float = 145.,
-                              lsr_motion: float = 220.,
-                              gamma: float = 3.4) -> None:
-    # "Radial and tangential dispersions"
-    galactocentric_distances = np.sqrt(np.power(stars['r_cylindrical'], 2)
-                                       + np.power(stars['z_coordinate'], 2))
-    xx_params = (galactocentric_distances - ro_param) / l_param
+def halo_stars_velocities(*,
+                          galactic_longitudes: np.ndarray,
+                          thetas_cylindrical: np.ndarray,
+                          u_peculiar_solar_velocity: float,
+                          v_peculiar_solar_velocity: float,
+                          w_peculiar_solar_velocity: float,
+                          lsr_velocity: float,
+                          spherical_velocity_component_sigma: float,
+                          generator: GaussianGeneratorType
+                          ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    More details at: "Simulating Gaia performances on white dwarfs" by S.Torres
+    """
+    stars_count = galactic_longitudes.shape[0]
 
-    squared_sigo_param = sigo_param ** 2
-    squared_sigm_param = sigm_param ** 2
-    sigr2_params = (
-         squared_sigm_param * (0.5 - np.arctan(xx_params / np.pi))
-         + squared_sigo_param)
-    dsigr2dr_params = (-(1. / l_param) * squared_sigm_param
-                       / ((1. + np.power(xx_params, 2)) * np.pi))
-    sigt2_params = (0.5 * lsr_motion ** 2 + (1. - gamma / 2.) * sigr2_params
-                    + (galactocentric_distances / 2.) * dsigr2dr_params)
-    sigr_params = np.sqrt(sigr2_params)
-    sigt_params = np.sqrt(sigt2_params)
-    sigr_params = lsr_motion / math.sqrt(2.)
-    sigt_params = lsr_motion / math.sqrt(2.)
+    r_spherical_velocities = (spherical_velocity_component_sigma
+                              * generator(size=stars_count))
+    theta_spherical_velocities = (spherical_velocity_component_sigma
+                                  * generator(size=stars_count))
+    phi_spherical_velocities = (spherical_velocity_component_sigma
+                                * generator(size=stars_count))
 
-    # "Spherical coordinates"
-    stars_count = stars.shape[0]
-    r_spherical_velocities = sigr_params * np.random.normal(size=stars_count)
-    theta_spherical_velocities = (sigt_params
-                                  * np.random.normal(size=stars_count))
-    phi_spherical_velocities = (sigt_params
-                                * np.random.normal(size=stars_count))
+    deltas = np.pi - galactic_longitudes - thetas_cylindrical
 
-    # "Cartesian velocities"
-    deltas = np.pi - stars['galactic_longitude'] - stars['theta_cylindrical']
-    sin_deltas = np.sin(deltas)
-    cos_deltas = np.cos(deltas)
-    x_velocities = (-cos_deltas * r_spherical_velocities
-                    + sin_deltas * phi_spherical_velocities)
-    y_velocities = (sin_deltas * r_spherical_velocities
-                    + cos_deltas * phi_spherical_velocities)
+    x_velocities, y_velocities = rotate_vectors(
+            x_values=r_spherical_velocities,
+            y_values=phi_spherical_velocities,
+            angles=deltas)
+    x_velocities = -x_velocities  # TODO: why minus?
     z_velocities = theta_spherical_velocities
-    sin_galactic_longitudes = np.sin(stars['galactic_longitude'])
-    cos_galactic_longitudes = np.cos(stars['galactic_longitude'])
 
-    u_velocities = (z_velocities * cos_galactic_longitudes
-                    + x_velocities * sin_galactic_longitudes)
-    v_velocities = (-z_velocities * sin_galactic_longitudes
-                    + x_velocities * cos_galactic_longitudes)
+    v_velocities, u_velocities = rotate_vectors(x_values=x_velocities,
+                                                y_values=z_velocities,
+                                                angles=galactic_longitudes)
     w_velocities = y_velocities
 
-    v_velocities -= lsr_motion
+    u_velocities += u_peculiar_solar_velocity
+    v_velocities += v_peculiar_solar_velocity - lsr_velocity
+    w_velocities += w_peculiar_solar_velocity
 
-    stars['u_velocity'] = u_velocities + u_peculiar_solar_velocity
-    stars['v_velocity'] = v_velocities + v_peculiar_solar_velocity
-    stars['w_velocity'] = w_velocities + w_peculiar_solar_velocity
+    return u_velocities, v_velocities, w_velocities
+
+
+def rotate_vectors(*,
+                   x_values: np.ndarray,
+                   y_values: np.ndarray,
+                   angles: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    sin_angles = np.sin(angles)
+    cos_angles = np.cos(angles)
+
+    rotated_x_values = cos_angles * x_values - sin_angles * y_values
+    rotated_y_values = sin_angles * x_values + cos_angles * y_values
+
+    return rotated_x_values, rotated_y_values
