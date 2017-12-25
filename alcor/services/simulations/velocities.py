@@ -4,6 +4,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 
+from alcor.models.star import GalacticDiskType
 from alcor.types import GaussianGeneratorType
 
 
@@ -24,9 +25,10 @@ def set_velocities(stars: pd.DataFrame,
                    oort_b_const: float,
                    generator: GaussianGeneratorType = np.random.normal
                    ) -> None:
-    halo_stars_mask = stars['galactic_disk_type'] == 'halo'
-    thin_disk_stars_mask = stars['galactic_disk_type'] == 'thin'
-    thick_disk_stars_mask = stars['galactic_disk_type'] == 'thick'
+    halo_stars_mask = stars['galactic_disk_type'] == GalacticDiskType.halo
+    thin_disk_stars_mask = stars['galactic_disk_type'] == GalacticDiskType.thin
+    thick_disk_stars_mask = (stars['galactic_disk_type']
+                             == GalacticDiskType.thick)
 
     halo_stars = stars[halo_stars_mask]
     thin_disk_stars = stars[thin_disk_stars_mask]
