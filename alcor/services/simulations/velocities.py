@@ -101,6 +101,7 @@ def disk_stars_velocities(*,
 
     u_velocities = (u_velocity_dispersion * generator(size=stars_count)
                     + uops)
+    # TODO: what is this 120.?
     v_velocities = (v_velocity_dispersion * generator(size=stars_count)
                     + vops - u_velocity_dispersion ** 2 / 120.)
     w_velocities = (w_velocity_dispersion * generator(size=stars_count)
