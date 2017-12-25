@@ -4,3 +4,5 @@ from .stars import (defined_stars,
                     undefined_stars_lists)
 from .utils import (floats,
                     non_float_strings)
+from .velocities import (floats_arrays,
+                         floats_arrays_w_size)
