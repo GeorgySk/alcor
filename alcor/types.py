@@ -1,7 +1,8 @@
 from typing import (Union,
-                    Dict,
                     Callable,
-                    Iterable)
+                    Iterable,
+                    Dict,
+                    Tuple)
 
 import numpy as np
 
@@ -15,3 +16,6 @@ GaussianGeneratorType = Callable[[Union[float, np.ndarray, Iterable],
                                   Union[float, np.ndarray, Iterable],
                                   Union[int, Iterable[int], None]],
                                  Union[np.ndarray, int, float, complex]]
+GeneratorType = Callable[[float, float, float], np.ndarray]
+UnitRangeGeneratorType = Callable[[Tuple[int, ...]], np.ndarray]
+ArrayOperatorType = Callable[[np.ndarray], np.ndarray]

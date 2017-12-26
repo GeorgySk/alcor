@@ -1,6 +1,11 @@
-ARG PYTHON3_VERSION=3
+ARG PYTHON3_VERSION
 
 FROM python:${PYTHON3_VERSION}
+
+RUN apt-get update && \
+    apt-get install -y unzip
+
+RUN python3 -m pip install pydevd>=1.1.1
 
 WORKDIR /alcor
 
@@ -9,6 +14,10 @@ COPY ./tests tests
 COPY ./README.rst README.rst
 COPY ./setup.py setup.py
 COPY ./setup.cfg setup.cfg
-RUN python3 -m pip install .
+RUN python3 -m pip install -e .
 
-CMD ["python3", "setup.py", "test"]
+RUN cd tests/tables && \
+    unzip -o fort_files.zip
+
+COPY ./run-plain-tests.sh run-plain-tests.sh
+ENTRYPOINT ["./run-plain-tests.sh"]
