@@ -36,6 +36,8 @@ from .stars import (defined_stars,
                     defined_stars_lists,
                     undefined_stars_lists)
 from .utils import (floats,
-                    metallicities,
                     non_float_strings,
+                    metallicities,
                     positive_floats)
+from .velocities import (floats_arrays,
+                         floats_arrays_w_size)
