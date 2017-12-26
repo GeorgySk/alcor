@@ -69,8 +69,8 @@ def set_velocities(stars: pd.DataFrame,
 
 def disk_stars(*,
                stars: pd.DataFrame,
-               disk: GalacticDiskType) -> pd.DataFrame:
-    mask = stars['galactic_disk_type'] == disk
+               disk_type: GalacticDiskType) -> pd.DataFrame:
+    mask = stars['galactic_disk_type'] == disk_type
     return stars[mask]
 
 
