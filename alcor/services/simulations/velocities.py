@@ -25,13 +25,13 @@ def set_velocities(stars: pd.DataFrame,
                    oort_constant_b: float,
                    generator: GaussianGeneratorType = np.random.normal
                    ) -> None:
-    halo_stars = galactic_structure_stars(
+    halo_stars = galactic_disk_stars(
             stars=stars,
             galactic_structure=GalacticDiskType.halo)
-    thin_disk_stars = galactic_structure_stars(
+    thin_disk_stars = galactic_disk_stars(
             stars=stars,
             galactic_structure=GalacticDiskType.thin)
-    thick_disk_stars = galactic_structure_stars(
+    thick_disk_stars = galactic_disk_stars(
             stars=stars,
             galactic_structure=GalacticDiskType.thick)
 
@@ -67,11 +67,10 @@ def set_velocities(stars: pd.DataFrame,
             velocity_dispersion=thick_disk_velocity_std)
 
 
-def galactic_structure_stars(
-        *,
-        stars: pd.DataFrame,
-        galactic_structure: GalacticDiskType) -> pd.DataFrame:
-    mask = stars['galactic_disk_type'] == galactic_structure
+def disk_stars(*,
+               stars: pd.DataFrame,
+               disk: GalacticDiskType) -> pd.DataFrame:
+    mask = stars['galactic_disk_type'] == disk
     return stars[mask]
 
 
