@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 import numpy as np
 import pytest
 
@@ -34,7 +36,7 @@ def thetas_cylindrical(galactic_longitudes: np.ndarray) -> np.ndarray:
 
 
 @pytest.fixture(scope='function')
-def peculiar_solar_velocity() -> float:
+def peculiar_solar_velocity() -> NamedTuple:
     return VelocityVector(u=example(strategies.floats),
                           v=example(strategies.floats),
                           w=example(strategies.floats))
@@ -77,7 +79,7 @@ def oort_b_const() -> float:
 
 
 @pytest.fixture(scope='function')
-def velocity_dispersion() -> float:
+def velocity_dispersion() -> NamedTuple:
     return VelocityVector(u=example(strategies.floats),
                           v=example(strategies.floats),
                           w=example(strategies.floats))

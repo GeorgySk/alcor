@@ -1,9 +1,10 @@
+from typing import NamedTuple
+
 import numpy as np
 
 from alcor.services.simulations.velocities import (rotate_vectors,
                                                    halo_stars_velocities,
-                                                   disk_stars_velocities,
-                                                   VelocityVector)
+                                                   disk_stars_velocities)
 from alcor.types import GaussianGeneratorType
 
 
@@ -23,7 +24,7 @@ def test_rotate_vectors(*,
 
 def test_halo_stars_velocities(galactic_longitudes: np.ndarray,
                                thetas_cylindrical: np.ndarray,
-                               peculiar_solar_velocity: VelocityVector,
+                               peculiar_solar_velocity: NamedTuple,
                                lsr_velocity: float,
                                spherical_velocity_component_sigma: float,
                                gaussian_generator: GaussianGeneratorType
@@ -47,12 +48,12 @@ def test_halo_stars_velocities(galactic_longitudes: np.ndarray,
 
 def test_disk_stars_velocities(r_cylindrical: np.ndarray,
                                thetas: np.ndarray,
-                               peculiar_solar_velocity: VelocityVector,
+                               peculiar_solar_velocity: NamedTuple,
                                gaussian_generator: GaussianGeneratorType,
                                solar_galactocentric_distance: float,
                                oort_a_const: float,
                                oort_b_const: float,
-                               velocity_dispersion: VelocityVector,
+                               velocity_dispersion: NamedTuple,
                                ) -> None:
     x_velocities, y_velocities, z_velocities = disk_stars_velocities(
             thetas_cylindrical=thetas,
