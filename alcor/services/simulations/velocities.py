@@ -1,7 +1,6 @@
 from collections import namedtuple
 from functools import partial
-from typing import (Tuple,
-                    NamedTuple)
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -14,15 +13,12 @@ VelocityVector = namedtuple('VelocityVector', ['u', 'v', 'w'])
 
 def set_velocities(stars: pd.DataFrame,
                    *,
-                   thin_disk_velocity_std: NamedTuple = VelocityVector(u=32.4,
-                                                                       v=23.,
-                                                                       w=18.1),
-                   thick_disk_velocity_std: NamedTuple = VelocityVector(u=50.,
-                                                                        v=56.,
-                                                                        w=34.),
-                   peculiar_solar_velocity: NamedTuple = VelocityVector(u=-11.,
-                                                                        v=-12.,
-                                                                        w=-7.),
+                   thin_disk_velocity_std: VelocityVector = VelocityVector(
+                           u=32.4, v=23., w=18.1),
+                   thick_disk_velocity_std: VelocityVector = VelocityVector(
+                           u=50., v=56., w=34.),
+                   peculiar_solar_velocity: VelocityVector = VelocityVector(
+                           u=-11., v=-12., w=-7.),
                    lsr_velocity: float = -220.,
                    solar_galactocentric_distance: float,
                    oort_constant_a: float,
