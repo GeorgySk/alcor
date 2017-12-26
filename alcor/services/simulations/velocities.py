@@ -25,8 +25,8 @@ def set_velocities(stars: pd.DataFrame,
                                                                         w=-7.),
                    lsr_velocity: float = -220.,
                    solar_galactocentric_distance: float,
-                   oort_a_const: float,
-                   oort_b_const: float,
+                   oort_constant_a: float,
+                   oort_constant_b: float,
                    generator: GaussianGeneratorType = np.random.normal
                    ) -> None:
     halo_stars = galactic_structure_stars(
@@ -53,8 +53,8 @@ def set_velocities(stars: pd.DataFrame,
             disk_stars_velocities,
             peculiar_solar_velocity=peculiar_solar_velocity,
             solar_galactocentric_distance=solar_galactocentric_distance,
-            oort_a_const=oort_a_const,
-            oort_b_const=oort_b_const,
+            oort_a_const=oort_constant_a,
+            oort_b_const=oort_constant_b,
             generator=generator)
 
     (thin_disk_stars['u_velocity'],
@@ -84,21 +84,22 @@ def disk_stars_velocities(*,
                           thetas_cylindrical: np.ndarray,
                           peculiar_solar_velocity: VelocityVector,
                           solar_galactocentric_distance: float,
-                          oort_a_const: float,
-                          oort_b_const: float,
+                          oort_constant_a: float,
+                          oort_constant_b: float,
                           velocity_dispersion: VelocityVector,
                           generator: GaussianGeneratorType
                           ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     # TODO: find out what it means
     uops = (peculiar_solar_velocity.u
             + ((3. - (2. * r_cylindrical) / solar_galactocentric_distance)
-               * oort_a_const - oort_b_const) * r_cylindrical
+               * oort_constant_a - oort_constant_b) * r_cylindrical
             * np.sin(thetas_cylindrical))
     vops = (peculiar_solar_velocity.v
             + ((3. - (2. * r_cylindrical) / solar_galactocentric_distance)
-               * oort_a_const - oort_b_const) * r_cylindrical
+               * oort_constant_a - oort_constant_b) * r_cylindrical
             * np.cos(thetas_cylindrical)
-            - (oort_a_const - oort_b_const) * solar_galactocentric_distance)
+            - (oort_constant_a - oort_constant_b)
+            * solar_galactocentric_distance)
 
     stars_count = r_cylindrical.size
 

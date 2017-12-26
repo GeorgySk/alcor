@@ -69,12 +69,12 @@ def thetas(r_cylindrical: np.ndarray) -> np.ndarray:
 
 
 @pytest.fixture(scope='function')
-def oort_a_const() -> float:
+def oort_constant_a() -> float:
     return example(strategies.floats)
 
 
 @pytest.fixture(scope='function')
-def oort_b_const() -> float:
+def oort_constant_b() -> float:
     return example(strategies.floats)
 
 
