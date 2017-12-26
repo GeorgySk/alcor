@@ -2,7 +2,8 @@ import numpy as np
 
 from alcor.services.simulations.velocities import (rotate_vectors,
                                                    halo_stars_velocities,
-                                                   disk_stars_velocities)
+                                                   disk_stars_velocities,
+                                                   VelocityVector)
 from alcor.types import GaussianGeneratorType
 
 
