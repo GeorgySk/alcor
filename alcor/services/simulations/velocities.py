@@ -25,15 +25,15 @@ def set_velocities(stars: pd.DataFrame,
                    oort_constant_b: float,
                    generator: GaussianGeneratorType = np.random.normal
                    ) -> None:
-    halo_stars = galactic_disk_stars(
+    halo_stars = disk_stars(
             stars=stars,
-            galactic_structure=GalacticDiskType.halo)
-    thin_disk_stars = galactic_disk_stars(
+            disk_type=GalacticDiskType.halo)
+    thin_disk_stars = disk_stars(
             stars=stars,
-            galactic_structure=GalacticDiskType.thin)
-    thick_disk_stars = galactic_disk_stars(
+            disk_type=GalacticDiskType.thin)
+    thick_disk_stars = disk_stars(
             stars=stars,
-            galactic_structure=GalacticDiskType.thick)
+            disk_type=GalacticDiskType.thick)
 
     (halo_stars['u_velocity'],
      halo_stars['v_velocity'],
