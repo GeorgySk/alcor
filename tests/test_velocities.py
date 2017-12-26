@@ -2,7 +2,8 @@ import numpy as np
 
 from alcor.services.simulations.velocities import (rotate_vectors,
                                                    halo_stars_velocities,
-                                                   disk_stars_velocities)
+                                                   disk_stars_velocities,
+                                                   VelocityVector)
 from alcor.types import GaussianGeneratorType
 
 
@@ -22,9 +23,7 @@ def test_rotate_vectors(*,
 
 def test_halo_stars_velocities(galactic_longitudes: np.ndarray,
                                thetas_cylindrical: np.ndarray,
-                               u_peculiar_solar_velocity: float,
-                               v_peculiar_solar_velocity: float,
-                               w_peculiar_solar_velocity: float,
+                               peculiar_solar_velocity: VelocityVector,
                                lsr_velocity: float,
                                spherical_velocity_component_sigma: float,
                                gaussian_generator: GaussianGeneratorType
@@ -32,9 +31,7 @@ def test_halo_stars_velocities(galactic_longitudes: np.ndarray,
     x_velocities, y_velocities, z_velocities = halo_stars_velocities(
             galactic_longitudes=galactic_longitudes,
             thetas_cylindrical=thetas_cylindrical,
-            u_peculiar_solar_velocity=u_peculiar_solar_velocity,
-            v_peculiar_solar_velocity=v_peculiar_solar_velocity,
-            w_peculiar_solar_velocity=w_peculiar_solar_velocity,
+            peculiar_solar_velocity=peculiar_solar_velocity,
             lsr_velocity=lsr_velocity,
             spherical_velocity_component_sigma=(
                 spherical_velocity_component_sigma),
@@ -50,30 +47,22 @@ def test_halo_stars_velocities(galactic_longitudes: np.ndarray,
 
 def test_disk_stars_velocities(r_cylindrical: np.ndarray,
                                thetas: np.ndarray,
-                               u_peculiar_solar_velocity: float,
-                               v_peculiar_solar_velocity: float,
-                               w_peculiar_solar_velocity: float,
+                               peculiar_solar_velocity: VelocityVector,
                                gaussian_generator: GaussianGeneratorType,
                                solar_galactocentric_distance: float,
                                oort_a_const: float,
                                oort_b_const: float,
-                               u_velocity_dispersion: float,
-                               v_velocity_dispersion: float,
-                               w_velocity_dispersion: float,
+                               velocity_dispersion: VelocityVector,
                                ) -> None:
     x_velocities, y_velocities, z_velocities = disk_stars_velocities(
             thetas_cylindrical=thetas,
-            u_peculiar_solar_velocity=u_peculiar_solar_velocity,
-            v_peculiar_solar_velocity=v_peculiar_solar_velocity,
-            w_peculiar_solar_velocity=w_peculiar_solar_velocity,
+            peculiar_solar_velocity=peculiar_solar_velocity,
             solar_galactocentric_distance=solar_galactocentric_distance,
             oort_a_const=oort_a_const,
             oort_b_const=oort_b_const,
             generator=gaussian_generator,
             r_cylindrical=r_cylindrical,
-            u_velocity_dispersion=u_velocity_dispersion,
-            v_velocity_dispersion=v_velocity_dispersion,
-            w_velocity_dispersion=w_velocity_dispersion)
+            velocity_dispersion=velocity_dispersion)
 
     assert isinstance(x_velocities, np.ndarray)
     assert isinstance(y_velocities, np.ndarray)

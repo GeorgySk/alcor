@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from alcor.services.simulations.velocities import VelocityVector
 from alcor.types import GaussianGeneratorType
 from tests.utils import example
 from tests import strategies
@@ -33,18 +34,10 @@ def thetas_cylindrical(galactic_longitudes: np.ndarray) -> np.ndarray:
 
 
 @pytest.fixture(scope='function')
-def u_peculiar_solar_velocity() -> float:
-    return example(strategies.floats)
-
-
-@pytest.fixture(scope='function')
-def v_peculiar_solar_velocity() -> float:
-    return example(strategies.floats)
-
-
-@pytest.fixture(scope='function')
-def w_peculiar_solar_velocity() -> float:
-    return example(strategies.floats)
+def peculiar_solar_velocity() -> float:
+    return VelocityVector(u=example(strategies.floats),
+                          v=example(strategies.floats),
+                          w=example(strategies.floats))
 
 
 @pytest.fixture(scope='function')
@@ -74,21 +67,6 @@ def thetas(r_cylindrical: np.ndarray) -> np.ndarray:
 
 
 @pytest.fixture(scope='function')
-def u_peculiar_solar_velocity() -> float:
-    return example(strategies.floats)
-
-
-@pytest.fixture(scope='function')
-def v_peculiar_solar_velocity() -> float:
-    return example(strategies.floats)
-
-
-@pytest.fixture(scope='function')
-def w_peculiar_solar_velocity() -> float:
-    return example(strategies.floats)
-
-
-@pytest.fixture(scope='function')
 def oort_a_const() -> float:
     return example(strategies.floats)
 
@@ -99,18 +77,10 @@ def oort_b_const() -> float:
 
 
 @pytest.fixture(scope='function')
-def u_velocity_dispersion() -> float:
-    return example(strategies.floats)
-
-
-@pytest.fixture(scope='function')
-def v_velocity_dispersion() -> float:
-    return example(strategies.floats)
-
-
-@pytest.fixture(scope='function')
-def w_velocity_dispersion() -> float:
-    return example(strategies.floats)
+def velocity_dispersion() -> float:
+    return VelocityVector(u=example(strategies.floats),
+                          v=example(strategies.floats),
+                          w=example(strategies.floats))
 
 
 @pytest.fixture(scope='function')
