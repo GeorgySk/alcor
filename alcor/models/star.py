@@ -19,7 +19,7 @@ STAR_PARAMETERS_NAMES = {'mass',
                          'proper_motion',
                          'proper_motion_component_b',
                          'proper_motion_component_l',
-                         'proper_motion_component_vr',
+                         'radial_velocity',
                          'right_ascension',
                          'declination',
                          'r_galactocentric',
@@ -78,7 +78,7 @@ class Star(Base):
                                        nullable=True)
     proper_motion_component_l = Column(Float(),
                                        nullable=True)
-    proper_motion_component_vr = Column(Float(),
+    radial_velocity = Column(Float(),
                                         nullable=True)
     right_ascension = Column(Float(),
                              nullable=True)
@@ -129,7 +129,7 @@ class Star(Base):
                  z_coordinate: float = None,
                  proper_motion_component_b: float = None,
                  proper_motion_component_l: float = None,
-                 proper_motion_component_vr: float = None,
+                 radial_velocity: float = None,
                  right_ascension: float = None,
                  declination: float = None,
                  right_ascension_proper_motion: float = None,
@@ -158,7 +158,7 @@ class Star(Base):
         self.z_coordinate = z_coordinate
         self.proper_motion_component_b = proper_motion_component_b
         self.proper_motion_component_l = proper_motion_component_l
-        self.proper_motion_component_vr = proper_motion_component_vr
+        self.radial_velocity = radial_velocity
         self.right_ascension = right_ascension
         self.declination = declination
         self.right_ascension_proper_motion = right_ascension_proper_motion

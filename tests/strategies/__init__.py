@@ -1,3 +1,7 @@
+from .coordinates import (positive_floats_w_lower_limit,
+                          positive_floats_arrays_w_size,
+                          triangle_angles,
+                          cos_sin_values)
 from .polar import (angles,
                     array_sizes,
                     floats_w_lower_limit,
