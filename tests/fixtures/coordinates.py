@@ -15,11 +15,8 @@ def other_adjacent() -> float:
 
 
 @pytest.fixture(scope='function')
-def opposite(adjacent: float,
-             other_adjacent: float) -> float:
-    min_value = adjacent + other_adjacent
-    return example(strategies.positive_floats_w_lower_limit(
-            min_value=min_value).filter(lambda x: 1e14 > x > min_value))
+def opposite() -> float:
+    return example(strategies.positive_floats(max_value=1e14))
 
 
 @pytest.fixture(scope='function')
