@@ -318,7 +318,7 @@ C     TODO: add choosing what output we want to get
      &                  'distance ',
      &                  'birth_time ',
      &                  'spectral_type ',
-     &                  'galactic_disk_type '
+     &                  'galactic_structure_type '
       else if (geometry == 'cones') then
           write(421, *) 'u_velocity ',
      &                  'v_velocity ',
@@ -326,7 +326,7 @@ C     TODO: add choosing what output we want to get
      &                  'distance ',
      &                  'galactic_longitude ',
      &                  'galactic_latitude ',
-     &                  'galactic_disk_type ',
+     &                  'galactic_structure_type ',
      &                  'spectral_type'
       end if
       close(421)
