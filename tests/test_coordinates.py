@@ -30,13 +30,13 @@ def test_opposite_triangle_side(adjacent: float,
 
 
 def test_get_galactic_longitudes(solar_galactocentric_distance: float,
-                                 r_cylindrical: float,
-                                 thetas_cylindrical: float,
+                                 single_r_cylindrical: float,
+                                 theta_cylindrical: float,
                                  distance_plane_projections: float) -> None:
     longitude = get_galactic_longitudes(
             solar_galactocentric_distance=solar_galactocentric_distance,
-            r_cylindrical=np.array([r_cylindrical]),
-            thetas_cylindrical=np.array([thetas_cylindrical]),
+            r_cylindrical=np.array([single_r_cylindrical]),
+            thetas_cylindrical=np.array([theta_cylindrical]),
             distance_plane_projections=np.array([distance_plane_projections]))
     assert isinstance(longitude, np.ndarray)
     assert np.pi * 2. > np.asscalar(longitude) >= 0.
@@ -54,16 +54,16 @@ def test_get_galactic_latitudes(z_coordinates: float,
 def test_right_ascensions(cos_latitude: float,
                           sin_latitude: float,
                           theta: float,
-                          galactic_longitudes: float,
-                          declinations: float,
+                          galactic_longitude: float,
+                          declination: float,
                           ngp_declination: float,
                           ngp_right_ascension: float) -> None:
     angle = right_ascensions(
             cos_latitude=np.array([cos_latitude]),
             sin_latitude=np.array([sin_latitude]),
             theta=theta,
-            galactic_longitudes=np.array([galactic_longitudes]),
-            declinations=np.array([declinations]),
+            galactic_longitudes=np.array([galactic_longitude]),
+            declinations=np.array([declination]),
             ngp_declination=ngp_declination,
             ngp_right_ascension=ngp_right_ascension)
 
