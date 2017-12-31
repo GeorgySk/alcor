@@ -12,8 +12,7 @@ def stars_w_coordinates(*,
                         ngp_declination: float = 0.478,
                         theta: float = 2.147,
                         ngp_right_ascension: float = 3.35,
-                        kappa: float = 4.74
-                        ) -> pd.DataFrame:
+                        kappa: float = 4.74) -> pd.DataFrame:
     """
     More info on conversions at:
     https://physics.stackexchange.com/questions/88663/converting-between-galactic-and-ecliptic-coordinates
@@ -45,14 +44,14 @@ def stars_w_coordinates(*,
     sin_latitude = np.sin(stars['galactic_latitude'])
     cos_latitude = np.cos(stars['galactic_latitude'])
 
-    velocities_by_prop_motion = 1. / (kappa * stars['distance'] * PC_PER_KPC)
+    velocities_by_proper_motion = 1. / (kappa * stars['distance'] * PC_PER_KPC)
 
     # TODO: find out if we need to divide by `cos_latitude`
     stars['proper_motion_in_longitude'] = (
-        (velocities_by_prop_motion / cos_latitude)
+        (velocities_by_proper_motion / cos_latitude)
         * (- stars['u_velocity'] * sin_longitude
            + stars['v_velocity'] * cos_longitude))
-    stars['proper_motion_in_latitude'] = velocities_by_prop_motion * (
+    stars['proper_motion_in_latitude'] = velocities_by_proper_motion * (
         - stars['u_velocity'] * cos_longitude * sin_latitude
         - stars['v_velocity'] * sin_latitude * sin_longitude
         + stars['w_velocity'] * cos_latitude)
