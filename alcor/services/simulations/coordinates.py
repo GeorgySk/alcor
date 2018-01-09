@@ -6,13 +6,13 @@ import pandas as pd
 PC_PER_KPC = 1e3
 
 
-def stars_w_coordinates(*,
-                        stars: pd.DataFrame,
-                        solar_galactocentric_distance: float,
-                        ngp_declination: float = 0.478,
-                        theta: float = 2.147,
-                        ngp_right_ascension: float = 3.35,
-                        kappa: float = 4.74) -> pd.DataFrame:
+def set_coordinates(stars: pd.DataFrame,
+                    *,
+                    solar_galactocentric_distance: float,
+                    ngp_declination: float = 0.478,
+                    theta: float = 2.147,
+                    ngp_right_ascension: float = 3.35,
+                    kappa: float = 4.74) -> None:
     """
     More info on conversions at:
     https://physics.stackexchange.com/questions/88663/converting-between-galactic-and-ecliptic-coordinates
@@ -78,8 +78,6 @@ def stars_w_coordinates(*,
             ngp_declination=ngp_declination,
             ngp_right_ascension=ngp_right_ascension)
 
-    return stars
-
 
 def right_ascensions(*,
                      cos_latitude: np.ndarray,
@@ -106,12 +104,16 @@ def right_ascensions(*,
     xs_lt_zero_xc_ge_zero_mask = ((xs < 0.) & (xc >= 0.))
     xs_lt_zero_xc_lt_zero_mask = ((xs < 0.) & (xc < 0.))
 
-    result[xs_ge_zero_xc_ge_zero_mask] = np.arcsin(xs) + ngp_right_ascension
-    result[xs_ge_zero_xc_lt_zero_mask] = np.arccos(xc) + ngp_right_ascension
-    result[xs_lt_zero_xc_ge_zero_mask] = (2. * np.pi + np.arcsin(xs)
-                                          + ngp_right_ascension)
-    result[xs_lt_zero_xc_lt_zero_mask] = (np.pi - np.arcsin(xs)
-                                          + ngp_right_ascension)
+    result[xs_ge_zero_xc_ge_zero_mask] = (
+        np.arcsin(xs[xs_ge_zero_xc_ge_zero_mask]) + ngp_right_ascension)
+    result[xs_ge_zero_xc_lt_zero_mask] = (
+        np.arccos(xc[xs_ge_zero_xc_lt_zero_mask]) + ngp_right_ascension)
+    result[xs_lt_zero_xc_ge_zero_mask] = (
+        2. * np.pi + np.arcsin(xs[xs_lt_zero_xc_ge_zero_mask])
+        + ngp_right_ascension)
+    result[xs_lt_zero_xc_lt_zero_mask] = (
+        np.pi - np.arcsin(xs[xs_lt_zero_xc_lt_zero_mask])
+        + ngp_right_ascension)
 
     mask = result > 2. * np.pi
     result[mask] -= 2. * np.pi

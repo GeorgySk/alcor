@@ -72,10 +72,21 @@ def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
     assert (progenitor_masses_before == progenitor_masses).all()
 
 
-def test_get_white_dwarfs(main_sequence_stars: pd.DataFrame) -> None:
+def test_get_white_dwarfs(main_sequence_stars: pd.DataFrame,
+                          mass_relation_parameter: float,
+                          chandrasekhar_limit: float,
+                          max_mass: float,
+                          solar_metallicity: float,
+                          subsolar_metallicity: float) -> None:
     # TODO: after merge there will be a fixture for ages
-    white_dwarfs = luminosities.white_dwarfs(main_sequence_stars,
-                                             max_galactic_structure_age=12.)
+    white_dwarfs = luminosities.get_white_dwarfs(
+            main_sequence_stars,
+            max_galactic_structure_age=12.,
+            mass_relation_parameter=mass_relation_parameter,
+            chandrasekhar_limit=chandrasekhar_limit,
+            max_mass=max_mass,
+            solar_metallicity=solar_metallicity,
+            subsolar_metallicity=subsolar_metallicity)
 
     assert isinstance(white_dwarfs, pd.DataFrame)
     assert 'metallicity' in white_dwarfs.columns
@@ -95,3 +106,4 @@ def test_get_metallicities(galactic_disks_types: np.ndarray,
     assert isinstance(metallicities, np.ndarray)
     assert (galactic_disks_types_before == galactic_disks_types).all()
     assert metallicities.size == galactic_disks_types.size
+    assert np.all(np.in1d(metallicities, [0.001, 0.01, 0.03, 0.06]))

@@ -2,8 +2,10 @@ from functools import partial
 
 import numpy as np
 import pandas as pd
+import pydevd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
+from alcor.models.star import GalacticDiskType
 from alcor.types import ArrayOperatorType
 from .utils import (immutable_array,
                     linear_function)
@@ -31,15 +33,15 @@ HIGH_MASS_FUNCTION = partial(linear_function,
                              const=0.5061)
 
 
-def white_dwarfs(stars: pd.DataFrame,
-                 *,
-                 max_galactic_structure_age: float,
-                 mass_relation_parameter: float = 1.,
-                 chandrasekhar_limit: float = 1.4,
-                 max_mass: float = 10.5,
-                 solar_metallicity: float = 0.01,
-                 subsolar_metallicity: float = 0.001,
-                 min_cooling_time: float = 0.) -> pd.DataFrame:
+def get_white_dwarfs(stars: pd.DataFrame,
+                     *,
+                     max_galactic_structure_age: float,
+                     mass_relation_parameter: float,
+                     chandrasekhar_limit: float,
+                     max_mass: float,
+                     solar_metallicity: float,
+                     subsolar_metallicity: float,
+                     min_cooling_time: float = 0.) -> pd.DataFrame:
     """
     Filters white dwarfs stars from initial sample of main sequence stars
     and assigns metallicities, cooling times and masses.
@@ -89,7 +91,10 @@ def get_metallicities(*,
                       solar_metallicity: float) -> np.ndarray:
     result = np.empty(galactic_disks_types.size)
 
-    halo_mask = galactic_disks_types == 'halo'
+    halo_mask = np.equal(galactic_disks_types.astype(int),
+                         np.full(galactic_disks_types.size,
+                                 GalacticDiskType.halo.value))
+    # halo_mask = galactic_disks_types == GalacticDiskType.halo.value
 
     result[halo_mask] = subsolar_metallicity
     result[~halo_mask] = solar_metallicity
@@ -115,6 +120,9 @@ def main_sequence_stars_lifetimes(
     Solar metallicity values from Althaus priv. comm (X = 0.725, Y = 0.265)
     Sub-solar metallicity values from Althaus priv. comm (X = 0.752, Y = 0.247)
     """
+    if masses.size == 0:
+        return np.array([])
+
     solar_masses_spline = linear_estimation(x=model_solar_masses,
                                             y=model_solar_times)
     subsolar_masses_spline = linear_estimation(x=model_subsolar_masses,

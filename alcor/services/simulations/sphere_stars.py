@@ -1,5 +1,4 @@
 import math
-import random
 from functools import partial
 from itertools import chain
 from typing import (Callable,
@@ -8,31 +7,32 @@ from typing import (Callable,
 
 import numpy as np
 import pandas as pd
+import pydevd
 
 from alcor.models.star import GalacticDiskType
 
 
 # TODO: take these consts to settings file
 def generate_stars(*,
-                   max_stars_count: int = 6000000,
-                   time_bins_count: int = 5000,
-                   thin_disk_age: float = 9.2,
-                   thick_disk_age: float = 12.,
-                   halo_age: float = 14.,
-                   halo_stars_formation_time: float = 1.,
-                   burst_age: float = 0.6,
-                   thick_disk_formation_rate_exponent: float = 2.,
-                   thick_disk_stars_fraction: float = 0.8,
-                   halo_stars_fraction: float = 0.05,
-                   initial_mass_function_exponent: float = -2.35,
-                   sector_radius_kpc: float = 0.05,
-                   burst_formation_factor: float = 5.,
-                   formation_rate_parameter: float = 25.,
-                   mass_reduction_factor: float = 0.03,
-                   generator: Callable[[float, float], float] = random.uniform,
-                   min_mass: float = 0.04,
-                   max_mass: float = 50.
-                   ) -> pd.DataFrame:
+                   max_stars_count: int,
+                   time_bins_count: int,
+                   thin_disk_age: float,
+                   thick_disk_age: float,
+                   halo_age: float,
+                   halo_stars_formation_time: float,
+                   burst_age: float,
+                   thick_disk_formation_rate_exponent: float,
+                   thick_disk_stars_fraction: float,
+                   halo_stars_fraction: float,
+                   initial_mass_function_exponent: float,
+                   sector_radius_kpc: float,
+                   burst_formation_factor: float,
+                   formation_rate_parameter: float,
+                   mass_reduction_factor: float,
+                   generator: Callable[[float, float], float],
+                   min_mass: float,
+                   max_mass: float) -> pd.DataFrame:
+    # pydevd.settrace('dockerhost', port=20111)
     max_age = max(thin_disk_age, thick_disk_age, halo_age)
     thin_disk_stars_fraction = (1. - thick_disk_stars_fraction
                                 - halo_stars_fraction)
@@ -41,12 +41,13 @@ def generate_stars(*,
             initial_mass_function,
             exponent=initial_mass_function_exponent)
 
-    initial_mass_generator = partial(monte_carlo_generator(
+    initial_mass_generator = partial(
+            monte_carlo_generator,
             function=initial_mass_function_by_salpeter,
             min_x=min_mass,
             max_x=max_mass,
             max_y=initial_mass_function_by_salpeter(min_mass),
-            generator=generator))
+            generator=generator)
 
     thin_disk_stars = generate_thin_disk_stars(
             max_age=max_age,
@@ -80,7 +81,6 @@ def generate_stars(*,
             formation_time=halo_stars_formation_time,
             generator=generator,
             initial_mass_generator=initial_mass_generator)
-
     return pd.concat([thin_disk_stars, thick_disk_stars, halo_stars])
 
 
@@ -108,7 +108,7 @@ def generate_halo_stars(*,
     return pd.DataFrame(dict(
             progenitor_mass=progenitors_masses,
             birth_time=birth_times,
-            galactic_structure_type=GalacticDiskType.halo))
+            galactic_disk_type=GalacticDiskType.halo))
 
 
 def generate_thick_disk_stars(*,
@@ -140,7 +140,7 @@ def generate_thick_disk_stars(*,
     return pd.DataFrame(dict(
             progenitor_mass=progenitors_masses,
             birth_time=birth_times,
-            galactic_structure_type=GalacticDiskType.thick))
+            galactic_disk_type=GalacticDiskType.thick))
 
 
 def thick_disk_star_birth_time(time: float,
@@ -201,7 +201,7 @@ def generate_thin_disk_stars(*,
     return pd.DataFrame(dict(
             progenitor_mass=progenitors_masses,
             birth_time=birth_times,
-            galactic_structure_type=GalacticDiskType.thin))
+            galactic_disk_type=GalacticDiskType.thin))
 
 
 def progenitors_masses_births_times(*,

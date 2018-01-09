@@ -6,6 +6,7 @@ from typing import (Union,
 
 import numpy as np
 import pandas as pd
+import pydevd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 from alcor.models.star import SpectralType
@@ -49,20 +50,20 @@ def assign_estimated_values(
             db_to_da_fraction=db_to_da_fraction,
             size=carbon_oxygen_white_dwarfs.shape[0])
 
-    da_white_dwarfs_mask = (carbon_oxygen_white_dwarfs['spectral_type']
-                            == SpectralType.DA.value)
-    da_white_dwarfs = carbon_oxygen_white_dwarfs[da_white_dwarfs_mask]
-    db_white_dwarfs = carbon_oxygen_white_dwarfs[~da_white_dwarfs_mask]
+    da_mask = np.equal(carbon_oxygen_white_dwarfs['spectral_type'],
+                       SpectralType.DA)
+    da_white_dwarfs = carbon_oxygen_white_dwarfs[da_mask]
+    db_white_dwarfs = carbon_oxygen_white_dwarfs[~da_mask]
 
     white_dwarfs_by_spectral_types = {SpectralType.DA: da_white_dwarfs,
                                       SpectralType.DB: db_white_dwarfs}
 
-    colors = ['u_ubvri_absolute',
-              'b_ubvri_absolute',
-              'v_ubvri_absolute',
-              'r_ubvri_absolute',
-              'i_ubvri_absolute',
-              'j_ubvri_absolute']
+    colors = ['color_u',
+              'color_b',
+              'color_v',
+              'color_r',
+              'color_i',
+              'color_j']
 
     for spectral_type, white_dwarfs in white_dwarfs_by_spectral_types.items():
         if white_dwarfs.shape[0] == 0:
@@ -81,28 +82,28 @@ def assign_estimated_values(
                 cooling_sequences=cooling_sequences[spectral_type],
                 interest_parameter='effective_temperature')
 
+        # pydevd.settrace('dockerhost', port=20111)
+
         for color in colors:
-            if white_dwarfs.shape[0] == 0:
-                continue
             white_dwarfs.loc[:, color] = white_dwarfs.apply(
                     estimate_color,
                     axis=1,
                     color_table=color_tables[spectral_type],
                     color=color)
-    oxygen_neon_white_dwarfs['spectral_type'] = SpectralType.ONe.value
+    oxygen_neon_white_dwarfs['spectral_type'] = SpectralType.ONe
     parameters = ['luminosity',
-                  'u_ubvri_absolute',
-                  'b_ubvri_absolute',
-                  'v_ubvri_absolute',
-                  'r_ubvri_absolute',
-                  'i_ubvri_absolute',
-                  'j_ubvri_absolute',
+                  'color_u',
+                  'color_b',
+                  'color_v',
+                  'color_r',
+                  'color_i',
+                  'color_j',
                   'effective_temperature']
 
     for parameter in parameters:
         oxygen_neon_white_dwarfs.apply(estimate_by_mass,
                                        axis=1,
-                                       color_table=one_color_table,
+                                       tracks=one_color_table,
                                        interest_parameter=parameter)
 
     return pd.concat([da_white_dwarfs,
@@ -375,8 +376,10 @@ def get_min_metallicity_index(metallicity: float,
     if (metallicity < grid_metallicities[0] or
             metallicity > grid_metallicities[-1]):
         raise ValueError('There is no support for metallicities '
-                         'lying out of the range of {grid_metallicities}'
-                         .format(grid_metallicities=grid_metallicities))
+                         'lying out of the range of {grid_metallicities}. '
+                         'Metallicity encountered: {metallicity}'
+                         .format(grid_metallicities=grid_metallicities,
+                                 metallicity=metallicity))
     metallicity = np.array([metallicity])
     left_index = np.searchsorted(grid_metallicities, metallicity) - 1.
     left_index = left_index.astype(int)

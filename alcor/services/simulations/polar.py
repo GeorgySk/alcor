@@ -6,6 +6,7 @@ from typing import (Callable,
 import numpy as np
 import pandas as pd
 
+from alcor.models.star import GalacticDiskType
 from alcor.types import (GeneratorType,
                          UnitRangeGeneratorType)
 
@@ -20,7 +21,7 @@ def assign_polar_coordinates(
         solar_galactocentric_distance: float,
         thin_disk_scale_height: float,
         thick_disk_scale_height: float,
-        halo_core_radius: float = 5.,
+        halo_core_radius: float,
         generator: GeneratorType = np.random.uniform,
         unit_range_generator: UnitRangeGeneratorType = np.random.rand,
         signs_generator: Callable[[int], np.ndarray] = random_signs
@@ -40,7 +41,7 @@ def assign_polar_coordinates(
             angle_covering_sector=angle_covering_sector,
             generator=generator)
 
-    halo_stars_mask = stars['galactic_disk_type'] == 'halo'
+    halo_stars_mask = stars['galactic_disk_type'] == GalacticDiskType.halo
 
     halo_stars = stars[halo_stars_mask]
     disks_stars = stars[~halo_stars_mask]
@@ -64,14 +65,15 @@ def assign_polar_coordinates(
             squared_radii_difference=squared_radii_difference,
             generator=generator)
 
-    thin_disk_stars_mask = disks_stars['galactic_disk_type'] == 'thin'
+    thin_disk_stars_mask = (disks_stars['galactic_disk_type']
+                            == GalacticDiskType.thin)
 
     thin_disk_stars = disks_stars[thin_disk_stars_mask]
     thick_disk_stars = disks_stars[~thin_disk_stars_mask]
 
     halo_stars['z_coordinate'] = halo_z_coordinates(
             angle_covering_sector=angle_covering_sector,
-            r_cylindrical=disks_stars['r_cylindrical'].values,
+            r_cylindrical=halo_stars['r_cylindrical'].values,
             generator=generator)
 
     thin_disk_stars['z_coordinate'] = disk_z_coordinates(
@@ -91,7 +93,7 @@ def assign_polar_coordinates(
     # TODO: here we had filtering out too close stars to the Sun.
     # Do we really need to do that? (alpha_centauri_distance = 1.5e-6)
 
-    return pd.concat(halo_stars, thin_disk_stars, thick_disk_stars)
+    return pd.concat([halo_stars, thin_disk_stars, thick_disk_stars])
 
 
 def disk_z_coordinates(*,

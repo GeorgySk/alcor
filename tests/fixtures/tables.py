@@ -18,33 +18,55 @@ FORT_FILES_PATH = os.path.abspath(os.path.join('tests',
 
 @pytest.fixture(scope='function')
 def da_cooling_tracks_lengths() -> List[int]:
-    cooling_tracks_by_metallicities = tracks.read_da_cooling()
+    cooling_tracks_by_metallicities = tracks.read_cooling(
+            path='input_data/da_cooling.hdf5',
+            metallicities=(1, 10, 30, 60),
+            interest_parameters=('cooling_time',
+                                 'effective_temperature',
+                                 'luminosity'))
     return list(tracks_by_metallicities_lengths(
             cooling_tracks=cooling_tracks_by_metallicities))
 
 
 @pytest.fixture(scope='function')
 def db_cooling_tracks_lengths() -> List[int]:
-    cooling_tracks_by_metallicities = tracks.read_db_cooling()
+    cooling_tracks_by_metallicities = tracks.read_cooling(
+            path='input_data/db_cooling.hdf5',
+            metallicities=(1, 10, 60),
+            interest_parameters=('cooling_time',
+                                 'effective_temperature',
+                                 'luminosity'))
     return list(tracks_by_metallicities_lengths(
             cooling_tracks=cooling_tracks_by_metallicities))
 
 
 @pytest.fixture(scope='function')
 def da_colors_tracks_lengths() -> List[int]:
-    characteristics = tracks.read_da_colors()
+    characteristics = tracks.read_table(
+            path='input_data/da_colors.hdf5',
+            interest_parameters=('color_u', 'color_b', 'color_v', 'color_r',
+                                 'color_i', 'color_j') + ('luminosity',))
     return list(tracks_lengths(characteristics))
 
 
 @pytest.fixture(scope='function')
 def db_colors_tracks_lengths() -> List[int]:
-    characteristics = tracks.read_db_colors()
+    characteristics = tracks.read_table(
+            path='input_data/db_colors.hdf5',
+            interest_parameters=('color_u', 'color_b', 'color_v', 'color_r',
+                                 'color_i', 'color_j') + ('luminosity',))
     return list(tracks_lengths(characteristics))
 
 
 @pytest.fixture(scope='function')
 def one_tables_lengths() -> List[int]:
-    characteristics = tracks.read_one_tables()
+    characteristics = tracks.read_table(
+            path='input_data/one_wds_tracks.hdf5',
+            interest_parameters=('cooling_time',
+                                 'effective_temperature',
+                                 'luminosity') + ('color_u', 'color_b',
+                                                  'color_v', 'color_r',
+                                                  'color_i', 'color_j'))
     return list(tracks_lengths(characteristics))
 
 

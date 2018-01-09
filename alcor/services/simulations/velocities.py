@@ -19,51 +19,39 @@ def set_velocities(stars: pd.DataFrame,
                            u=50., v=56., w=34.),
                    peculiar_solar_velocity: VelocityVector = VelocityVector(
                            u=-11., v=-12., w=-7.),
-                   lsr_velocity: float = -220.,
                    solar_galactocentric_distance: float,
                    oort_constant_a: float,
                    oort_constant_b: float,
                    generator: GaussianGeneratorType = np.random.normal
                    ) -> None:
-    halo_stars = disk_stars(
-            stars=stars,
-            disk_type=GalacticDiskType.halo)
-    thin_disk_stars = disk_stars(
-            stars=stars,
-            disk_type=GalacticDiskType.thin)
-    thick_disk_stars = disk_stars(
-            stars=stars,
-            disk_type=GalacticDiskType.thick)
+    thin_disk_stars_mask = (stars['galactic_disk_type']
+                            == GalacticDiskType.thin)
+    thick_disk_stars_mask = (stars['galactic_disk_type']
+                             == GalacticDiskType.thick)
 
-    (halo_stars['u_velocity'],
-     halo_stars['v_velocity'],
-     halo_stars['w_velocity']) = halo_stars_velocities(
-            galactic_longitudes=halo_stars['galactic_longitude'].values,
-            thetas_cylindrical=halo_stars['theta_cylindrical'].values,
-            peculiar_solar_velocity=peculiar_solar_velocity,
-            lsr_velocity=lsr_velocity,
-            spherical_velocity_component_sigma=lsr_velocity / np.sqrt(2.),
-            generator=generator)
+    # (white_dwarfs.loc[halo_stars_mask, 'u_velocity']
 
     stars_velocities = partial(
             disk_stars_velocities,
             peculiar_solar_velocity=peculiar_solar_velocity,
             solar_galactocentric_distance=solar_galactocentric_distance,
-            oort_a_const=oort_constant_a,
-            oort_b_const=oort_constant_b,
+            oort_constant_a=oort_constant_a,
+            oort_constant_b=oort_constant_b,
             generator=generator)
 
-    (thin_disk_stars['u_velocity'],
-     thin_disk_stars['v_velocity'],
-     thin_disk_stars['w_velocity']) = stars_velocities(
-            r_cylindrical=thin_disk_stars['r_cylindrical'],
-            thetas_cylindrical=thin_disk_stars['theta_cylindrical'],
+    (stars.loc[thin_disk_stars_mask, 'u_velocity'],
+     stars.loc[thin_disk_stars_mask, 'v_velocity'],
+     stars.loc[thin_disk_stars_mask, 'w_velocity']) = stars_velocities(
+            r_cylindrical=stars.loc[thin_disk_stars_mask, 'r_cylindrical'],
+            thetas_cylindrical=stars.loc[thin_disk_stars_mask,
+                                         'theta_cylindrical'],
             velocity_dispersion=thin_disk_velocity_std)
-    (thick_disk_stars['u_velocity'],
-     thick_disk_stars['v_velocity'],
-     thick_disk_stars['w_velocity']) = stars_velocities(
-            r_cylindrical=thick_disk_stars['r_cylindrical'],
-            thetas_cylindrical=thick_disk_stars['theta_cylindrical'],
+    (stars.loc[thick_disk_stars_mask, 'u_velocity'],
+     stars.loc[thick_disk_stars_mask, 'v_velocity'],
+     stars.loc[thick_disk_stars_mask, 'w_velocity']) = stars_velocities(
+            r_cylindrical=stars.loc[thick_disk_stars_mask, 'r_cylindrical'],
+            thetas_cylindrical=stars.loc[thick_disk_stars_mask,
+                                         'theta_cylindrical'],
             velocity_dispersion=thick_disk_velocity_std)
 
 
@@ -121,7 +109,7 @@ def halo_stars_velocities(*,
     """
     More details at: "Simulating Gaia performances on white dwarfs" by S.Torres
     """
-    stars_count = galactic_longitudes.shape[0]
+    stars_count = galactic_longitudes.size
 
     r_spherical_velocities = (spherical_velocity_component_sigma
                               * generator(size=stars_count))
