@@ -31,14 +31,14 @@ def plot(stars: pd.DataFrame,
     # TODO: write a function?
     # Transformation from UBVRI to ugriz. More info at:
     # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
-    ugriz_ug = (0.75 * (stars['u_abs_magnitude'] - stars['b_abs_magnitude'])
-                + 0.77 * (stars['b_abs_magnitude'] - stars['v_abs_magnitude'])
+    ugriz_ug = (0.75 * (stars['color_u'] - stars['color_b'])
+                + 0.77 * (stars['color_b'] - stars['color_v'])
                 + 0.72)
-    ugriz_gr = (1.646 * (stars['v_abs_magnitude'] - stars['r_abs_magnitude'])
+    ugriz_gr = (1.646 * (stars['color_v'] - stars['color_r'])
                 - 0.139)
-    ugriz_ri = (1.007 * (stars['r_abs_magnitude'] - stars['i_abs_magnitude'])
+    ugriz_ri = (1.007 * (stars['color_r'] - stars['color_i'])
                 - 0.236)
-    ugriz_iz = (0.577 * (stars['r_abs_magnitude'] - stars['i_abs_magnitude'])
+    ugriz_iz = (0.577 * (stars['color_r'] - stars['color_i'])
                 - 0.15)
 
     draw_subplot(subplot=subplot_ug_vs_gr,

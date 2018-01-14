@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pydevd
 
 
 def by_parallax(stars: pd.DataFrame,
@@ -35,14 +36,14 @@ def by_proper_motion(stars: pd.DataFrame,
 def by_reduced_proper_motion(stars: pd.DataFrame) -> pd.DataFrame:
     # Transformation from UBVRI to ugriz. More info at:
     # Jordi, Grebel & Ammon, 2006, A&A, 460; equations 1-8 and Table 3
-    g_ugriz_abs_magnitudes = (stars['v_abs_magnitude'] - 0.124
-                              + 0.63 * (stars['b_abs_magnitude']
-                                        - stars['v_abs_magnitude']))
+    g_ugriz_abs_magnitudes = (stars['color_v'] - 0.124
+                              + 0.63 * (stars['color_b']
+                                        - stars['color_v']))
     z_ugriz_abs_magnitudes = (g_ugriz_abs_magnitudes
-                              - 1.646 * (stars['v_abs_magnitude']
-                                         - stars['r_abs_magnitude'])
-                              - 1.584 * (stars['r_abs_magnitude']
-                                         - stars['i_abs_magnitude'])
+                              - 1.646 * (stars['color_v']
+                                         - stars['color_r'])
+                              - 1.584 * (stars['color_r']
+                                         - stars['color_i'])
                               + 0.525)
     g_apparent_magnitudes = apparent_magnitude(g_ugriz_abs_magnitudes,
                                                distance_kpc=stars['distance'])
@@ -60,7 +61,7 @@ def by_reduced_proper_motion(stars: pd.DataFrame) -> pd.DataFrame:
 def by_apparent_magnitude(stars: pd.DataFrame,
                           *,
                           max_v_apparent_magnitude: float) -> pd.DataFrame:
-    v_apparent_magnitudes = apparent_magnitude(stars['v_abs_magnitude'],
+    v_apparent_magnitudes = apparent_magnitude(stars['color_v'],
                                                distance_kpc=stars['distance'])
     return stars[v_apparent_magnitudes <= max_v_apparent_magnitude]
 

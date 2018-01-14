@@ -7,6 +7,7 @@ from typing import (Callable,
 
 import numpy as np
 import pandas as pd
+import pydevd
 from sqlalchemy import func
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.session import Session
@@ -150,10 +151,10 @@ def star_query_entities(*,
                      Star.v_velocity,
                      Star.w_velocity]
     if filtration_method == 'restricted':
-        entities += [Star.b_abs_magnitude,
-                     Star.v_abs_magnitude,
-                     Star.r_abs_magnitude,
-                     Star.i_abs_magnitude,
+        entities += [Star.color_b,
+                     Star.color_v,
+                     Star.color_r,
+                     Star.color_i,
                      Star.proper_motion]
 
     if nullify_radial_velocity:
@@ -189,10 +190,10 @@ def star_query_entities(*,
                      Star.spectral_type]
 
     if with_ugriz_diagrams:
-        entities += [Star.b_abs_magnitude,
-                     Star.v_abs_magnitude,
-                     Star.r_abs_magnitude,
-                     Star.i_abs_magnitude,
+        entities += [Star.color_b,
+                     Star.color_v,
+                     Star.color_r,
+                     Star.color_i,
                      Star.spectral_type]
 
     if entities:
