@@ -19,9 +19,12 @@ from alcor.models import (STAR_PARAMETERS_NAMES,
 from alcor.models.simulation import Parameter
 from alcor.models.star import GalacticDiskType
 from alcor.services.simulations.coordinates import set_coordinates
+from alcor.services.simulations.equatorial_coordinates import \
+    assign_equatorial_coordinates
 from alcor.services.simulations.luminosities import get_white_dwarfs
 from alcor.services.simulations.magnitudes import assign_estimated_values
 from alcor.services.simulations.polar import assign_polar_coordinates
+from alcor.services.simulations.proper_motions import assign_proper_motions
 from alcor.services.simulations.sphere_stars import generate_stars
 from alcor.services.simulations.tracks import (read_cooling,
                                                read_table)
@@ -220,6 +223,21 @@ def run_simulation(
             lsr_velocity=lsr_velocity,
             spherical_velocity_component_sigma=lsr_velocity / np.sqrt(2.),
             generator=gaussian_generator)
+
+    sin_longitude = np.sin(white_dwarfs['galactic_longitude'])
+    cos_longitude = np.cos(white_dwarfs['galactic_longitude'])
+    sin_latitude = np.sin(white_dwarfs['galactic_latitude'])
+    cos_latitude = np.cos(white_dwarfs['galactic_latitude'])
+
+    assign_proper_motions(white_dwarfs,
+                          sin_longitude=sin_longitude,
+                          cos_longitude=cos_longitude,
+                          sin_latitude=sin_latitude,
+                          cos_latitude=cos_latitude)
+
+    assign_equatorial_coordinates(white_dwarfs,
+                                  sin_latitude=sin_latitude,
+                                  cos_latitude=cos_latitude)
 
     # pydevd.settrace('dockerhost', port=20111)
     return assign_estimated_values(
