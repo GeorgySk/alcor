@@ -10,7 +10,6 @@ from typing import (Dict,
 
 import numpy as np
 import pandas as pd
-import pydevd
 from sqlalchemy.orm.session import Session
 
 from alcor.models import (STAR_PARAMETERS_NAMES,
@@ -239,7 +238,6 @@ def run_simulation(
                                   sin_latitude=sin_latitude,
                                   cos_latitude=cos_latitude)
 
-    # pydevd.settrace('dockerhost', port=20111)
     return assign_estimated_values(
             white_dwarfs,
             max_carbon_oxygen_core_wd_mass=max_carbon_oxygen_core_wd_mass,

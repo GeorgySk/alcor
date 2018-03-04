@@ -50,8 +50,7 @@ def assign_estimated_values(
             db_to_da_fraction=db_to_da_fraction,
             size=carbon_oxygen_white_dwarfs.shape[0])
 
-    da_mask = np.equal(carbon_oxygen_white_dwarfs['spectral_type'],
-                       SpectralType.DA)
+    da_mask = carbon_oxygen_white_dwarfs['spectral_type'] == SpectralType.DA
     da_white_dwarfs = carbon_oxygen_white_dwarfs[da_mask]
     db_white_dwarfs = carbon_oxygen_white_dwarfs[~da_mask]
 
@@ -82,8 +81,6 @@ def assign_estimated_values(
                 cooling_sequences=cooling_sequences[spectral_type],
                 interest_parameter='effective_temperature')
 
-        # pydevd.settrace('dockerhost', port=20111)
-
         for color in colors:
             white_dwarfs.loc[:, color] = white_dwarfs.apply(
                     estimate_color,
@@ -101,10 +98,11 @@ def assign_estimated_values(
                   'effective_temperature']
 
     for parameter in parameters:
-        oxygen_neon_white_dwarfs.apply(estimate_by_mass,
-                                       axis=1,
-                                       tracks=one_color_table,
-                                       interest_parameter=parameter)
+        oxygen_neon_white_dwarfs[parameter] = oxygen_neon_white_dwarfs.apply(
+                estimate_by_mass,
+                axis=1,
+                tracks=one_color_table,
+                interest_parameter=parameter)
 
     return pd.concat([da_white_dwarfs,
                       db_white_dwarfs,
@@ -358,8 +356,7 @@ def extrapolate_interest_value(
 def generate_spectral_types(*,
                             db_to_da_fraction: float,
                             size: int) -> np.ndarray:
-    spectral_types = np.empty(size,
-                              dtype='<U3')
+    spectral_types = np.empty(size)
 
     randoms = np.random.rand(size)
     db_mask = randoms < db_to_da_fraction
