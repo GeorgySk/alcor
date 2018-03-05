@@ -4,7 +4,6 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-import pydevd
 
 from alcor.models.star import GalacticDiskType
 from alcor.types import GaussianGeneratorType
@@ -25,7 +24,6 @@ def set_velocities(stars: pd.DataFrame,
                    oort_constant_b: float,
                    generator: GaussianGeneratorType = np.random.normal
                    ) -> None:
-    # pydevd.settrace('dockerhost', port=20111)
     thin_disk_stars_mask = (stars['galactic_disk_type']
                             == GalacticDiskType.thin)
     thick_disk_stars_mask = (stars['galactic_disk_type']

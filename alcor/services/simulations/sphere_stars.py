@@ -7,7 +7,6 @@ from typing import (Callable,
 
 import numpy as np
 import pandas as pd
-import pydevd
 
 from alcor.models.star import GalacticDiskType
 
@@ -32,7 +31,6 @@ def generate_stars(*,
                    generator: Callable[[float, float], float],
                    min_mass: float,
                    max_mass: float) -> pd.DataFrame:
-    # pydevd.settrace('dockerhost', port=20111)
     max_age = max(thin_disk_age, thick_disk_age, halo_age)
     thin_disk_stars_fraction = (1. - thick_disk_stars_fraction
                                 - halo_stars_fraction)
