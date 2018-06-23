@@ -43,16 +43,16 @@ def assign_estimated_values(
 
     carbon_oxygen_white_dwarfs_mask = (stars['mass']
                                        < max_carbon_oxygen_core_wd_mass)
-    carbon_oxygen_white_dwarfs = stars[carbon_oxygen_white_dwarfs_mask]
-    oxygen_neon_white_dwarfs = stars[~carbon_oxygen_white_dwarfs_mask]
+    carbon_oxygen_white_dwarfs = stars[carbon_oxygen_white_dwarfs_mask].copy()
+    oxygen_neon_white_dwarfs = stars[~carbon_oxygen_white_dwarfs_mask].copy()
 
     carbon_oxygen_white_dwarfs['spectral_type'] = generate_spectral_types(
             db_to_da_fraction=db_to_da_fraction,
             size=carbon_oxygen_white_dwarfs.shape[0])
 
     da_mask = carbon_oxygen_white_dwarfs['spectral_type'] == SpectralType.DA
-    da_white_dwarfs = carbon_oxygen_white_dwarfs[da_mask]
-    db_white_dwarfs = carbon_oxygen_white_dwarfs[~da_mask]
+    da_white_dwarfs = carbon_oxygen_white_dwarfs[da_mask].copy()
+    db_white_dwarfs = carbon_oxygen_white_dwarfs[~da_mask].copy()
 
     white_dwarfs_by_spectral_types = {SpectralType.DA: da_white_dwarfs,
                                       SpectralType.DB: db_white_dwarfs}
