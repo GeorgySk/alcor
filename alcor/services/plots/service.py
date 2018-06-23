@@ -7,7 +7,6 @@ from typing import (Callable,
 
 import numpy as np
 import pandas as pd
-import pydevd
 from sqlalchemy import func
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.session import Session

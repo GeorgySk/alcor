@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import pydevd
 
 
 def by_parallax(stars: pd.DataFrame,

@@ -6,7 +6,6 @@ from typing import (Union,
 
 import numpy as np
 import pandas as pd
-import pydevd
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 from alcor.models.star import SpectralType
