@@ -4,9 +4,6 @@ from .coordinates import (positive_floats_w_lower_limit,
                           cos_sin_values)
 from .polar import (angles,
                     array_sizes,
-                    floats_w_lower_limit,
-                    galactic_structures,
-                    nonnegative_floats,
                     positive_floats_arrays)
 from .luminosities import (dataframes_w_galactic_structure_types,
                            positive_floats_arrays)
