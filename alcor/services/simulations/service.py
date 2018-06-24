@@ -95,7 +95,6 @@ def run_simulation(
         gaussian_generator: GaussianGeneratorType = np.random.normal,
         min_mass: float = 0.04,
         max_mass: float = 50.,
-        mass_relation_parameter: float = 1.,
         chandrasekhar_limit: float = 1.4,
         solar_metallicity: float = 0.01,
         subsolar_metallicity: float = 0.001,
@@ -159,7 +158,6 @@ def run_simulation(
     white_dwarfs = get_white_dwarfs(
             stars=main_sequence_stars,
             max_galactic_structure_age=max_age,
-            mass_relation_parameter=mass_relation_parameter,
             chandrasekhar_limit=chandrasekhar_limit,
             solar_metallicity=solar_metallicity,
             subsolar_metallicity=subsolar_metallicity)

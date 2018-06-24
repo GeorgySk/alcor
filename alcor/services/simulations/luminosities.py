@@ -37,7 +37,6 @@ HIGH_MASS_FUNCTION = partial(linear_function,
 def get_white_dwarfs(stars: pd.DataFrame,
                      *,
                      max_galactic_structure_age: float,
-                     mass_relation_parameter: float,
                      chandrasekhar_limit: float,
                      solar_metallicity: float,
                      subsolar_metallicity: float,
@@ -49,8 +48,6 @@ def get_white_dwarfs(stars: pd.DataFrame,
     :param stars: main sequence stars
     :param max_galactic_structure_age: the highest age of thin disk,
     thick disk and halo
-    :param mass_relation_parameter: factor by which white dwarf's mass is
-    multiplied (previously called as IMFR parameter)
     :param chandrasekhar_limit: maximum mass of a stable white dwarf
     :param solar_metallicity: metallicity assigned to all thin
     and thick disks white dwarfs due to relatively young ages
@@ -83,8 +80,7 @@ def get_white_dwarfs(stars: pd.DataFrame,
 
     stars = stars[stars['cooling_time'] > min_cooling_time]
 
-    stars['mass'] = (mass_relation_parameter
-                     * white_dwarf_masses(stars['progenitor_mass'].values))
+    stars['mass'] = white_dwarf_masses(stars['progenitor_mass'].values)
 
     return stars[stars['mass'] <= chandrasekhar_limit]
 
