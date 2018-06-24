@@ -117,6 +117,7 @@ def run_simulation(
     if geometry == 'cones':
         raise NotImplementedError('Only spherical geometry available now')
 
+    logging.debug('Reading cooling tracks')
     # TODO: take this out of the function and out of loop
     da_cooling_tracks = read_cooling(path=da_tracks_path,
                                      metallicities=da_metallicities,
@@ -131,6 +132,7 @@ def run_simulation(
     db_colors = read_table(path=db_colors_path,
                            interest_parameters=colors + ('luminosity',))
 
+    logging.debug('Generating main sequence stars')
     main_sequence_stars = generate_stars(
             thin_disk_age=parameters_values['thin_disk_age'],
             thick_disk_age=parameters_values['thick_disk_age'],
@@ -155,6 +157,7 @@ def run_simulation(
                   parameters_values['thick_disk_age'],
                   parameters_values['halo_age'])
 
+    logging.debug('Leaving only White Dwarfs')
     white_dwarfs = get_white_dwarfs(
             stars=main_sequence_stars,
             max_galactic_structure_age=max_age,
@@ -162,6 +165,7 @@ def run_simulation(
             solar_metallicity=solar_metallicity,
             subsolar_metallicity=subsolar_metallicity)
 
+    logging.debug('Assigning polar coordinates')
     white_dwarfs = assign_polar_coordinates(
             stars=white_dwarfs,
             sector_radius=parameters_values['radius'],
@@ -171,6 +175,7 @@ def run_simulation(
             thick_disk_scale_height=thick_disk_scale_height,
             halo_core_radius=halo_core_radius)
 
+    logging.debug('Assigning velocities')
     set_velocities(stars=white_dwarfs,
                    thin_disk_velocity_std=thin_disk_velocity_std,
                    thick_disk_velocity_std=thick_disk_velocity_std,
@@ -180,6 +185,7 @@ def run_simulation(
                    oort_constant_b=oort_constant_b,
                    generator=gaussian_generator)
 
+    logging.debug('Assigning coordinates')
     set_coordinates(
             stars=white_dwarfs,
             solar_galactocentric_distance=solar_galactocentric_distance)
@@ -187,6 +193,7 @@ def run_simulation(
     halo_stars_mask = (white_dwarfs['galactic_disk_type']
                        == GalacticDiskType.halo)
 
+    logging.debug('Assigning velocities to halo stars')
     (white_dwarfs.loc[halo_stars_mask, 'u_velocity'],
      white_dwarfs.loc[halo_stars_mask, 'v_velocity'],
      white_dwarfs.loc[halo_stars_mask, 'w_velocity']) = halo_stars_velocities(
@@ -205,16 +212,19 @@ def run_simulation(
     sin_latitude = np.sin(white_dwarfs['galactic_latitude'])
     cos_latitude = np.cos(white_dwarfs['galactic_latitude'])
 
+    logging.debug('Assigning proper motions')
     assign_proper_motions(white_dwarfs,
                           sin_longitude=sin_longitude,
                           cos_longitude=cos_longitude,
                           sin_latitude=sin_latitude,
                           cos_latitude=cos_latitude)
 
+    logging.debug('Assigning equatorial coordinates')
     assign_equatorial_coordinates(white_dwarfs,
                                   sin_latitude=sin_latitude,
                                   cos_latitude=cos_latitude)
 
+    logging.debug('Assigning colors, effective temperature and luminosity')
     return assign_estimated_values(
             white_dwarfs,
             max_carbon_oxygen_core_wd_mass=max_carbon_oxygen_core_wd_mass,
