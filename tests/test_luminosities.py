@@ -48,18 +48,14 @@ def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
 
 
 def test_get_white_dwarfs(main_sequence_stars: pd.DataFrame,
-                          mass_relation_parameter: float,
                           chandrasekhar_limit: float,
-                          max_mass: float,
                           solar_metallicity: float,
                           subsolar_metallicity: float) -> None:
     # TODO: after merge there will be a fixture for ages
     white_dwarfs = luminosities.get_white_dwarfs(
             main_sequence_stars,
             max_galactic_structure_age=12.,
-            mass_relation_parameter=mass_relation_parameter,
             chandrasekhar_limit=chandrasekhar_limit,
-            max_mass=max_mass,
             solar_metallicity=solar_metallicity,
             subsolar_metallicity=subsolar_metallicity)
 

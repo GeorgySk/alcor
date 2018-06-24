@@ -35,11 +35,6 @@ def rightmost_time() -> float:
 
 
 @pytest.fixture(scope='function')
-def mass_relation_parameter() -> float:
-    return example(strategies.positive_floats(max_value=1e14))
-
-
-@pytest.fixture(scope='function')
 def chandrasekhar_limit() -> float:
     return example(strategies.positive_floats(max_value=1e14))
 
