@@ -161,7 +161,6 @@ def run_simulation(
             max_galactic_structure_age=max_age,
             mass_relation_parameter=mass_relation_parameter,
             chandrasekhar_limit=chandrasekhar_limit,
-            max_mass=max_mass,
             solar_metallicity=solar_metallicity,
             subsolar_metallicity=subsolar_metallicity)
 

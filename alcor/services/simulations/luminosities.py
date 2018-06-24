@@ -37,7 +37,6 @@ def get_white_dwarfs(stars: pd.DataFrame,
                      max_galactic_structure_age: float,
                      mass_relation_parameter: float,
                      chandrasekhar_limit: float,
-                     max_mass: float,
                      solar_metallicity: float,
                      subsolar_metallicity: float,
                      min_cooling_time: float = 0.) -> pd.DataFrame:
@@ -51,16 +50,12 @@ def get_white_dwarfs(stars: pd.DataFrame,
     :param mass_relation_parameter: factor by which white dwarf's mass is
     multiplied (previously called as IMFR parameter)
     :param chandrasekhar_limit: maximum mass of a stable white dwarf
-    :param max_mass: maximum mass of a main sequence star
-    that can generate a white dwarf
     :param solar_metallicity: metallicity assigned to all thin
     and thick disks white dwarfs due to relatively young ages
     :param subsolar_metallicity: metallicity assigned to all halo white dwarfs
     :param min_cooling_time: natural lower limit for cooling time
     :return: white dwarfs
     """
-    stars = stars[stars['progenitor_mass'] < max_mass]
-
     stars['metallicity'] = get_metallicities(
             galactic_disks_types=stars['galactic_disk_type'].values,
             subsolar_metallicity=subsolar_metallicity,
