@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import pandas as pd
 from scipy.interpolate import InterpolatedUnivariateSpline
@@ -37,30 +36,6 @@ def test_estimated_times(masses: np.ndarray,
     assert isinstance(solar_times, np.ndarray)
     assert masses.shape == solar_times.shape
     assert (masses_before == masses).all()
-
-
-def test_estimate_lifetime() -> None:
-    estimated_lifetime = luminosities.estimate_lifetime(
-            metallicity=3.,
-            subsolar_main_sequence_lifetime=1.,
-            solar_main_sequence_lifetime=2.,
-            subsolar_metallicity=1.,
-            solar_metallicity=2.)
-
-    assert math.isclose(estimated_lifetime, 3.)
-
-
-def test_get_main_sequence_lifetimes(masses: np.ndarray,
-                                     metallicities: np.ndarray,
-                                     solar_metallicity: float,
-                                     subsolar_metallicity: float) -> None:
-    main_sequence_lifetimes = luminosities.main_sequence_stars_lifetimes(
-            masses=masses,
-            metallicities=metallicities,
-            solar_metallicity=solar_metallicity,
-            subsolar_metallicity=subsolar_metallicity)
-
-    assert isinstance(main_sequence_lifetimes, np.ndarray)
 
 
 def test_get_white_dwarf_masses(progenitor_masses: np.ndarray) -> None:
