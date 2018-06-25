@@ -55,6 +55,12 @@ STAR_PARAMETERS_NAMES = ['mass',
                          'r_abs_magnitude',
                          'i_abs_magnitude',
                          'j_abs_magnitude',
+                         'extinction',
+                         'u_ugriz',
+                         'g_ugriz',
+                         'r_ugriz',
+                         'i_ugriz',
+                         'z_ugriz',
                          'ug_ugriz',
                          'gr_ugriz',
                          'ri_ugriz',
@@ -65,6 +71,7 @@ STAR_PARAMETERS_NAMES = ['mass',
                          'birth_time',
                          'effective_temperature',
                          'surface_gravity',
+                         'cooling_time',
                          'spectral_type',
                          'galactic_disk_type']
 
@@ -127,6 +134,8 @@ class Star(Base):
                              nullable=True)
     j_abs_magnitude = Column(Float(),
                              nullable=True)
+    extinction = Column(Float(),
+                        nullable=True)
     ug_ugriz = Column(Float(),
                       nullable=True)
     gr_ugriz = Column(Float(),
@@ -135,6 +144,16 @@ class Star(Base):
                       nullable=True)
     iz_ugriz = Column(Float(),
                       nullable=True)
+    u_ugriz = Column(Float(),
+                     nullable=True)
+    g_ugriz = Column(Float(),
+                     nullable=True)
+    r_ugriz = Column(Float(),
+                     nullable=True)
+    i_ugriz = Column(Float(),
+                     nullable=True)
+    z_ugriz = Column(Float(),
+                     nullable=True)
     u_velocity = Column(Float(),
                         nullable=True)
     v_velocity = Column(Float(),
@@ -147,6 +166,8 @@ class Star(Base):
                                    nullable=True)
     surface_gravity = Column(Float(),
                              nullable=True)
+    cooling_time = Column(Float(),
+                          nullable=True)
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
                            nullable=True)
@@ -179,16 +200,23 @@ class Star(Base):
                  r_abs_magnitude: float = None,
                  i_abs_magnitude: float = None,
                  j_abs_magnitude: float = None,
+                 extinction: float = None,
                  ug_ugriz: float = None,
                  gr_ugriz: float = None,
                  ri_ugriz: float = None,
                  iz_ugriz: float = None,
+                 u_ugriz: float = None,
+                 g_ugriz: float = None,
+                 r_ugriz: float = None,
+                 i_ugriz: float = None,
+                 z_ugriz: float = None,
                  u_velocity: float = None,
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
                  effective_temperature: float = None,
                  surface_gravity: float = None,
+                 cooling_time: float = None,
                  spectral_type: int = None,
                  galactic_disk_type: GalacticDiskType = None):
         self.id = None
@@ -215,16 +243,23 @@ class Star(Base):
         self.r_abs_magnitude = r_abs_magnitude
         self.i_abs_magnitude = i_abs_magnitude
         self.j_abs_magnitude = j_abs_magnitude
+        self.extinction = extinction
         self.ug_ugriz = ug_ugriz
         self.gr_ugriz = gr_ugriz
         self.ri_ugriz = ri_ugriz
         self.iz_ugriz = iz_ugriz
+        self.u_ugriz = u_ugriz
+        self.g_ugriz = g_ugriz
+        self.r_ugriz = r_ugriz
+        self.i_ugriz = i_ugriz
+        self.z_ugriz = z_ugriz
         self.u_velocity = u_velocity
         self.v_velocity = v_velocity
         self.w_velocity = w_velocity
         self.birth_time = birth_time
         self.effective_temperature = effective_temperature
         self.surface_gravity = surface_gravity
+        self.cooling_time = cooling_time
         self.spectral_type = spectral_type
         self.galactic_disk_type = galactic_disk_type
 

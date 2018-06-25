@@ -68,6 +68,8 @@ C         Heliocentric velocities, B3 system
      &                        coordinate_Zcylindr(MAX_STARS_COUNT),
      &                        lgac(MAX_STARS_COUNT),
      &                        bgac(MAX_STARS_COUNT)
+         real :: starBirthTime(MAX_STARS_COUNT),
+     &           m(MAX_STARS_COUNT)
           
           common /vel/ uu, vv, ww
           common /coorcil/ coordinate_R,
@@ -77,6 +79,7 @@ C         Heliocentric velocities, B3 system
      &                   numberOfWDs,
      &                   disk_belonging
           common /lb/ lgac, bgac
+          common /tm/ starBirthTime, m
     
 C         Peculiar solar velocities, values from Anguiano et al. 2017
 C         TODO: find out why signs are different from values in Python

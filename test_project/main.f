@@ -65,10 +65,11 @@ C     For terminal:
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: ug(numberOfStars),
-     &        gr(numberOfStars),
-     &        ri(numberOfStars),
-     &        iz(numberOfStars)
+      real :: u_ugriz(numberOfStars),
+     &        g_ugriz(numberOfStars),
+     &        r_ugriz(numberOfStars),
+     &        i_ugriz(numberOfStars),
+     &        z_ugriz(numberOfStars)
       logical :: is_numeric, longitudes_from_csv, latitudes_from_csv
       integer :: iterations_count, getNumberOfLines
 
@@ -300,19 +301,24 @@ C     TODO: add choosing what output we want to get
      &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'ug_ugriz ',
-     &                  'gr_ugriz ',
-     &                  'ri_ugriz ',
-     &                  'iz_ugriz ',
+     &                  'u_ugriz ',
+     &                  'g_ugriz ',
+     &                  'r_ugriz ',
+     &                  'i_ugriz ',
+     &                  'z_ugriz ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
      &                  'proper_motion_component_b ',
      &                  'proper_motion_component_l ',
+     &                  'proper_motion_component_vr ',
      &                  'proper_motion ',
      &                  'distance ',
      &                  'birth_time ',
      &                  'spectral_type ',
+     &                  'effective_temperature ',
+     &                  'surface_gravity ',
+     &                  'cooling_time ',
      &                  'galactic_disk_type '
       else if (geometry == 'cones') then
           write(421, *) 'mass ',
@@ -324,10 +330,11 @@ C     TODO: add choosing what output we want to get
      &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'ug_ugriz ',
-     &                  'gr_ugriz ',
-     &                  'ri_ugriz ',
-     &                  'iz_ugriz ',
+     &                  'u_ugriz ',
+     &                  'g_ugriz ',
+     &                  'r_ugriz ',
+     &                  'i_ugriz ',
+     &                  'z_ugriz ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
@@ -337,6 +344,7 @@ C     TODO: add choosing what output we want to get
      &                  'birth_time ',
      &                  'effective_temperature ',
      &                  'surface_gravity ',
+     &                  'cooling_time ',
      &                  'spectral_type ',
      &                  'galactic_disk_type '
       end if
@@ -403,16 +411,17 @@ C         Calculating the trajectories according to/along z-coordinate
           write(6,*) '8. Determinating visual magnitudes (8/9)'
           call magi(fractionOfDB,
      &              table,
-     &              ug,
-     &              gr,
-     &              ri,
-     &              iz) 
+     &              u_ugriz,
+     &              g_ugriz,
+     &              r_ugriz,
+     &              i_ugriz,
+     &              z_ugriz) 
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
      &         cone_height_latitudes(i),
-     &         ug, gr, ri, iz)
+     &         u_ugriz, g_ugriz, r_ugriz, i_ugriz, z_ugriz)
           open(765, file='processed_cones.txt')
           write(unit=765,fmt=*) cone_height_longitudes(i),
      &                          cone_height_latitudes(i)
@@ -479,7 +488,8 @@ C***********************************************************************
 
       subroutine printForProcessing(output_filename, geometry, iseed,
      &         solarGalactocentricDistance,cone_height_longitude,
-     &         cone_height_latitude, ug, gr, ri, iz)
+     &         cone_height_latitude, u_ugriz, g_ugriz, r_ugriz, i_ugriz,
+     &         z_ugriz)
       implicit none
       external ran
       real ran
@@ -502,6 +512,7 @@ C***********************************************************************
       double precision :: solarGalactocentricDistance
       real prev_min_longitude, prev_max_longitude, 
      &                 prev_min_latitude, prev_max_latitude
+      real ngp_ra, ngp_dec
       
       parameter (numberOfStars=6000000)
 C     (Only northern hemisphere)
@@ -509,15 +520,15 @@ C     (Only northern hemisphere)
 C     Minimum parallax below which we discard results (0.025<=>40 pc)
       parameter (minimumParallax=0.025)
 C     Binning of Luminosity Function 
-      parameter (mbolmin=5.75,mbolmax=20.75,mbolinc=0.5)
-C     Minimum proper motion
+      parameter (mbolmin=5.75, mbolmax=20.75, mbolinc=0.5)
       parameter (minimumProperMotion=0.04)
-C     Parameters of mass histograms
+      parameter (ngp_ra=3.366042, ngp_dec=0.473507826)
       
-      real :: ug(numberOfStars),
-     &        gr(numberOfStars),
-     &        ri(numberOfStars),
-     &        iz(numberOfStars)
+      real :: u_ugriz(numberOfStars),
+     &        g_ugriz(numberOfStars),
+     &        r_ugriz(numberOfStars),
+     &        i_ugriz(numberOfStars),
+     &        z_ugriz(numberOfStars)
       double precision :: properMotion(numberOfStars),
      &                    rightAscension(numberOfStars),
      &                    declination(numberOfStars)
@@ -600,6 +611,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       logical longitude_overlapping, latitude_overlapping,
      &  star_in_intersection
       character(len=:), allocatable :: disk_str
+      real :: c_1, c_2
       real :: gal_to_equat_angle = 2.147
       real :: right_ascension_prop_motion,
      &        declination_prop_motion,
@@ -639,18 +651,21 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
                   disk_str = 'halo'
               end if
 
+              c_1 = (sin(ngp_dec) * cos(declination(i)) 
+     &               - cos(ngp_dec) * sin(declination(i))
+     &                 * cos(rightAscension(i) - ngp_ra))
+
+              c_2 = cos(ngp_dec) * sin(rightAscension(i) - ngp_ra)
+
               right_ascension_prop_motion = (
-     &            sin(gal_to_equat_angle)
-     &            * longitude_proper_motion(i)
-     &            - cos(gal_to_equat_angle) 
-     &              * latitude_proper_motion(i))
-              declination_prop_motion = (cos(gal_to_equat_angle) 
-     &                                   * longitude_proper_motion(i)
-     &                                   + sin(gal_to_equat_angle)
-     &                                     * latitude_proper_motion(i))
+     &            c_1 * longitude_proper_motion(i)
+     &            - c_2 * latitude_proper_motion(i)) / cos(bgac(i))
+              declination_prop_motion = (
+     &            c_2 * longitude_proper_motion(i)
+     &            + c_1 * latitude_proper_motion(i)) / cos(bgac(i))
+
               total_prop_motion = real(
      &            sqrt(right_ascension_prop_motion ** 2
-     &                 * cos(declination(i)) ** 2
      &                 + declination_prop_motion ** 2))
 
               write(421, *) massOfWD(i),
@@ -662,19 +677,24 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      bgac(i),
      &                      rightAscension(i),
      &                      declination(i),
-     &                      ug(i),
-     &                      gr(i),
-     &                      ri(i),
-     &                      iz(i),
+     &                      u_ugriz(i),
+     &                      g_ugriz(i),
+     &                      r_ugriz(i),
+     &                      i_ugriz(i),
+     &                      z_ugriz(i),
      &                      uu(i),
      &                      vv(i),
      &                      ww(i),
      &                      latitude_proper_motion(i),
      &                      longitude_proper_motion(i),
+     &                      radial_velocity(i),
      &                      properMotion(i),
      &                      rgac(i),
      &                      starBirthTime(i),
      &                      typeOfWD(i),
+     &                      effTempOfWD(i),
+     &                      log_g(i),
+     &                      coolingTime(i),
      &                      disk_str
           end do
       else if (geometry == 'cones') then
@@ -843,10 +863,11 @@ C                if cone crosses 2pi, move it -2pi
      &                                latitude,
      &                                rightAscension(i),
      &                                declination(i),
-     &                                ug(i),
-     &                                gr(i),
-     &                                ri(i),
-     &                                iz(i),
+     &                                u_ugriz(i),
+     &                                g_ugriz(i),
+     &                                r_ugriz(i),
+     &                                i_ugriz(i),
+     &                                z_ugriz(i),
      &                                uu(i),
      &                                vv(i),
      &                                ww(i),
@@ -856,6 +877,7 @@ C                if cone crosses 2pi, move it -2pi
      &                                starBirthTime(i),
      &                                effTempOfWD(i),
      &                                log_g(i),
+     &                                coolingTime(i),
      &                                typeOfWD(i),
      &                                disk_str
                      end if
