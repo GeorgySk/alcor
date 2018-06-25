@@ -35,7 +35,10 @@ C     cylindrical z-coordinate are determined.
      &            stars_count, 
      &            in, 
      &            numberOfWDs,
-     &            flagOfWD(MAX_STARS_COUNT)
+     &            flagOfWD(MAX_STARS_COUNT),
+     &            thin_disk_stars_count,
+     &            thick_disk_stars_count,
+     &            halo_stars_count
       real :: z_coordinate,                radius,
      &        time_try_sfr,                sfr_try,
      &        burst_age,                   burst_init_time, 
@@ -72,6 +75,10 @@ C     TODO: rename this to main_sequence_mass?
       common /index/ flagOfWD,
      &               numberOfWDs,
      &               disk_belonging
+
+      thin_disk_stars_count = 0
+      thick_disk_stars_count = 0
+      halo_stars_count = 0
 
 C     TODO: find out the meaning of psi, mrep and 1.0e6
       normalization_const = get_normalization_const(parameterOfSFR, 
@@ -129,6 +136,7 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
               random_value = ran(iseed)
               if (random_value <= thick_disk_stars_fraction) then
                   disk_belonging(stars_count) = 2
+                  thick_disk_stars_count = thick_disk_stars_count + 1
                   do
                       time_try = thick_disk_age * ran(iseed)
                       time_try_sfr = time_try 
@@ -145,10 +153,12 @@ C             disk_belonging = 1 (thin disk), = 2 (thick disk)
      &                 .and. random_value <= thick_disk_stars_fraction 
      &                                       + halo_stars_fraction) then
                   disk_belonging(stars_count) = 3
+                  halo_stars_count = halo_stars_count + 1
                   starBirthTime(stars_count) = halo_birth_init_time
      &                + halo_stars_formation_time * ran(iseed)
               else
                   disk_belonging(stars_count) = 1
+                  thin_disk_stars_count = thin_disk_stars_count + 1
                   starBirthTime(stars_count) = thin_disk_birth_init_time 
      &                + float(bin_index - 1) * time_increment 
      &                + time_increment * ran(iseed)
@@ -181,6 +191,9 @@ C                 Assigning random sign
         
       numberOfStarsInSample = stars_count
       write(6,*) '     Number of stars in sample=',numberOfStarsInSample
+      write(6,*) '     Thin disk: ', thin_disk_stars_count
+      write(6,*) '     Thick disk: ', thick_disk_stars_count
+      write(6,*) '     Halo: ', halo_stars_count
       
       end subroutine
 
