@@ -337,7 +337,8 @@ C       Smaller luminosity than known -> linear 2D extrapolation
      &         color_U(numberOfMassesWithColors,ns2),
      &        luminosity(numberOfMassesWithColors,ns2-1),
      &        luminosity(numberOfMassesWithColors,ns2),c_2)
-          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c1)
+          call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors - 1),
+     &                 mtrk(numberOfMassesWithColors),c1)
           call extrap1(lumi,color_B(numberOfMassesWithColors-1,ns1-1),
      &         color_B(numberOfMassesWithColors-1,ns1),
      &         luminosity(numberOfMassesWithColors-1,ns2-1),
@@ -346,7 +347,8 @@ C       Smaller luminosity than known -> linear 2D extrapolation
      &         color_B(numberOfMassesWithColors,ns2),
      &         luminosity(numberOfMassesWithColors,ns2-1),
      &         luminosity(numberOfMassesWithColors,ns2),c_2)
-          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c2)
+          call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors - 1),
+     &                 mtrk(numberOfMassesWithColors),c2)
           call extrap1(lumi,color_V(numberOfMassesWithColors-1,ns1-1),
      &         color_V(numberOfMassesWithColors-1,ns1),
      &         luminosity(numberOfMassesWithColors-1,ns1-1),
@@ -355,7 +357,8 @@ C       Smaller luminosity than known -> linear 2D extrapolation
      &         color_V(numberOfMassesWithColors,ns2),
      &         luminosity(numberOfMassesWithColors,ns2-1),
      &         luminosity(numberOfMassesWithColors,ns2),c_2)
-          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c3)
+          call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors - 1),
+     &                 mtrk(numberOfMassesWithColors),c3)
           call extrap1(lumi,color_R(numberOfMassesWithColors-1,ns1-1),
      &         color_R(numberOfMassesWithColors-1,ns1),
      &         luminosity(numberOfMassesWithColors-1,ns1-1),
@@ -364,7 +367,8 @@ C       Smaller luminosity than known -> linear 2D extrapolation
      &         color_R(numberOfMassesWithColors,ns2),
      &         luminosity(numberOfMassesWithColors,ns2-1),
      &         luminosity(numberOfMassesWithColors,ns2),c_2)
-          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c4)
+          call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors - 1),
+     &                 mtrk(numberOfMassesWithColors),c4)
           call extrap1(lumi,color_I(numberOfMassesWithColors-1,ns1-1),
      &         color_I(numberOfMassesWithColors-1,ns1),
      &         luminosity(numberOfMassesWithColors-1,ns1-1),
@@ -373,7 +377,8 @@ C       Smaller luminosity than known -> linear 2D extrapolation
      &         color_I(numberOfMassesWithColors,ns2),
      &         luminosity(numberOfMassesWithColors,ns2-1),
      &         luminosity(numberOfMassesWithColors,ns2),c_2)
-          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c5)
+          call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors - 1),
+     &                 mtrk(numberOfMassesWithColors),c5)
           call extrap1(lumi,color_J(numberOfMassesWithColors-1,ns1-1),
      &         color_J(numberOfMassesWithColors-1,ns1),
      &         luminosity(numberOfMassesWithColors-1,ns1-1),
@@ -382,7 +387,8 @@ C       Smaller luminosity than known -> linear 2D extrapolation
      &         color_J(numberOfMassesWithColors,ns2),
      &         luminosity(numberOfMassesWithColors,ns2-1),
      &         luminosity(numberOfMassesWithColors,ns2),c_2)
-          call extrap1(mass,c_1,c_2,mtrk(1),mtrk(2),c6)   
+          call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors - 1),
+     &                 mtrk(numberOfMassesWithColors),c6)   
           check3 = 1
           GOTO 45
 C       Luminosity between known values
@@ -423,7 +429,7 @@ C       Luminosity between known values
             c_2 = color_U(numberOfMassesWithColors, i2)
      &            + (color_U(numberOfMassesWithColors, i2 + 1)
      &               - color_U(numberOfMassesWithColors, i2)) * a2 / b2
-            call extrap1(mass,c_1,c_2,mtrk(1),
+            call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors-1),
      &           mtrk(numberOfMassesWithColors),c1)
             c_1 = color_B(numberOfMassesWithColors - 1, i1)
      &            + (color_B(numberOfMassesWithColors - 1, i1 + 1)
@@ -441,7 +447,7 @@ C       Luminosity between known values
             c_2 = color_V(numberOfMassesWithColors, i2) 
      &            + (color_V(numberOfMassesWithColors, i2 + 1)
      &               - color_V(numberOfMassesWithColors, i2)) * a2 / b2
-            call extrap1(mass,c_1,c_2,mtrk(1),
+            call extrap1(mass,c_1,c_2,mtrk(numberOfMassesWithColors-1),
      &           mtrk(numberOfMassesWithColors),c3)
             c_1 = color_R(numberOfMassesWithColors - 1, i1)
      &            + (color_R(numberOfMassesWithColors - 1, i1 + 1)
