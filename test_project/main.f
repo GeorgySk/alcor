@@ -94,6 +94,9 @@ C     Filling info about groups of files (cooling, color tables)
 C     Terminal reading
       num_args = iargc()
 
+      longitudes_from_csv = .FALSE.
+      latitudes_from_csv = .FALSE.
+
       if (num_args .eq. 0) then
         fractionOfDB = 0.20 
         thin_disk_age = 9.2
