@@ -5,8 +5,6 @@ services:
     build: .
     image: lycantropos/alcor:latest
     entrypoint: "/alcor/docker-entrypoint.sh"
-    volumes:
-      - .:/alcor/
     command:
       # Generating stars:
       - simulate
