@@ -55,17 +55,15 @@ C       --- Checking if the time is less than the minimum---
 C         making linear extrapolation in log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2))/(ttrkk(jj,1)))
               s=log10(xtrk(jj,2)/xtrk(jj,1))/deltf
-              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm1=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2))      
+              xm1=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2))/(ttrkk(jj,1)))
               s=(xtrk(jj,2)-xtrk(jj,1))/deltf
-              b=xtrk(jj,2)-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm1=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,2)-s*log10(ttrkk(jj,2))      
+              xm1=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,2)-ttrkk(jj,1)
@@ -81,17 +79,15 @@ C       --- Checking if the time is greater than maximum ---
 C         making linear extrapolation in log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=log10(xtrk(jj,ns)/xtrk(jj,ns-1))/deltf
-              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm1=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns))      
+              xm1=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=(xtrk(jj,ns)-xtrk(jj,ns-1))/deltf
-              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm1=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns))      
+              xm1=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,ns)-ttrkk(jj,ns-1)
@@ -122,17 +118,15 @@ C       --- Checking if the time is less than minimum---
 C         hacemos un extrapolacion lineal en log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2))/(ttrkk(jj,1)))
               s=log10(xtrk(jj,2)/xtrk(jj,1))/deltf
-              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm2=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2))      
+              xm2=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2))/(ttrkk(jj,1)))
               s=(xtrk(jj,2)-xtrk(jj,1))/deltf
-              b=xtrk(jj,2)-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm2=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,2)-s*log10(ttrkk(jj,2))      
+              xm2=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,2)-ttrkk(jj,1)
@@ -148,17 +142,15 @@ C       --- Checking if the time is greater than maximum---
 C         making linear extrapolation in log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=log10(xtrk(jj,ns)/xtrk(jj,ns-1))/deltf
-              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm2=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns))      
+              xm2=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=(xtrk(jj,ns)-xtrk(jj,ns-1))/deltf
-              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm2=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns))      
+              xm2=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,ns)-ttrkk(jj,ns-1)
@@ -197,17 +189,15 @@ C       --- Checking if time is less than minimum---
 C         making linear extrapolation in log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2)/(ttrkk(jj,1))))
               s=log10(xtrk(jj,2)/xtrk(jj,1))/deltf
-              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm1=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2))      
+              xm1=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2))/(ttrkk(jj,1)))
               s=(xtrk(jj,2)-xtrk(jj,1))/deltf
-              b=xtrk(jj,2)-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm1=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,2)-s*log10(ttrkk(jj,2))
+              xm1=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,2)-ttrkk(jj,1)
@@ -223,17 +213,15 @@ C       --- Checking if time is greater than maximum---
 C         making linear extrapolation in log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=log10(xtrk(jj,ns)/xtrk(jj,ns-1))/deltf
-              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm1=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns))      
+              xm1=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=(xtrk(jj,ns)-xtrk(jj,ns-1))/deltf
-              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm1=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns))      
+              xm1=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,ns)-ttrkk(jj,ns-1)
@@ -264,17 +252,15 @@ C       --- Checking if time is less than minimum ---
 C       making linear extrapolation in log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2))/(ttrkk(jj,1)))
               s=log10(xtrk(jj,2)/xtrk(jj,1))/deltf
-              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm2=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,2))-s*log10(ttrkk(jj,2))      
+              xm2=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,2)+tprewd(jj))/(ttrkk(jj,1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,2))/(ttrkk(jj,1)))
               s=(xtrk(jj,2)-xtrk(jj,1))/deltf
-              b=xtrk(jj,2)-s*log10(ttrkk(jj,2)+tprewd(jj))      
-              xm2=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,2)-s*log10(ttrkk(jj,2))      
+              xm2=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,2)-ttrkk(jj,1)
@@ -290,17 +276,15 @@ C       --- Checking if time is greater than maximum ---
 C         making linear extrapolation in log-log
           if(model.eq.0) then
             if(modlog.eq.1) then
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=log10(xtrk(jj,ns)/xtrk(jj,ns-1))/deltf
-              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm2=10.0**(s*log10(y+tprewd(jj))+b)
+              b=log10(xtrk(jj,ns))-s*log10(ttrkk(jj,ns))      
+              xm2=10.0**(s*log10(y)+b)
             else
-              deltf=log10((ttrkk(jj,ns)+tprewd(jj))/(ttrkk(jj,ns-1)+
-     &              tprewd(jj)))
+              deltf=log10((ttrkk(jj,ns))/(ttrkk(jj,ns-1)))
               s=(xtrk(jj,ns)-xtrk(jj,ns-1))/deltf
-              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns)+tprewd(jj))      
-              xm2=s*log10(y+tprewd(jj))+b
+              b=xtrk(jj,ns)-s*log10(ttrkk(jj,ns))      
+              xm2=s*log10(y)+b
             endif
           else
             deltf=ttrkk(jj,ns)-ttrkk(jj,ns-1)
@@ -345,17 +329,15 @@ C     ---   Times less than minimum  ---
 C       making linear extrapolation in log-log
         if(model.eq.0) then
           if(modlog.eq.1) then
-            deltf=log10((ttrkk(j1,2)+tprewd(j1))/(ttrkk(j1,1)+
-     &            tprewd(j1)))
+            deltf=log10((ttrkk(j1,2))/(ttrkk(j1,1)))
             s=log10(xtrk(j1,2)/xtrk(j1,1))/deltf
-            b=log10(xtrk(j1,2))-s*log10(ttrkk(j1,2)+tprewd(j1))
-            x1=10.0**(s*log10(y+tprewd(j1))+b)
+            b=log10(xtrk(j1,2))-s*log10(ttrkk(j1,2))
+            x1=10.0**(s*log10(y)+b)
           else
-            deltf=log10((ttrkk(j1,2)+tprewd(j1))/(ttrkk(j1,1)+
-     &            tprewd(j1)))
+            deltf=log10((ttrkk(j1,2))/(ttrkk(j1,1)))
             s=(xtrk(j1,2)-xtrk(j1,1))/deltf
-            b=xtrk(j1,2)-s*log10(ttrkk(j1,2)+tprewd(j1))
-            x1=s*log10(y+tprewd(j1))+b
+            b=xtrk(j1,2)-s*log10(ttrkk(j1,2))
+            x1=s*log10(y)+b
           end if
         else
           deltf=ttrkk(j1,2)-ttrkk(j1,1)
@@ -373,17 +355,15 @@ C     ---   Times greater than maximum ---
 C       making linear extrapolation in log-log
         if(model.eq.0) then
           if(modlog.eq.1) then
-            deltf=log10((ttrkk(j1,ns)+tprewd(j1))/(ttrkk(j1,ns-1)+
-     &            tprewd(j1)))
+            deltf=log10((ttrkk(j1,ns))/(ttrkk(j1,ns-1)))
             s=log10(xtrk(j1,ns)/xtrk(j1,ns-1))/deltf
-            b=log10(xtrk(j1,ns))-s*log10(ttrkk(j1,ns)+tprewd(j1))
-            x1=10.0**(s*log10(y+tprewd(j1))+b)
+            b=log10(xtrk(j1,ns))-s*log10(ttrkk(j1,ns))
+            x1=10.0**(s*log10(y)+b)
           else
-            deltf=log10((ttrkk(j1,ns)+tprewd(j1))/(ttrkk(j1,ns-1)+
-     &            tprewd(j1)))
+            deltf=log10((ttrkk(j1,ns))/(ttrkk(j1,ns-1)))
             s=(xtrk(j1,ns)-xtrk(j1,ns-1))/deltf
-            b=xtrk(j1,ns)-s*log10(ttrkk(j1,ns)+tprewd(j1))
-            x1=s*log10(y+tprewd(j1))+b
+            b=xtrk(j1,ns)-s*log10(ttrkk(j1,ns))
+            x1=s*log10(y)+b
           end if
         else
           deltf=ttrkk(j1,ns)-ttrkk(j1,ns-1)
@@ -414,17 +394,15 @@ C     ---   Times less than minimum---
 C       making linear extrapolation in log-log
         if(model.eq.0) then
           if(modlog.eq.1) then
-            deltf=log10((ttrkk(j2,2)+tprewd(j2))/(ttrkk(j2,1)+
-     &            tprewd(j2)))
+            deltf=log10((ttrkk(j2,2))/(ttrkk(j2,1)))
             s=log10(xtrk(j2,2)/xtrk(j2,1))/deltf
-            b=log10(xtrk(j2,2))-s*log10(ttrkk(j2,2)+tprewd(j2))
-            x3=10.0**(s*log10(y+tprewd(j2))+b)
+            b=log10(xtrk(j2,2))-s*log10(ttrkk(j2,2))
+            x3=10.0**(s*log10(y)+b)
           else
-            deltf=log10((ttrkk(j2,2)+tprewd(j2))/(ttrkk(j2,1)+
-     &            tprewd(j2)))
+            deltf=log10((ttrkk(j2,2))/(ttrkk(j2,1)))
             s=(xtrk(j2,2)-xtrk(j2,1))/deltf
-            b=xtrk(j2,2)-s*log10(ttrkk(j2,2)+tprewd(j2))
-            x3=s*log10(y+tprewd(j2))+b
+            b=xtrk(j2,2)-s*log10(ttrkk(j2,2))
+            x3=s*log10(y)+b
           end if
         else
           deltf=ttrkk(j2,2)-ttrkk(j2,1)
@@ -442,17 +420,15 @@ C     ---   Times greater than maximum   ---
 C       making linear extrapolation in log-log
         if(model.eq.0) then
           if(modlog.eq.1) then
-            deltf=log10((ttrkk(j2,ns)+tprewd(j2))/(ttrkk(j2,ns-1)+
-     &            tprewd(j2)))
+            deltf=log10((ttrkk(j2,ns))/(ttrkk(j2,ns-1)))
             s=log10(xtrk(j2,ns)/xtrk(j2,ns-1))/deltf
-            b=log10(xtrk(j2,ns))-s*log10(ttrkk(j2,ns)+tprewd(j2))
-            x3=10.0**(s*log10(y+tprewd(j2))+b)
+            b=log10(xtrk(j2,ns))-s*log10(ttrkk(j2,ns))
+            x3=10.0**(s*log10(y)+b)
           else
-            deltf=log10((ttrkk(j2,ns)+tprewd(j2))/(ttrkk(j2,ns-1)+
-     &            tprewd(j2)))
+            deltf=log10((ttrkk(j2,ns))/(ttrkk(j2,ns-1)))
             s=(xtrk(j2,ns)-xtrk(j2,ns-1))/deltf
-            b=xtrk(j2,ns)-s*log10(ttrkk(j2,ns)+tprewd(j2))
-            x3=s*log10(y+tprewd(j2))+b
+            b=xtrk(j2,ns)-s*log10(ttrkk(j2,ns))
+            x3=s*log10(y)+b
           endif
         else
           deltf=ttrkk(j2,ns)-ttrkk(j2,ns-1)
