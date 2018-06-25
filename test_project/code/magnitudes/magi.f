@@ -184,39 +184,39 @@ C         Calculating extinction
           ri = r_ugriz(i) - i_ugriz(i)
           iz = i_ugriz(i) - z_ugriz(i)
 
-          ug_up = -24.384 * gr ** 5 - 19.0 * gr ** 4 
-     &            + 3.497 * gr ** 3 + 1.193 * gr ** 2 
-     &            + 0.083 * gr + 0.61
-          ug_low = -20.653 * gr ** 5 + 10.816 * gr ** 4 
-     &            + 15.718 * gr ** 3 - 1.294 * gr ** 2 
-     &            - 0.084 * gr + 0.3
-          gr_up = -0.6993 * ri ** 2 + 0.947 * ri + 0.192
-          gr_low = -1.32 * ri ** 3 + 2.173 * ri ** 2 
-     &             + 2.452 * ri - 0.07
-          top = -0.56
-          left = 0.176 * iz + 0.127
-          right = -0.754 * iz + 0.11
+C           ug_up = -24.384 * gr ** 5 - 19.0 * gr ** 4 
+C      &            + 3.497 * gr ** 3 + 1.193 * gr ** 2 
+C      &            + 0.083 * gr + 0.61
+C           ug_low = -20.653 * gr ** 5 + 10.816 * gr ** 4 
+C      &            + 15.718 * gr ** 3 - 1.294 * gr ** 2 
+C      &            - 0.084 * gr + 0.3
+C           gr_up = -0.6993 * ri ** 2 + 0.947 * ri + 0.192
+C           gr_low = -1.32 * ri ** 3 + 2.173 * ri ** 2 
+C      &             + 2.452 * ri - 0.07
+C           top = -0.56
+C           left = 0.176 * iz + 0.127
+C           right = -0.754 * iz + 0.11
 
-          if ((ug > ug_low) .and. (ug < ug_up) 
-     &        .and. (gr > gr_low) .and. (gr < gr_up) 
-     &        .and. (ri > top) 
-     &        .and. (ri < left) .and. (ri < right)
-     &       ) then
-            g_ugriz_apparent = g_ugriz(i) - 5.0 + 5.0 * (log10(rgac(i)) 
-     &                                                   + 3.0)
-C             i_ugriz_apparent = i_ugriz - 5.0 + 5.0 * (log10(rgac(i)) 
-C      &                                                + 3.0)
-C             if (i_ugriz_apparent < 15.0 
-C      &          .or. i_ugriz_apparent > 19.1) then
-            if (g_ugriz_apparent < 15.0 
-     &          .or. g_ugriz_apparent > 22.0) then
-              eliminated(i) = .true.
-            else
-              eliminated(i) = .false.
-            end if
-          else
-              eliminated(i) = .true.
-          end if
+C           if ((ug > ug_low) .and. (ug < ug_up) 
+C      &        .and. (gr > gr_low) .and. (gr < gr_up) 
+C      &        .and. (ri > top) 
+C      &        .and. (ri < left) .and. (ri < right)
+C      &       ) then
+C             g_ugriz_apparent = g_ugriz(i) - 5.0 + 5.0 * (log10(rgac(i)) 
+C      &                                                   + 3.0)
+C C             i_ugriz_apparent = i_ugriz - 5.0 + 5.0 * (log10(rgac(i)) 
+C C      &                                                + 3.0)
+C C             if (i_ugriz_apparent < 15.0 
+C C      &          .or. i_ugriz_apparent > 19.1) then
+C             if (g_ugriz_apparent < 15.0 
+C      &          .or. g_ugriz_apparent > 22.0) then
+C               eliminated(i) = .true.
+C             else
+C               eliminated(i) = .false.
+C             end if
+C           else
+C               eliminated(i) = .true.
+C           end if
 
 C       ---  ELSE mass >= 1.4  --- EXPLOTA, exceeding Chandrasekar limit
         else
