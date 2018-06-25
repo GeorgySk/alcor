@@ -25,6 +25,7 @@ def main() -> None:
                    'default "settings.yml").')
 @click.option('--project-dir', '-d',
               required=True,
+              default='test_project',
               type=click.Path(),
               help='Project directory path '
                    '(absolute or relative).')
