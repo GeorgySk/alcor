@@ -16,16 +16,5 @@ setup(name=PROJECT_NAME,
       download_url=project_base_url + 'archive/master.tar.gz',
       keywords=['astrophysics'],
       install_requires=[
-          'psycopg2>=2.7.1',  # PostgreSQL driver
-          'sqlalchemy>=1.1.14',  # ORM
           'PyYAML>=3.12.0',  # settings loading
-          'matplotlib>=2.0.2',  # plotting
-      ],
-      setup_requires=['pytest-runner>=2.11.1'],
-      tests_require=[
-          'pydevd>=1.0.0',  # debugging
-          'pytest>=3.2.1',
-          'pytest-cov>=2.4.0',
-          'hypothesis>=3.28.0',
-          'hypothesis_sqlalchemy>=0.0.2',
       ])

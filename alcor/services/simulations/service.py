@@ -1,17 +1,11 @@
 import logging
 import os
-import uuid
 from subprocess import check_call
 from typing import Dict
 
-from sqlalchemy.orm.session import Session
-
-from alcor.models import Group
-from alcor.models.simulation import Parameter
-from alcor.services.common import group_output_file_name
+from alcor.services.common import output_file_name
 from alcor.types import (GridParametersInfoType,
                          CSVParametersInfoType)
-from alcor.utils import parse_stars
 from . import grid
 
 logger = logging.getLogger(__name__)
@@ -21,32 +15,14 @@ def run(*,
         geometry: str,
         precision: int,
         grid_parameters_info: GridParametersInfoType,
-        csv_parameters_info: CSVParametersInfoType,
-        session: Session) -> None:
+        csv_parameters_info: CSVParametersInfoType) -> None:
     for parameters_values in grid.parameters_values(
             parameters_info=grid_parameters_info,
             precision=precision):
-        group = Group(id=uuid.uuid4())
-        output_file_name = group_output_file_name(group=group)
         run_simulation(parameters_values=parameters_values,
                        csv_parameters_info=csv_parameters_info,
                        geometry=geometry,
-                       output_file_name=output_file_name)
-
-        with open(output_file_name) as output_file:
-            stars = list(parse_stars(output_file,
-                                     group=group))
-        os.remove(output_file_name)
-
-        parameters = [Parameter(group_id=group.id,
-                                name=name,
-                                value=str(value))
-                      for name, value in parameters_values.items()]
-
-        session.add(group)
-        session.add_all(parameters)
-        session.add_all(stars)
-        session.commit()
+                       output_file_name=output_file_name())
 
 
 def run_simulation(*,
