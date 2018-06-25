@@ -127,11 +127,9 @@ C         Calculating the proper motions in galactic coordinates
           velocity_by_prop_motion = 1.0 / (KAPPA * rgac(wd_index) 
      &                                     * PC_PER_KPC)
 
-C         TODO: find out why dividing by cos_bgac
           longitude_proper_motion(wd_index) = real(
      &        velocity_by_prop_motion
-     &        * (-uu(wd_index) * sin_lgac / cos_bgac
-     &           + vv(wd_index) * cos_lgac / cos_bgac))
+     &        * (-uu(wd_index) * sin_lgac + vv(wd_index) * cos_lgac))
           latitude_proper_motion(wd_index) = real(
      &        velocity_by_prop_motion
      &        * (-uu(wd_index) * cos_lgac * sin_bgac
@@ -141,7 +139,6 @@ C         TODO: find out why dividing by cos_bgac
      &        uu(wd_index) * cos_bgac * cos_lgac
      &        + vv(wd_index) * cos_bgac * sin_lgac
      &        + ww(wd_index) * sin_bgac)
-C         FIXME: Looks like this formula is wrong
           properMotion(wd_index) = sqrt(
      &        longitude_proper_motion(wd_index) 
      &        * longitude_proper_motion(wd_index)
