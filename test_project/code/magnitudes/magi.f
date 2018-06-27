@@ -1,10 +1,11 @@
       subroutine magi(fractionOfDB,
      &                table,
-     &                u_ugriz,
-     &                g_ugriz,
-     &                r_ugriz,
-     &                i_ugriz,
-     &                z_ugriz)
+     &                u_ubvrij,
+     &                b_ubvrij,
+     &                v_ubvrij,
+     &                r_ubvrij,
+     &                i_ubvrij,
+     &                j_ubvrij)
       use external_types
 C     This subroutine calculates ltc,cbv,cvi,cvr,cuv visual absolute 
 C     and apparent magnitude of the WDs.
@@ -37,12 +38,12 @@ C     and apparent magnitude of the WDs.
       integer disk_belonging(numberOfStars)
       logical :: eliminated(numberOfStars)
 
-      real :: u_ubvrij,
-     &        b_ubvrij,
-     &        v_ubvrij,
-     &        r_ubvrij,
-     &        i_ubvrij,
-     &        j_ubvrij,
+      real :: u_ubvrij(numberOfStars),
+     &        b_ubvrij(numberOfStars),
+     &        v_ubvrij(numberOfStars),
+     &        r_ubvrij(numberOfStars),
+     &        i_ubvrij(numberOfStars),
+     &        j_ubvrij(numberOfStars),
      &        extinction
 
       real :: ug, 
@@ -50,11 +51,11 @@ C     and apparent magnitude of the WDs.
      &        ri,
      &        iz
 
-      real :: u_ugriz(numberOfStars), 
-     &        g_ugriz(numberOfStars),
-     &        r_ugriz(numberOfStars),
-     &        i_ugriz(numberOfStars),
-     &        z_ugriz(numberOfStars)
+      real :: u_ugriz, 
+     &        g_ugriz,
+     &        r_ugriz,
+     &        i_ugriz,
+     &        z_ugriz
 
       real ::
      & u_ugriz_w_error, g_ugriz_w_error, r_ugriz_w_error, 
@@ -136,53 +137,53 @@ C         Calculating extinction
      &                 AVT,SAVT,AVC,JMAX,AV,SAV)
           extinction = AVT + AVC
 
-          u_ubvrij = c1 + extinction * 1.664
-          b_ubvrij = c2 + extinction * 1.321
-          v_ubvrij = c3 + extinction * 1.015
-          r_ubvrij = c4 + extinction * 0.819
-          i_ubvrij = c5 + extinction * 0.594
-          j_ubvrij = c6 + extinction * 0.276
+          u_ubvrij(i) = c1 + extinction * 1.664
+          b_ubvrij(i) = c2 + extinction * 1.321
+          v_ubvrij(i) = c3 + extinction * 1.015
+          r_ubvrij(i) = c4 + extinction * 0.819
+          i_ubvrij(i) = c5 + extinction * 0.594
+          j_ubvrij(i) = c6 + extinction * 0.276
 
-          g_ugriz(i) = v_ubvrij + 0.63 * (b_ubvrij - v_ubvrij)
-     &              - 0.124
-          u_ugriz(i) = (g_ugriz(i)
-     &               + 0.75 * (u_ubvrij - b_ubvrij)
-     &               + 0.77 * (b_ubvrij - v_ubvrij)
-     &               + 0.72)
-          r_ugriz(i) = (g_ugriz(i) 
-     &               - 1.646 * (v_ubvrij - r_ubvrij) + 0.139)
-          i_ugriz(i) = (r_ugriz(i)
-     &               - 1.007 * (r_ubvrij - i_ubvrij) + 0.236)
-          z_ugriz(i) = (i_ugriz(i) 
-     &               - (1.584 - 1.007) * (r_ubvrij - i_ubvrij)
-     &               + 0.386 - 0.236)
+C           g_ugriz = v_ubvrij(i) + 0.63 * (b_ubvrij(i) - v_ubvrij(i))
+C      &              - 0.124
+C           u_ugriz = (g_ugriz
+C      &               + 0.75 * (u_ubvrij(i) - b_ubvrij(i))
+C      &               + 0.77 * (b_ubvrij(i) - v_ubvrij(i))
+C      &               + 0.72)
+C           r_ugriz = (g_ugriz 
+C      &               - 1.646 * (v_ubvrij(i) - r_ubvrij(i)) + 0.139)
+C           i_ugriz = (r_ugriz
+C      &               - 1.007 * (r_ubvrij(i) - i_ubvrij(i)) + 0.236)
+C           z_ugriz = (i_ugriz 
+C      &               - (1.584 - 1.007) * (r_ubvrij(i) - i_ubvrij(i))
+C      &               + 0.386 - 0.236)
 
-          call errfot(u_ugriz(i),
-     &                u_ugriz_w_error,
-     &                1)
-          call errfot(g_ugriz(i),
-     &                g_ugriz_w_error,
-     &                2)
-          call errfot(r_ugriz(i),
-     &                r_ugriz_w_error,
-     &                3)
-          call errfot(i_ugriz(i),
-     &                i_ugriz_w_error,
-     &                4)
-          call errfot(z_ugriz(i),
-     &                z_ugriz_w_error,
-     &                5)
+C           call errfot(u_ugriz,
+C      &                u_ugriz_w_error,
+C      &                1)
+C           call errfot(g_ugriz,
+C      &                g_ugriz_w_error,
+C      &                2)
+C           call errfot(r_ugriz,
+C      &                r_ugriz_w_error,
+C      &                3)
+C           call errfot(i_ugriz,
+C      &                i_ugriz_w_error,
+C      &                4)
+C           call errfot(z_ugriz,
+C      &                z_ugriz_w_error,
+C      &                5)
 
-          u_ugriz(i) = u_ugriz_w_error
-          g_ugriz(i) = g_ugriz_w_error
-          r_ugriz(i) = r_ugriz_w_error
-          i_ugriz(i) = i_ugriz_w_error
-          z_ugriz(i) = z_ugriz_w_error
+C           u_ugriz = u_ugriz_w_error
+C           g_ugriz = g_ugriz_w_error
+C           r_ugriz = r_ugriz_w_error
+C           i_ugriz = i_ugriz_w_error
+C           z_ugriz = z_ugriz_w_error
 
-          ug = u_ugriz(i) - g_ugriz(i)
-          gr = g_ugriz(i) - r_ugriz(i)
-          ri = r_ugriz(i) - i_ugriz(i)
-          iz = i_ugriz(i) - z_ugriz(i)
+C           ug = u_ugriz - g_ugriz
+C           gr = g_ugriz - r_ugriz
+C           ri = r_ugriz - i_ugriz
+C           iz = i_ugriz - z_ugriz
 
 C           ug_up = -24.384 * gr ** 5 - 19.0 * gr ** 4 
 C      &            + 3.497 * gr ** 3 + 1.193 * gr ** 2 

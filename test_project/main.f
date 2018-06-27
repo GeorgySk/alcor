@@ -65,11 +65,12 @@ C     For terminal:
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: u_ugriz(numberOfStars),
-     &        g_ugriz(numberOfStars),
-     &        r_ugriz(numberOfStars),
-     &        i_ugriz(numberOfStars),
-     &        z_ugriz(numberOfStars)
+      real :: u_ubvrij(numberOfStars),
+     &        b_ubvrij(numberOfStars),
+     &        v_ubvrij(numberOfStars),
+     &        r_ubvrij(numberOfStars),
+     &        i_ubvrij(numberOfStars),
+     &        j_ubvrij(numberOfStars)
       logical :: is_numeric, longitudes_from_csv, latitudes_from_csv
       integer :: iterations_count, getNumberOfLines
 
@@ -304,11 +305,12 @@ C     TODO: add choosing what output we want to get
      &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'u_ugriz ',
-     &                  'g_ugriz ',
-     &                  'r_ugriz ',
-     &                  'i_ugriz ',
-     &                  'z_ugriz ',
+     &                  'u_ubvrij ',
+     &                  'b_ubvrij ',
+     &                  'v_ubvrij ',
+     &                  'r_ubvrij ',
+     &                  'i_ubvrij ',
+     &                  'j_ubvrij ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
@@ -414,17 +416,18 @@ C         Calculating the trajectories according to/along z-coordinate
           write(6,*) '8. Determinating visual magnitudes (8/9)'
           call magi(fractionOfDB,
      &              table,
-     &              u_ugriz,
-     &              g_ugriz,
-     &              r_ugriz,
-     &              i_ugriz,
-     &              z_ugriz) 
+     &              u_ubvrij,
+     &              b_ubvrij,
+     &              v_ubvrij,
+     &              r_ubvrij,
+     &              i_ubvrij,
+     &              j_ubvrij) 
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
      &         cone_height_latitudes(i),
-     &         u_ugriz, g_ugriz, r_ugriz, i_ugriz, z_ugriz)
+     &         u_ubvrij,b_ubvrij,v_ubvrij, r_ubvrij, i_ubvrij, j_ubvrij)
           open(765, file='processed_cones.txt')
           write(unit=765,fmt=*) cone_height_longitudes(i),
      &                          cone_height_latitudes(i)
@@ -491,8 +494,8 @@ C***********************************************************************
 
       subroutine printForProcessing(output_filename, geometry, iseed,
      &         solarGalactocentricDistance,cone_height_longitude,
-     &         cone_height_latitude, u_ugriz, g_ugriz, r_ugriz, i_ugriz,
-     &         z_ugriz)
+     &         cone_height_latitude, u_ubvrij, b_ubvrij, v_ubvrij, 
+     &         r_ubvrij, i_ubvrij, j_ubvrij)
       implicit none
       external ran
       real ran
@@ -527,11 +530,12 @@ C     Binning of Luminosity Function
       parameter (minimumProperMotion=0.04)
       parameter (ngp_ra=3.366042, ngp_dec=0.473507826)
       
-      real :: u_ugriz(numberOfStars),
-     &        g_ugriz(numberOfStars),
-     &        r_ugriz(numberOfStars),
-     &        i_ugriz(numberOfStars),
-     &        z_ugriz(numberOfStars)
+      real :: u_ubvrij(numberOfStars),
+     &        b_ubvrij(numberOfStars),
+     &        v_ubvrij(numberOfStars),
+     &        r_ubvrij(numberOfStars),
+     &        i_ubvrij(numberOfStars),
+     &        j_ubvrij(numberOfStars)
       double precision :: properMotion(numberOfStars),
      &                    rightAscension(numberOfStars),
      &                    declination(numberOfStars)
@@ -680,11 +684,12 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      bgac(i),
      &                      rightAscension(i),
      &                      declination(i),
-     &                      u_ugriz(i),
-     &                      g_ugriz(i),
-     &                      r_ugriz(i),
-     &                      i_ugriz(i),
-     &                      z_ugriz(i),
+     &                      u_ubvrij(i),
+     &                      b_ubvrij(i),
+     &                      v_ubvrij(i),
+     &                      r_ubvrij(i),
+     &                      i_ubvrij(i),
+     &                      j_ubvrij(i),
      &                      uu(i),
      &                      vv(i),
      &                      ww(i),
@@ -866,11 +871,12 @@ C                if cone crosses 2pi, move it -2pi
      &                                latitude,
      &                                rightAscension(i),
      &                                declination(i),
-     &                                u_ugriz(i),
-     &                                g_ugriz(i),
-     &                                r_ugriz(i),
-     &                                i_ugriz(i),
-     &                                z_ugriz(i),
+     &                                u_ubvrij(i),
+     &                                b_ubvrij(i),
+     &                                v_ubvrij(i),
+     &                                r_ubvrij(i),
+     &                                i_ubvrij(i),
+     &                                j_ubvrij(i),
      &                                uu(i),
      &                                vv(i),
      &                                ww(i),
