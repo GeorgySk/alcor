@@ -22,11 +22,9 @@ def assign_proper_motions(stars: pd.DataFrame,
     """
     velocities_by_proper_motion = 1. / (kappa * stars['distance'] * PC_PER_KPC)
 
-    # TODO: check again if cos_latitude should be here
     stars['proper_motion_in_longitude'] = (
-        (velocities_by_proper_motion / cos_latitude)
-        * (- stars['u_velocity'] * sin_longitude
-           + stars['v_velocity'] * cos_longitude))
+        velocities_by_proper_motion * (- stars['u_velocity'] * sin_longitude
+                                       + stars['v_velocity'] * cos_longitude))
     stars['proper_motion_in_latitude'] = velocities_by_proper_motion * (
         - stars['u_velocity'] * cos_longitude * sin_latitude
         - stars['v_velocity'] * sin_latitude * sin_longitude
@@ -36,6 +34,5 @@ def assign_proper_motions(stars: pd.DataFrame,
         + stars['v_velocity'] * cos_latitude * sin_latitude
         + stars['w_velocity'] * sin_latitude)
 
-    # TODO: find out if we need to multiply l-component by cos(b)
     stars['proper_motion'] = np.sqrt(stars['proper_motion_in_longitude'] ** 2
                                      + stars['proper_motion_in_latitude'] ** 2)
