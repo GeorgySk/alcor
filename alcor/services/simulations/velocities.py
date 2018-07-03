@@ -131,7 +131,7 @@ def halo_stars_velocities(*,
     w_velocities = y_velocities
 
     u_velocities += peculiar_solar_velocity.u
-    v_velocities += peculiar_solar_velocity.v - lsr_velocity
+    v_velocities += peculiar_solar_velocity.v + lsr_velocity
     w_velocities += peculiar_solar_velocity.w
 
     return u_velocities, v_velocities, w_velocities
