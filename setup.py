@@ -40,10 +40,11 @@ setup(name=PROJECT_NAME,
           'matplotlib>=2.0.2',  # plotting
           'scipy>=1.0.0',  # numerical routines
           'h5py>=2.7.1',  # hdf5 files support
+          'sympy>=1.1.1'  # symbolic mathematics
       ],
       setup_requires=['pytest-runner>=2.11.1'],
       tests_require=[
-          'pytest>=3.2.1',
+          'pytest==3.2.1',
           'pytest-cov>=2.4.0',
           'hypothesis>=3.28.0',
           'hypothesis_sqlalchemy>=0.0.2',

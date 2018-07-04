@@ -14,10 +14,10 @@ grid:
     thick_disk_star_formation_exponent: 2.0
     initial_mass_function_exponent: -2.35
     lifetime_mass_ratio: 1.0
-    mass_reduction_factor: 0.0003
+    mass_reduction_factor: 0.001
     thick_disk_stars_fraction: 0.15
     halo_stars_fraction: 0.05
-    radius: 2  # kpc
+    radius: 0.04  # kpc
 csv:
   cones:
     longitudes:

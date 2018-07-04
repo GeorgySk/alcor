@@ -1,10 +1,10 @@
 import numpy as np
 
+from alcor.services.simulations.equatorial_coordinates import right_ascensions
 from alcor.services.simulations.coordinates import (triangle_angle,
                                                     opposite_triangle_side,
                                                     get_galactic_longitudes,
-                                                    get_galactic_latitudes,
-                                                    right_ascensions)
+                                                    get_galactic_latitudes)
 
 
 def test_triangle_angle(adjacent: float,

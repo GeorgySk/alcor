@@ -1,14 +1,13 @@
 import random
-from functools import partial
 from typing import Callable
 
 import numpy as np
 import pytest
 
-from alcor.services.simulations.sphere_stars import monte_carlo_generator
 from tests import strategies
-from tests.test_sphere_stars import UNIVERSE_AGE
 from tests.utils import example
+
+UNIVERSE_AGE = 14.
 
 
 @pytest.fixture(scope='session')
@@ -167,21 +166,3 @@ def initial_mass_function(initial_mass_function_parameter: float
         return x ** initial_mass_function_parameter
 
     return function
-
-
-# TODO: find out what to do with this
-@pytest.fixture(scope='function')
-def initial_mass_generator(generator: Callable[[float, float], float],
-                           min_mass: float,
-                           max_mass: float,
-                           initial_mass_function: Callable[[float], float],
-                           initial_mass_function_parameter: float) -> float:
-    max_y = (initial_mass_function(min_mass)
-             if initial_mass_function_parameter < 0.
-             else initial_mass_function(max_mass))
-    return partial(monte_carlo_generator,
-                   function=initial_mass_function,
-                   min_x=min_mass,
-                   max_x=max_mass,
-                   max_y=max_y,
-                   generator=generator)

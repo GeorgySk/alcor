@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from alcor.models.star import GalacticDiskType
 from alcor.services.simulations.luminosities import (linear_estimation,
                                                      immutable_array)
 from tests import strategies
@@ -30,6 +31,11 @@ def rightmost_mass() -> float:
 
 @pytest.fixture(scope='function')
 def rightmost_time() -> float:
+    return example(strategies.positive_floats(max_value=1e14))
+
+
+@pytest.fixture(scope='function')
+def chandrasekhar_limit() -> float:
     return example(strategies.positive_floats(max_value=1e14))
 
 
@@ -63,7 +69,9 @@ def stars_without_masses() -> pd.DataFrame:
 
 @pytest.fixture(scope='function')
 def galactic_disks_types() -> np.ndarray:
-    return np.array(['thin', 'thick', 'halo'])
+    return np.array([GalacticDiskType.halo,
+                     GalacticDiskType.thin,
+                     GalacticDiskType.thick])
 
 
 @pytest.fixture(scope='function')
