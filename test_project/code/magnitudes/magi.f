@@ -22,7 +22,8 @@ C     and apparent magnitude of the WDs.
       real :: luminosityOfWD(numberOfStars),
      &        massOfWD(numberOfStars),
      &        metallicityOfWD(numberOfStars),
-     &        effTempOfWD(numberOfStars)
+     &        effTempOfWD(numberOfStars),
+     &        log_g(numberOfStars)
       integer :: flagOfWD(numberOfStars)
       real :: coolingTime(numberOfStars)
       integer typeOfWD(numberOfStars)
@@ -42,7 +43,7 @@ C     and apparent magnitude of the WDs.
       TYPE(FileGroupInfo),DIMENSION(11) :: table
 
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
-     &                effTempOfWD
+     &                effTempOfWD, log_g
       common /index/ flagOfWD,numberOfWDs,disk_belonging
       common /paral/ rgac
       common /cool/ coolingTime
@@ -96,7 +97,8 @@ C         ---  END IF CO/ONe ---
           end if
 
           luminosityOfWD(i) = -lum
-          effTempOfWD(i) = teff            
+          effTempOfWD(i) = teff
+          log_g(i) = xlog    
 
           u_ubvrij(i) = c1
           b_ubvrij(i) = c2

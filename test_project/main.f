@@ -65,8 +65,6 @@ C     For terminal:
      &        cone_height_latitude
       real, allocatable :: cone_height_longitudes(:),
      &                     cone_height_latitudes(:)
-      real :: min_longitude, max_longitude, 
-     &        min_latitude, max_latitude
       real :: u_ubvrij(numberOfStars),
      &        b_ubvrij(numberOfStars),
      &        v_ubvrij(numberOfStars),
@@ -304,11 +302,12 @@ C     TODO: add choosing what output we want to get
      &                  'galactic_latitude ',
      &                  'right_ascension ',
      &                  'declination ',
-     &                  'j_abs_magnitude ',
+     &                  'u_abs_magnitude ',
      &                  'b_abs_magnitude ',
      &                  'v_abs_magnitude ',
      &                  'r_abs_magnitude ',
      &                  'i_abs_magnitude ',
+     &                  'j_abs_magnitude ',
      &                  'u_velocity ',
      &                  'v_velocity ',
      &                  'w_velocity ',
@@ -320,14 +319,32 @@ C     TODO: add choosing what output we want to get
      &                  'spectral_type ',
      &                  'galactic_disk_type '
       else if (geometry == 'cones') then
-          write(421, *) 'u_velocity ',
-     &                  'v_velocity ',
-     &                  'w_velocity ',
-     &                  'distance ',
+          write(421, *) 'mass ',
+     &                  'luminosity ',
+     &                  'r_galactocentric ',
+     &                  'th_galactocentric ',
+     &                  'z_coordinate ',
      &                  'galactic_longitude ',
      &                  'galactic_latitude ',
-     &                  'galactic_disk_type ',
-     &                  'spectral_type'
+     &                  'right_ascension ',
+     &                  'declination ',
+     &                  'u_abs_magnitude ',
+     &                  'b_abs_magnitude ',
+     &                  'v_abs_magnitude ',
+     &                  'r_abs_magnitude ',
+     &                  'i_abs_magnitude ',
+     &                  'j_abs_magnitude ',
+     &                  'u_velocity ',
+     &                  'v_velocity ',
+     &                  'w_velocity ',
+     &                  'proper_motion_component_l ',
+     &                  'proper_motion_component_b ',
+     &                  'distance ',
+     &                  'birth_time ',
+     &                  'effective_temperature ',
+     &                  'surface_gravity ',
+     &                  'spectral_type ',
+     &                  'galactic_disk_type '
       end if
       close(421)
       
@@ -356,9 +373,12 @@ C         converting cone height parameters from deg to rad
      &                                 numberOfStarsInSample,iseed,
      &                                 thick_disk_stars_fraction,
      &                                 thin_disk_age,
-     &                                 min_longitude, max_longitude,
-     &                                 min_latitude, max_latitude,
-     &                                 massReductionFactor)
+     &                                 massReductionFactor,
+     &                                 thick_disk_age,
+     &                                 thick_disk_sfr_param,
+     &                                 halo_age,
+     &                                 halo_stars_formation_time,
+     &                                 halo_stars_fraction)
           else 
               write(6,*) "wrong geometry name, use 'sphere' or 'cones'"
           end if
@@ -398,7 +418,6 @@ C         Calculating the trajectories according to/along z-coordinate
 
 C         TODO: redo checking processed cones
           call printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitudes(i),
      &         cone_height_latitudes(i),
      &         u_ubvrij, b_ubvrij, v_ubvrij, r_ubvrij, i_ubvrij,
@@ -468,7 +487,6 @@ C***********************************************************************
       include 'code/colors/errors/errfot.f'
 
       subroutine printForProcessing(output_filename, geometry, iseed,
-     &         min_longitude, max_longitude, min_latitude, max_latitude,
      &         solarGalactocentricDistance,cone_height_longitude,
      &         cone_height_latitude, u_ubvrij, b_ubvrij, v_ubvrij,
      &         r_ubvrij, i_ubvrij, j_ubvrij)
@@ -518,7 +536,8 @@ C     Parameters of mass histograms
       real luminosityOfWD(numberOfStars),
      &                 massOfWD(numberOfStars),
      &                 metallicityOfWD(numberOfStars),
-     &                 effTempOfWD(numberOfStars)
+     &                 effTempOfWD(numberOfStars),
+     &                 log_g(numberOfStars)
       integer :: flagOfWD(numberOfStars)
 C     rgac - galactocentric distance to WD TODO: give a better name
       real rgac(numberOfStars)
@@ -599,7 +618,7 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
       real :: m(numberOfStars), 
      &        starBirthTime(numberOfStars)
       common /enanas/ luminosityOfWD,massOfWD,metallicityOfWD,
-     &                effTempOfWD
+     &                effTempOfWD, log_g
       common /index/ flagOfWD,numberOfWDs,disk_belonging      
       common /mad/ properMotion,rightAscension,declination
       common /mopro/ latitude_proper_motion,
@@ -654,11 +673,12 @@ C     same as for arrayOfVelocitiesForSD_u/v/w. (For cloud)
      &                      bgac(i),
      &                      rightAscension(i),
      &                      declination(i),
-     &                      j_ubvrij(i),
+     &                      u_ubvrij(i),
      &                      b_ubvrij(i),
      &                      v_ubvrij(i),
      &                      r_ubvrij(i),
      &                      i_ubvrij(i),
+     &                      j_ubvrij(i),
      &                      uu(i),
      &                      vv(i),
      &                      ww(i),
@@ -825,14 +845,32 @@ C                if cone crosses 2pi, move it -2pi
                      else if (disk_belonging(i) == 2) then
                          disk_str = 'thick'
                      end if
-                     write(421,*) uu(i),
-     &                            vv(i),
-     &                            ww(i),
-     &                            rgac(i),
+                     write(421,*) massOfWD(i),
+     &                            luminosityOfWD(i),
+     &                            coordinate_R(i),
+     &                            coordinate_Theta(i),
+     &                            coordinate_Zcylindr(i),
      &                            longitude,
      &                            latitude,
-     &                            disk_str,
-     &                            typeOfWD(i)
+     &                            rightAscension(i),
+     &                            declination(i),
+     &                            u_ubvrij(i),
+     &                            b_ubvrij(i),
+     &                            v_ubvrij(i),
+     &                            r_ubvrij(i),
+     &                            i_ubvrij(i),
+     &                            j_ubvrij(i),
+     &                            uu(i),
+     &                            vv(i),
+     &                            ww(i),
+     &                            longitude_proper_motion(i),
+     &                            latitude_proper_motion(i),
+     &                            rgac(i),
+     &                            starBirthTime(i),
+     &                            effTempOfWD(i),
+     &                            log_g(i),
+     &                            typeOfWD(i),
+     &                            disk_str
                  else
                      eliminations_counter = eliminations_counter + 1
                  end if

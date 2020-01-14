@@ -34,6 +34,7 @@ C       m: mass in the main sequence
      &            massOfWD(MAX_STARS_COUNT),
      &            metallicityOfWD(MAX_STARS_COUNT),
      &            effTempOfWD(MAX_STARS_COUNT),
+     &            log_g(MAX_STARS_COUNT),
      &            m(MAX_STARS_COUNT)
           integer disk_belonging(MAX_STARS_COUNT),
      &            flagOfWD(MAX_STARS_COUNT)
@@ -46,7 +47,8 @@ C         TODO: give names with one style
           common /enanas/ luminosityOfWD,
      &                    massOfWD,
      &                    metallicityOfWD,
-     &                    effTempOfWD
+     &                    effTempOfWD,
+     &                    log_g
           common /index/ flagOfWD,
      &                   numberOfWDs,
      &                   disk_belonging

@@ -30,15 +30,18 @@ STAR_PARAMETERS_NAMES = {'mass',
                          'distance',
                          'galactic_latitude',
                          'galactic_longitude',
-                         'j_abs_magnitude',
+                         'u_abs_magnitude',
                          'b_abs_magnitude',
                          'v_abs_magnitude',
                          'r_abs_magnitude',
                          'i_abs_magnitude',
+                         'j_abs_magnitude',
                          'u_velocity',
                          'v_velocity',
                          'w_velocity',
                          'birth_time',
+                         'effective_temperature',
+                         'surface_gravity',
                          'spectral_type',
                          'galactic_disk_type'}
 
@@ -88,15 +91,17 @@ class Star(Base):
                                nullable=True)
     galactic_longitude = Column(Float(),
                                 nullable=True)
-    j_abs_magnitude = Column(Float(),
+    u_abs_magnitude = Column(Float(),
                              nullable=True)
     b_abs_magnitude = Column(Float(),
                              nullable=True)
-    r_abs_magnitude = Column(Float(),
-                             nullable=True)
     v_abs_magnitude = Column(Float(),
                              nullable=True)
+    r_abs_magnitude = Column(Float(),
+                             nullable=True)
     i_abs_magnitude = Column(Float(),
+                             nullable=True)
+    j_abs_magnitude = Column(Float(),
                              nullable=True)
     u_velocity = Column(Float(),
                         nullable=True)
@@ -106,6 +111,10 @@ class Star(Base):
                         nullable=True)
     birth_time = Column(Float(),
                         nullable=True)
+    effective_temperature = Column(Float(),
+                                   nullable=True)
+    surface_gravity = Column(Float(),
+                             nullable=True)
     # TODO: make it Enum, DA - 0, DB - 1, ONe - 2
     spectral_type = Column(Integer(),
                            nullable=True)
@@ -132,15 +141,18 @@ class Star(Base):
                  distance: float = None,
                  galactic_latitude: float = None,
                  galactic_longitude: float = None,
-                 j_abs_magnitude: float = None,
+                 u_abs_magnitude: float = None,
                  b_abs_magnitude: float = None,
-                 r_abs_magnitude: float = None,
                  v_abs_magnitude: float = None,
+                 r_abs_magnitude: float = None,
                  i_abs_magnitude: float = None,
+                 j_abs_magnitude: float = None,
                  u_velocity: float = None,
                  v_velocity: float = None,
                  w_velocity: float = None,
                  birth_time: float = None,
+                 effective_temperature: float = None,
+                 surface_gravity: float = None,
                  spectral_type: int = None,
                  galactic_disk_type: GalacticDiskType = None):
         self.id = None
@@ -161,14 +173,17 @@ class Star(Base):
         self.distance = distance
         self.galactic_latitude = galactic_latitude
         self.galactic_longitude = galactic_longitude
-        self.j_abs_magnitude = j_abs_magnitude
+        self.u_abs_magnitude = u_abs_magnitude
         self.b_abs_magnitude = b_abs_magnitude
-        self.r_abs_magnitude = r_abs_magnitude
         self.v_abs_magnitude = v_abs_magnitude
+        self.r_abs_magnitude = r_abs_magnitude
         self.i_abs_magnitude = i_abs_magnitude
+        self.j_abs_magnitude = j_abs_magnitude
         self.u_velocity = u_velocity
         self.v_velocity = v_velocity
         self.w_velocity = w_velocity
         self.birth_time = birth_time
+        self.effective_temperature = effective_temperature
+        self.surface_gravity = surface_gravity
         self.spectral_type = spectral_type
         self.galactic_disk_type = galactic_disk_type
