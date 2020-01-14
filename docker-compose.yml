@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  alcor:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+      args:
+        - PYTHON3_VERSION=$PYTHON3_VERSION
+    image: lycantropos/alcor-tests:0.0.0
+    volumes:
+      - ./alcor:/alcor/alcor
+      - ./tests:/alcor/tests
+      - ./README.rst:/alcor/README.rst
+      - ./setup.py:/alcor/setup.py
+      - ./setup.cfg:/alcor/setup.cfg
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"  # for debugging

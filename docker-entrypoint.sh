@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -e
+
+set -ex
 
 cd test_project
 # unzipping seed files
@@ -8,4 +9,4 @@ unzip -o forts.zip
 gfortran main.f -o main.e ${FORTRAN_COMPILER_OPTIONS}
 cd -
 
-python3.6 manage.py "$@"
+python3 manage.py "$@"

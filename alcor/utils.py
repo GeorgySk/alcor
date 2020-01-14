@@ -7,13 +7,15 @@ from typing import (Any,
                     Hashable,
                     Iterable,
                     Iterator,
+                    Container,
                     Mapping,
-                    Dict)
+                    Dict,
+                    Tuple,
+                    List)
 
 import yaml
 
-from alcor.models import (STAR_PARAMETERS_NAMES,
-                          Group,
+from alcor.models import (Group,
                           Star)
 
 logger = logging.getLogger(__name__)
@@ -25,25 +27,30 @@ def load_settings(path: str
         return yaml.safe_load(file)
 
 
-def join_str(items: Iterable[Any],
-             sep: str = ', ') -> str:
-    return sep.join(map(str, items))
-
-
 def parse_stars(lines: Iterator[str],
-                group: Group) -> Iterator[Star]:
-    headers = next(lines).split()
-    for header in headers:
-        if not (header in STAR_PARAMETERS_NAMES):
-            logger.error(f'There is no parameter {header} in '
-                         f'STAR_PARAMETERS_NAMES')
+                *,
+                group: Group,
+                columns_names: List[str]) -> Iterator[Star]:
+    group_id = group.id
     for line in lines:
         parts = line.split()
         params = map(str_to_float, parts)
-        values = OrderedDict(zip(headers,
+        values = OrderedDict(zip(columns_names,
                                  params))
-        yield Star(group_id=group.id,
+        yield Star(group_id=group_id,
                    **values)
+
+
+def validate_header(header: Iterable[str],
+                    *,
+                    possible_columns_names: Container[str]) -> None:
+    unknown_columns_names = [column_name
+                             for column_name in header
+                             if column_name not in possible_columns_names]
+    if unknown_columns_names:
+        err_msg = ('Unknown columns names: "{columns_names}".'
+                   .format(columns_names='", "'.join(unknown_columns_names)))
+        raise ValueError(err_msg)
 
 
 def str_to_float(string: str) -> Union[str, float]:
@@ -53,7 +60,8 @@ def str_to_float(string: str) -> Union[str, float]:
         return string
 
 
-def zip_mappings(*mappings: Mapping[Hashable, Any]):
+def zip_mappings(*mappings: Mapping[Hashable, Any]
+                 ) -> Iterator[Tuple[Hashable, Tuple[Any, ...]]]:
     keys_sets = map(set, mappings)
     common_keys = reduce(set.intersection, keys_sets)
     for key in common_keys:

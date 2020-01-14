@@ -2,35 +2,29 @@ version: '3'
 
 services:
   alcor:
-    build: .
-    image: lycantropos/alcor:latest
-    entrypoint: "/alcor/docker-entrypoint.sh"
+    build:
+      context: .
+      args:
+        - PYTHON3_VERSION=$PYTHON3_VERSION
+        - FORTRAN_COMPILER_OPTIONS=$FORTRAN_COMPILER_OPTIONS
+    image: lycantropos/alcor:0.0.0
     volumes:
-      - .:/alcor/
+      - ./test_project:/alcor/test_project
+      - ./alcor:/alcor/alcor
+      - ./tests:/alcor/tests
+      - ./README.rst:/alcor/README.rst
+      - ./setup.py:/alcor/setup.py
+      - ./setup.cfg:/alcor/setup.cfg
+      - ./settings.yml:/alcor/settings.yml
+      - ./requirements.txt:/alcor/requirements.txt
+      - ./manage.py:/alcor/manage.py
+      - ./docker-entrypoint.sh:/alcor/docker-entrypoint.sh
     extra_hosts:
-      - "dockerhost:$DOCKERHOST"  # for debugging
+      dockerhost: $DOCKERHOST  # for debugging
     command:
-      # Generating stars:
       - simulate
       - --project-dir
       - test_project
       - --clean
     environment:
-      - POSTGRES_URI=postgresql://username:password@postgres/alcor
-      - FORTRAN_COMPILER_OPTIONS=-g -fbacktrace
-        -ffpe-trap=zero,overflow,invalid -Wall -Wextra -Wconversion
-        -fbounds-check -fcheck=all -fmax-errors=5
-
-  postgres:
-    image: postgres:latest
-    volumes:
-      - postgres-data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_DB=alcor
-      - POSTGRES_USER=username
-      - POSTGRES_PASSWORD=password
-    ports:
-      - 5432:5432
-
-volumes:
-  postgres-data:
+      POSTGRES_URI: $POSTGRES_URI
